@@ -25,6 +25,7 @@ ADD_SCENE(nfc, retry_confirm, RetryConfirm)
 ADD_SCENE(nfc, exit_confirm, ExitConfirm)
 ADD_SCENE(nfc, save_confirm, SaveConfirm)
 
+ADD_SCENE(nfc, mf_ultralight_c_dict_attack, MfUltralightCDictAttack)
 ADD_SCENE(nfc, mf_ultralight_write, MfUltralightWrite)
 ADD_SCENE(nfc, mf_ultralight_write_success, MfUltralightWriteSuccess)
 ADD_SCENE(nfc, mf_ultralight_write_fail, MfUltralightWriteFail)

@@ -181,6 +181,10 @@ MfUltralightPoller* mf_ultralight_poller_alloc(Iso14443_3aPoller* iso14443_3a_po
     instance->general_event.protocol = NfcProtocolMfUltralight;
     instance->general_event.event_data = &instance->mfu_event;
     instance->general_event.instance = instance;
+
+    instance->dict_attack_ctx.auth_success = false;
+    instance->dict_attack_ctx.is_card_present = false;
+
     mbedtls_des3_init(&instance->des_context);
     return instance;
 }
@@ -521,7 +525,7 @@ static NfcCommand mf_ultralight_poller_handler_read_pages(MfUltralightPoller* in
     } else {
         if(instance->data->type == MfUltralightTypeMfulC &&
            !mf_ultralight_3des_key_valid(instance->data)) {
-            instance->state = MfUltralightPollerStateCheckMfulCAuthStatus;
+            instance->state = MfUltralightPollerStateDictAttack;
         } else {
             FURI_LOG_D(TAG, "Read page %d failed", instance->pages_read);
             if(instance->pages_read) {
@@ -730,6 +734,63 @@ static NfcCommand mf_ultralight_poller_handler_write_success(MfUltralightPoller*
     return command;
 }
 
+static NfcCommand mf_ultralight_poller_handler_dict_attack(MfUltralightPoller* instance) {
+    NfcCommand command = NfcCommandContinue;
+    const MfUltralightData* tag_data = instance->data;
+    uint32_t features = mf_ultralight_get_feature_support_set(tag_data->type);
+    FURI_LOG_D(TAG, "Dict Attack");
+    do {
+        if(!mf_ultralight_support_feature(features, MfUltralightFeatureSupportAuthenticate)) {
+            instance->error = MfUltralightErrorProtocol;
+            instance->state = MfUltralightPollerStateReadFailed;
+            break;
+        }
+
+        instance->dict_attack_ctx.is_card_present = true;
+        instance->mfu_event.type = MfUltralightPollerEventTypeRequestKey;
+        command = instance->callback(instance->general_event, instance->context);
+        if(!instance->mfu_event.data->key_request_data.key_provided) {
+            instance->state = MfUltralightPollerStateReadSuccess;
+            break;
+        }
+
+        FURI_LOG_D(TAG, "Trying next 3DES key");
+        instance->error = MfUltralightErrorNone;
+        instance->auth_context.auth_success = false;
+        instance->auth_context.tdes_key = instance->mfu_event.data->key_request_data.key;
+        do {
+            uint8_t output[MF_ULTRALIGHT_C_AUTH_DATA_SIZE];
+            uint8_t RndA[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE] = {0};
+            furi_hal_random_fill_buf(RndA, sizeof(RndA));
+            instance->error = mf_ultralight_poller_authenticate_start(instance, RndA, output);
+            if(instance->error != MfUltralightErrorNone) break;
+
+            uint8_t decoded_shifted_RndA[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE] = {0};
+            const uint8_t* RndB = output + MF_ULTRALIGHT_C_AUTH_RND_B_BLOCK_OFFSET;
+            instance->error = mf_ultralight_poller_authenticate_end(
+                instance, RndB, output, decoded_shifted_RndA);
+            if(instance->error != MfUltralightErrorNone) break;
+
+            mf_ultralight_3des_shift_data(RndA);
+            instance->auth_context.auth_success =
+                (memcmp(RndA, decoded_shifted_RndA, sizeof(decoded_shifted_RndA)) == 0);
+            if(instance->auth_context.auth_success) {
+                FURI_LOG_D(TAG, "Dict attack success");
+                instance->state = MfUltralightPollerStateReadPages;
+                instance->dict_attack_ctx.auth_success = true;
+                break;
+            }
+        } while(false);
+
+        if(!instance->auth_context.auth_success) {
+            FURI_LOG_D(TAG, "Dict attack auth failed");
+            iso14443_3a_poller_halt(instance->iso14443_3a_poller);
+        }
+    } while(false);
+
+    return command;
+}
+
 static const MfUltralightPollerReadHandler
     mf_ultralight_poller_read_handler[MfUltralightPollerStateNum] = {
         [MfUltralightPollerStateIdle] = mf_ultralight_poller_handler_idle,
@@ -755,6 +816,7 @@ static const MfUltralightPollerReadHandler
         [MfUltralightPollerStateWritePages] = mf_ultralight_poller_handler_write_pages,
         [MfUltralightPollerStateWriteFail] = mf_ultralight_poller_handler_write_fail,
         [MfUltralightPollerStateWriteSuccess] = mf_ultralight_poller_handler_write_success,
+        [MfUltralightPollerStateDictAttack] = mf_ultralight_poller_handler_dict_attack,
 
 };
 
