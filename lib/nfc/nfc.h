@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include <nfc_mode.h>
+
 #include <toolbox/bit_buffer.h>
 
 #ifdef __cplusplus
@@ -85,18 +87,6 @@ typedef enum {
  * @returns command which the event producer must execute.
  */
 typedef NfcCommand (*NfcEventCallback)(NfcEvent event, void* context);
-
-/**
- * @brief Enumeration of possible operating modes.
- *
- * Not all technologies implement the listener operating mode.
- */
-typedef enum {
-    NfcModePoller, /**< Configure the Nfc instance as a poller. */
-    NfcModeListener, /**< Configure the Nfc instance as a listener. */
-
-    NfcModeNum, /**< Operating mode count. Internal use. */
-} NfcMode;
 
 /**
  * @brief Enumeration of available technologies.
