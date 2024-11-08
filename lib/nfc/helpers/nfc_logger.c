@@ -43,6 +43,7 @@ typedef struct {
 } FURI_PACKED NfcTrace;
 
 typedef enum {
+    NfcLoggerStateDisabled,
     NfcLoggerStateIdle,
     NfcLoggerStateProcessing,
     NfcLoggerStateStopped,
@@ -169,6 +170,8 @@ void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode) {
     furi_assert(protocol < NfcProtocolNum);
     furi_assert(mode < NfcModeNum);
 
+    if(instance->state == NfcLoggerStateDisabled) return;
+
     instance->exit = false;
     instance->trace = nfc_logger_trace_alloc(protocol, mode);
 
@@ -191,6 +194,8 @@ void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode) {
 
 void nfc_logger_stop(NfcLogger* instance) {
     furi_assert(instance);
+
+    if(instance->state == NfcLoggerStateDisabled) return;
 
     if(instance->state != NfcLoggerStateError) {
         nfc_logger_transaction_end(instance);
@@ -243,6 +248,8 @@ void nfc_logger_transaction_begin(NfcLogger* instance) {
     furi_assert(instance);
     furi_assert(instance->transaction == NULL);
 
+    if(instance->state == NfcLoggerStateDisabled) return;
+
     if(instance->transaction) {
         nfc_logger_transaction_end(instance);
     }
@@ -258,6 +265,7 @@ void nfc_logger_transaction_begin(NfcLogger* instance) {
 void nfc_logger_transaction_end(NfcLogger* instance) {
     furi_assert(instance);
     do {
+        if(instance->state == NfcLoggerStateDisabled) break;
         if(instance->state != NfcLoggerStateProcessing) break;
         if(!instance->transaction) break;
 
@@ -299,6 +307,8 @@ void nfc_logger_transaction_append(
     furi_assert(instance);
     furi_assert(data);
     furi_assert(data_size > 0);
+
+    if(instance->state == NfcLoggerStateDisabled) return;
 
     NfcPacket* p = nfc_logger_get_packet(instance->transaction, response);
     FURI_LOG_D(
