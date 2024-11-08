@@ -119,16 +119,6 @@ NfcLogger* nfc_logger_alloc(void) {
 
     instance->storage = furi_record_open(RECORD_STORAGE);
     instance->filename = furi_string_alloc();
-
-    FuriThread* thread = furi_thread_alloc();
-    furi_thread_set_name(thread, TAG);
-    furi_thread_set_priority(thread, FuriThreadPriorityLow);
-    furi_thread_set_stack_size(thread, 1024);
-    furi_thread_set_callback(thread, nfc_logger_thread_callback);
-    furi_thread_set_context(thread, instance);
-    instance->logger_thread = thread;
-
-    instance->transaction_queue = furi_message_queue_alloc(4, sizeof(NfcTransaction*));
     return instance;
 }
 
@@ -141,6 +131,21 @@ void nfc_logger_free(NfcLogger* instance) {
 
     furi_thread_free(instance->logger_thread);
     free(instance);
+}
+
+void nfc_logger_config(NfcLogger* instance, bool enabled) {
+    if(enabled) {
+        FuriThread* thread =
+            furi_thread_alloc_ex(TAG, 1024U, nfc_logger_thread_callback, instance);
+        furi_thread_set_priority(thread, FuriThreadPriorityLow);
+        instance->logger_thread = thread;
+
+        instance->transaction_queue = furi_message_queue_alloc(4, sizeof(NfcTransaction*));
+        instance->state = NfcLoggerStateIdle;
+    } else {
+        nfc_logger_free_thread_and_queue(instance);
+        instance->state = NfcLoggerStateDisabled;
+    }
 }
 
 static NfcTrace* nfc_logger_trace_alloc(NfcProtocol protocol, NfcMode mode) {

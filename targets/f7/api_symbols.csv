@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,78.7,,
+Version,+,78.8,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
@@ -2799,7 +2799,7 @@ Function,+,nfc_device_set_loading_callback,void,"NfcDevice*, NfcLoadingCallback,
 Function,+,nfc_device_set_uid,_Bool,"NfcDevice*, const uint8_t*, size_t"
 Function,+,nfc_felica_listener_set_sensf_res_data,NfcError,"Nfc*, const uint8_t*, const uint8_t, const uint8_t*, const uint8_t, const uint16_t"
 Function,+,nfc_free,void,Nfc*
-Function,-,nfc_get_logger,NfcLogger*,Nfc*
+Function,+,nfc_get_logger,NfcLogger*,Nfc*
 Function,+,nfc_iso14443a_listener_set_col_res_data,NfcError,"Nfc*, uint8_t*, uint8_t, uint8_t*, uint8_t"
 Function,+,nfc_iso14443a_listener_tx_custom_parity,NfcError,"Nfc*, const BitBuffer*"
 Function,+,nfc_iso14443a_poller_trx_custom_parity,NfcError,"Nfc*, const BitBuffer*, BitBuffer*, uint32_t"
@@ -2814,6 +2814,7 @@ Function,+,nfc_listener_start,void,"NfcListener*, NfcGenericCallback, void*"
 Function,+,nfc_listener_stop,void,NfcListener*
 Function,+,nfc_listener_tx,NfcError,"Nfc*, const BitBuffer*"
 Function,-,nfc_logger_alloc,NfcLogger*,
+Function,+,nfc_logger_config,void,"NfcLogger*, _Bool"
 Function,-,nfc_logger_free,void,NfcLogger*
 Function,-,nfc_logger_start,void,"NfcLogger*, NfcProtocol, NfcMode"
 Function,-,nfc_logger_stop,void,NfcLogger*
