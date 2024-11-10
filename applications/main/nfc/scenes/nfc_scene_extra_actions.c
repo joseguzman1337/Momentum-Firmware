@@ -3,7 +3,7 @@
 enum SubmenuIndex {
     SubmenuIndexReadCardType,
     SubmenuIndexMfClassicKeys,
-    SubmenuIndexMfUlCKeys,
+    SubmenuIndexMfUltralightCKeys,
     SubmenuIndexMfUltralightUnlock,
     SubmenuIndexSlixUnlock,
 };
@@ -33,7 +33,7 @@ void nfc_scene_extra_actions_on_enter(void* context) {
     submenu_add_item(
         submenu,
         "MIFARE Ultralight C Keys",
-        SubmenuIndexMfUlCKeys,
+        SubmenuIndexMfUltralightCKeys,
         nfc_scene_extra_actions_submenu_callback,
         instance);
     submenu_add_item(
@@ -61,8 +61,8 @@ bool nfc_scene_extra_actions_on_event(void* context, SceneManagerEvent event) {
         if(event.event == SubmenuIndexMfClassicKeys) {
             scene_manager_next_scene(instance->scene_manager, NfcSceneMfClassicKeys);
             consumed = true;
-        } else if(event.event == SubmenuIndexMfUlCKeys) {
-            // TODO: Add MFUL C key management scene here
+        } else if(event.event == SubmenuIndexMfUltralightCKeys) {
+            scene_manager_next_scene(instance->scene_manager, NfcSceneMfUltralightCKeys);
             consumed = true;
         } else if(event.event == SubmenuIndexMfUltralightUnlock) {
             mf_ultralight_auth_reset(instance->mf_ul_auth);
