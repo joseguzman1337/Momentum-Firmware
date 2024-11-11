@@ -1,9 +1,4 @@
-#include "nfc_logger.h"
-
-#include <furi.h>
-#include <furi_hal_resources.h>
-#include <furi_hal_rtc.h>
-#include <storage/storage.h>
+#include "nfc_logger_i.h"
 
 #define TAG "NfcLogger"
 
@@ -13,65 +8,6 @@
 #define NFC_LOG_FILE_PATH_BASE(filename) (NFC_LOG_FILE_PATH filename)
 #define NFC_LOG_TEMP_FILE_PATH           NFC_LOG_FILE_PATH_BASE(NFC_LOG_TEMP_FILE_NAME)
 //EXT_PATH(NFC_LOG_FOLDER "/" NFC_LOG_TEMP_FILE_NAME)
-
-typedef enum {
-    NfcTransactionTypeEmpty,
-    NfcTransactionTypeRequest,
-    NfcTransactionTypeResponse,
-    NfcTransactionTypeRequestResponse,
-} NfcTransactionType;
-
-typedef struct {
-    uint32_t time;
-    uint32_t flags;
-    size_t data_size;
-    uint8_t* data;
-} NfcPacket;
-
-typedef struct {
-    uint32_t id;
-    NfcTransactionType type;
-    //uint32_t time; ///TODO: optional
-    NfcPacket* request;
-    NfcPacket* response;
-} FURI_PACKED NfcTransaction;
-
-typedef struct {
-    NfcProtocol protocol;
-    NfcMode mode;
-    size_t transactions_count;
-} FURI_PACKED NfcTrace;
-
-typedef enum {
-    NfcLoggerStateDisabled,
-    NfcLoggerStateIdle,
-    NfcLoggerStateProcessing,
-    NfcLoggerStateStopped,
-    NfcLoggerStateError
-} NfcLoggerState;
-
-struct NfcLogger {
-    NfcTrace* trace;
-    NfcTransaction* transaction;
-    NfcLoggerState state;
-
-    FuriString* filename;
-    Storage* storage;
-    FuriThread* logger_thread;
-    FuriMessageQueue* transaction_queue;
-    bool exit;
-};
-
-static void nfc_logger_transaction_free(NfcTransaction* instance);
-
-static void nfc_logger_save_packet(File* file, NfcPacket* packet) {
-    if(packet) {
-        storage_file_write(file, &packet->time, sizeof(uint32_t) * 2 + sizeof(size_t));
-        //storage_file_write(file, &packet->time, sizeof(uint32_t));
-        //storage_file_write(file, &packet->data_size, sizeof(size_t));
-        storage_file_write(file, packet->data, packet->data_size);
-    }
-}
 
 static int32_t nfc_logger_thread_callback(void* context) {
     FURI_LOG_D(TAG, "Thread start");
@@ -95,13 +31,9 @@ static int32_t nfc_logger_thread_callback(void* context) {
         if(furi_message_queue_get(instance->transaction_queue, &ptr, 50) == FuriStatusErrorTimeout)
             continue;
 
-        FURI_LOG_D(TAG, "Save_tr: %ld", ptr->id);
-        storage_file_write(f, &(ptr->id), sizeof(uint32_t) + sizeof(NfcTransactionType));
-        nfc_logger_save_packet(f, ptr->request);
-        nfc_logger_save_packet(f, ptr->response);
-        //storage_file_write(f, &(ptr->time), sizeof(uint32_t));
+        nfc_transaction_save_to_file(f, ptr);
 
-        nfc_logger_transaction_free(ptr);
+        nfc_transaction_free(ptr);
         furi_hal_gpio_write(pin, toggle);
         toggle = !toggle;
     }
@@ -165,6 +97,17 @@ static void nfc_logger_trace_free(NfcTrace* trace) {
     free(trace);
 }
 
+bool nfc_logger_enabled(NfcLogger* instance) {
+    furi_assert(instance);
+    return instance->state != NfcLoggerStateDisabled;
+}
+
+void nfc_logger_set_history_size(NfcLogger* instance, uint8_t size) {
+    furi_assert(instance);
+    furi_assert(size > 0);
+    instance->history_size_max = size;
+}
+
 void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode) {
     furi_assert(instance);
     furi_assert(protocol < NfcProtocolNum);
@@ -187,8 +130,6 @@ void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode) {
         dt.minute,
         dt.second);
 
-    instance->state = NfcLoggerStateIdle;
-
     furi_thread_start(instance->logger_thread);
 }
 
@@ -203,12 +144,14 @@ void nfc_logger_stop(NfcLogger* instance) {
 
     instance->exit = true;
     furi_thread_join(instance->logger_thread);
+    //    nfc_logger_free_thread_and_queue(instance);
 
     if(instance->state != NfcLoggerStateError) {
         FuriString* str = furi_string_alloc_set_str(NFC_LOG_FILE_PATH);
         furi_string_cat(str, instance->filename);
         furi_string_cat_str(str, ".bin");
         storage_common_copy(instance->storage, NFC_LOG_TEMP_FILE_PATH, furi_string_get_cstr(str));
+        ///TODO: Maybe rename with storage_common_rename(instance->storage) would be better?
         furi_string_free(str);
 
         ///TODO: Re-save temp.bin log file to file_name and save in flipper_format
@@ -217,32 +160,9 @@ void nfc_logger_stop(NfcLogger* instance) {
         instance->state = NfcLoggerStateStopped;
     }
 }
-//----------------------------------------------------------------------------------------------------------
-//NfcTransaction handlers
-static NfcTransaction* nfc_logger_transaction_alloc(uint32_t id) {
-    NfcTransaction* t = malloc(sizeof(NfcTransaction));
-    t->type = NfcTransactionTypeEmpty;
-    t->id = id;
-    return t;
-}
 
-static void nfc_logger_transaction_free(NfcTransaction* instance) {
-    furi_assert(instance);
-
-    FURI_LOG_D(TAG, "Free_tr: %ld", instance->id);
-
-    if(instance->request) {
-        if(instance->request->data) free(instance->request->data);
-        free(instance->request);
-    }
-
-    if(instance->response) {
-        if(instance->response->data) free(instance->response->data);
-        free(instance->response);
-    }
-
-    free(instance);
-}
+//------------------------------------------------------------------------------------------------------------------------
+//NfcTransaction some handlers
 
 void nfc_logger_transaction_begin(NfcLogger* instance) {
     furi_assert(instance);
@@ -258,8 +178,7 @@ void nfc_logger_transaction_begin(NfcLogger* instance) {
     FURI_LOG_D(TAG, "Begin_tr: %ld", id);
 
     instance->state = NfcLoggerStateProcessing;
-    instance->transaction = nfc_logger_transaction_alloc(id);
-    instance->trace->transactions_count++;
+    instance->transaction = nfc_transaction_alloc(id, instance->history_size_max);
 }
 
 void nfc_logger_transaction_end(NfcLogger* instance) {
@@ -268,8 +187,12 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
         if(instance->state == NfcLoggerStateDisabled) break;
         if(instance->state != NfcLoggerStateProcessing) break;
         if(!instance->transaction) break;
+        if(nfc_transaction_get_type(instance->transaction) == NfcTransactionTypeEmpty) {
+            nfc_transaction_free(instance->transaction);
+            break;
+        }
 
-        FURI_LOG_D(TAG, "End_tr: %ld", instance->transaction->id);
+        //FURI_LOG_D(TAG, "End_tr: %ld", instance->transaction->id);
 
         if(furi_message_queue_put(instance->transaction_queue, &instance->transaction, 10) !=
            FuriStatusOk) {
@@ -277,49 +200,30 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
             FURI_LOG_E(TAG, "Transaction lost, logger will be stopped!");
             nfc_logger_stop(instance);
         }
+        instance->trace->transactions_count++;
         instance->transaction = NULL;
     } while(false);
 }
 
-static NfcPacket* nfc_logger_get_packet(NfcTransaction* transaction, bool response) {
-    furi_assert(transaction);
-
-    NfcPacket* p;
-    if(response) {
-        if(!transaction->response) transaction->response = malloc(sizeof(NfcPacket));
-        transaction->type = transaction->type == NfcTransactionTypeRequest ?
-                                NfcTransactionTypeRequestResponse :
-                                NfcTransactionTypeResponse;
-        p = transaction->response;
-    } else {
-        if(!transaction->request) transaction->request = malloc(sizeof(NfcPacket));
-        transaction->type = NfcTransactionTypeRequest;
-        p = transaction->request;
-    }
-    return p;
-}
-
-void nfc_logger_transaction_append(
+void nfc_logger_append_data(
     NfcLogger* instance,
     const uint8_t* data,
     const size_t data_size,
     bool response) {
+    if(instance->state == NfcLoggerStateDisabled) return;
+
+    nfc_transaction_append(instance->transaction, data, data_size, response);
+}
+
+void nfc_logger_append_history(NfcLogger* instance, NfcLoggerHistory* history) {
     furi_assert(instance);
-    furi_assert(data);
-    furi_assert(data_size > 0);
+    furi_assert(history);
 
     if(instance->state == NfcLoggerStateDisabled) return;
 
-    NfcPacket* p = nfc_logger_get_packet(instance->transaction, response);
-    FURI_LOG_D(
-        TAG,
-        "Append_tr: %ld size: %d type: %02X",
-        instance->transaction->id,
-        data_size,
-        instance->transaction->type);
+    uint8_t history_cnt = nfc_transaction_get_history_count(instance->transaction);
+    ///TODO:replace assert with check
+    furi_assert(history_cnt < instance->history_size_max);
 
-    p->time = furi_get_tick();
-    p->data_size = data_size;
-    p->data = malloc(data_size);
-    memcpy(p->data, data, data_size);
+    nfc_transaction_append_history(instance->transaction, history);
 }
