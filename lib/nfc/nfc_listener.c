@@ -24,14 +24,14 @@ struct NfcListener {
     NfcDevice* nfc_dev;
 };
 
-static void nfc_listener_list_alloc(NfcListener* instance) {
+static uint8_t nfc_listener_list_alloc(NfcListener* instance) {
     instance->list.head = malloc(sizeof(NfcListenerListElement));
     instance->list.head->protocol = instance->protocol;
 
     instance->list.head->listener_api = nfc_listeners_api[instance->protocol];
     instance->list.head->child = NULL;
     instance->list.tail = instance->list.head;
-
+    uint8_t count = 1;
     // Build linked list
     do {
         NfcProtocol parent_protocol = nfc_protocol_get_parent(instance->list.head->protocol);
@@ -43,6 +43,7 @@ static void nfc_listener_list_alloc(NfcListener* instance) {
         parent->child = instance->list.head;
 
         instance->list.head = parent;
+        count++;
     } while(true);
 
     // Allocate listener instances
@@ -59,6 +60,8 @@ static void nfc_listener_list_alloc(NfcListener* instance) {
 
         iter = iter->child;
     } while(true);
+
+    return count;
 }
 
 static void nfc_listener_list_free(NfcListener* instance) {
@@ -83,7 +86,9 @@ NfcListener* nfc_listener_alloc(Nfc* nfc, NfcProtocol protocol, const NfcDeviceD
     instance->protocol = protocol;
     instance->nfc_dev = nfc_device_alloc();
     nfc_device_set_data(instance->nfc_dev, protocol, data);
-    nfc_listener_list_alloc(instance);
+
+    uint8_t history_count = nfc_listener_list_alloc(instance);
+    nfc_logger_set_history_size(nfc_get_logger(nfc), history_count);
 
     return instance;
 }
