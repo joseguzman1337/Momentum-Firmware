@@ -18,6 +18,7 @@
 #pragma once
 
 #include <nfc_mode.h>
+#include <helpers/logger/nfc_logger.h>
 
 #include <toolbox/bit_buffer.h>
 
@@ -244,6 +245,10 @@ NfcError
  */
 NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer);
 
+NfcLogger* nfc_get_logger(Nfc* instance);
+
+//void nfc_enable_logger(Nfc* instance);
+//void nfc_logger_enable()
 /*
  * Technology-specific functions.
  *
