@@ -13,11 +13,16 @@ typedef struct {
     uint8_t* data;
 } NfcPacket;
 
-struct FURI_PACKED NfcTransaction {
+typedef struct {
     uint32_t id;
     NfcTransactionType type;
     uint8_t history_count;
-    //uint32_t time; ///TODO: optional
+    FuriHalNfcEvent nfc_event;
+    uint32_t time; ///TODO: optional
+} FURI_PACKED NfcTransactionHeader;
+
+struct FURI_PACKED NfcTransaction {
+    NfcTransactionHeader header;
     NfcPacket* request;
     NfcPacket* response;
     NfcLoggerHistory* history;
