@@ -27,6 +27,13 @@ typedef struct {
         history.response_flags = 0; \
     } while(false);
 
+///TODO:rename to NFC_FLAG_HAL
+#define NFC_FLAG_USER_ABORT         (1 << 0)
+#define NFC_FLAG_FIELD_ON           (1 << 1)
+#define NFC_FLAG_FIELD_OFF          (1 << 2)
+#define NFC_FLAG_LISTENER_ACTIVATED (1 << 3)
+#define NFC_FLAG_RX_END             (1 << 4)
+
 #define NFC_FLAG_ISO14443_3A_CRC_OK    (1 << 0)
 #define NFC_FLAG_ISO14443_3A_CRC_BAD   (1 << 1)
 #define NFC_FLAG_ISO14443_3A_ACTIVATED (1 << 2)
