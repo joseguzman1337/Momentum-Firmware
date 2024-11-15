@@ -2,6 +2,7 @@
 
 #include <nfc_mode.h>
 #include <nfc/protocols/nfc_protocol.h>
+#include <furi_hal_nfc.h>
 
 #include <furi.h>
 
@@ -35,7 +36,7 @@ bool nfc_logger_enabled(NfcLogger* instance);
 void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode);
 void nfc_logger_stop(NfcLogger* instance);
 
-void nfc_logger_transaction_begin(NfcLogger* instance);
+void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event);
 void nfc_logger_transaction_end(NfcLogger* instance);
 
 void nfc_logger_append_data( //nfc_logger_append_request and append_response instead and this move to static

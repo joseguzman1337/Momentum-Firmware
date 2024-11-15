@@ -164,7 +164,7 @@ void nfc_logger_stop(NfcLogger* instance) {
 //------------------------------------------------------------------------------------------------------------------------
 //NfcTransaction some handlers
 
-void nfc_logger_transaction_begin(NfcLogger* instance) {
+void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
     furi_assert(instance);
     furi_assert(instance->transaction == NULL);
 
@@ -175,10 +175,10 @@ void nfc_logger_transaction_begin(NfcLogger* instance) {
     }
 
     uint32_t id = instance->trace->transactions_count;
-    FURI_LOG_D(TAG, "Begin_tr: %ld", id);
+    //FURI_LOG_D(TAG, "Begin_tr: %ld", id);
 
     instance->state = NfcLoggerStateProcessing;
-    instance->transaction = nfc_transaction_alloc(id, instance->history_size_max);
+    instance->transaction = nfc_transaction_alloc(id, event, instance->history_size_max);
 }
 
 void nfc_logger_transaction_end(NfcLogger* instance) {

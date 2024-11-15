@@ -14,7 +14,9 @@ typedef enum {
 
 typedef struct NfcTransaction NfcTransaction;
 
-NfcTransaction* nfc_transaction_alloc(uint32_t id, uint8_t history_max_size);
+
+NfcTransaction*
+    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t history_max_size);
 void nfc_transaction_free(NfcTransaction* instance);
 uint8_t nfc_transaction_get_history_count(NfcTransaction* instance);
 NfcTransactionType nfc_transaction_get_type(const NfcTransaction* instance);

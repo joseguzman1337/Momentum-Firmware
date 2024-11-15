@@ -11,6 +11,22 @@ NfcTransaction* nfc_transaction_alloc(uint32_t id, uint8_t history_max_size) {
     t->history_count = 0;
     t->history = malloc(sizeof(NfcLoggerHistory) * history_max_size);
     return t;
+} */
+
+static NfcTransaction* nfc_transaction_alloc_empty() {
+    return malloc(sizeof(NfcTransaction));
+}
+
+NfcTransaction*
+    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t history_max_size) {
+    NfcTransaction* t = nfc_transaction_alloc_empty(); //malloc(sizeof(NfcTransaction));
+    t->header.type = NfcTransactionTypeEmpty;
+    t->header.id = id;
+    t->header.history_count = 0;
+    t->header.nfc_event = event;
+    t->header.time = furi_get_tick();
+    t->history = malloc(sizeof(NfcLoggerHistory) * history_max_size);
+    return t;
 }
 
 void nfc_transaction_free(NfcTransaction* instance) {
