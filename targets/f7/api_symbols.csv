@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,78.12,,
+Version,+,78.13,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
@@ -2822,7 +2822,7 @@ Function,-,nfc_logger_free,void,NfcLogger*
 Function,-,nfc_logger_set_history_size,void,"NfcLogger*, uint8_t"
 Function,-,nfc_logger_start,void,"NfcLogger*, NfcProtocol, NfcMode"
 Function,-,nfc_logger_stop,void,NfcLogger*
-Function,-,nfc_logger_transaction_begin,void,NfcLogger*
+Function,-,nfc_logger_transaction_begin,void,"NfcLogger*, FuriHalNfcEvent"
 Function,-,nfc_logger_transaction_end,void,NfcLogger*
 Function,+,nfc_poller_alloc,NfcPoller*,"Nfc*, NfcProtocol"
 Function,+,nfc_poller_detect,_Bool,NfcPoller*
