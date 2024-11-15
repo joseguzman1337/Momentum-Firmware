@@ -3,6 +3,8 @@
 #include <furi_hal_resources.h>
 #include <furi_hal_rtc.h>
 #include <storage/storage.h>
+#include <stream/file_stream.h>
+#include <toolbox/path.h>
 
 #include "nfc_transaction.h"
 
