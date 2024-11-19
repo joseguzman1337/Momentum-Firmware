@@ -110,8 +110,50 @@ void table_set_column_alignment(
         table->delimeters_data.column);
 }
 
+static void table_get_column_format(Table* table, uint8_t column_index, FuriString* output) {
+    furi_assert(column_index < table->column_count);
+
+    const char column_delimeter = table->delimeters_data.column;
+    const size_t* columns_width = table->columns_width;
+    if(table->aligns[column_index] == TableColumnDataAlignmentRight) {
+        furi_string_printf(
+            output,
+            (column_index < table->column_count - 1) ? "%c%%%ds" : "%c%%%ds%c\r\n",
+            column_delimeter,
+            columns_width[column_index],
+            column_delimeter);
+    } else {
+        furi_string_printf(
+            output,
+            (column_index < table->column_count - 1) ? "%c%%-%ds" : "%c%%-%ds%c\r\n",
+            column_delimeter,
+            columns_width[column_index],
+            column_delimeter);
+    }
+}
 
 void table_printf_header(Table* table, FuriString* output) {
+    furi_assert(table);
+    furi_assert(output);
+    FuriString* header_format = furi_string_alloc();
+
+    for(size_t i = 0; i < table->column_count; i++) {
+        table_get_column_format(table, i, header_format);
+        furi_string_cat_printf(
+            output, furi_string_get_cstr(header_format), furi_string_get_cstr(table->names[i]));
+    }
+
+    for(size_t i = 0; i < table->column_count; i++) {
+        furi_string_cat_printf(output, "%c", table->delimeters_header.column);
+        for(size_t j = 0; j < table->columns_width[i]; j++) {
+            furi_string_cat_printf(output, "%c", table->delimeters_header.row);
+        }
+    }
+    furi_string_cat_printf(output, "%c\r\n", table->delimeters_header.column);
+
+    furi_string_free(header_format);
+}
+/* void table_printf_header(Table* table, FuriString* output) {
     furi_assert(table);
     furi_assert(output);
 
@@ -145,6 +187,115 @@ void table_printf_row(Table* table, FuriString* output, ...) {
     furi_string_cat_vprintf(output, furi_string_get_cstr(table->format), args);
     va_end(args);
 }
+
+void table_printf_row_array(Table* table, FuriString* output, FuriString** data, size_t data_count) {
+    furi_assert(table);
+    furi_assert(output);
+    furi_assert(data);
+    furi_assert(data_count == table->column_count);
+
+    const size_t* columns_width = table->columns_width;
+    FuriString* format = furi_string_alloc();
+    FuriString* split_buffer = furi_string_alloc();
+
+    size_t* split_indexes = malloc(sizeof(size_t) * table->column_count);
+
+    uint8_t lines_per_row = 1;
+    for(uint8_t line = 0; line < lines_per_row; line++) {
+        for(size_t i = 0; i < table->column_count; i++) {
+            const size_t col_width = columns_width[i];
+            size_t line_length = furi_string_size(data[i]);
+
+            uint8_t lines_per_data = line_length / col_width;
+            if(line_length % col_width != 0) {
+                lines_per_data += 1;
+            }
+
+            lines_per_row = MAX(lines_per_row, lines_per_data);
+
+            if(split_indexes[i] == line_length) {
+                furi_string_set_str(split_buffer, "");
+            } else {
+                /*  size_t offset_len = col_width;
+                if((line_length - split_indexes[i]) > col_width) {
+                    size_t separator_pos =
+                        //furi_string_search_rchar(data[i], ' ', offset_len + split_indexes[i]);
+                        furi_string_search_char(data[i], ' ', offset_len + split_indexes[i]) -
+                        split_indexes[i];
+
+                    offset_len = MIN(separator_pos, col_width);
+                } else {
+                    offset_len = line_length - split_indexes[i];
+                } */
+                size_t offset_len = (line_length - split_indexes[i]) > col_width ?
+                                        col_width :
+                                        (line_length - split_indexes[i]);
+
+                /*     while(furi_string_get_char(data[i], offset_len + split_indexes[i]) != ' ') {
+                    offset_len--;
+                }
+
+                if(furi_string_get_char(data[i], split_indexes[i]) == ' ') split_indexes[i] += 1;
+ */
+                furi_string_set_n(split_buffer, data[i], split_indexes[i], offset_len);
+                split_indexes[i] += offset_len;
+            }
+
+            table_get_column_format(table, i, format);
+            furi_string_cat_printf(
+                output, furi_string_get_cstr(format), furi_string_get_cstr(split_buffer));
+        }
+        // furi_string_cat_printf(output, "\r\n");
+    }
+
+    free(split_indexes);
+    furi_string_free(format);
+    furi_string_free(split_buffer);
+}
+/* void table_printf_row_array(Table* table, FuriString* output, FuriString** data, size_t data_count) {
+    furi_assert(table);
+    furi_assert(output);
+    furi_assert(data);
+    furi_assert(data_count > table->column_count);
+
+    const size_t* columns_width = table->columns_width;
+    FuriString* format = furi_string_alloc();
+    FuriString* split_buffer = furi_string_alloc();
+    bool split = false;
+    size_t* split_indexes = malloc(sizeof(size_t) * table->column_count);
+    do {
+        for(size_t i = 0; i < table->column_count; i++) {
+            table_get_column_format(table, i, format);
+            if(split && split_indexes[i] == 0) {
+                furi_string_set_str(split_buffer, "");
+            } else {
+                size_t data_size = furi_string_size(data[i]) - split_indexes[i]; //57 - 0 = 57;
+                if(data_size > columns_width[i]) {
+                    //split_indexes[i] =
+                    //furi_string_set_n(split_buffer, data[i], split_indexes[i], columns_width[i]);
+                    size_t bottom = (split_indexes[i] + columns_width[i]) > data_size ?
+                                        data_size + split_indexes[i] :
+                                        split_indexes[i] + columns_width[i];
+
+                    size_t separator_index = furi_string_search_rchar(data[i], ' ', bottom); //27
+
+                    furi_string_set_n(split_buffer, data[i], split_indexes[i], separator_index);
+                    split_indexes[i] = separator_index;
+
+                    split = true;
+                } else {
+                    furi_string_set_str(split_buffer, data[i]);
+                }
+
+                furi_string_cat_printf(
+                    output, furi_string_get_cstr(format), furi_string_get_cstr(split_buffer));
+            }
+        }
+    } while(split);
+    free(split_indexes);
+    furi_string_free(format);
+    furi_string_free(split_buffer);
+} */
 
 void table_append_formatted_row(Table* table, FuriString* formatted_row, FuriString* output) {
     furi_assert(table);
