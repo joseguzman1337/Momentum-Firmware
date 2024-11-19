@@ -7,6 +7,12 @@ extern "C" {
 #endif
 
 typedef struct Table Table;
+typedef enum {
+    TableColumnDataAlignmentLeft,
+    TableColumnDataAlignmentRight,
+
+    TableColumnDataAlignmentNum
+} TableColumnDataAlignment;
 
 Table* table_alloc(size_t column_count, const size_t* columns_width, const char** names);
 void table_free(Table* table);

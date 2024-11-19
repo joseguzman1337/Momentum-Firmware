@@ -8,6 +8,7 @@ typedef struct {
 struct Table {
     size_t column_count;
     size_t* columns_width;
+    TableColumnDataAlignment* aligns;
 
     FuriString** names;
     FuriString* format;
@@ -41,11 +42,15 @@ static void table_generate_format_string(
     FuriString* format_output,
     const size_t* columns_width,
     const size_t column_count,
+    const TableColumnDataAlignment* align,
     const char column_delimeter) {
     furi_string_reset(format_output);
     for(size_t i = 0; i < column_count; i++) {
         furi_string_cat_printf(
-            format_output, i == 4 ? "%c%%-%ds" : "%c%%%ds", column_delimeter, columns_width[i]);
+            format_output,
+            align[i] == TableColumnDataAlignmentLeft ? "%c%%-%ds" : "%c%%%ds",
+            column_delimeter,
+            columns_width[i]);
     }
     furi_string_cat_printf(format_output, "%c\r\n", column_delimeter);
 }
@@ -62,12 +67,19 @@ Table* table_alloc(size_t column_count, const size_t* columns_width, const char*
     table->delimeters_header.row = '-';
     table->delimeters_data.column = '|';
 
+    table->aligns = malloc(column_count);
+    memset(table->aligns, TableColumnDataAlignmentRight, column_count);
+
     table_alloc_width_array(table, columns_width);
     table_alloc_names_array(table, names);
 
     table->format = furi_string_alloc();
     table_generate_format_string(
-        table->format, table->columns_width, table->column_count, table->delimeters_data.column);
+        table->format,
+        table->columns_width,
+        table->column_count,
+        table->aligns,
+        table->delimeters_data.column);
     // furi_string_printf()
     return table;
 }
@@ -78,8 +90,26 @@ void table_free(Table* table) {
     furi_string_free(table->format);
     table_free_names_array(table);
     free(table->columns_width);
+    free(table->aligns);
     free(table);
 }
+
+void table_set_column_alignment(
+    Table* table,
+    size_t column_index,
+    TableColumnDataAlignment alignment) {
+    furi_assert(table);
+    furi_assert(column_index < table->column_count);
+    furi_assert(alignment < TableColumnDataAlignmentNum);
+    table->aligns[column_index] = alignment;
+    table_generate_format_string(
+        table->format,
+        table->columns_width,
+        table->column_count,
+        table->aligns,
+        table->delimeters_data.column);
+}
+
 
 void table_printf_header(Table* table, FuriString* output) {
     furi_assert(table);
