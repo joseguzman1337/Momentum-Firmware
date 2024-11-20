@@ -136,6 +136,31 @@ static void nfc_logger_close_log_bin(File* bin_log_file) {
     }
     storage_file_free(bin_log_file);
 } */
+///TODO: remove after debug
+static void nfc_logger_delete_all_logs(Storage* storage) {
+    File* f = storage_file_alloc(storage);
+    FuriString* str = furi_string_alloc();
+    do {
+        if(!storage_dir_open(f, EXT_PATH(NFC_LOG_FOLDER))) break;
+        FileInfo f_info;
+        char name[50];
+        memset(name, 0, sizeof(name));
+
+        while(storage_dir_read(f, &f_info, name, sizeof(name))) {
+            if(strstr(name, "LOG")) {
+                path_concat(EXT_PATH(NFC_LOG_FOLDER), name, str);
+                FS_Error err = storage_common_remove(storage, furi_string_get_cstr(str));
+                if(err == FSE_OK)
+                    FURI_LOG_D(TAG, "Delete %s", name);
+                else
+                    FURI_LOG_W(TAG, "Unable to remove %s err %02X", name, err);
+            }
+        }
+        storage_dir_close(f);
+    } while(false);
+    furi_string_free(str);
+    storage_file_free(f);
+}
 
 static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_name) {
     //File* text_log_file = storage_file_alloc(storage);
