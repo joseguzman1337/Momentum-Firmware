@@ -3,29 +3,20 @@
 
 #define TAG "NfcTransaction"
 //----------------------------------------------------------------------------------------------------------
-//NfcTransaction handlers
-/* NfcTransaction* nfc_transaction_alloc(uint32_t id, uint8_t history_max_size) {
-    NfcTransaction* t = malloc(sizeof(NfcTransaction));
-    t->type = NfcTransactionTypeEmpty;
-    t->id = id;
-    t->history_count = 0;
-    t->history = malloc(sizeof(NfcLoggerHistory) * history_max_size);
-    return t;
-} */
 
 static NfcTransaction* nfc_transaction_alloc_empty() {
     return malloc(sizeof(NfcTransaction));
 }
 
 NfcTransaction*
-    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t history_max_size) {
+    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t max_history_chain_count) {
     NfcTransaction* t = nfc_transaction_alloc_empty(); //malloc(sizeof(NfcTransaction));
     t->header.type = NfcTransactionTypeEmpty;
     t->header.id = id;
-    t->header.history_count = 0;
+    t->header.history_chain_count = 0;
     t->header.nfc_event = event;
     t->header.time = furi_get_tick();
-    t->history = malloc(sizeof(NfcLoggerHistory) * history_max_size);
+    t->history_chain = malloc(sizeof(NfcLoggerHistory*) * max_history_chain_count);
     return t;
 }
 
@@ -44,7 +35,12 @@ void nfc_transaction_free(NfcTransaction* instance) {
         free(instance->response);
     }
 
-    free(instance->history);
+    ///TODO:
+    /*     for(uint8_t i = 0; i < instance->header.history_chain_count; i++) {
+        nfc_history_chain_free(instance->history_chain[i]);
+    }
+ */
+    free(instance->history_chain);
     free(instance);
 }
 
@@ -93,12 +89,13 @@ void nfc_transaction_append_history(NfcTransaction* transaction, NfcLoggerHistor
         transaction->header.type = NfcTransactionTypeFlagsOnly;
     }
 
-    transaction->history[transaction->header.history_count++] = *history;
+    furi_crash();
+    // transaction->history[transaction->header.history_count++] = *history;
 }
 
 uint8_t nfc_transaction_get_history_count(NfcTransaction* instance) {
     furi_assert(instance);
-    return instance->header.history_count;
+    return instance->header.history_chain_count;
 }
 
 NfcTransactionType nfc_transaction_get_type(const NfcTransaction* instance) {
@@ -130,11 +127,13 @@ void nfc_transaction_save_to_file(File* file, const NfcTransaction* transaction)
        transaction->header.type == NfcTransactionTypeRequestResponse)
         nfc_logger_save_packet(file, transaction->response);
 
+    FURI_LOG_E(TAG, "No history saved! Rework!");
+    /* 
     if(transaction->header.history_count > 0)
         storage_file_write(
             file,
             transaction->history,
-            transaction->header.history_count * sizeof(NfcLoggerHistory));
+            transaction->header.history_count * sizeof(NfcLoggerHistory)); */
 }
 
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
@@ -173,13 +172,14 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
             //storage_file_read(file, transaction->response->data, transaction->response->data_size);
         }
 
-        if(transaction->header.history_count > 0) {
+        FURI_LOG_E(TAG, "No history load! Rework!");
+        /* if(transaction->header.history_count > 0) {
             size_t history_size_bytes =
                 transaction->header.history_count * sizeof(NfcLoggerHistory);
             transaction->history = malloc(history_size_bytes);
             stream_read(stream, (uint8_t*)transaction->history, history_size_bytes);
             //storage_file_read(file, transaction->history, history_size_bytes);
-        }
+        } */
 
         result = true;
         *transaction_ptr = transaction;
@@ -189,20 +189,6 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
 
     return result;
 }
-
-/* static size_t
-    nfc_packet_format(NfcPacket* packet, size_t start, size_t row_size, FuriString* output) {
-    size_t i = start;
-    size_t n = MIN(row_size, packet->data_size - 2 - start);
-    furi_string_reset(output);
-    for(i = 0; i < n; i++) {
-        furi_string_cat_printf(output, "%02X ", packet->data[i]);
-    }
-    if(n == packet->data_size - 2)
-        furi_string_cat_printf(output, "[ %02X %02X ]", packet->data[i], packet->data[i + 1]);
-    i += 2;
-    return i;
-} */
 
 static void nfc_packet_format(NfcPacket* packet, FuriString* output) {
     furi_string_reset(output);
@@ -258,7 +244,6 @@ static const char* nfc_transaction_get_type_name(NfcTransactionType type) {
 
 static void nfc_transaction_format_common(
     NfcTransaction* transaction,
-    // NfcMode mode,
     NfcTransactionType desired_type,
     NfcTransactionString* output) {
     do {
@@ -301,108 +286,16 @@ static void nfc_transaction_format_common(
     } while(false);
 }
 
-void nfc_transaction_format_request(
-    NfcTransaction* transaction,
-    //    NfcMode mode,
-    NfcTransactionString* output) {
+void nfc_transaction_format_request(NfcTransaction* transaction, NfcTransactionString* output) {
     furi_assert(output);
     furi_assert(transaction);
-    // furi_assert(mode < NfcModeNum);
 
     nfc_transaction_format_common(transaction, NfcTransactionTypeRequest, output);
 }
 
-void nfc_transaction_format_response(
-    NfcTransaction* transaction,
-    // NfcMode mode,
-    NfcTransactionString* output) {
+void nfc_transaction_format_response(NfcTransaction* transaction, NfcTransactionString* output) {
     furi_assert(output);
     furi_assert(transaction);
-    // furi_assert(mode < NfcModeNum);
 
     nfc_transaction_format_common(transaction, NfcTransactionTypeResponse, output);
 }
-/* bool nfc_transaction_read_from_file(File* file, NfcTransaction** transaction_ptr) {
-    furi_assert(file);
-
-    bool result = false;
-    NfcTransaction* transaction = nfc_transaction_alloc_empty();
-    do {
-        size_t bytes_read = storage_file_read(file, transaction, sizeof(NfcTransactionHeader));
-        if(bytes_read != sizeof(NfcTransactionHeader)) {
-            FURI_LOG_E(TAG, "Unable to read transaction from file");
-            break;
-        }
-
-        if(transaction->header.type == NfcTransactionTypeRequest ||
-           transaction->header.type == NfcTransactionTypeRequestResponse) {
-            transaction->request = malloc(sizeof(NfcPacket));
-            storage_file_read(file, transaction->request, sizeof(uint32_t) * 3);
-
-            transaction->request->data = malloc(transaction->request->data_size);
-            storage_file_read(file, transaction->request->data, transaction->request->data_size);
-        }
-
-        if(transaction->header.type == NfcTransactionTypeResponse ||
-           transaction->header.type == NfcTransactionTypeRequestResponse) {
-            transaction->response = malloc(sizeof(NfcPacket));
-            storage_file_read(file, transaction->response, sizeof(uint32_t) * 3);
-
-            transaction->response->data = malloc(transaction->response->data_size);
-            storage_file_read(file, transaction->response->data, transaction->response->data_size);
-        }
-
-        if(transaction->header.history_count > 0) {
-            size_t history_size_bytes =
-                transaction->header.history_count * sizeof(NfcLoggerHistory);
-            transaction->history = malloc(history_size_bytes);
-            storage_file_read(file, transaction->history, history_size_bytes);
-        }
-
-        result = true;
-        *transaction_ptr = transaction;
-    } while(false);
-
-    if(!result) nfc_transaction_free(transaction);
-
-    return result;
-} */
-/* 
-void nfc_transaction_save_to_flipper_format(FlipperFormat* ff, NfcTransaction* transaction) {
-    furi_assert(ff);
-    furi_assert(transaction);
-
-    do {
-        NfcTransactionHeader* header = &transaction->header;
-        flipper_format_write_comment_cstr(ff, "Transaction info");
-        flipper_format_write_uint32(ff, "Id", header->id, 1);
-        //transa
-        flipper_format_write_uint32(ff, "Type", header->type, 1);
-
-        if(header->type != NfcTransactionTypeFlagsOnly)
-            flipper_format_write_comment_cstr(ff, "Data");
-
-        if(header->type == NfcTransactionTypeRequest ||
-           header->type == NfcTransactionTypeRequestResponse) {
-            flipper_format_write_hex(
-                ff, "RDR", transaction->request->data, transaction->request->data_size);
-        }
-
-        if(header->type == NfcTransactionTypeResponse ||
-           header->type == NfcTransactionTypeRequestResponse) {
-            flipper_format_write_hex(
-                ff, "TAG", transaction->response->data, transaction->response->data_size);
-        }
-
-        if(header->history_count > 0) {
-            flipper_format_write_comment_cstr(ff, "History");
-            for(size_t i = 0; i < header->history_count; i++) {
-                NfcLoggerHistory* history = &transaction->history[i];
-                flipper_format_write_uint32(ff, "Protocol", history->protocol, 1);
-                flipper_format_write_hex(ff, "Request flags", &history->request_flags, 1);
-            }
-        }
-        //flipper_format_write_uint32(ff, "",  )
-    } while(false);
-}
- */
