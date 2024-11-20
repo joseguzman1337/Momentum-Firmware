@@ -11,15 +11,10 @@ extern "C" {
 
 typedef uint32_t NfcLoggerFlags;
 
-typedef struct {
-    NfcProtocol protocol;
-    NfcLoggerFlags request_flags;
-    NfcLoggerFlags response_flags;
-} FURI_PACKED NfcLoggerHistory;
-
-#define NFC_LOG_FLAG(flag_register, flag)    (flag_register |= flag)
-#define NFC_LOG_FLAG_REQUEST(history, flag)  (NFC_LOG_FLAG(history.request_flags, flag))
-#define NFC_LOG_FLAG_RESPONSE(history, flag) (NFC_LOG_FLAG(history.response_flags, flag))
+#define NFC_LOG_FLAG_GET(flag_register, flag) ((flag_register & flag) == flag)
+#define NFC_LOG_FLAG_SET(flag_register, flag) (flag_register |= flag)
+#define NFC_LOG_FLAG_REQUEST(history, flag)   (NFC_LOG_FLAG_SET(history.request_flags, flag))
+#define NFC_LOG_FLAG_RESPONSE(history, flag)  (NFC_LOG_FLAG_SET(history.response_flags, flag))
 
 #define NFC_LOG_FLAG_FLUSH(history) \
     do {                            \
