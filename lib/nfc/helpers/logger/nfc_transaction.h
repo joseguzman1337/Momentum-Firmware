@@ -24,16 +24,18 @@ typedef struct {
 typedef struct {
     FuriString* id;
     FuriString* type;
-    FuriString* nfc_event;
     FuriString* time;
     FuriString* src;
-    FuriString* request;
-    FuriString* response;
+    FuriString* payload;
+    FuriString* crc_status;
     FuriString* annotation;
 } NfcTransactionString;
 
+///TODO: Think of moving major part of these functions to _i.h header and expose them only for logger.c under the hood
+///without putting them into api
+
 NfcTransaction*
-    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t history_max_size);
+    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t max_history_chain_count);
 void nfc_transaction_free(NfcTransaction* instance);
 uint8_t nfc_transaction_get_history_count(NfcTransaction* instance);
 NfcTransactionType nfc_transaction_get_type(const NfcTransaction* instance);
@@ -48,7 +50,10 @@ void nfc_transaction_append_history(NfcTransaction* transaction, NfcLoggerHistor
 void nfc_transaction_save_to_file(File* file, const NfcTransaction* transaction);
 
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr);
-void nfc_transaction_format(NfcTransaction* transaction, NfcTransactionString* output);
+//void nfc_transaction_format(NfcTransaction* transaction, NfcTransactionString* output);
+void nfc_transaction_format_request(NfcTransaction* transaction, NfcTransactionString* output);
+void nfc_transaction_format_response(NfcTransaction* transaction, NfcTransactionString* output);
+
 NfcTransactionString* nfc_transaction_string_alloc(void);
 void nfc_transaction_string_free(NfcTransactionString* transaction);
 void nfc_transaction_string_reset(NfcTransactionString* transaction);

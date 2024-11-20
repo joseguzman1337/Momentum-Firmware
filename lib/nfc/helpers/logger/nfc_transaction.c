@@ -256,10 +256,11 @@ static const char* nfc_transaction_get_type_name(NfcTransactionType type) {
     }
 }
 
-void nfc_transaction_format(NfcTransaction* transaction, NfcTransactionString* output) {
-    furi_assert(output);
-    furi_assert(transaction);
-
+static void nfc_transaction_format_common(
+    NfcTransaction* transaction,
+    // NfcMode mode,
+    NfcTransactionType desired_type,
+    NfcTransactionString* output) {
     do {
         NfcTransactionHeader* header = &transaction->header;
         uint32_t time = (header->type == NfcTransactionTypeFlagsOnly ||
@@ -267,22 +268,59 @@ void nfc_transaction_format(NfcTransaction* transaction, NfcTransactionString* o
                             header->time :
                             transaction->request->time;
 
-        furi_string_printf(output->id, "%ld", header->id);
-        furi_string_printf(output->src, "%s", "RDR");
+        if(desired_type != NfcTransactionTypeResponse ||
+           header->type != NfcTransactionTypeRequestResponse) {
+            furi_string_printf(output->id, "%ld", header->id);
+            furi_string_printf(output->type, "%s", nfc_transaction_get_type_name(header->type));
+            furi_string_printf(output->src, "RDR");
+        } else
+            furi_string_printf(output->src, "TAG");
+
+        /*  furi_string_printf(
+            output->src, desired_type == NfcTransactionTypeResponse ? "TAG" : "RDR"); */
+
+        //furi_string_printf(output->src, "%s", "RDR");
         furi_string_printf(output->time, "%ld", time);
-        furi_string_printf(output->type, "%s", nfc_transaction_get_type_name(header->type));
 
-        if(header->type == NfcTransactionTypeRequest ||
-           header->type == NfcTransactionTypeRequestResponse) {
-            nfc_packet_format(transaction->request, output->request);
+        if((header->type == NfcTransactionTypeRequest ||
+            header->type == NfcTransactionTypeRequestResponse) &&
+           (desired_type == NfcTransactionTypeRequest)) {
+            nfc_packet_format(transaction->request, output->payload);
         }
 
-        if(header->type == NfcTransactionTypeResponse ||
-           header->type == NfcTransactionTypeRequestResponse) {
-            nfc_packet_format(transaction->response, output->response);
+        if((header->type == NfcTransactionTypeResponse ||
+            header->type == NfcTransactionTypeRequestResponse) &&
+           (desired_type == NfcTransactionTypeResponse)) {
+            nfc_packet_format(transaction->response, output->payload);
         }
+
+        FURI_LOG_E(TAG, "No CRC status format! Rework!");
+        /*     nfc_histroy_format_crc_status(
+            transaction->history, transaction->header.history_count, output->crc_status); */
 
     } while(false);
+}
+
+void nfc_transaction_format_request(
+    NfcTransaction* transaction,
+    //    NfcMode mode,
+    NfcTransactionString* output) {
+    furi_assert(output);
+    furi_assert(transaction);
+    // furi_assert(mode < NfcModeNum);
+
+    nfc_transaction_format_common(transaction, NfcTransactionTypeRequest, output);
+}
+
+void nfc_transaction_format_response(
+    NfcTransaction* transaction,
+    // NfcMode mode,
+    NfcTransactionString* output) {
+    furi_assert(output);
+    furi_assert(transaction);
+    // furi_assert(mode < NfcModeNum);
+
+    nfc_transaction_format_common(transaction, NfcTransactionTypeResponse, output);
 }
 /* bool nfc_transaction_read_from_file(File* file, NfcTransaction** transaction_ptr) {
     furi_assert(file);
