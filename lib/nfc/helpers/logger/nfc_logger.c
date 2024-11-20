@@ -167,44 +167,34 @@ static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_na
         NfcTransaction* transaction;
 
         FuriString* str = furi_string_alloc();
-        const size_t width[7] = {5, 10, 8, 3, 30, 3, 30};
-        const char* names[7] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
-        Table* table = table_alloc(7, width, names);
+        // const size_t width[7] = {5, 10, 8, 3, 30, 3, 30};
+        // const char* names[7] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
 
+        const size_t width[] = {5, 10, 8, 3, 20, 3, 30};
+        const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
+        const size_t count = COUNT_OF(width);
+        Table* table = table_alloc(count, width, names);
+        table_set_column_alignment(table, 4, TableColumnDataAlignmentLeft);
         table_printf_header(table, str);
         stream_write_string(stream_txt, str);
 
         NfcTransactionString* tr_str = nfc_transaction_string_alloc();
 
         while(nfc_transaction_read(stream_bin, &transaction)) {
-            furi_string_reset(str);
-            nfc_transaction_string_reset(tr_str);
-            nfc_transaction_format(transaction, tr_str);
-
             NfcTransactionType type = nfc_transaction_get_type(transaction);
-            table_printf_row(
-                table,
-                str,
-                furi_string_get_cstr(tr_str->id),
-                furi_string_get_cstr(tr_str->type),
-                furi_string_get_cstr(tr_str->time),
-                furi_string_get_cstr(tr_str->src),
-                type == NfcTransactionTypeResponse ? furi_string_get_cstr(tr_str->response) :
-                                                     furi_string_get_cstr(tr_str->request),
-                "OK",
-                furi_string_get_cstr(tr_str->annotation));
+            furi_string_reset(str);
 
-            if(type == NfcTransactionTypeRequestResponse)
-                table_printf_row(
-                    table,
-                    str,
-                    "",
-                    "",
-                    "",
-                    "TAG",
-                    furi_string_get_cstr(tr_str->response),
-                    "KO",
-                    furi_string_get_cstr(tr_str->annotation));
+            if(type != NfcTransactionTypeResponse) {
+                nfc_transaction_string_reset(tr_str);
+                nfc_transaction_format_request(transaction, tr_str);
+                table_printf_row_array(table, str, (FuriString**)tr_str, count);
+            }
+
+            if(type == NfcTransactionTypeResponse || type == NfcTransactionTypeRequestResponse) {
+                nfc_transaction_string_reset(tr_str);
+                nfc_transaction_format_response(transaction, tr_str);
+                table_printf_row_array(table, str, (FuriString**)tr_str, count);
+            }
 
             stream_write_string(stream_txt, str);
             nfc_transaction_free(transaction);
