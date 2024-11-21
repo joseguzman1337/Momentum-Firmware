@@ -12,7 +12,9 @@ typedef struct {
     NfcProtocol protocol;
     NfcLoggerFlags request_flags;
     NfcLoggerFlags response_flags;
-} FURI_PACKED NfcLoggerHistory;
+} FURI_PACKED NfcHistoryItem;
+
+typedef struct NfcHistory NfcHistory;
 
 #ifdef __cplusplus
 }

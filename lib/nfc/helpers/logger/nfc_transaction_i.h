@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nfc_transaction.h"
+#include "nfc_logger_history_i.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +17,6 @@ typedef struct {
 typedef struct {
     uint32_t id;
     NfcTransactionType type;
-    uint8_t history_count;
     FuriHalNfcEvent nfc_event;
     uint32_t time; ///TODO: optional
 } FURI_PACKED NfcTransactionHeader;
@@ -25,7 +25,7 @@ struct FURI_PACKED NfcTransaction {
     NfcTransactionHeader header;
     NfcPacket* request;
     NfcPacket* response;
-    NfcLoggerHistory* history;
+    NfcHistory* history;
 };
 
 #ifdef __cplusplus

@@ -294,7 +294,7 @@ bool nfc_logger_enabled(NfcLogger* instance) {
 void nfc_logger_set_history_size(NfcLogger* instance, uint8_t size) {
     furi_assert(instance);
     furi_assert(size > 0);
-    instance->history_size_max = size;
+    instance->history_chain_size = size;
 }
 
 void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode) {
@@ -378,7 +378,7 @@ void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
     //FURI_LOG_D(TAG, "Begin_tr: %ld", id);
 
     instance->state = NfcLoggerStateProcessing;
-    instance->transaction = nfc_transaction_alloc(id, event, instance->history_size_max);
+    instance->transaction = nfc_transaction_alloc(id, event, instance->history_chain_size);
 }
 
 void nfc_logger_transaction_end(NfcLogger* instance) {
@@ -413,15 +413,10 @@ void nfc_logger_append_data(
     nfc_transaction_append(instance->transaction, data, data_size, response);
 }
 
-void nfc_logger_append_history(NfcLogger* instance, NfcLoggerHistory* history) {
+void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
     furi_assert(instance);
     furi_assert(history);
 
     if(instance->state == NfcLoggerStateDisabled) return;
-
-    uint8_t history_cnt = nfc_transaction_get_history_count(instance->transaction);
-    ///TODO:replace assert with check
-    furi_assert(history_cnt < instance->history_size_max);
-
     nfc_transaction_append_history(instance->transaction, history);
 }

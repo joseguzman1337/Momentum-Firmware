@@ -13,10 +13,9 @@ NfcTransaction*
     NfcTransaction* t = nfc_transaction_alloc_empty(); //malloc(sizeof(NfcTransaction));
     t->header.type = NfcTransactionTypeEmpty;
     t->header.id = id;
-    t->header.history_chain_count = 0;
     t->header.nfc_event = event;
     t->header.time = furi_get_tick();
-    t->history_chain = malloc(sizeof(NfcLoggerHistory*) * max_history_chain_count);
+    t->history = nfc_history_alloc(max_history_chain_count);
     return t;
 }
 
@@ -35,12 +34,7 @@ void nfc_transaction_free(NfcTransaction* instance) {
         free(instance->response);
     }
 
-    ///TODO:
-    /*     for(uint8_t i = 0; i < instance->header.history_chain_count; i++) {
-        nfc_history_chain_free(instance->history_chain[i]);
-    }
- */
-    free(instance->history_chain);
+    nfc_history_free(instance->history);
     free(instance);
 }
 
@@ -81,21 +75,14 @@ void nfc_transaction_append(
     memcpy(p->data, data, data_size);
 }
 
-void nfc_transaction_append_history(NfcTransaction* transaction, NfcLoggerHistory* history) {
+void nfc_transaction_append_history(NfcTransaction* transaction, NfcHistoryItem* item) {
     furi_assert(transaction);
 
     // FURI_LOG_D(TAG, "Add history: %ld", transaction->id);
     if(transaction->header.type == NfcTransactionTypeEmpty) {
         transaction->header.type = NfcTransactionTypeFlagsOnly;
     }
-
-    furi_crash();
-    // transaction->history[transaction->header.history_count++] = *history;
-}
-
-uint8_t nfc_transaction_get_history_count(NfcTransaction* instance) {
-    furi_assert(instance);
-    return instance->header.history_chain_count;
+    nfc_history_append(transaction->history, item);
 }
 
 NfcTransactionType nfc_transaction_get_type(const NfcTransaction* instance) {
@@ -127,13 +114,7 @@ void nfc_transaction_save_to_file(File* file, const NfcTransaction* transaction)
        transaction->header.type == NfcTransactionTypeRequestResponse)
         nfc_logger_save_packet(file, transaction->response);
 
-    FURI_LOG_E(TAG, "No history saved! Rework!");
-    /* 
-    if(transaction->header.history_count > 0)
-        storage_file_write(
-            file,
-            transaction->history,
-            transaction->header.history_count * sizeof(NfcLoggerHistory)); */
+    nfc_history_save(file, transaction->history);
 }
 
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
@@ -175,7 +156,7 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
         FURI_LOG_E(TAG, "No history load! Rework!");
         /* if(transaction->header.history_count > 0) {
             size_t history_size_bytes =
-                transaction->header.history_count * sizeof(NfcLoggerHistory);
+                transaction->header.history_count * sizeof(NfcHistoryItem);
             transaction->history = malloc(history_size_bytes);
             stream_read(stream, (uint8_t*)transaction->history, history_size_bytes);
             //storage_file_read(file, transaction->history, history_size_bytes);

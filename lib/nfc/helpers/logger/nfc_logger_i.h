@@ -18,7 +18,7 @@ struct NfcLogger {
     NfcLoggerState state;
     NfcTrace* trace;
     NfcTransaction* transaction;
-    uint8_t history_size_max;
+    uint8_t history_chain_size;
 
     FuriString* filename;
     Storage* storage;
