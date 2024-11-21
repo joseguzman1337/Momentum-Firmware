@@ -87,8 +87,8 @@ NfcListener* nfc_listener_alloc(Nfc* nfc, NfcProtocol protocol, const NfcDeviceD
     instance->nfc_dev = nfc_device_alloc();
     nfc_device_set_data(instance->nfc_dev, protocol, data);
 
-    uint8_t history_count = nfc_listener_list_alloc(instance);
-    nfc_logger_set_history_size(nfc_get_logger(nfc), history_count);
+    uint8_t listeners_count = nfc_listener_list_alloc(instance);
+    nfc_logger_set_history_size(nfc_get_logger(nfc), listeners_count);
 
     return instance;
 }
