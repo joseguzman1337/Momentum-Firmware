@@ -46,7 +46,6 @@ Iso14443_3aListener* iso14443_3a_listener_alloc(Nfc* nfc, Iso14443_3aData* data)
         instance->data->atqa,
         instance->data->sak);
 
-    instance->logger = nfc_get_logger(nfc);
     instance->history.protocol = NfcProtocolIso14443_3a;
     return instance;
 }
@@ -85,8 +84,6 @@ NfcCommand iso14443_3a_listener_run(NfcGenericEvent event, void* context) {
     Iso14443_3aListener* instance = context;
     NfcEvent* nfc_event = event.event_data;
     NfcCommand command = NfcCommandContinue;
-    //Looks like that there is no need in storing history inside of the instance.
-    NFC_LOG_FLAG_FLUSH(instance->history);
 
     if(nfc_event->type == NfcEventTypeListenerActivated) {
         instance->state = Iso14443_3aListenerStateActive;
@@ -119,13 +116,17 @@ NfcCommand iso14443_3a_listener_run(NfcGenericEvent event, void* context) {
             }
             instance->iso14443_3a_event_data.buffer = nfc_event->data.buffer;
             if(instance->callback) {
-                nfc_logger_append_history(instance->logger, &instance->history);
                 command = instance->callback(instance->generic_event, instance->context);
             }
         }
     }
-    //nfc_logger_append_history(instance->logger, &instance->history);
     return command;
+}
+
+void iso14443_3a_listener_log_history(NfcLogger* logger, void* context) {
+    Iso14443_3aListener* instance = context;
+    nfc_logger_append_history(logger, &instance->history);
+    NFC_LOG_FLAG_FLUSH(instance->history);
 }
 
 const NfcListenerBase nfc_listener_iso14443_3a = {
@@ -134,4 +135,5 @@ const NfcListenerBase nfc_listener_iso14443_3a = {
     .set_callback = (NfcListenerSetCallback)iso14443_3a_listener_set_callback,
     .get_data = (NfcListenerGetData)iso14443_3a_listener_get_data,
     .run = (NfcListenerRun)iso14443_3a_listener_run,
+    .log_history = (NfcListenerLogHistory)iso14443_3a_listener_log_history,
 };

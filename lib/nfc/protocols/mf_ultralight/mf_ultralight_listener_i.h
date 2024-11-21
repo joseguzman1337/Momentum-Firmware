@@ -69,6 +69,7 @@ struct MfUltralightListener {
     MfUltralightMirrorMode mirror;
     MfUltralightListenerCompositeCommandContext composite_cmd;
     mbedtls_des3_context des_context;
+    NfcHistoryItem history;
     uint8_t rndB[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE];
     uint8_t encB[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE];
     void* context;
