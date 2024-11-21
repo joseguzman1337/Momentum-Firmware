@@ -117,6 +117,25 @@ NfcCommand nfc_listener_start_callback(NfcEvent event, void* context) {
     NfcListenerListElement* head_listener = instance->list.head;
     command = head_listener->listener_api->run(generic_event, head_listener->listener);
 
+    ///TODO: There is no need in this code for now, because there is a way to put nfc_logger to every
+    ///instance of a hierarchy during allocation, after that each listener will call some logging function,
+    ///with logger by iteslf. BUT maybe this can will be handy when it comes to call logging on each level.
+
+    NfcLogger* logger = nfc_get_logger(instance->nfc);
+    if(nfc_logger_enabled(logger)) {
+        NfcListenerListElement* iter = head_listener;
+        do {
+            if(iter->protocol == NfcProtocolInvalid) break;
+
+            if(iter->listener_api->log_history)
+                iter->listener_api->log_history(logger, iter->listener);
+
+            if(iter->child == NULL) break;
+
+            iter = iter->child;
+        } while(true);
+    }
+
     return command;
 }
 
