@@ -77,6 +77,9 @@ typedef NfcCommand (*NfcListenerRun)(NfcGenericEvent event, void* context);
  */
 typedef const NfcDeviceData* (*NfcListenerGetData)(const NfcGenericInstance* instance);
 
+typedef void (*NfcListenerLogHistory)(NfcLogger* logger, void* context);
+/* const NfcGenericInstance* instance, */
+
 /**
  * @brief Generic NFC listener interface.
  *
@@ -91,6 +94,7 @@ typedef struct {
     NfcListenerSetCallback set_callback; /**< Pointer to the set_callback() function. */
     NfcListenerRun run; /**< Pointer to the run() function. */
     NfcListenerGetData get_data; /**< Pointer to the get_data() function. */
+    NfcListenerLogHistory log_history;
 } NfcListenerBase;
 
 #ifdef __cplusplus
