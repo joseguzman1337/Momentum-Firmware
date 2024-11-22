@@ -94,49 +94,6 @@ static bool nfc_logger_read_trace(Stream* stream, NfcTrace* trace) {
     return result;
 }
 
-/* static bool nfc_logger_open_log_bin(
-    Storage* storage,
-    FuriString* file_path,
-    File** bin_log_file,
-    NfcTrace* trace_ptr) {
-    furi_assert(storage);
-    furi_assert(file_path);
-    furi_assert(bin_log_file);
-    furi_assert(trace_ptr);
-
-    bool result = false;
-    File* file = storage_file_alloc(storage);
-    FuriString* path_ext = furi_string_alloc_set(file_path);
-    furi_string_cat_printf(path_ext, ".bin");
-    do {
-        if(!storage_file_open(
-               file, furi_string_get_cstr(path_ext), FSAM_READ, FSOM_OPEN_EXISTING)) {
-            FURI_LOG_E(TAG, "Unable to open binary log file: %s", furi_string_get_cstr(file_path));
-            break;
-        }
-
-        size_t read_bytes = storage_file_read(file, trace_ptr, sizeof(NfcTrace));
-        if(read_bytes != sizeof(NfcTrace)) {
-            FURI_LOG_E(TAG, "Trace not found");
-            break;
-        }
-
-        *bin_log_file = file;
-        result = true;
-    } while(false);
-
-    if(!result) storage_file_free(file);
-    furi_string_free(path_ext);
-    return result;
-}
-
-static void nfc_logger_close_log_bin(File* bin_log_file) {
-    furi_assert(bin_log_file);
-    if(!storage_file_close(bin_log_file)) {
-        FURI_LOG_E(TAG, "Unable to close binary log file");
-    }
-    storage_file_free(bin_log_file);
-} */
 ///TODO: remove after debug
 static void nfc_logger_delete_all_logs(Storage* storage) {
     File* f = storage_file_alloc(storage);
@@ -213,8 +170,6 @@ static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_na
         NfcTransaction* transaction;
 
         FuriString* str = furi_string_alloc();
-        // const size_t width[7] = {5, 10, 8, 3, 30, 3, 30};
-        // const char* names[7] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
 
         const size_t width[] = {5, 10, 8, 3, 60, 3, 30};
         const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
