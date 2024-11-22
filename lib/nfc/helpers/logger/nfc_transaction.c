@@ -153,14 +153,7 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
             //storage_file_read(file, transaction->response->data, transaction->response->data_size);
         }
 
-        FURI_LOG_E(TAG, "No history load! Rework!");
-        /* if(transaction->header.history_count > 0) {
-            size_t history_size_bytes =
-                transaction->header.history_count * sizeof(NfcHistoryItem);
-            transaction->history = malloc(history_size_bytes);
-            stream_read(stream, (uint8_t*)transaction->history, history_size_bytes);
-            //storage_file_read(file, transaction->history, history_size_bytes);
-        } */
+        if(!nfc_history_load(stream, &transaction->history)) break;
 
         result = true;
         *transaction_ptr = transaction;
@@ -260,9 +253,8 @@ static void nfc_transaction_format_common(
             nfc_packet_format(transaction->response, output->payload);
         }
 
-        FURI_LOG_E(TAG, "No CRC status format! Rework!");
-        /*     nfc_histroy_format_crc_status(
-            transaction->history, transaction->header.history_count, output->crc_status); */
+        //FURI_LOG_E(TAG, "No CRC status format! Rework!");
+        nfc_histroy_format_crc_status(transaction->history, output->crc_status);
 
     } while(false);
 }
