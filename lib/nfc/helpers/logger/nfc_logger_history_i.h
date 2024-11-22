@@ -2,6 +2,7 @@
 
 #include "nfc_logger_history.h"
 #include <storage/storage.h>
+#include <stream/file_stream.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,12 +33,10 @@ void nfc_history_free(NfcHistory* instance);
 
 void nfc_history_append(NfcHistory* instance, const NfcHistoryItem* item);
 
+bool nfc_history_load(Stream* stream, NfcHistory** instance_ptr);
 void nfc_history_save(File* file, const NfcHistory* instance);
 
-void nfc_histroy_format_crc_status(
-    NfcHistoryItem* history,
-    size_t history_cnt,
-    FuriString* crc_status_str);
+void nfc_histroy_format_crc_status(const NfcHistory* history, FuriString* crc_status_str);
 
 #ifdef __cplusplus
 }

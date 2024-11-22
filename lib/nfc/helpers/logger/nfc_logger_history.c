@@ -52,56 +52,35 @@ static const NfcLoggerHistoryCrcCheckerItem nfc_history_crc_checker[] = {
     {.protocol = NfcProtocolIso15693_3, .checker = nfc_history_crc_checker_dummy},
 };
 
-static bool nfc_history_find_crc_protocol_index(
-    NfcHistoryItem* history,
-    size_t history_cnt,
-    size_t* checker_index) {
-    bool found = false;
-
-    for(size_t i = 0; i < history_cnt; i++) {
+static NfcHistoryCrcStatus nfc_history_find_crc_from_chain(const NfcHistoryChain* chain) {
+    NfcHistoryCrcStatus status = NfcHistoryCrcNotSet;
+    for(size_t i = 0; i < chain->length; i++) {
         for(size_t j = 0; j < COUNT_OF(nfc_history_crc_checker); j++) {
-            if(nfc_history_crc_checker[j].protocol != history[i].protocol) continue;
-            const char* protocol_name = nfc_device_get_protocol_name(history[i].protocol);
-            FURI_LOG_D(TAG, "Found CRC checker: %s", protocol_name);
-            found = true;
-            *checker_index = j;
-            break;
+            if(chain->items[i].protocol != nfc_history_crc_checker[j].protocol) continue;
+            status = nfc_history_crc_checker[j].checker(&chain->items[i]);
+            return status;
         }
     }
-    return found;
+    return status;
 }
 
-void nfc_histroy_format_crc_status(
-    NfcHistoryItem* history,
-    size_t history_cnt,
-    FuriString* crc_status_str) {
-    size_t checker_index = 0;
-
-    if(nfc_history_find_crc_protocol_index(history, history_cnt, &checker_index)) {
-        NfcHistoryCrcStatus crc_status =
-            nfc_history_crc_checker[checker_index].checker(&history[checker_index]);
-        furi_string_printf(crc_status_str, nfc_history_crc_status_message[crc_status]);
+static NfcHistoryCrcStatus nfc_history_find_crc_status(const NfcHistory* history) {
+    NfcHistoryCrcStatus status = NfcHistoryCrcNotSet;
+    for(size_t i = 0; i < history->base.chain_count; i++) {
+        status = nfc_history_find_crc_from_chain(&history->chains[i]);
+        if(status != NfcHistoryCrcNotSet) break;
     }
+    return status;
 }
 
-///TODO: make inline
-/* static inline NfcHistoryChain* nfc_history_chain_alloc(uint8_t item_count_max) {
-    furi_assert(item_count_max > 0);
-    NfcHistoryChain* chain = malloc(sizeof(NfcHistoryChain));
-    chain->items = malloc(sizeof(NfcHistoryItem*) * item_count_max);
-
-    return chain;
+void nfc_histroy_format_crc_status(const NfcHistory* history, FuriString* crc_status_str) {
+    furi_assert(history);
+    furi_assert(crc_status_str);
+    NfcHistoryCrcStatus status = nfc_history_find_crc_status(history);
+    furi_string_printf(crc_status_str, nfc_history_crc_status_message[status]);
 }
-
-///TODO: make inline
-static inline void nfc_history_chain_free(NfcHistoryChain* chain) {
-    furi_assert(chain);
-    free(chain->items);
-    free(chain);
-} */
 
 NfcHistory* nfc_history_alloc(uint8_t max_chain_length) {
-    //NfcHistory* history = malloc(sizeof(NfcHistory));
     size_t chain_size = sizeof(NfcHistoryItem) * max_chain_length + sizeof(uint8_t);
     NfcHistory* history = malloc(sizeof(NfcHistoryBase) + chain_size * 5);
 
@@ -110,23 +89,13 @@ NfcHistory* nfc_history_alloc(uint8_t max_chain_length) {
 
     history->base.chain_max_length = max_chain_length;
 
-    //history->chains = malloc(sizeof(NfcHistoryChain*) * history->base.history_max_size);
-    /*    for(size_t i = 0; i < history->base.history_max_size; i++) {
-        history->chains[i] = nfc_history_chain_alloc(history->base.chain_max_length);
-    } */
-
-    //history->chains[0] = nfc_history_chain_alloc(history->base.chain_max_length);
+    story_chain_alloc(history->base.chain_max_length);
     return history;
 }
 
 void nfc_history_free(NfcHistory* instance) {
     furi_assert(instance);
 
-    /*  NfcHistoryBase* base = &instance->base;
-    for(size_t i = 0; i < base->chain_count; i++) {
-        nfc_history_chain_free(instance->chains[i]);
-    }
-    free(instance->chains); */
     free(instance);
 }
 
@@ -170,7 +139,54 @@ void nfc_history_save(File* file, const NfcHistory* instance) {
     }
 }
 
-/* 
+static inline bool nfc_history_chain_load(Stream* stream, NfcHistoryChain* chain) {
+    bool result = false;
+    do {
+        size_t bytes_to_read = sizeof(chain->length);
+        size_t read = stream_read(stream, &chain->length, bytes_to_read);
+        if(bytes_to_read != read) break;
+
+        bytes_to_read = sizeof(NfcHistoryItem) * chain->length;
+        read = stream_read(stream, (uint8_t*)chain->items, bytes_to_read);
+        if(bytes_to_read != read) break;
+
+        result = true;
+    } while(false);
+    return result;
+}
+
+bool nfc_history_load(Stream* stream, NfcHistory** instance_ptr) {
+    furi_assert(stream);
+    furi_assert(instance_ptr);
+    bool result = false;
+    do {
+        NfcHistoryBase base;
+        size_t read = stream_read(stream, (uint8_t*)&base, sizeof(NfcHistoryBase));
+        if(read != sizeof(NfcHistoryBase)) {
+            FURI_LOG_W(TAG, "Unable to read history from file");
+            break;
+        }
+        NfcHistory* history = nfc_history_alloc(base.chain_max_length);
+        history->base = base;
+
+        result = true;
+        for(size_t i = 0; i < history->base.chain_count; i++) {
+            result = nfc_history_chain_load(stream, &history->chains[i]);
+            if(!result) {
+                FURI_LOG_W(TAG, "Unable to read chain from file");
+                break;
+            }
+        }
+
+        if(result) {
+            *instance_ptr = history;
+        } else {
+            nfc_history_free(history);
+        }
+    } while(false);
+    return result;
+}
+
 void nfc_histroy_format_annotation(
     NfcHistoryItem* history,
     size_t history_cnt,
