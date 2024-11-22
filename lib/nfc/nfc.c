@@ -120,6 +120,7 @@ static int32_t nfc_worker_listener(void* context) {
 
     while(true) {
         FuriHalNfcEvent event = furi_hal_nfc_listener_wait_event(FURI_HAL_NFC_EVENT_WAIT_FOREVER);
+        nfc_logger_transaction_begin(instance->logger, event);
         if(event & FuriHalNfcEventAbortRequest) {
             nfc_event.type = NfcEventTypeUserAbort;
             instance->callback(nfc_event, instance->context);
@@ -139,9 +140,6 @@ static int32_t nfc_worker_listener(void* context) {
             instance->callback(nfc_event, instance->context);
         }
         if(event & FuriHalNfcEventRxEnd) {
-            ///TODO: transaction must begin at the very top of this function, because all other event's also need processing
-            nfc_logger_transaction_begin(instance->logger);
-
             furi_hal_nfc_timer_block_tx_start(instance->fdt_listen_fc);
 
             nfc_event.type = NfcEventTypeRxEnd;
@@ -164,6 +162,7 @@ static int32_t nfc_worker_listener(void* context) {
                 furi_hal_nfc_listener_idle();
             }
         }
+        nfc_logger_transaction_end(instance->logger);
     }
 
     furi_hal_nfc_reset_mode();
@@ -370,8 +369,6 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
         ret = nfc_process_hal_error(error);
     }
 
-    ///TODO: Possibly this must be moved to listener_worker, and must be placed at the very end of the while cycle
-    nfc_logger_transaction_end(instance->logger);
     return ret;
 }
 
