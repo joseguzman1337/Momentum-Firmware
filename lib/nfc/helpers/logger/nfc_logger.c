@@ -1,5 +1,6 @@
 #include "nfc_logger_i.h"
 #include <nfc_device.h>
+#include <nfc/protocols/nfc_protocol.h>
 #include "table.h"
 //#include <flipper_format.h>
 
@@ -162,6 +163,25 @@ static void nfc_logger_delete_all_logs(Storage* storage) {
     storage_file_free(f);
 }
 
+static void nfc_logger_trace_format_protocol_layers_description(
+    Stream* stream,
+    NfcProtocol trace_protocol) {
+    furi_assert(stream);
+    furi_assert(trace_protocol < NfcProtocolNum);
+
+    stream_write_format(stream, "Protocol layers:\r\n");
+
+    uint8_t count = 0;
+    NfcProtocol* protocols = nfc_protocol_layer_list_alloc(trace_protocol, &count);
+    stream_write_format(stream, "L0 - NFC\r\n");
+    for(uint8_t i = 0; i < count; i++) {
+        stream_write_format(
+            stream, "L%d - %s\r\n", i + 1, nfc_device_get_protocol_name(protocols[i]));
+    }
+    stream_write_format(stream, "\r\n");
+    nfc_protocol_layer_list_free(protocols);
+}
+
 static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_name) {
     //File* text_log_file = storage_file_alloc(storage);
     Stream* stream_bin = file_stream_alloc(storage);
@@ -189,6 +209,7 @@ static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_na
             trace.mode == NfcModeListener ? "NfcListener" : "NfcPoller",
             trace.transactions_count);
 
+        nfc_logger_trace_format_protocol_layers_description(stream_txt, trace.protocol);
         NfcTransaction* transaction;
 
         FuriString* str = furi_string_alloc();
