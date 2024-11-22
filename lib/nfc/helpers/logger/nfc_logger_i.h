@@ -16,6 +16,7 @@ typedef struct {
 
 struct NfcLogger {
     NfcLoggerState state;
+    NfcProtocol protocol;
     NfcTrace* trace;
     NfcTransaction* transaction;
     uint8_t history_chain_size;

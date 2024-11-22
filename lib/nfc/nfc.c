@@ -332,7 +332,7 @@ void nfc_start(Nfc* instance, NfcEventCallback callback, void* context) {
         furi_thread_set_callback(instance->worker_thread, nfc_worker_listener);
     }
     instance->comm_state = NfcCommStateIdle;
-    nfc_logger_start(instance->logger, NfcProtocolIso14443_3a, instance->mode);
+    nfc_logger_start(instance->logger, instance->mode);
     furi_thread_start(instance->worker_thread);
 }
 

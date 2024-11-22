@@ -292,22 +292,24 @@ bool nfc_logger_enabled(NfcLogger* instance) {
     return instance->state != NfcLoggerStateDisabled;
 }
 
-void nfc_logger_set_history_size(NfcLogger* instance, uint8_t size) {
+void nfc_logger_set_protocol_history_size(NfcLogger* instance, NfcProtocol protocol, uint8_t size) {
     furi_assert(instance);
+    furi_assert(protocol < NfcProtocolNum);
     furi_assert(size > 0);
+    instance->protocol = protocol;
     instance->history_chain_size = size;
 }
 
-void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode) {
+void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
     furi_assert(instance);
-    furi_assert(protocol < NfcProtocolNum);
+    furi_assert(instance->protocol < NfcProtocolNum);
     furi_assert(mode < NfcModeNum);
 
     if(instance->state == NfcLoggerStateDisabled) return;
     nfc_logger_delete_all_logs(instance->storage);
 
     instance->exit = false;
-    instance->trace = nfc_logger_trace_alloc(protocol, mode);
+    instance->trace = nfc_logger_trace_alloc(instance->protocol, mode);
 
     DateTime dt;
     furi_hal_rtc_get_datetime(&dt);
