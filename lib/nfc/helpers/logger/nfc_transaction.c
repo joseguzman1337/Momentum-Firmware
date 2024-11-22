@@ -166,11 +166,18 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
 
 static void nfc_packet_format(NfcPacket* packet, FuriString* output) {
     furi_string_reset(output);
-    size_t n = packet->data_size - 2;
+    size_t n = packet->data_size;
+    if(packet->data_size >= 3) {
+        n = packet->data_size - 2;
+    }
+
     for(size_t i = 0; i < n; i++) {
         furi_string_cat_printf(output, "%02X ", packet->data[i]);
     }
-    furi_string_cat_printf(output, "[ %02X %02X ]", packet->data[n], packet->data[n + 1]);
+
+    if(packet->data_size >= 3) {
+        furi_string_cat_printf(output, "[ %02X %02X ]", packet->data[n], packet->data[n + 1]);
+    }
 }
 
 NfcTransactionString* nfc_transaction_string_alloc() {
