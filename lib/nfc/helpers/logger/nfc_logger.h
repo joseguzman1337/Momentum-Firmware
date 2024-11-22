@@ -6,7 +6,7 @@
 
 #include <furi.h>
 
-#include "nfc_logger_types.h"
+#include "nfc_logger_history.h"
 
 //#include "nfc_transaction_i.h"
 
@@ -45,7 +45,7 @@ void nfc_logger_append_data( //nfc_logger_append_request and append_response ins
     const size_t data_size,
     bool response);
 
-void nfc_logger_append_history(NfcLogger* instance, NfcLoggerHistory* history);
+void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history);
 
 #ifdef __cplusplus
 }

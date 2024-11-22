@@ -36,7 +36,7 @@ static int32_t nfc_logger_thread_callback(void* context) {
 
         nfc_transaction_save_to_file(f, ptr);
 
-        FURI_LOG_D(TAG, "Free_tr: %ld", nfc_transaction_get_id(ptr));
+        //FURI_LOG_D(TAG, "Free_tr: %ld", nfc_transaction_get_id(ptr));
         nfc_transaction_free(ptr);
         furi_hal_gpio_write(pin, toggle);
         toggle = !toggle;
@@ -195,7 +195,7 @@ static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_na
         // const size_t width[7] = {5, 10, 8, 3, 30, 3, 30};
         // const char* names[7] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
 
-        const size_t width[] = {5, 10, 8, 3, 20, 3, 30};
+        const size_t width[] = {5, 10, 8, 3, 60, 3, 30};
         const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
         const size_t count = COUNT_OF(width);
         Table* table = table_alloc(count, width, names);
@@ -266,7 +266,8 @@ void nfc_logger_config(NfcLogger* instance, bool enabled) {
         furi_thread_set_priority(thread, FuriThreadPriorityLow);
         instance->logger_thread = thread;
 
-        instance->transaction_queue = furi_message_queue_alloc(4, sizeof(NfcTransaction*));
+        ///TODO: tune queue size to reduce memory usage
+        instance->transaction_queue = furi_message_queue_alloc(50, sizeof(NfcTransaction*));
         instance->state = NfcLoggerStateIdle;
     } else {
         nfc_logger_free_thread_and_queue(instance);
@@ -303,6 +304,7 @@ void nfc_logger_start(NfcLogger* instance, NfcProtocol protocol, NfcMode mode) {
     furi_assert(mode < NfcModeNum);
 
     if(instance->state == NfcLoggerStateDisabled) return;
+    nfc_logger_delete_all_logs(instance->storage);
 
     instance->exit = false;
     instance->trace = nfc_logger_trace_alloc(protocol, mode);
@@ -348,11 +350,8 @@ void nfc_logger_stop(NfcLogger* instance) {
         ///TODO: Re-save temp.bin log file to file_name and save in readable or flipper_format
 
         if(status == FSE_OK) {
-            /* furi_string_set(str, NFC_LOG_FILE_PATH);
-            furi_string_cat(str, instance->filename); */
             nfc_logger_convert_bin_to_text(
                 instance->storage, furi_string_get_cstr(instance->filename));
-            //nfc_logger_save_log_to_flipper_format(instance->storage, str);
         }
 
         nfc_logger_trace_free(instance->trace);
