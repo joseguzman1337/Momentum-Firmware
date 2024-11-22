@@ -88,8 +88,6 @@ NfcHistory* nfc_history_alloc(uint8_t max_chain_length) {
     history->base.history_max_size = 5;
 
     history->base.chain_max_length = max_chain_length;
-
-    story_chain_alloc(history->base.chain_max_length);
     return history;
 }
 
