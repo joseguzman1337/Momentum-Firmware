@@ -39,6 +39,7 @@ typedef uint32_t NfcLoggerFlags;
 #define NFC_FLAG_MF_ULTRALIGHT_COMPOSITE_CMD_IN_PROGRESS (1 << 1)
 #define NFC_FLAG_MF_ULTRALIGHT_RESET_STATE               (1 << 2)
 
+void nfc_logger_flag_parse(NfcProtocol protocol, uint32_t flags, FuriString* output);
 #ifdef __cplusplus
 }
 #endif

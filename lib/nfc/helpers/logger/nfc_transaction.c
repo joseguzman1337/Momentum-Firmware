@@ -262,7 +262,8 @@ static void nfc_transaction_format_common(
 
         //FURI_LOG_E(TAG, "No CRC status format! Rework!");
         nfc_histroy_format_crc_status(transaction->history, output->crc_status);
-
+        nfc_histroy_format_annotation(
+            transaction->history, transaction->header.nfc_event, output->annotation);
     } while(false);
 }
 

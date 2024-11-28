@@ -186,9 +186,30 @@ bool nfc_history_load(Stream* stream, NfcHistory** instance_ptr) {
 }
 
 void nfc_histroy_format_annotation(
-    NfcHistoryItem* history,
-    size_t history_cnt,
+    const NfcHistory* instance,
+    const FuriHalNfcEvent nfc_event,
     FuriString* annotation) {
-    furi_assert(history);
+    furi_assert(instance);
     furi_assert(annotation);
-} */
+
+    if(nfc_event == 0) return;
+
+    FuriString* layer_parsed_str = furi_string_alloc();
+
+    nfc_logger_flag_parse(NfcProtocolInvalid, nfc_event, layer_parsed_str);
+    furi_string_printf(annotation, "L0(%s)", furi_string_get_cstr(layer_parsed_str));
+
+    for(size_t i = 0; i < instance->base.chain_count; i++) {
+        for(size_t j = 0; j < instance->chains[i].length; j++) {
+            furi_string_reset(layer_parsed_str);
+            const NfcHistoryItem* item = &(instance->chains[i].items[j]);
+            if(item->request_flags == 0) continue;
+            nfc_logger_flag_parse(item->protocol, item->request_flags, layer_parsed_str);
+
+            furi_string_cat_printf(
+                annotation, "->L%d(%s)", j + 1, furi_string_get_cstr(layer_parsed_str));
+        }
+    }
+
+    furi_string_free(layer_parsed_str);
+}
