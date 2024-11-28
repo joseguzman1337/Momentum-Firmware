@@ -2,14 +2,23 @@
 
 #define TAG "NfcLoggerFlags"
 
+typedef void (*NfcLoggerFlagCustomFormatCallback)(FuriString* output);
+
 typedef struct {
-    //NfcProtocol protocol;
-    //const NfcLoggerFlagDescription* child_flags;
+    NfcLoggerFlagCustomFormatCallback format;
+    ///TODO: introduce here some sort of switch, which will define how default formatting
+    ///and custom formatting will behave will they concat or override with each other
     const char* name;
 } NfcLoggerFlagDescription;
 
+static void nfc_logger_flag_format_ultralight_command(FuriString* output) {
+    furi_string_cat_str(output, "READBLOCK");
+    //mf_ultralight get cmd code from payload
+    //mf_ultralight parse command, and format with payload
+}
+
 static const NfcLoggerFlagDescription ultralight_flag_description[] = {
-    [0] = {.name = "CMD"},
+    [0] = {.name = "CMD", .format = nfc_logger_flag_format_ultralight_command},
     [1] = {.name = "Composite CMD"},
     [2] = {.name = "Reset"},
 };
@@ -75,8 +84,12 @@ void nfc_logger_flag_parse(NfcProtocol protocol, uint32_t flags, FuriString* out
     for(size_t i = 0; i < size; i++) {
         uint32_t flag_mask = (1 << i);
         if(flags & flag_mask) {
-            furi_string_cat_printf(
-                output, (flags_cnt > 0) ? ", %s" : "%s", flag_description[i].name);
+            const NfcLoggerFlagDescription* fd = &flag_description[i];
+            furi_string_cat_printf(output, (flags_cnt > 0) ? ", %s" : "%s", fd->name);
+
+            if(fd->format) {
+                fd->format(output);
+            }
             flags_cnt++;
         }
     }

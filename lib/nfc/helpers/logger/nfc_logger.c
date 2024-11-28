@@ -139,7 +139,21 @@ static void nfc_logger_trace_format_protocol_layers_description(
     nfc_protocol_layer_list_free(protocols);
 }
 
-static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_name) {
+static bool rzac_filter_apply(NfcLoggerTransactionFilter filter, NfcTransactionType type) {
+    bool result = (filter == NfcLoggerTransactionFilterAll);
+    if(filter == NfcLoggerTransactionFilterPayloadOnly &&
+       (type == NfcTransactionTypeRequestResponse || type == NfcTransactionTypeRequest ||
+        type == NfcTransactionTypeResponse)) {
+        result = true;
+    }
+
+    return result;
+}
+
+static void nfc_logger_convert_bin_to_text(
+    Storage* storage,
+    const char* file_name,
+    const NfcLoggerFormatFilter* filter) {
     //File* text_log_file = storage_file_alloc(storage);
     Stream* stream_bin = file_stream_alloc(storage);
     Stream* stream_txt = file_stream_alloc(storage);
@@ -182,22 +196,27 @@ static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_na
         NfcTransactionString* tr_str = nfc_transaction_string_alloc();
 
         while(nfc_transaction_read(stream_bin, &transaction)) {
-            NfcTransactionType type = nfc_transaction_get_type(transaction);
-            furi_string_reset(str);
+            do {
+                NfcTransactionType type = nfc_transaction_get_type(transaction);
+                if(!rzac_filter_apply(filter->transaction_filter, type)) break;
 
-            if(type != NfcTransactionTypeResponse) {
-                nfc_transaction_string_reset(tr_str);
-                nfc_transaction_format_request(transaction, tr_str);
-                table_printf_row_array(table, str, (FuriString**)tr_str, count);
-            }
+                furi_string_reset(str);
 
-            if(type == NfcTransactionTypeResponse || type == NfcTransactionTypeRequestResponse) {
-                nfc_transaction_string_reset(tr_str);
-                nfc_transaction_format_response(transaction, tr_str);
-                table_printf_row_array(table, str, (FuriString**)tr_str, count);
-            }
+                if(type != NfcTransactionTypeResponse) {
+                    nfc_transaction_string_reset(tr_str);
+                    nfc_transaction_format_request(transaction, filter->history_filter, tr_str);
+                    table_printf_row_array(table, str, (FuriString**)tr_str, count);
+                }
 
-            stream_write_string(stream_txt, str);
+                if(type == NfcTransactionTypeResponse ||
+                   type == NfcTransactionTypeRequestResponse) {
+                    nfc_transaction_string_reset(tr_str);
+                    nfc_transaction_format_response(transaction, tr_str);
+                    table_printf_row_array(table, str, (FuriString**)tr_str, count);
+                }
+
+                stream_write_string(stream_txt, str);
+            } while(false);
             nfc_transaction_free(transaction);
         }
 
@@ -217,6 +236,8 @@ NfcLogger* nfc_logger_alloc(void) {
 
     instance->storage = furi_record_open(RECORD_STORAGE);
     instance->filename = furi_string_alloc();
+    instance->filter.transaction_filter = NfcLoggerTransactionFilterAll;
+    instance->filter.history_filter = NfcLoggerHistoryLayerFilterAll;
     return instance;
 }
 
@@ -235,7 +256,7 @@ void nfc_logger_free(NfcLogger* instance) {
     free(instance);
 }
 
-void nfc_logger_config(NfcLogger* instance, bool enabled) {
+void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatFilter* filter) {
     if(enabled) {
         FuriThread* thread =
             furi_thread_alloc_ex(TAG, 1024U, nfc_logger_thread_callback, instance);
@@ -245,6 +266,11 @@ void nfc_logger_config(NfcLogger* instance, bool enabled) {
         ///TODO: tune queue size to reduce memory usage
         instance->transaction_queue = furi_message_queue_alloc(50, sizeof(NfcTransaction*));
         instance->state = NfcLoggerStateIdle;
+
+        if(filter) {
+            instance->filter.transaction_filter = filter->transaction_filter;
+            instance->filter.history_filter = filter->history_filter;
+        }
     } else {
         nfc_logger_free_thread_and_queue(instance);
         instance->state = NfcLoggerStateDisabled;
@@ -329,7 +355,7 @@ void nfc_logger_stop(NfcLogger* instance) {
 
         if(status == FSE_OK) {
             nfc_logger_convert_bin_to_text(
-                instance->storage, furi_string_get_cstr(instance->filename));
+                instance->storage, furi_string_get_cstr(instance->filename), &instance->filter);
         }
 
         nfc_logger_trace_free(instance->trace);

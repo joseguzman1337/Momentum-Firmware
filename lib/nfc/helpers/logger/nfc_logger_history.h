@@ -14,6 +14,11 @@ typedef struct {
     NfcLoggerFlags response_flags;
 } FURI_PACKED NfcHistoryItem;
 
+typedef enum {
+    NfcLoggerHistoryLayerFilterAll,
+    NfcLoggerHistoryLayerFilterTopProtocolOnly,
+} NfcLoggerHistoryLayerFilter;
+
 typedef struct NfcHistory NfcHistory;
 
 #ifdef __cplusplus

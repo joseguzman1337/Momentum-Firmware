@@ -21,6 +21,7 @@ struct NfcLogger {
     NfcTransaction* transaction;
     uint8_t history_chain_size;
 
+    NfcLoggerFormatFilter filter;
     FuriString* filename;
     Storage* storage;
     FuriThread* logger_thread;

@@ -38,6 +38,7 @@ void nfc_histroy_format_crc_status(const NfcHistory* instance, FuriString* crc_s
 void nfc_histroy_format_annotation(
     const NfcHistory* instance,
     const FuriHalNfcEvent nfc_event,
+    const NfcLoggerHistoryLayerFilter filter,
     FuriString* annotation);
 
 #ifdef __cplusplus

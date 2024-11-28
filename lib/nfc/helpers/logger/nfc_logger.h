@@ -20,6 +20,16 @@ extern "C" {
 typedef struct NfcLogger NfcLogger;
 
 typedef enum {
+    NfcLoggerTransactionFilterAll,
+    NfcLoggerTransactionFilterPayloadOnly,
+} NfcLoggerTransactionFilter;
+
+typedef struct {
+    NfcLoggerTransactionFilter transaction_filter;
+    NfcLoggerHistoryLayerFilter history_filter;
+} NfcLoggerFormatFilter;
+
+typedef enum {
     NfcLoggerStateDisabled,
     NfcLoggerStateIdle,
     NfcLoggerStateProcessing,
@@ -29,7 +39,7 @@ typedef enum {
 
 NfcLogger* nfc_logger_alloc(void);
 void nfc_logger_free(NfcLogger* instance);
-void nfc_logger_config(NfcLogger* instance, bool enabled /*Here some other params can be added*/);
+void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatFilter* filter);
 void nfc_logger_set_protocol_history_size(NfcLogger* instance, NfcProtocol protocol, uint8_t size);
 
 bool nfc_logger_enabled(NfcLogger* instance);

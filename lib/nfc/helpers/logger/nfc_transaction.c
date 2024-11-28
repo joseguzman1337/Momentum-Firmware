@@ -117,6 +117,8 @@ void nfc_transaction_save_to_file(File* file, const NfcTransaction* transaction)
     nfc_history_save(file, transaction->history);
 }
 
+///TODO: rework this function so it will apply filter by itself and simply  skip
+///transactions which don't match to filter values;
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
     furi_assert(stream);
     furi_assert(transaction_ptr);
@@ -242,10 +244,6 @@ static void nfc_transaction_format_common(
         } else
             furi_string_printf(output->src, "TAG");
 
-        /*  furi_string_printf(
-            output->src, desired_type == NfcTransactionTypeResponse ? "TAG" : "RDR"); */
-
-        //furi_string_printf(output->src, "%s", "RDR");
         furi_string_printf(output->time, "%ld", time);
 
         if((header->type == NfcTransactionTypeRequest ||
@@ -260,18 +258,20 @@ static void nfc_transaction_format_common(
             nfc_packet_format(transaction->response, output->payload);
         }
 
-        //FURI_LOG_E(TAG, "No CRC status format! Rework!");
         nfc_histroy_format_crc_status(transaction->history, output->crc_status);
-        nfc_histroy_format_annotation(
-            transaction->history, transaction->header.nfc_event, output->annotation);
     } while(false);
 }
 
-void nfc_transaction_format_request(NfcTransaction* transaction, NfcTransactionString* output) {
+void nfc_transaction_format_request(
+    NfcTransaction* transaction,
+    NfcLoggerHistoryLayerFilter filter,
+    NfcTransactionString* output) {
     furi_assert(output);
     furi_assert(transaction);
 
     nfc_transaction_format_common(transaction, NfcTransactionTypeRequest, output);
+    nfc_histroy_format_annotation(
+        transaction->history, transaction->header.nfc_event, filter, output->annotation);
 }
 
 void nfc_transaction_format_response(NfcTransaction* transaction, NfcTransactionString* output) {
