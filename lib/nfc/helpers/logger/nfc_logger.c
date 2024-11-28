@@ -171,7 +171,7 @@ static void nfc_logger_convert_bin_to_text(Storage* storage, const char* file_na
 
         FuriString* str = furi_string_alloc();
 
-        const size_t width[] = {5, 10, 8, 3, 60, 3, 30};
+        const size_t width[] = {5, 10, 8, 3, 60, 3, 60};
         const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
         const size_t count = COUNT_OF(width);
         Table* table = table_alloc(count, width, names);
