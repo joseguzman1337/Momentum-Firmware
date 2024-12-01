@@ -110,6 +110,8 @@ typedef bool (*NfcPollerDetect)(NfcGenericEvent event, void* context);
  */
 typedef const NfcDeviceData* (*NfcPollerGetData)(const NfcGenericInstance* instance);
 
+typedef void (*NfcPollerLogHistory)(NfcLogger* logger, void* context);
+
 /**
  * @brief Generic NFC poller interface.
  *
@@ -125,6 +127,7 @@ typedef struct {
     NfcPollerRun run; /**< Pointer to the run() function. */
     NfcPollerDetect detect; /**< Pointer to the detect() function. */
     NfcPollerGetData get_data; /**< Pointer to the get_data() function. */
+    NfcPollerLogHistory log_history;
 } NfcPollerBase;
 
 #ifdef __cplusplus
