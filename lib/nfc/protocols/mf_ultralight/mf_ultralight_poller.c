@@ -797,6 +797,12 @@ static bool mf_ultralight_poller_detect(NfcGenericEvent event, void* context) {
     return protocol_detected;
 }
 
+static void mf_ultralight_poller_log_history(NfcLogger* logger, void* context) {
+    MfUltralightPoller* instance = context;
+    nfc_logger_append_history(logger, &instance->history);
+    NFC_LOG_FLAG_FLUSH(instance->history);
+}
+
 const NfcPollerBase mf_ultralight_poller = {
     .alloc = (NfcPollerAlloc)mf_ultralight_poller_alloc,
     .free = (NfcPollerFree)mf_ultralight_poller_free,
@@ -804,4 +810,5 @@ const NfcPollerBase mf_ultralight_poller = {
     .run = (NfcPollerRun)mf_ultralight_poller_run,
     .detect = (NfcPollerDetect)mf_ultralight_poller_detect,
     .get_data = (NfcPollerGetData)mf_ultralight_poller_get_data,
+    .log_history = (NfcPollerLogHistory)mf_ultralight_poller_log_history,
 };

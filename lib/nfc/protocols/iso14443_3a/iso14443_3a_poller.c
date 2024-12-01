@@ -118,6 +118,12 @@ static bool iso14443_3a_poller_detect(NfcGenericEvent event, void* context) {
     return protocol_detected;
 }
 
+static void iso14443_3a_poller_log_history(NfcLogger* logger, void* context) {
+    Iso14443_3aPoller* instance = context;
+    nfc_logger_append_history(logger, &instance->history);
+    NFC_LOG_FLAG_FLUSH(instance->history);
+}
+
 const NfcPollerBase nfc_poller_iso14443_3a = {
     .alloc = (NfcPollerAlloc)iso14443_3a_poller_alloc,
     .free = (NfcPollerFree)iso14443_3a_poller_free_new,
@@ -125,4 +131,5 @@ const NfcPollerBase nfc_poller_iso14443_3a = {
     .run = (NfcPollerRun)iso14443_3a_poller_run,
     .detect = (NfcPollerDetect)iso14443_3a_poller_detect,
     .get_data = (NfcPollerGetData)iso14443_3a_poller_get_data,
+    .log_history = (NfcPollerLogHistory)iso14443_3a_poller_log_history,
 };
