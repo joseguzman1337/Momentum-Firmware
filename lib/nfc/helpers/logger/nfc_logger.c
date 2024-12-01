@@ -242,8 +242,14 @@ NfcLogger* nfc_logger_alloc(void) {
 }
 
 static inline void nfc_logger_free_thread_and_queue(NfcLogger* instance) {
-    if(instance->logger_thread) furi_thread_free(instance->logger_thread);
-    if(instance->transaction_queue) furi_message_queue_free(instance->transaction_queue);
+    if(instance->logger_thread) {
+        furi_thread_free(instance->logger_thread);
+        instance->logger_thread = NULL;
+    }
+    if(instance->transaction_queue) {
+        furi_message_queue_free(instance->transaction_queue);
+        instance->transaction_queue = NULL;
+    }
 }
 
 void nfc_logger_free(NfcLogger* instance) {
