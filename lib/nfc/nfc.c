@@ -189,6 +189,7 @@ bool nfc_worker_poller_ready_handler(Nfc* instance) {
     NfcCommand command = NfcCommandContinue;
 
     NfcEvent event = {.type = NfcEventTypePollerReady};
+    nfc_logger_transaction_begin(instance->logger, FuriHalNfcEventTxStart);
     command = instance->callback(event, instance->context);
     if(command == NfcCommandReset) {
         instance->poller_state = NfcPollerStateReset;
@@ -196,6 +197,7 @@ bool nfc_worker_poller_ready_handler(Nfc* instance) {
         instance->poller_state = NfcPollerStateStop;
     }
 
+    nfc_logger_transaction_end(instance->logger);
     return false;
 }
 
