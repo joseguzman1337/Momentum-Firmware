@@ -31,7 +31,7 @@ static Iso14443_3aPoller* iso14443_3a_poller_alloc(Nfc* nfc) {
     instance->general_event.protocol = NfcProtocolIso14443_3a;
     instance->general_event.event_data = &instance->iso14443_3a_event;
     instance->general_event.instance = instance;
-
+    instance->history.protocol = NfcProtocolIso14443_3a;
     return instance;
 }
 
@@ -74,11 +74,13 @@ static NfcCommand iso14443_3a_poller_run(NfcGenericEvent event, void* context) {
             Iso14443_3aData data = {};
             Iso14443_3aError error = iso14443_3a_poller_activate(instance, &data);
             if(error == Iso14443_3aErrorNone) {
+                NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_ACTIVATED);
                 instance->state = Iso14443_3aPollerStateActivated;
                 instance->iso14443_3a_event.type = Iso14443_3aPollerEventTypeReady;
                 instance->iso14443_3a_event_data.error = error;
                 command = instance->callback(instance->general_event, instance->context);
             } else {
+                NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_ERROR);
                 instance->iso14443_3a_event.type = Iso14443_3aPollerEventTypeError;
                 instance->iso14443_3a_event_data.error = error;
                 command = instance->callback(instance->general_event, instance->context);

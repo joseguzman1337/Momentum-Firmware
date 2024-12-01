@@ -34,6 +34,7 @@ typedef uint32_t NfcLoggerFlags;
 #define NFC_FLAG_ISO14443_3A_ACTIVATED (1 << 2)
 #define NFC_FLAG_ISO14443_3A_HALT      (1 << 3)
 #define NFC_FLAG_ISO14443_3A_FIELD_OFF (1 << 4)
+#define NFC_FLAG_ISO14443_3A_ERROR     (1 << 5)
 
 #define NFC_FLAG_MF_ULTRALIGHT_CMD                       (1 << 0)
 #define NFC_FLAG_MF_ULTRALIGHT_COMPOSITE_CMD_IN_PROGRESS (1 << 1)

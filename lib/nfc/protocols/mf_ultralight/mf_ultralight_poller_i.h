@@ -2,6 +2,7 @@
 
 #include "mf_ultralight_poller.h"
 #include <lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
+#include <helpers/logger/nfc_logger.h>
 #include <lib/bit_lib/bit_lib.h>
 
 #ifdef __cplusplus
@@ -95,6 +96,7 @@ struct MfUltralightPoller {
     MfUltralightPollerEvent mfu_event;
     MfUltralightPollerEventData mfu_event_data;
     NfcGenericCallback callback;
+    NfcHistoryItem history;
     void* context;
 };
 

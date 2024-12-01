@@ -3,6 +3,7 @@
 #include "iso14443_3a_poller.h"
 
 #include <toolbox/bit_buffer.h>
+#include <helpers/logger/nfc_logger.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +52,7 @@ struct Iso14443_3aPoller {
     Iso14443_3aPollerEvent iso14443_3a_event;
     Iso14443_3aPollerEventData iso14443_3a_event_data;
     NfcGenericCallback callback;
+    NfcHistoryItem history;
     void* context;
 };
 
