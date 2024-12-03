@@ -8,10 +8,17 @@
 extern "C" {
 #endif
 
+typedef void NfcHistoryData;
+
 typedef struct {
     NfcProtocol protocol;
+    uint8_t data_block_size;
     NfcLoggerFlags request_flags;
-    NfcLoggerFlags response_flags;
+} FURI_PACKED NfcHistoryItemBase;
+
+typedef struct {
+    NfcHistoryItemBase base;
+    NfcHistoryData* data;
 } FURI_PACKED NfcHistoryItem;
 
 typedef enum {

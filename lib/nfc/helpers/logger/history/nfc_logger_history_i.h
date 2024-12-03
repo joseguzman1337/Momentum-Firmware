@@ -9,6 +9,7 @@
 extern "C" {
 #endif
 
+/// TODO: Try to move this to .c file in order to hide from nfc_transaction.c module
 typedef struct {
     uint8_t length;
     NfcHistoryItem items[];
@@ -16,17 +17,18 @@ typedef struct {
 
 typedef struct {
     uint8_t chain_count;
-    uint8_t history_max_size;
-    uint8_t chain_max_length;
+    uint8_t max_chain_count;
+    uint8_t history_size_bytes;
 } NfcHistoryBase;
 
 struct FURI_PACKED NfcHistory {
     NfcHistoryBase base;
     NfcHistoryChain chains[];
-    //NfcHistoryChain** chains;
 };
 
-NfcHistory* nfc_history_alloc(uint8_t max_chain_cnt);
+//NfcHistory* nfc_history_alloc(uint8_t max_chain_cnt);
+uint8_t nfc_history_get_size_bytes(NfcProtocol protocol, NfcMode mode, uint8_t max_chain_count);
+NfcHistory* nfc_history_alloc(uint8_t history_size_bytes, uint8_t max_chain_count);
 void nfc_history_free(NfcHistory* instance);
 
 void nfc_history_append(NfcHistory* instance, const NfcHistoryItem* item);

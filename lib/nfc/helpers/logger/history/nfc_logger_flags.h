@@ -1,7 +1,12 @@
 #pragma once
 
+//#include <nfc/nfc.h>
 #include <nfc_mode.h>
 #include <nfc/protocols/nfc_protocol.h>
+
+/*
+#include <nfc/protocols/mf_ultralight/mf_ultralight_poller_i.h>
+#include <nfc/protocols/mf_ultralight/mf_ultralight_listener.h> */
 
 #include <furi.h>
 
@@ -19,7 +24,6 @@ typedef uint32_t NfcLoggerFlags;
 #define NFC_LOG_FLAG_FLUSH(history) \
     do {                            \
         history.request_flags = 0;  \
-        history.response_flags = 0; \
     } while(false);
 
 ///TODO:rename to NFC_FLAG_HAL
@@ -39,6 +43,22 @@ typedef uint32_t NfcLoggerFlags;
 #define NFC_FLAG_MF_ULTRALIGHT_CMD                       (1 << 0)
 #define NFC_FLAG_MF_ULTRALIGHT_COMPOSITE_CMD_IN_PROGRESS (1 << 1)
 #define NFC_FLAG_MF_ULTRALIGHT_RESET_STATE               (1 << 2)
+
+//---------------------------------------------------
+/* typedef union {
+    MfUltralightPollerEventType poller_event;
+    MfUltralightListenerEventType listener_event;
+} NfcHistoryEventType_MfUltralight;
+
+typedef union {
+    MfUltralightPollerState poller_state;
+} NfcHistoryState_MfUltralight;
+
+typedef struct {
+    NfcHistoryEventType_MfUltralight event;
+    NfcHistoryState_MfUltralight state;
+    NfcCommand command;
+} FURI_PACKED NfcHistoryData_MfUltralight; */
 
 void nfc_logger_flag_parse(NfcProtocol protocol, uint32_t flags, FuriString* output);
 #ifdef __cplusplus
