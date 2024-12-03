@@ -1,7 +1,7 @@
 #pragma once
 
 #include "nfc_transaction.h"
-#include "nfc_logger_history_i.h"
+#include "history/nfc_logger_history_i.h"
 
 #ifdef __cplusplus
 extern "C" {

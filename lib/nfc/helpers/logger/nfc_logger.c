@@ -1,4 +1,5 @@
 #include "nfc_logger_i.h"
+#include "history/nfc_logger_history_i.h"
 #include <nfc_device.h>
 #include <nfc/protocols/nfc_protocol.h>
 #include "table.h"
@@ -185,7 +186,7 @@ static void nfc_logger_convert_bin_to_text(
 
         FuriString* str = furi_string_alloc();
 
-        const size_t width[] = {5, 10, 8, 3, 60, 3, 60};
+        const size_t width[] = {5, 10, 8, 3, 60, 3, 120};
         const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
         const size_t count = COUNT_OF(width);
         Table* table = table_alloc(count, width, names);
@@ -300,12 +301,14 @@ bool nfc_logger_enabled(NfcLogger* instance) {
     return instance->state != NfcLoggerStateDisabled;
 }
 
+///TODO: Rename this to set_protocol
 void nfc_logger_set_protocol_history_size(NfcLogger* instance, NfcProtocol protocol, uint8_t size) {
     furi_assert(instance);
     furi_assert(protocol < NfcProtocolNum);
     furi_assert(size > 0);
     instance->protocol = protocol;
-    instance->history_chain_size = size;
+    UNUSED(size);
+    //instance->history_chain_size = size;
 }
 
 void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
@@ -315,6 +318,10 @@ void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
 
     if(instance->state == NfcLoggerStateDisabled) return;
     nfc_logger_delete_all_logs(instance->storage);
+
+    instance->max_chain_size = 3;
+    instance->history_size_bytes =
+        nfc_history_get_size_bytes(instance->protocol, mode, instance->max_chain_size);
 
     instance->exit = false;
     instance->trace = nfc_logger_trace_alloc(instance->protocol, mode);
@@ -387,7 +394,8 @@ void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
     //FURI_LOG_D(TAG, "Begin_tr: %ld", id);
 
     instance->state = NfcLoggerStateProcessing;
-    instance->transaction = nfc_transaction_alloc(id, event, instance->history_chain_size);
+    instance->transaction =
+        nfc_transaction_alloc(id, event, instance->history_size_bytes, instance->max_chain_size);
 }
 
 void nfc_logger_transaction_end(NfcLogger* instance) {

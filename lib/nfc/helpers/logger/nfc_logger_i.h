@@ -19,7 +19,8 @@ struct NfcLogger {
     NfcProtocol protocol;
     NfcTrace* trace;
     NfcTransaction* transaction;
-    uint8_t history_chain_size;
+    uint8_t max_chain_size;
+    uint8_t history_size_bytes;
 
     NfcLoggerFormatFilter filter;
     FuriString* filename;

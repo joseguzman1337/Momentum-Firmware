@@ -2,20 +2,22 @@
 #include "nfc_transaction_i.h"
 
 #define TAG "NfcTransaction"
-//----------------------------------------------------------------------------------------------------------
 
 static NfcTransaction* nfc_transaction_alloc_empty() {
     return malloc(sizeof(NfcTransaction));
 }
 
-NfcTransaction*
-    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t max_history_chain_count) {
+NfcTransaction* nfc_transaction_alloc(
+    uint32_t id,
+    FuriHalNfcEvent event,
+    uint8_t history_size_bytes,
+    uint8_t max_chain_count) {
     NfcTransaction* t = nfc_transaction_alloc_empty(); //malloc(sizeof(NfcTransaction));
     t->header.type = NfcTransactionTypeEmpty;
     t->header.id = id;
     t->header.nfc_event = event;
     t->header.time = furi_get_tick();
-    t->history = nfc_history_alloc(max_history_chain_count);
+    t->history = nfc_history_alloc(history_size_bytes, max_chain_count);
     return t;
 }
 

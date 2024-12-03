@@ -6,7 +6,7 @@
 
 #include <furi.h>
 
-#include "nfc_logger_history.h"
+#include "history/nfc_logger_history.h"
 
 //#include "nfc_transaction_i.h"
 

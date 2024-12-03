@@ -34,8 +34,14 @@ typedef struct {
 ///TODO: Think of moving major part of these functions to _i.h header and expose them only for logger.c under the hood
 ///without putting them into api
 
-NfcTransaction*
-    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t max_history_chain_count);
+/* NfcTransaction*
+    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t history_size_bytes); */
+NfcTransaction* nfc_transaction_alloc(
+    uint32_t id,
+    FuriHalNfcEvent event,
+    uint8_t history_size_bytes,
+    uint8_t max_chain_count);
+
 void nfc_transaction_free(NfcTransaction* instance);
 NfcTransactionType nfc_transaction_get_type(const NfcTransaction* instance);
 uint32_t nfc_transaction_get_id(const NfcTransaction* instance);
