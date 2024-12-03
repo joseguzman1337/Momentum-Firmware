@@ -1,0 +1,59 @@
+
+#include "iso14443_3a_listener_data_formatter_i.h"
+/* 
+static const char* events[] = {
+    [Iso14443_3aListenerEventTypeFieldOff] = "Field Off",
+    [Iso14443_3aListenerEventTypeHalted] = "Halt",
+    [Iso14443_3aListenerEventTypeReceivedStandardFrame] = "RxFrame",
+    [Iso14443_3aListenerEventTypeReceivedData] = "RxData",
+}; */
+
+static const char* events[] = {
+    [NfcEventTypeUserAbort] = "Abort",
+    [NfcEventTypeFieldOn] = "Field On",
+    [NfcEventTypeFieldOff] = "Field Off",
+    [NfcEventTypeTxStart] = "TxStart",
+    [NfcEventTypeTxEnd] = "TxEnd",
+    [NfcEventTypeRxStart] = "RxStart",
+    [NfcEventTypeRxEnd] = "RxEnd",
+
+    [NfcEventTypeListenerActivated] = "LstActived",
+    [NfcEventTypePollerReady] = "PollerReady",
+};
+
+static const char* states[] = {
+    [Iso14443_3aListenerStateActive] = "Active",
+    [Iso14443_3aListenerStateIdle] = "Idle",
+};
+
+static const char* commands[] = {
+    [NfcCommandContinue] = "Continue",
+    [NfcCommandReset] = "Reset",
+    [NfcCommandSleep] = "Sleep",
+    [NfcCommandStop] = "Stop",
+};
+
+const char* iso14443_3a_listener_data_format_event_type(const Iso14443_3aListenerEventType event) {
+    return events[event];
+}
+
+static void iso14443_3a_listener_data_format(const NfcHistoryData* data, FuriString* output) {
+    const Iso14443_3aListenerHistoryData* iso14443_3a_data = data;
+
+    FURI_LOG_D(
+        "ISO14",
+        "E_%02X, S_%02X, C_%02X",
+        iso14443_3a_data->event,
+        iso14443_3a_data->state,
+        iso14443_3a_data->command);
+
+    const char* event_text = events[iso14443_3a_data->event];
+    const char* state_text = states[iso14443_3a_data->state];
+    const char* command_text = commands[iso14443_3a_data->command];
+    furi_string_printf(output, "E=%s, S=%s, C=%s", event_text, state_text, command_text);
+}
+
+const NfcHistoryItemDataHandler iso14443_3a_listener_data_formatter = {
+    .data_size = sizeof(Iso14443_3aListenerHistoryData),
+    .format = iso14443_3a_listener_data_format,
+};
