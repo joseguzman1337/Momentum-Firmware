@@ -50,6 +50,13 @@ typedef struct {
 typedef uint16_t MfUltralightStaticLockData;
 typedef uint32_t MfUltralightDynamicLockData;
 
+typedef struct {
+    //MfUltralightListenerEventType event;
+    Iso14443_3aListenerEventType event;
+    MfUltralightCommand mfu_command;
+    NfcCommand command;
+} FURI_PACKED MfUltralightListenerHistoryData;
+
 struct MfUltralightListener {
     Iso14443_3aListener* iso14443_3a_listener;
     MfUltralightListenerAuthState auth_state;
@@ -70,6 +77,7 @@ struct MfUltralightListener {
     MfUltralightListenerCompositeCommandContext composite_cmd;
     mbedtls_des3_context des_context;
     NfcHistoryItem history;
+    MfUltralightListenerHistoryData history_data;
     uint8_t rndB[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE];
     uint8_t encB[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE];
     void* context;

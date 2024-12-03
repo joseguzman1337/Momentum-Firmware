@@ -13,6 +13,12 @@ typedef enum {
     Iso14443_3aListenerStateActive,
 } Iso14443_3aListenerState;
 
+typedef struct {
+    NfcEventType event;
+    Iso14443_3aListenerState state;
+    NfcCommand command;
+} FURI_PACKED Iso14443_3aListenerHistoryData;
+
 struct Iso14443_3aListener {
     Nfc* nfc;
     Iso14443_3aData* data;
@@ -25,6 +31,7 @@ struct Iso14443_3aListener {
     Iso14443_3aListenerEventData iso14443_3a_event_data;
     NfcGenericCallback callback;
     NfcHistoryItem history;
+    Iso14443_3aListenerHistoryData history_data;
     void* context;
 };
 
