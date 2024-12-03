@@ -46,7 +46,9 @@ Iso14443_3aListener* iso14443_3a_listener_alloc(Nfc* nfc, Iso14443_3aData* data)
         instance->data->atqa,
         instance->data->sak);
 
-    instance->history.protocol = NfcProtocolIso14443_3a;
+    instance->history.base.protocol = NfcProtocolIso14443_3a;
+    instance->history.base.data_block_size = sizeof(Iso14443_3aListenerHistoryData);
+    instance->history.data = &instance->history_data;
     return instance;
 }
 
@@ -87,14 +89,14 @@ NfcCommand iso14443_3a_listener_run(NfcGenericEvent event, void* context) {
 
     if(nfc_event->type == NfcEventTypeListenerActivated) {
         instance->state = Iso14443_3aListenerStateActive;
-        NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_ACTIVATED);
+        NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_ISO14443_3A_ACTIVATED);
     } else if(nfc_event->type == NfcEventTypeFieldOff) {
         instance->state = Iso14443_3aListenerStateIdle;
         if(instance->callback) {
             instance->iso14443_3a_event.type = Iso14443_3aListenerEventTypeFieldOff;
             instance->callback(instance->generic_event, instance->context);
         }
-        NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_FIELD_OFF);
+        NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_ISO14443_3A_FIELD_OFF);
         command = NfcCommandSleep;
     } else if(nfc_event->type == NfcEventTypeRxEnd) {
         if(iso14443_3a_listener_halt_received(nfc_event->data.buffer)) {
@@ -102,16 +104,16 @@ NfcCommand iso14443_3a_listener_run(NfcGenericEvent event, void* context) {
                 instance->iso14443_3a_event.type = Iso14443_3aListenerEventTypeHalted;
                 instance->callback(instance->generic_event, instance->context);
             }
-            NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_HALT);
+            NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_ISO14443_3A_HALT);
             command = NfcCommandSleep;
         } else {
             if(iso14443_crc_check(Iso14443CrcTypeA, nfc_event->data.buffer)) {
                 instance->iso14443_3a_event.type =
                     Iso14443_3aListenerEventTypeReceivedStandardFrame;
                 iso14443_crc_trim(nfc_event->data.buffer);
-                NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_CRC_OK);
+                NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_ISO14443_3A_CRC_OK);
             } else {
-                NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_CRC_BAD);
+                NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_ISO14443_3A_CRC_BAD);
                 instance->iso14443_3a_event.type = Iso14443_3aListenerEventTypeReceivedData;
             }
             instance->iso14443_3a_event_data.buffer = nfc_event->data.buffer;
@@ -120,13 +122,17 @@ NfcCommand iso14443_3a_listener_run(NfcGenericEvent event, void* context) {
             }
         }
     }
+
+    instance->history_data.command = command;
+    instance->history_data.event = nfc_event->type;
+    instance->history_data.state = instance->state;
     return command;
 }
 
 void iso14443_3a_listener_log_history(NfcLogger* logger, void* context) {
     Iso14443_3aListener* instance = context;
     nfc_logger_append_history(logger, &instance->history);
-    NFC_LOG_FLAG_FLUSH(instance->history);
+    NFC_LOG_FLAG_FLUSH(instance->history.base);
 }
 
 const NfcListenerBase nfc_listener_iso14443_3a = {
