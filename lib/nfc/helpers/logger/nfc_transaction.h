@@ -21,16 +21,6 @@ typedef struct {
     uint8_t* data;
 } NfcPacketString;
 
-typedef struct {
-    FuriString* id;
-    FuriString* type;
-    FuriString* time;
-    FuriString* src;
-    FuriString* payload;
-    FuriString* crc_status;
-    FuriString* annotation;
-} NfcTransactionString;
-
 ///TODO: Think of moving major part of these functions to _i.h header and expose them only for logger.c under the hood
 ///without putting them into api
 
