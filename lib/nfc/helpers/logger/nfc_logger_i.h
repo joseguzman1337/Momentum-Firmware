@@ -7,12 +7,7 @@
 #include <toolbox/path.h>
 
 #include "nfc_transaction.h"
-
-typedef struct {
-    NfcProtocol protocol;
-    NfcMode mode;
-    size_t transactions_count;
-} FURI_PACKED NfcTrace;
+#include "nfc_trace_data_type_i.h"
 
 struct NfcLogger {
     NfcLoggerState state;
