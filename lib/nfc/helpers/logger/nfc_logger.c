@@ -121,36 +121,6 @@ static void nfc_logger_delete_all_logs(Storage* storage) {
     storage_file_free(f);
 }
 
-static void nfc_logger_trace_format_protocol_layers_description(
-    Stream* stream,
-    NfcProtocol trace_protocol) {
-    furi_assert(stream);
-    furi_assert(trace_protocol < NfcProtocolNum);
-
-    stream_write_format(stream, "Protocol layers:\r\n");
-
-    uint8_t count = 0;
-    NfcProtocol* protocols = nfc_protocol_layer_list_alloc(trace_protocol, &count);
-    stream_write_format(stream, "L0 - NFC\r\n");
-    for(uint8_t i = 0; i < count; i++) {
-        stream_write_format(
-            stream, "L%d - %s\r\n", i + 1, nfc_device_get_protocol_name(protocols[i]));
-    }
-    stream_write_format(stream, "\r\n");
-    nfc_protocol_layer_list_free(protocols);
-}
-
-static bool rzac_filter_apply(NfcLoggerTransactionFilter filter, NfcTransactionType type) {
-    bool result = (filter == NfcLoggerTransactionFilterAll);
-    if(filter == NfcLoggerTransactionFilterPayloadOnly &&
-       (type == NfcTransactionTypeRequestResponse || type == NfcTransactionTypeRequest ||
-        type == NfcTransactionTypeResponse)) {
-        result = true;
-    }
-
-    return result;
-}
-
 static void nfc_logger_convert_bin_to_text(
     Storage* storage,
     const char* file_name,
@@ -173,59 +143,29 @@ static void nfc_logger_convert_bin_to_text(
 
         if(!nfc_logger_read_trace(stream_bin, &trace)) break;
 
-        stream_write_format(stream_txt, "Trace info\nName: %s\n", file_name);
-        stream_write_format(
-            stream_txt,
-            "Protocol: %s\nMode: %s\nTransaction count: %d\n\n",
-            nfc_device_get_protocol_name(trace.protocol),
-            trace.mode == NfcModeListener ? "NfcListener" : "NfcPoller",
-            trace.transactions_count);
-
-        nfc_logger_trace_format_protocol_layers_description(stream_txt, trace.protocol);
-        NfcTransaction* transaction;
+        UNUSED(filter);
+        NfcFormatter* formatter = nfc_formatter_alloc();
 
         FuriString* str = furi_string_alloc();
-
-        const size_t width[] = {5, 10, 8, 3, 60, 3, 120};
-        const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
-        const size_t count = COUNT_OF(width);
-        Table* table = table_alloc(count, width, names);
-        table_set_column_alignment(table, 4, TableColumnDataAlignmentLeft);
-        table_printf_header(table, str);
+        nfc_format_trace(formatter, file_name, &trace, str);
         stream_write_string(stream_txt, str);
 
-        NfcTransactionString* tr_str = nfc_transaction_string_alloc();
+        furi_string_reset(str);
 
+        nfc_format_table_header(formatter, str);
+        stream_write_string(stream_txt, str);
+
+        NfcTransaction* transaction;
         while(nfc_transaction_read(stream_bin, &transaction)) {
-            do {
-                NfcTransactionType type = nfc_transaction_get_type(transaction);
-                if(!rzac_filter_apply(filter->transaction_filter, type)) break;
+            furi_string_reset(str);
+            nfc_format_transaction(formatter, transaction, str);
+            stream_write_string(stream_txt, str);
 
-                furi_string_reset(str);
-
-                if(type != NfcTransactionTypeResponse) {
-                    nfc_transaction_string_reset(tr_str);
-                    nfc_transaction_format_request(transaction, filter->history_filter, tr_str);
-                    table_printf_row_array(table, str, (FuriString**)tr_str, count);
-                }
-
-                if(type == NfcTransactionTypeResponse ||
-                   type == NfcTransactionTypeRequestResponse) {
-                    nfc_transaction_string_reset(tr_str);
-                    nfc_transaction_format_response(transaction, tr_str);
-                    table_printf_row_array(table, str, (FuriString**)tr_str, count);
-                }
-
-                stream_write_string(stream_txt, str);
-            } while(false);
             nfc_transaction_free(transaction);
         }
 
-        nfc_transaction_string_free(tr_str);
-
         furi_string_free(str);
-        table_free(table);
-
+        nfc_formatter_free(formatter);
     } while(false);
 
     stream_free(stream_bin);

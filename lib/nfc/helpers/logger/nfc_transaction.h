@@ -55,17 +55,6 @@ void nfc_transaction_append_history(NfcTransaction* transaction, NfcHistoryItem*
 void nfc_transaction_save_to_file(File* file, const NfcTransaction* transaction);
 
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr);
-//void nfc_transaction_format(NfcTransaction* transaction, NfcTransactionString* output);
-void nfc_transaction_format_request(
-    NfcTransaction* transaction,
-    NfcLoggerHistoryLayerFilter filter,
-    NfcTransactionString* output);
-
-void nfc_transaction_format_response(NfcTransaction* transaction, NfcTransactionString* output);
-
-NfcTransactionString* nfc_transaction_string_alloc(void);
-void nfc_transaction_string_free(NfcTransactionString* transaction);
-void nfc_transaction_string_reset(NfcTransactionString* transaction);
 
 #ifdef __cplusplus
 }
