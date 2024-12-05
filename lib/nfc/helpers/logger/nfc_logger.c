@@ -354,14 +354,20 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
     } while(false);
 }
 
-void nfc_logger_append_data(
-    NfcLogger* instance,
-    const uint8_t* data,
-    const size_t data_size,
-    bool response) {
+void nfc_logger_append_request(NfcLogger* instance, const uint8_t* data, const size_t data_size) {
+    furi_assert(instance);
+    furi_assert(data);
+    furi_assert(data_size > 0);
     if(instance->state == NfcLoggerStateDisabled) return;
+    nfc_transaction_append(instance->transaction, data, data_size, false);
+}
 
-    nfc_transaction_append(instance->transaction, data, data_size, response);
+void nfc_logger_append_response(NfcLogger* instance, const uint8_t* data, const size_t data_size) {
+    furi_assert(instance);
+    furi_assert(data);
+    furi_assert(data_size > 0);
+    if(instance->state == NfcLoggerStateDisabled) return;
+    nfc_transaction_append(instance->transaction, data, data_size, true);
 }
 
 void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
