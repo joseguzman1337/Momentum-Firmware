@@ -1,5 +1,6 @@
 #include "nfc_history_formatter.h"
 #include "nfc/helpers/logger/history/nfc_history_i.h"
+#include "nfc/helpers/logger/formatter/protocols/_nfc_hal/nfc_hal_formatter.h"
 #include "nfc/helpers/logger/formatter/protocols/nfc_protocol_formatters.h"
 
 void nfc_histroy_format_annotation(
@@ -15,7 +16,7 @@ void nfc_histroy_format_annotation(
 
     FuriString* layer_parsed_str = furi_string_alloc();
     //  if(filter == NfcLoggerHistoryLayerFilterAll) {
-    nfc_logger_flag_parse(NfcProtocolInvalid, nfc_event, layer_parsed_str);
+    nfc_hal_data_format_hal_event_type(nfc_event, layer_parsed_str);
     furi_string_printf(annotation, "L0(%s)", furi_string_get_cstr(layer_parsed_str));
     //  }
 
