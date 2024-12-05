@@ -181,7 +181,11 @@ MfUltralightPoller* mf_ultralight_poller_alloc(Iso14443_3aPoller* iso14443_3a_po
     instance->general_event.protocol = NfcProtocolMfUltralight;
     instance->general_event.event_data = &instance->mfu_event;
     instance->general_event.instance = instance;
-    instance->history.protocol = NfcProtocolMfUltralight;
+
+    instance->history.base.protocol = NfcProtocolMfUltralight;
+    instance->history.base.data_block_size = sizeof(MfUltralightPollerHistoryData);
+    instance->history.data = &instance->history_data;
+
     mbedtls_des3_init(&instance->des_context);
     return instance;
 }
@@ -768,6 +772,7 @@ static NfcCommand mf_ultralight_poller_run(NfcGenericEvent event, void* context)
     const Iso14443_3aPollerEvent* iso14443_3a_event = event.event_data;
 
     NfcCommand command = NfcCommandContinue;
+    instance->history_data.state = instance->state;
 
     if(iso14443_3a_event->type == Iso14443_3aPollerEventTypeReady) {
         command = mf_ultralight_poller_read_handler[instance->state](instance);
@@ -776,6 +781,8 @@ static NfcCommand mf_ultralight_poller_run(NfcGenericEvent event, void* context)
         command = instance->callback(instance->general_event, instance->context);
     }
 
+    instance->history_data.event = iso14443_3a_event->type;
+    instance->history_data.command = command;
     return command;
 }
 
@@ -801,7 +808,7 @@ static bool mf_ultralight_poller_detect(NfcGenericEvent event, void* context) {
 static void mf_ultralight_poller_log_history(NfcLogger* logger, void* context) {
     MfUltralightPoller* instance = context;
     nfc_logger_append_history(logger, &instance->history);
-    NFC_LOG_FLAG_FLUSH(instance->history);
+    NFC_LOG_FLAG_FLUSH(instance->history.base);
 }
 
 const NfcPollerBase mf_ultralight_poller = {

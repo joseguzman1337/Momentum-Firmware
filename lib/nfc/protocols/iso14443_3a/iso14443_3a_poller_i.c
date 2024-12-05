@@ -52,10 +52,10 @@ static Iso14443_3aError iso14443_3a_poller_standard_frame_exchange(
         bit_buffer_copy(rx_buffer, instance->rx_buffer);
         if(!iso14443_crc_check(Iso14443CrcTypeA, instance->rx_buffer)) {
             ret = Iso14443_3aErrorWrongCrc;
-            NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_CRC_BAD);
+            NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_ISO14443_3A_CRC_BAD);
             break;
         } else
-            NFC_LOG_FLAG_REQUEST(instance->history, NFC_FLAG_ISO14443_3A_CRC_OK);
+            NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_ISO14443_3A_CRC_OK);
 
         nfc_logger_append_data(
             logger, bit_buffer_get_data(rx_buffer), bit_buffer_get_size_bytes(rx_buffer), true);

@@ -73,6 +73,12 @@ typedef enum {
     MfUltralightPollerStateNum,
 } MfUltralightPollerState;
 
+typedef struct {
+    Iso14443_3aPollerEventType event;
+    MfUltralightPollerState state;
+    NfcCommand command;
+} FURI_PACKED MfUltralightPollerHistoryData;
+
 struct MfUltralightPoller {
     Iso14443_3aPoller* iso14443_3a_poller;
     MfUltralightPollerState state;
@@ -97,6 +103,7 @@ struct MfUltralightPoller {
     MfUltralightPollerEventData mfu_event_data;
     NfcGenericCallback callback;
     NfcHistoryItem history;
+    MfUltralightPollerHistoryData history_data;
     void* context;
 };
 

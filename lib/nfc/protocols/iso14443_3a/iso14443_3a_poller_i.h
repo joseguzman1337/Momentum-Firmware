@@ -40,6 +40,13 @@ typedef enum {
     Iso14443_3aPollerStateActivated,
 } Iso14443_3aPollerState;
 
+typedef struct {
+    NfcEventType event;
+    Iso14443_3aPollerState state;
+    Iso14443_3aError error;
+    NfcCommand command;
+} FURI_PACKED Iso14443_3aPollerHistoryData;
+
 struct Iso14443_3aPoller {
     Nfc* nfc;
     Iso14443_3aPollerState state;
@@ -53,6 +60,7 @@ struct Iso14443_3aPoller {
     Iso14443_3aPollerEventData iso14443_3a_event_data;
     NfcGenericCallback callback;
     NfcHistoryItem history;
+    Iso14443_3aPollerHistoryData history_data;
     void* context;
 };
 
