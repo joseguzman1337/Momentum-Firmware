@@ -1,4 +1,4 @@
-#include "nfc_logger_history_i.h"
+#include "nfc_history_i.h"
 
 #include <nfc/protocols/iso14443_3a/iso14443_3a_listener_i.h>
 #include <nfc/protocols/mf_ultralight/mf_ultralight_listener_i.h>
@@ -83,59 +83,10 @@ static NfcHistoryCrcStatus nfc_history_find_crc_status(const NfcHistory* history
     return status;
 } */
 
-static const uint8_t listener_history_chain_size[NfcProtocolNum] = {
-    [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aListenerHistoryData),
-    [NfcProtocolMfUltralight] = sizeof(MfUltralightListenerHistoryData),
-};
-
-static const uint8_t poller_history_chain_size[NfcProtocolNum] = {
-    [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aPollerHistoryData),
-    [NfcProtocolMfUltralight] = sizeof(MfUltralightPollerHistoryData),
-};
-
-static uint8_t nfc_history_get_chain_size_bytes(NfcProtocol protocol, NfcMode mode) {
-    const uint8_t* history_data_size_source =
-        (mode == NfcModeListener) ? listener_history_chain_size : poller_history_chain_size;
-
-    uint8_t chain_size_bytes = sizeof(uint8_t);
-    do {
-        chain_size_bytes += sizeof(NfcHistoryItemBase);
-        uint8_t buf = history_data_size_source[protocol];
-
-        FURI_LOG_D(
-            TAG,
-            "Protocol: %d data_size: %d item base: %d",
-            protocol,
-            buf,
-            sizeof(NfcHistoryItemBase));
-
-        chain_size_bytes += buf; /* history_data_size_source[protocol] */
-
-        protocol = nfc_protocol_get_parent(protocol);
-    } while(protocol != NfcProtocolInvalid);
-    FURI_LOG_D(TAG, "Chain size: %d", chain_size_bytes);
-    return chain_size_bytes;
-}
-
-uint8_t nfc_history_get_size_bytes(NfcProtocol protocol, NfcMode mode, uint8_t max_chain_count) {
-    const uint8_t chain_size_bytes = nfc_history_get_chain_size_bytes(protocol, mode);
-    uint8_t history_size_bytes = sizeof(NfcHistoryBase) + chain_size_bytes * max_chain_count;
-    FURI_LOG_D(TAG, "History size: %d", history_size_bytes);
-    return history_size_bytes;
-}
-
 NfcHistory* nfc_history_alloc(uint8_t history_size_bytes, uint8_t max_chain_count) {
-    /*     size_t chain_size = sizeof(NfcHistoryItemBase) * max_chain_length + sizeof(uint8_t);
-    NfcHistory* history = malloc(sizeof(NfcHistoryBase) + chain_size * 5);
-
-    ///TODO: maybe make this an input parameter which will be populated from logger instance
-    history->base.history_max_size = 5;
-
-    history->base.chain_max_length = max_chain_length; */
     NfcHistory* history = malloc(history_size_bytes);
     history->base.history_size_bytes = history_size_bytes;
     history->base.max_chain_count = max_chain_count;
-    //history->base.
     return history;
 }
 
@@ -162,15 +113,12 @@ void nfc_history_append(NfcHistory* instance, const NfcHistoryItem* item) {
         if(instance->chains[current_chain_index].length == base->max_chain_count) {
             base->chain_count += 1;
             current_chain_index += 1;
-            // instance->chains[base->chain_count] = nfc_history_chain_alloc(base->chain_max_length);
         }
 
         NfcHistoryChain* chain = &instance->chains[current_chain_index];
         NfcHistoryItemInternal* chain_item = (NfcHistoryItemInternal*)&chain->items[chain->length];
         chain_item->base = item->base;
         memcpy(chain_item->data, item->data, item->base.data_block_size);
-        //uint8_t* data_ptr = ((uint8_t*)&chain->items[chain->length]) + sizeof(NfcHistoryItemBase);
-        //memcpy(data_ptr, item->data, item->base.data_block_size);
 
         chain->length++;
     } while(false);
@@ -184,8 +132,6 @@ static inline void nfc_history_chain_save(File* file, const NfcHistoryChain* cha
         //&item->base + sizeof(NfcHistoryItemBase)
         storage_file_write(file, item->data, item->base.data_block_size);
     }
-
-    //storage_file_write(file, chain->items, sizeof(NfcHistoryItem) * chain->length);
 }
 
 void nfc_history_save(File* file, const NfcHistory* instance) {

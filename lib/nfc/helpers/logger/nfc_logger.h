@@ -1,17 +1,11 @@
 #pragma once
 
-#include <nfc_mode.h>
 #include <nfc/protocols/nfc_protocol.h>
 #include <furi_hal_nfc.h>
 
 #include <furi.h>
 
-#include "history/nfc_logger_history.h"
-
-//#include "nfc_transaction_i.h"
-
-//#include <stdint.h>
-//#include <stddef.h>
+#include "history/nfc_history.h"
 
 #ifdef __cplusplus
 extern "C" {

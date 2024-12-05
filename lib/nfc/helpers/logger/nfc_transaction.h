@@ -6,7 +6,7 @@
 #include <toolbox/path.h>
 #include <furi_hal_nfc.h>
 
-#include "history/nfc_logger_history.h"
+#include "history/nfc_history.h"
 #include "history/nfc_logger_flags.h"
 
 #ifdef __cplusplus

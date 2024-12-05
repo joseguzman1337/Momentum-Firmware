@@ -1,9 +1,7 @@
 #include "nfc_logger_i.h"
-#include "history/nfc_logger_history_i.h"
+#include "history/nfc_history_size.h"
+#include "formatter/nfc_formatter.h"
 #include <nfc_device.h>
-#include <nfc/protocols/nfc_protocol.h>
-#include "table.h"
-//#include <flipper_format.h>
 
 #define TAG "NfcLogger"
 

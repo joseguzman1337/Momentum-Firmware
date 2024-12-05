@@ -4,7 +4,7 @@
 #include <furi_hal_nfc.h>
 
 #include "../nfc_formatter_context.h"
-#include "nfc/helpers/logger/history/nfc_logger_history.h"
+#include "nfc/helpers/logger/history/nfc_history.h"
 #include "nfc/helpers/logger/nfc_packet_data_type_i.h"
 
 #ifdef __cplusplus

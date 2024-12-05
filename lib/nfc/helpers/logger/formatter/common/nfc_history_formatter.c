@@ -1,5 +1,5 @@
 #include "nfc_history_formatter.h"
-#include "nfc/helpers/logger/history/nfc_logger_history_i.h"
+#include "nfc/helpers/logger/history/nfc_history_i.h"
 #include "nfc/helpers/logger/formatter/protocols/nfc_protocol_formatters.h"
 
 void nfc_histroy_format_annotation(
