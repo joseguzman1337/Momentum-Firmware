@@ -37,12 +37,12 @@ bool nfc_history_load(Stream* stream, NfcHistory** instance_ptr);
 void nfc_history_save(File* file, const NfcHistory* instance);
 
 void nfc_histroy_format_crc_status(const NfcHistory* instance, FuriString* crc_status_str);
-void nfc_histroy_format_annotation(
+/* void nfc_histroy_format_annotation(
     const NfcHistory* instance,
     const FuriHalNfcEvent nfc_event,
     const NfcLoggerHistoryLayerFilter filter,
     FuriString* annotation);
-
+ */
 #ifdef __cplusplus
 }
 #endif

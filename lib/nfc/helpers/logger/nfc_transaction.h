@@ -1,5 +1,14 @@
 #pragma once
 
+///TODO: temporary added headers
+#include <storage/storage.h>
+#include <stream/file_stream.h>
+#include <toolbox/path.h>
+#include <furi_hal_nfc.h>
+
+#include "history/nfc_logger_history.h"
+#include "history/nfc_logger_flags.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -8,18 +17,11 @@ typedef enum {
     NfcTransactionTypeEmpty,
     NfcTransactionTypeFlagsOnly,
     NfcTransactionTypeRequest,
-    NfcTransactionTypeResponse,
+    NfcTransactionTypeResponse, //TODO: remove this, because NFC cannot send response without request
     NfcTransactionTypeRequestResponse,
 } NfcTransactionType;
 
 typedef struct NfcTransaction NfcTransaction;
-
-typedef struct {
-    uint32_t time;
-    uint32_t flags;
-    size_t data_size;
-    uint8_t* data;
-} NfcPacketString;
 
 ///TODO: Think of moving major part of these functions to _i.h header and expose them only for logger.c under the hood
 ///without putting them into api

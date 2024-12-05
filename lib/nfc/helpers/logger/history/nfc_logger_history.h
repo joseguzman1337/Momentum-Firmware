@@ -1,25 +1,13 @@
 #pragma once
 
 #include "nfc_logger_flags.h"
+#include "nfc_history_data_type_i.h"
 
 #include <furi.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef void NfcHistoryData;
-
-typedef struct {
-    NfcProtocol protocol;
-    uint8_t data_block_size;
-    NfcLoggerFlags request_flags;
-} FURI_PACKED NfcHistoryItemBase;
-
-typedef struct {
-    NfcHistoryItemBase base;
-    NfcHistoryData* data;
-} FURI_PACKED NfcHistoryItem;
 
 typedef enum {
     NfcLoggerHistoryLayerFilterAll,

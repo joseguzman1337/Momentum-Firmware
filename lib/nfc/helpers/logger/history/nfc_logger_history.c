@@ -3,35 +3,26 @@
 #include <nfc/protocols/iso14443_3a/iso14443_3a_listener_i.h>
 #include <nfc/protocols/mf_ultralight/mf_ultralight_listener_i.h>
 
-#include "formatter/nfc_history_data_formatter.h"
+#include <nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
+#include <nfc/protocols/mf_ultralight/mf_ultralight_poller_i.h>
+
+//#include "../formatter/nfc_formatter.h"
 
 #include <nfc_device.h>
 
 #define TAG "NfcHistory"
 
-typedef struct {
-    NfcHistoryItemBase base;
-    uint8_t data[];
-} FURI_PACKED NfcHistoryItemInternal;
-
-typedef enum {
+/* typedef enum {
     NfcHistoryCrcNotSet,
     NfcHistoryCrcOk,
     NfcHistoryCrcBad,
     NfcHistoryCrcInvalidFlags,
     NfcHistoryCrcInvalidNum,
-} NfcHistoryCrcStatus;
+} NfcHistoryCrcStatus; */
 
-static const char* nfc_history_crc_status_message[NfcHistoryCrcInvalidNum] = {
-    [NfcHistoryCrcNotSet] = "",
-    [NfcHistoryCrcOk] = "OK",
-    [NfcHistoryCrcBad] = "KO",
-    [NfcHistoryCrcInvalidFlags] = "ERR",
-};
+//typedef NfcHistoryCrcStatus (*NfcLoggerHistoryCrcChecker)(const NfcHistoryItem* history);
 
-typedef NfcHistoryCrcStatus (*NfcLoggerHistoryCrcChecker)(const NfcHistoryItem* history);
-
-typedef struct {
+/* typedef struct {
     NfcProtocol protocol;
     NfcLoggerHistoryCrcChecker checker;
 } NfcLoggerHistoryCrcCheckerItem;
@@ -40,7 +31,7 @@ static NfcHistoryCrcStatus nfc_history_crc_checker_dummy(const NfcHistoryItem* h
     UNUSED(history);
     furi_crash("CRC checker not implemented");
     return NfcHistoryCrcInvalidFlags;
-}
+} */
 
 /* typedef NfcHistory* (*NfcHistoryAllocCallback)(void);
 typedef size_t (*NfcHistoryGetDataSizeCallback)(void);
@@ -50,7 +41,7 @@ typedef struct {
     NfcHistoryGetDataSizeCallback get_size;
 } NfcHistoryBase; */
 
-static NfcHistoryCrcStatus nfc_history_crc_checker_iso14443_3a(const NfcHistoryItem* history) {
+/* static NfcHistoryCrcStatus nfc_history_crc_checker_iso14443_3a(const NfcHistoryItem* history) {
     NfcHistoryCrcStatus crc_status = NfcHistoryCrcNotSet;
     bool crc_ok = NFC_LOG_FLAG_GET(history->base.request_flags, NFC_FLAG_ISO14443_3A_CRC_OK);
     bool crc_bad = NFC_LOG_FLAG_GET(history->base.request_flags, NFC_FLAG_ISO14443_3A_CRC_BAD);
@@ -90,14 +81,7 @@ static NfcHistoryCrcStatus nfc_history_find_crc_status(const NfcHistory* history
         if(status != NfcHistoryCrcNotSet) break;
     }
     return status;
-}
-
-void nfc_histroy_format_crc_status(const NfcHistory* history, FuriString* crc_status_str) {
-    furi_assert(history);
-    furi_assert(crc_status_str);
-    NfcHistoryCrcStatus status = nfc_history_find_crc_status(history);
-    furi_string_printf(crc_status_str, nfc_history_crc_status_message[status]);
-}
+} */
 
 static const uint8_t listener_history_chain_size[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aListenerHistoryData),
@@ -105,8 +89,8 @@ static const uint8_t listener_history_chain_size[NfcProtocolNum] = {
 };
 
 static const uint8_t poller_history_chain_size[NfcProtocolNum] = {
-    [NfcProtocolIso14443_3a] = 1, //sizeof(Iso14443_3aPollerHistoryData),
-    [NfcProtocolMfUltralight] = 1 //sizeof()
+    [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aPollerHistoryData),
+    [NfcProtocolMfUltralight] = sizeof(MfUltralightPollerHistoryData),
 };
 
 static uint8_t nfc_history_get_chain_size_bytes(NfcProtocol protocol, NfcMode mode) {
@@ -289,85 +273,4 @@ bool nfc_history_load(Stream* stream, NfcHistory** instance_ptr) {
         }
     } while(false);
     return result;
-}
-
-void nfc_histroy_format_annotation2(
-    const NfcHistory* instance,
-    const FuriHalNfcEvent nfc_event,
-    const NfcLoggerHistoryLayerFilter filter,
-    FuriString* annotation) {
-    furi_assert(instance);
-    furi_assert(annotation);
-
-    if(nfc_event == 0) return;
-
-    FuriString* layer_parsed_str = furi_string_alloc();
-    if(filter == NfcLoggerHistoryLayerFilterAll) {
-        nfc_logger_flag_parse(NfcProtocolInvalid, nfc_event, layer_parsed_str);
-        furi_string_printf(annotation, "L0(%s)", furi_string_get_cstr(layer_parsed_str));
-    }
-
-    for(size_t i = 0; i < instance->base.chain_count; i++) {
-        for(size_t j = 0; j < instance->chains[i].length; j++) {
-            furi_string_reset(layer_parsed_str);
-            const NfcHistoryItem* item = &(instance->chains[i].items[j]);
-            if(item->base.request_flags == 0) continue;
-
-            ///TODO: Here must be some top protocol varaible, but from where?
-            /* if(filter == NfcLoggerHistoryLayerFilterTopProtocolOnly &&
-               item->protocol != NfcProtocolMfUltralight)
-                continue; */
-
-            nfc_logger_flag_parse(item->base.protocol, item->base.request_flags, layer_parsed_str);
-
-            const char* format =
-                (filter == NfcLoggerHistoryLayerFilterTopProtocolOnly) ? "L%d(%s)" : "->L%d(%s)";
-
-            furi_string_cat_printf(
-                annotation, format, j + 1, furi_string_get_cstr(layer_parsed_str));
-        }
-    }
-
-    furi_string_free(layer_parsed_str);
-}
-
-void nfc_histroy_format_annotation(
-    const NfcHistory* instance,
-    const FuriHalNfcEvent nfc_event,
-    const NfcLoggerHistoryLayerFilter filter,
-    FuriString* annotation) {
-    furi_assert(instance);
-    furi_assert(annotation);
-
-    FuriString* layer_parsed_str = furi_string_alloc();
-    if(filter == NfcLoggerHistoryLayerFilterAll) {
-        nfc_logger_flag_parse(NfcProtocolInvalid, nfc_event, layer_parsed_str);
-        furi_string_printf(annotation, "L0(%s)", furi_string_get_cstr(layer_parsed_str));
-    }
-
-    for(size_t i = 0; i < instance->base.chain_count; i++) {
-        for(size_t j = 0; j < instance->chains[i].length; j++) {
-            furi_string_reset(layer_parsed_str);
-            const NfcHistoryItemInternal* item =
-                (NfcHistoryItemInternal*)&(instance->chains[i].items[j]);
-            //if(item->base.request_flags == 0) continue;
-
-            ///TODO: Here must be some top protocol varaible, but from where?
-            /* if(filter == NfcLoggerHistoryLayerFilterTopProtocolOnly &&
-               item->protocol != NfcProtocolMfUltralight)
-                continue; */
-
-            //nfc_logger_flag_parse(item->base.protocol, item->base.request_flags, layer_parsed_str);
-            nfc_history_data_format(
-                item->base.protocol, NfcModeListener, item->data, layer_parsed_str);
-
-            const char* format =
-                (filter == NfcLoggerHistoryLayerFilterTopProtocolOnly) ? "L%d(%s)" : "->L%d(%s)";
-
-            furi_string_cat_printf(
-                annotation, format, j + 1, furi_string_get_cstr(layer_parsed_str));
-        }
-    }
-
-    furi_string_free(layer_parsed_str);
 }
