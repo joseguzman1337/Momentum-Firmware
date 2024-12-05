@@ -156,7 +156,7 @@ static void nfc_logger_convert_bin_to_text(
         NfcTransaction* transaction;
         while(nfc_transaction_read(stream_bin, &transaction)) {
             furi_string_reset(str);
-            nfc_format_transaction(formatter, transaction, str);
+            nfc_formatter_format(formatter, transaction, str);
             stream_write_string(stream_txt, str);
 
             nfc_transaction_free(transaction);
