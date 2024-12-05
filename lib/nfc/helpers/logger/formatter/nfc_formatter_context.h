@@ -3,7 +3,7 @@
 #include <furi.h>
 #include <nfc_mode.h>
 #include <nfc/protocols/nfc_protocol.h>
-#include "nfc/helpers/logger/table.h"
+#include "table.h"
 
 #ifdef __cplusplus
 extern "C" {
