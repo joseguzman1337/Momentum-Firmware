@@ -241,14 +241,10 @@ bool nfc_logger_enabled(NfcLogger* instance) {
     return instance->state != NfcLoggerStateDisabled;
 }
 
-///TODO: Rename this to set_protocol
-void nfc_logger_set_protocol_history_size(NfcLogger* instance, NfcProtocol protocol, uint8_t size) {
+void nfc_logger_set_protocol(NfcLogger* instance, NfcProtocol protocol) {
     furi_assert(instance);
     furi_assert(protocol < NfcProtocolNum);
-    furi_assert(size > 0);
     instance->protocol = protocol;
-    UNUSED(size);
-    //instance->history_chain_size = size;
 }
 
 void nfc_logger_start(NfcLogger* instance, NfcMode mode) {

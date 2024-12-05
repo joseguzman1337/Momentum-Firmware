@@ -84,8 +84,7 @@ NfcPoller* nfc_poller_alloc(Nfc* nfc, NfcProtocol protocol) {
     instance->protocol = protocol;
     nfc_poller_list_alloc(instance);
 
-    nfc_logger_set_protocol_history_size(
-        nfc_get_logger(nfc), instance->protocol, nfc_protocol_layers_get_count(protocol));
+    nfc_logger_set_protocol(nfc_get_logger(nfc), instance->protocol);
     return instance;
 }
 
