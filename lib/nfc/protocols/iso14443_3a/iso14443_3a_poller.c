@@ -132,7 +132,6 @@ static bool iso14443_3a_poller_detect(NfcGenericEvent event, void* context) {
 static void iso14443_3a_poller_log_history(NfcLogger* logger, void* context) {
     Iso14443_3aPoller* instance = context;
     nfc_logger_append_history(logger, &instance->history);
-    NFC_LOG_FLAG_FLUSH(instance->history.base);
 }
 
 const NfcPollerBase nfc_poller_iso14443_3a = {

@@ -808,7 +808,6 @@ static bool mf_ultralight_poller_detect(NfcGenericEvent event, void* context) {
 static void mf_ultralight_poller_log_history(NfcLogger* logger, void* context) {
     MfUltralightPoller* instance = context;
     nfc_logger_append_history(logger, &instance->history);
-    NFC_LOG_FLAG_FLUSH(instance->history.base);
 }
 
 const NfcPollerBase mf_ultralight_poller = {

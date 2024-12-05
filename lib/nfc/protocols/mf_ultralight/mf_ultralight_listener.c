@@ -800,7 +800,6 @@ NfcCommand mf_ultralight_listener_run(NfcGenericEvent event, void* context) {
     Iso14443_3aListenerEvent* iso14443_3a_event = event.event_data;
     BitBuffer* rx_buffer = iso14443_3a_event->data->buffer;
     NfcCommand command = NfcCommandContinue;
-    NFC_LOG_FLAG_FLUSH(instance->history.base);
 
     if(iso14443_3a_event->type == Iso14443_3aListenerEventTypeReceivedStandardFrame) {
         MfUltralightCommand mfu_command = MfUltralightCommandNotFound;
@@ -808,15 +807,12 @@ NfcCommand mf_ultralight_listener_run(NfcGenericEvent event, void* context) {
         uint8_t cmd = bit_buffer_get_byte(rx_buffer, 0);
 
         if(mf_ultralight_composite_command_in_progress(instance)) {
-            NFC_LOG_FLAG_REQUEST(
-                instance->history.base, NFC_FLAG_MF_ULTRALIGHT_COMPOSITE_CMD_IN_PROGRESS);
             mfu_command = mf_ultralight_composite_command_run(instance, rx_buffer);
         } else {
             for(size_t i = 0; i < COUNT_OF(mf_ultralight_command); i++) {
                 if(size != mf_ultralight_command[i].cmd_len_bits) continue;
                 if(cmd != mf_ultralight_command[i].cmd) continue;
                 mfu_command = mf_ultralight_command[i].callback(instance, rx_buffer);
-                NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_MF_ULTRALIGHT_CMD);
 
                 if(mfu_command != MfUltralightCommandNotFound) break;
             }
@@ -827,7 +823,6 @@ NfcCommand mf_ultralight_listener_run(NfcGenericEvent event, void* context) {
         iso14443_3a_event->type == Iso14443_3aListenerEventTypeReceivedData ||
         iso14443_3a_event->type == Iso14443_3aListenerEventTypeFieldOff ||
         iso14443_3a_event->type == Iso14443_3aListenerEventTypeHalted) {
-        NFC_LOG_FLAG_REQUEST(instance->history.base, NFC_FLAG_MF_ULTRALIGHT_RESET_STATE);
         command = mf_ultralight_reset_listener_state(instance, iso14443_3a_event->type);
     }
 
@@ -840,7 +835,6 @@ NfcCommand mf_ultralight_listener_run(NfcGenericEvent event, void* context) {
 void mf_ultralight_log_history(NfcLogger* logger, void* context) {
     MfUltralightListener* instance = context;
     nfc_logger_append_history(logger, &instance->history);
-    NFC_LOG_FLAG_FLUSH(instance->history.base);
     instance->history_data.mfu_command = MfUltralightCommandNotFound;
 }
 
