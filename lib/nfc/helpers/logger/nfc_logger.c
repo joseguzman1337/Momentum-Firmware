@@ -1,4 +1,4 @@
-#include "nfc_logger_i.h"
+#include "nfc_logger_context.h"
 #include "history/nfc_history_size.h"
 #include "formatter/nfc_formatter.h"
 #include <nfc_device.h>
@@ -353,7 +353,10 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
     } while(false);
 }
 
-void nfc_logger_append_request(NfcLogger* instance, const uint8_t* data, const size_t data_size) {
+void nfc_logger_append_request_data(
+    NfcLogger* instance,
+    const uint8_t* data,
+    const size_t data_size) {
     furi_assert(instance);
     furi_assert(data);
     furi_assert(data_size > 0);
@@ -361,7 +364,10 @@ void nfc_logger_append_request(NfcLogger* instance, const uint8_t* data, const s
     nfc_transaction_append(instance->transaction, data, data_size, false);
 }
 
-void nfc_logger_append_response(NfcLogger* instance, const uint8_t* data, const size_t data_size) {
+void nfc_logger_append_response_data(
+    NfcLogger* instance,
+    const uint8_t* data,
+    const size_t data_size) {
     furi_assert(instance);
     furi_assert(data);
     furi_assert(data_size > 0);

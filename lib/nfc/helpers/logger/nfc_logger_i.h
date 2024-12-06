@@ -1,5 +1,7 @@
-#include "nfc_logger.h"
+#pragma once
 
+#include "nfc_logger.h"
+/* 
 #include <furi_hal_resources.h>
 #include <furi_hal_rtc.h>
 #include <storage/storage.h>
@@ -7,20 +9,36 @@
 #include <toolbox/path.h>
 
 #include "nfc_transaction.h"
-#include "nfc_trace_data_type_i.h"
+#include "nfc_trace_data_type_i.h" */
 
-struct NfcLogger {
-    NfcLoggerState state;
-    NfcProtocol protocol;
-    NfcTrace* trace;
-    NfcTransaction* transaction;
-    uint8_t max_chain_size;
-    uint8_t history_size_bytes;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    NfcLoggerFormatFilter filter;
-    FuriString* filename;
-    Storage* storage;
-    FuriThread* logger_thread;
-    FuriMessageQueue* transaction_queue;
-    bool exit;
-};
+NfcLogger* nfc_logger_alloc(void);
+void nfc_logger_free(NfcLogger* instance);
+
+bool nfc_logger_enabled(NfcLogger* instance);
+void nfc_logger_set_protocol(NfcLogger* instance, NfcProtocol protocol);
+
+void nfc_logger_start(NfcLogger* instance, NfcMode mode);
+void nfc_logger_stop(NfcLogger* instance);
+
+void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event);
+void nfc_logger_transaction_end(NfcLogger* instance);
+
+void nfc_logger_append_request_data(
+    NfcLogger* instance,
+    const uint8_t* data,
+    const size_t data_size);
+
+void nfc_logger_append_response_data(
+    NfcLogger* instance,
+    const uint8_t* data,
+    const size_t data_size);
+
+void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history);
+
+#ifdef __cplusplus
+}
+#endif
