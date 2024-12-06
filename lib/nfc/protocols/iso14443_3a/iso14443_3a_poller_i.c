@@ -35,7 +35,7 @@ static Iso14443_3aError iso14443_3a_poller_standard_frame_exchange(
     Iso14443_3aError ret = Iso14443_3aErrorNone;
 
     NfcLogger* logger = nfc_get_logger(instance->nfc);
-    nfc_logger_append_request(
+    nfc_logger_append_request_data(
         logger,
         bit_buffer_get_data(instance->tx_buffer),
         bit_buffer_get_size_bytes(instance->tx_buffer));
@@ -53,7 +53,7 @@ static Iso14443_3aError iso14443_3a_poller_standard_frame_exchange(
             ret = Iso14443_3aErrorWrongCrc;
             break;
         }
-        nfc_logger_append_response(
+        nfc_logger_append_response_data(
             logger, bit_buffer_get_data(rx_buffer), bit_buffer_get_size_bytes(rx_buffer));
 
         iso14443_crc_trim(rx_buffer);

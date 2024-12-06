@@ -1,7 +1,7 @@
 #include "felica_listener.h"
 
 #include <nfc/protocols/nfc_generic_event.h>
-#include <helpers/logger/nfc_logger.h>
+#include <helpers/logger/nfc_logger_i.h>
 
 #define FELICA_LISTENER_READ_BLOCK_COUNT_MAX  (4U)
 #define FELICA_LISTENER_READ_BLOCK_COUNT_MIN  (1U)

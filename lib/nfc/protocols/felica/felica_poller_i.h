@@ -2,7 +2,7 @@
 
 #include "felica_poller.h"
 #include <toolbox/bit_buffer.h>
-#include <helpers/logger/nfc_logger.h>
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {

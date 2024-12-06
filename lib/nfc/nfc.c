@@ -2,6 +2,7 @@
 
 #include "nfc.h"
 
+#include "helpers/logger/nfc_logger_i.h"
 #include <furi_hal_nfc.h>
 #include <furi/furi.h>
 
@@ -147,7 +148,7 @@ static int32_t nfc_worker_listener(void* context) {
                 instance->rx_buffer, sizeof(instance->rx_buffer), &instance->rx_bits);
             bit_buffer_copy_bits(event_data.buffer, instance->rx_buffer, instance->rx_bits);
 
-            nfc_logger_append_request(
+            nfc_logger_append_request_data(
                 instance->logger,
                 bit_buffer_get_data(event_data.buffer),
                 bit_buffer_get_size_bytes(event_data.buffer));
@@ -362,7 +363,7 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
 
     const uint8_t* data = bit_buffer_get_data(tx_buffer);
     size_t data_size = bit_buffer_get_size_bytes(tx_buffer);
-    nfc_logger_append_response(instance->logger, data, data_size);
+    nfc_logger_append_response_data(instance->logger, data, data_size);
 
     FuriHalNfcError error = furi_hal_nfc_listener_tx(data, bit_buffer_get_size(tx_buffer));
     if(error != FuriHalNfcErrorNone) {

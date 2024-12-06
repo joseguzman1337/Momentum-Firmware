@@ -1,5 +1,6 @@
 #include "nfc_listener.h"
 
+#include <helpers/logger/nfc_logger_i.h>
 #include <nfc/protocols/nfc_listener_defs.h>
 #include <nfc/nfc_device_i.h>
 

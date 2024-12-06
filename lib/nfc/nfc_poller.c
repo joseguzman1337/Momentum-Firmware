@@ -1,5 +1,6 @@
 #include "nfc_poller.h"
 
+#include <helpers/logger/nfc_logger_i.h>
 #include <nfc/protocols/nfc_poller_defs.h>
 
 #include <furi.h>

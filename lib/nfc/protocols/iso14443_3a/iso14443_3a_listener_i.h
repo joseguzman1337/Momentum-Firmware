@@ -2,7 +2,7 @@
 
 #include "iso14443_3a_listener.h"
 #include <nfc/protocols/nfc_generic_event.h>
-#include <helpers/logger/nfc_logger.h>
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
