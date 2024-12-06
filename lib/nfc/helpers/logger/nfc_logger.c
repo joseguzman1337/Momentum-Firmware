@@ -29,14 +29,13 @@ static int32_t nfc_logger_thread_callback(void* context) {
     NfcTrace* trace = instance->trace;
     storage_file_write(f, trace, sizeof(NfcTrace));
 
-    while(!instance->exit) {
+    while(!instance->exit || furi_message_queue_get_count(instance->transaction_queue)) {
         NfcTransaction* ptr = NULL;
         if(furi_message_queue_get(instance->transaction_queue, &ptr, 50) == FuriStatusErrorTimeout)
             continue;
 
         nfc_transaction_save_to_file(f, ptr);
 
-        //FURI_LOG_D(TAG, "Free_tr: %ld", nfc_transaction_get_id(ptr));
         nfc_transaction_free(ptr);
         furi_hal_gpio_write(pin, toggle);
         toggle = !toggle;
