@@ -6,7 +6,6 @@
 #include "nfc/helpers/logger/nfc_trace_data_type_i.h"
 #include "nfc/helpers/logger/nfc_transaction_data_type_i.h"
 #include "nfc/helpers/logger/history/nfc_history_data_type_i.h"
-#include "nfc/helpers/logger/history/nfc_logger_history_i.h"
 
 #include "common/nfc_transaction_formatter.h"
 
@@ -123,8 +122,10 @@ void nfc_formatter_format(
 
     instance->crc_from_history = nfc_history_get_crc_status(transaction->history, instance->mode);
 
+    ///TODO: This If needs to be removed. nfc_format_transaction must guarantee that all protocols
+    //will behave as expected
     if(instance->protocol == NfcProtocolIso14443_3a ||
-       instance->protocol == NfcProtocolMfUltralight) {
+       instance->protocol == NfcProtocolMfUltralight || instance->protocol == NfcProtocolFelica) {
         nfc_format_transaction(instance, transaction, output);
     } else
         furi_string_printf(output, "NIMP");
