@@ -208,7 +208,7 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatF
         instance->logger_thread = thread;
 
         ///TODO: tune queue size to reduce memory usage
-        instance->transaction_queue = furi_message_queue_alloc(50, sizeof(NfcTransaction*));
+        instance->transaction_queue = furi_message_queue_alloc(150, sizeof(NfcTransaction*));
         instance->state = NfcLoggerStateIdle;
 
         if(filter) {
