@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,78.13,,
+Version,+,83.5,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
@@ -2813,17 +2813,7 @@ Function,+,nfc_listener_get_protocol,NfcProtocol,const NfcListener*
 Function,+,nfc_listener_start,void,"NfcListener*, NfcGenericCallback, void*"
 Function,+,nfc_listener_stop,void,NfcListener*
 Function,+,nfc_listener_tx,NfcError,"Nfc*, const BitBuffer*"
-Function,-,nfc_logger_alloc,NfcLogger*,
-Function,-,nfc_logger_append_data,void,"NfcLogger*, const uint8_t*, const size_t, _Bool"
-Function,-,nfc_logger_append_history,void,"NfcLogger*, NfcLoggerHistory*"
-Function,+,nfc_logger_config,void,"NfcLogger*, _Bool"
-Function,-,nfc_logger_enabled,_Bool,NfcLogger*
-Function,-,nfc_logger_free,void,NfcLogger*
-Function,-,nfc_logger_set_history_size,void,"NfcLogger*, uint8_t"
-Function,-,nfc_logger_start,void,"NfcLogger*, NfcProtocol, NfcMode"
-Function,-,nfc_logger_stop,void,NfcLogger*
-Function,-,nfc_logger_transaction_begin,void,"NfcLogger*, FuriHalNfcEvent"
-Function,-,nfc_logger_transaction_end,void,NfcLogger*
+Function,+,nfc_logger_config,void,"NfcLogger*, _Bool, const NfcLoggerFormatFilter*"
 Function,+,nfc_poller_alloc,NfcPoller*,"Nfc*, NfcProtocol"
 Function,+,nfc_poller_detect,_Bool,NfcPoller*
 Function,+,nfc_poller_free,void,NfcPoller*
