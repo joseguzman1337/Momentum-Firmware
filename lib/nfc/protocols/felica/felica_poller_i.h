@@ -2,6 +2,7 @@
 
 #include "felica_poller.h"
 #include <toolbox/bit_buffer.h>
+#include <helpers/logger/nfc_logger.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +27,13 @@ typedef enum {
     FelicaPollerStateNum
 } FelicaPollerState;
 
+typedef struct {
+    NfcEventType event;
+    FelicaPollerState state;
+    FelicaError error;
+    NfcCommand command;
+} FURI_PACKED FelicaPollerHistoryData;
+
 struct FelicaPoller {
     Nfc* nfc;
     FelicaPollerState state;
@@ -40,6 +48,8 @@ struct FelicaPoller {
     FelicaPollerEventData felica_event_data;
     NfcGenericCallback callback;
     uint8_t block_index;
+    NfcHistoryItem history;
+    FelicaPollerHistoryData history_data;
     void* context;
 };
 
@@ -96,7 +106,7 @@ FelicaError felica_poller_read_blocks(
  * @return FelicaErrorNone on success, an error code on failure.
 */
 FelicaError felica_poller_write_blocks(
-    const FelicaPoller* instance,
+    FelicaPoller* instance,
     const uint8_t block_count,
     const uint8_t* const block_numbers,
     const uint8_t* data,
@@ -115,7 +125,7 @@ FelicaError felica_poller_write_blocks(
  * @return FelicaErrorNone on success, an error code on failure.
  */
 FelicaError felica_poller_frame_exchange(
-    const FelicaPoller* instance,
+    FelicaPoller* instance,
     const BitBuffer* tx_buffer,
     BitBuffer* rx_buffer,
     uint32_t fwt);

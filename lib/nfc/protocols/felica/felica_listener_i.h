@@ -1,6 +1,7 @@
 #include "felica_listener.h"
 
 #include <nfc/protocols/nfc_generic_event.h>
+#include <helpers/logger/nfc_logger.h>
 
 #define FELICA_LISTENER_READ_BLOCK_COUNT_MAX  (4U)
 #define FELICA_LISTENER_READ_BLOCK_COUNT_MIN  (1U)
@@ -56,6 +57,13 @@ typedef void (*FelicaCommanReadBlockHandler)(
     const uint8_t resp_data_index,
     FelicaListenerReadCommandResponse* response);
 
+typedef struct {
+    NfcEventType event;
+    FelicaListenerState state;
+    FelicaError error;
+    NfcCommand command;
+} FelicaListenerHistoryData;
+
 struct FelicaListener {
     Nfc* nfc;
     FelicaData* data;
@@ -74,6 +82,10 @@ struct FelicaListener {
 
     NfcGenericEvent generic_event;
     NfcGenericCallback callback;
+
+    NfcHistoryItem history;
+    FelicaListenerHistoryData history_data;
+
     void* context;
 };
 

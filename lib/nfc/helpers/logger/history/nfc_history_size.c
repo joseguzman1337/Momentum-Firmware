@@ -3,20 +3,24 @@
 
 #include <nfc/protocols/iso14443_3a/iso14443_3a_listener_i.h>
 #include <nfc/protocols/mf_ultralight/mf_ultralight_listener_i.h>
+#include <nfc/protocols/felica/felica_listener_i.h>
 
 #include <nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
 #include <nfc/protocols/mf_ultralight/mf_ultralight_poller_i.h>
+#include <nfc/protocols/felica/felica_poller_i.h>
 
 #define TAG "NfcHistorySize"
 
 static const uint8_t listener_history_chain_size[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aListenerHistoryData),
     [NfcProtocolMfUltralight] = sizeof(MfUltralightListenerHistoryData),
+    [NfcProtocolFelica] = sizeof(FelicaListenerHistoryData),
 };
 
 static const uint8_t poller_history_chain_size[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aPollerHistoryData),
     [NfcProtocolMfUltralight] = sizeof(MfUltralightPollerHistoryData),
+    [NfcProtocolFelica] = sizeof(FelicaPollerHistoryData),
 };
 
 static uint8_t nfc_history_get_chain_size_bytes(NfcProtocol protocol, NfcMode mode) {
