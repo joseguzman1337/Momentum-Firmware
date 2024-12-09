@@ -47,8 +47,11 @@ typedef void (*NfcPollerFree)(NfcGenericInstance* instance);
  * @param[in] callback pointer to the user-defined callback function which will receive events.
  * @param[in] context pointer to the user-specific context (will be passed to the callback).
  */
-typedef void (
-    *NfcPollerSetCallback)(NfcGenericInstance* poller, NfcGenericCallback callback, void* context);
+typedef void (*NfcPollerSetCallback)(
+    NfcGenericInstance* poller,
+    NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
+    void* context);
 
 /**
  * @brief Activate and read a supported NFC card.
@@ -110,6 +113,12 @@ typedef bool (*NfcPollerDetect)(NfcGenericEvent event, void* context);
  */
 typedef const NfcDeviceData* (*NfcPollerGetData)(const NfcGenericInstance* instance);
 
+/**
+ * @brief Saves pre-defined structure with listener state to logger's ongoing transaction
+ *
+ * @param[in] instance pointer to the logger instance.
+ * @returns pointer to the listener history data.
+ */
 typedef void (*NfcPollerLogHistory)(NfcLogger* logger, void* context);
 
 /**
