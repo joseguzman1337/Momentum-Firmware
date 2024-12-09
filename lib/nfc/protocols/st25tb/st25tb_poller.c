@@ -35,6 +35,9 @@ static St25tbPoller* st25tb_poller_alloc(Nfc* nfc) {
     instance->general_event.event_data = &instance->st25tb_event;
     instance->general_event.instance = instance;
 
+    instance->history.base.protocol = NfcProtocolSt25tb;
+    instance->history.base.data_block_size = sizeof(St25tbPollerHistoryData);
+    instance->history.data = &instance->history_data;
     return instance;
 }
 
@@ -69,6 +72,8 @@ static NfcCommand st25tb_poller_select_handler(St25tbPoller* instance) {
 
     do {
         St25tbError error = st25tb_poller_select(instance, NULL);
+        instance->history_data.error = error;
+
         if(error != St25tbErrorNone) {
             instance->state = St25tbPollerStateFailure;
             instance->st25tb_event_data.error = error;
@@ -138,7 +143,7 @@ static NfcCommand st25tb_poller_read_handler(St25tbPoller* instance) {
             *current_block += 1;
         }
     } while(false);
-
+    instance->history_data.error = error;
     return NfcCommandContinue;
 }
 
@@ -146,7 +151,7 @@ static NfcCommand st25tb_poller_write_handler(St25tbPoller* instance) {
     St25tbPollerWriteContext* write_ctx = &instance->poller_ctx.write;
     St25tbError error =
         st25tb_poller_write_block(instance, write_ctx->block_data, write_ctx->block_number);
-
+    instance->history_data.error = error;
     if(error == St25tbErrorNone) {
         instance->state = St25tbPollerStateSuccess;
     } else {
@@ -201,6 +206,9 @@ static NfcCommand st25tb_poller_run(NfcGenericEvent event, void* context) {
         command = st25tb_poller_state_handlers[instance->state](instance);
     }
 
+    instance->history_data.state = instance->state;
+    instance->history_data.event = nfc_event->type;
+    instance->history_data.command = command;
     return command;
 }
 
@@ -225,8 +233,8 @@ static bool st25tb_poller_detect(NfcGenericEvent event, void* context) {
 
 static void st25tb_poller_log_history(NfcLogger* logger, void* context) {
     St25tbPoller* instance = context;
-    // nfc_logger_append_history(logger, &instance->history);
-    FURI_LOG_W(TAG, "Not implemented");
+    nfc_logger_append_history(logger, &instance->history);
+
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
     }

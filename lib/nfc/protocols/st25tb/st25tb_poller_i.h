@@ -3,6 +3,7 @@
 #include "st25tb_poller.h"
 
 #include <nfc/nfc_poller.h>
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,13 @@ typedef union {
     St25tbPollerWriteContext write;
 } St25tbPollerContext;
 
+typedef struct {
+    NfcEventType event;
+    St25tbPollerState state;
+    St25tbError error;
+    NfcCommand command;
+} FURI_PACKED St25tbPollerHistoryData;
+
 struct St25tbPoller {
     Nfc* nfc;
     St25tbPollerState state;
@@ -49,6 +57,8 @@ struct St25tbPoller {
     St25tbPollerEventData st25tb_event_data;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    St25tbPollerHistoryData history_data;
     void* context;
 };
 
