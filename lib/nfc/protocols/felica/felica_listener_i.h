@@ -82,6 +82,7 @@ struct FelicaListener {
 
     NfcGenericEvent generic_event;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
 
     NfcHistoryItem history;
     FelicaListenerHistoryData history_data;

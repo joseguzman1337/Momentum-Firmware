@@ -784,11 +784,13 @@ const MfUltralightData* mf_ultralight_listener_get_data(MfUltralightListener* in
 void mf_ultralight_listener_set_callback(
     MfUltralightListener* instance,
     NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
     void* context) {
     furi_assert(instance);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 NfcCommand mf_ultralight_listener_run(NfcGenericEvent event, void* context) {
@@ -836,6 +838,10 @@ void mf_ultralight_log_history(NfcLogger* logger, void* context) {
     MfUltralightListener* instance = context;
     nfc_logger_append_history(logger, &instance->history);
     instance->history_data.mfu_command = MfUltralightCommandNotFound;
+
+    if(instance->log_callback) {
+        instance->log_callback(logger, instance->context);
+    }
 }
 
 const NfcListenerBase mf_ultralight_listener = {

@@ -64,11 +64,13 @@ void iso14443_3a_listener_free(Iso14443_3aListener* instance) {
 void iso14443_3a_listener_set_callback(
     Iso14443_3aListener* instance,
     NfcGenericCallback callback,
+    NfcListenerLogHistory log_callback,
     void* context) {
     furi_assert(instance);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 const Iso14443_3aData* iso14443_3a_listener_get_data(Iso14443_3aListener* instance) {
@@ -127,6 +129,10 @@ NfcCommand iso14443_3a_listener_run(NfcGenericEvent event, void* context) {
 void iso14443_3a_listener_log_history(NfcLogger* logger, void* context) {
     Iso14443_3aListener* instance = context;
     nfc_logger_append_history(logger, &instance->history);
+
+    if(instance->log_callback) {
+        instance->log_callback(logger, instance->context);
+    }
 }
 
 const NfcListenerBase nfc_listener_iso14443_3a = {

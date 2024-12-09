@@ -40,6 +40,7 @@ struct Iso15693_3Listener {
     Iso15693_3ListenerEvent iso15693_3_event;
     Iso15693_3ListenerEventData iso15693_3_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 
     const Iso15693_3ExtensionHandlerTable* extension_table;

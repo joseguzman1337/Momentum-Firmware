@@ -25,6 +25,7 @@ struct Iso14443_4aListener {
     Iso14443_4aListenerEvent iso14443_4a_event;
     Iso14443_4aListenerEventData iso14443_4a_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

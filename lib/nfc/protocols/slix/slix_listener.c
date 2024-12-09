@@ -35,12 +35,16 @@ static void slix_listener_free(SlixListener* instance) {
     free(instance);
 }
 
-static void
-    slix_listener_set_callback(SlixListener* instance, NfcGenericCallback callback, void* context) {
+static void slix_listener_set_callback(
+    SlixListener* instance,
+    NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
+    void* context) {
     furi_assert(instance);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 static const SlixData* slix_listener_get_data(SlixListener* instance) {
@@ -70,10 +74,21 @@ static NfcCommand slix_listener_run(NfcGenericEvent event, void* context) {
     return command;
 }
 
+void slix_log_history(NfcLogger* logger, void* context) {
+    UNUSED(logger);
+    SlixListener* instance = context;
+    FURI_LOG_W(TAG, "Log not implemeted yet");
+
+    if(instance->log_callback) {
+        instance->log_callback(logger, context);
+    }
+}
+
 const NfcListenerBase nfc_listener_slix = {
     .alloc = (NfcListenerAlloc)slix_listener_alloc,
     .free = (NfcListenerFree)slix_listener_free,
     .set_callback = (NfcListenerSetCallback)slix_listener_set_callback,
     .get_data = (NfcListenerGetData)slix_listener_get_data,
     .run = (NfcListenerRun)slix_listener_run,
+    .log_history = (NfcListenerLogHistory)slix_log_history,
 };

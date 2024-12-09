@@ -52,6 +52,7 @@ struct MfClassicListener {
     MfClassicListenerEvent mfc_event;
     MfClassicListenerEventData mfc_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 
     bool cmd_in_progress;

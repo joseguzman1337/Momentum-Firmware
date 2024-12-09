@@ -37,11 +37,14 @@ static void iso14443_4a_listener_free(Iso14443_4aListener* instance) {
 static void iso14443_4a_listener_set_callback(
     Iso14443_4aListener* instance,
     NfcGenericCallback callback,
+    NfcListenerLogHistory log_callback,
     void* context) {
     furi_assert(instance);
+    UNUSED(log_callback);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 static const Iso14443_4aData* iso14443_4a_listener_get_data(Iso14443_4aListener* instance) {
@@ -96,10 +99,20 @@ static NfcCommand iso14443_4a_listener_run(NfcGenericEvent event, void* context)
     return command;
 }
 
+void iso14443_4a_log_history(NfcLogger* logger, void* context) {
+    Iso14443_4aListener* instance = context;
+
+    FURI_LOG_W(TAG, "Log not implemeted yet");
+    if(instance->log_callback) {
+        instance->log_callback(logger, context);
+    }
+}
+
 const NfcListenerBase nfc_listener_iso14443_4a = {
     .alloc = (NfcListenerAlloc)iso14443_4a_listener_alloc,
     .free = (NfcListenerFree)iso14443_4a_listener_free,
     .set_callback = (NfcListenerSetCallback)iso14443_4a_listener_set_callback,
     .get_data = (NfcListenerGetData)iso14443_4a_listener_get_data,
     .run = (NfcListenerRun)iso14443_4a_listener_run,
+    .log_history = (NfcListenerLogHistory)iso14443_4a_log_history,
 };

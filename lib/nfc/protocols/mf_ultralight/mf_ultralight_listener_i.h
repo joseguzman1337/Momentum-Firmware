@@ -71,6 +71,7 @@ struct MfUltralightListener {
     MfUltralightListenerEvent mfu_event;
     MfUltralightListenerEventData mfu_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     uint8_t sector;
     bool single_counter_increased;
     MfUltralightMirrorMode mirror;

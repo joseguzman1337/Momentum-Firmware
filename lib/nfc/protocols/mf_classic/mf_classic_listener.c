@@ -672,11 +672,13 @@ void mf_classic_listener_free(MfClassicListener* instance) {
 void mf_classic_listener_set_callback(
     MfClassicListener* instance,
     NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
     void* context) {
     furi_assert(instance);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 const MfClassicData* mf_classic_listener_get_data(const MfClassicListener* instance) {
@@ -686,10 +688,20 @@ const MfClassicData* mf_classic_listener_get_data(const MfClassicListener* insta
     return instance->data;
 }
 
+void mf_classic_log_history(NfcLogger* logger, void* context) {
+    MfClassicListener* instance = context;
+
+    FURI_LOG_W(TAG, "Log not implemeted yet");
+    if(instance->log_callback) {
+        instance->log_callback(logger, context);
+    }
+}
+
 const NfcListenerBase mf_classic_listener = {
     .alloc = (NfcListenerAlloc)mf_classic_listener_alloc,
     .free = (NfcListenerFree)mf_classic_listener_free,
     .set_callback = (NfcListenerSetCallback)mf_classic_listener_set_callback,
     .get_data = (NfcListenerGetData)mf_classic_listener_get_data,
     .run = (NfcListenerRun)mf_classic_listener_run,
+    .log_history = (NfcGenericLogHistoryCallback)mf_classic_log_history,
 };

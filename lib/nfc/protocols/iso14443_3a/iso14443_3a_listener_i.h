@@ -30,6 +30,7 @@ struct Iso14443_3aListener {
     Iso14443_3aListenerEvent iso14443_3a_event;
     Iso14443_3aListenerEventData iso14443_3a_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     Iso14443_3aListenerHistoryData history_data;
     void* context;

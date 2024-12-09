@@ -25,6 +25,7 @@ struct SlixListener {
     SlixListenerEvent slix_event;
     SlixListenerEventData slix_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

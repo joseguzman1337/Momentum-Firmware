@@ -49,10 +49,12 @@ void felica_listener_free(FelicaListener* instance) {
 void felica_listener_set_callback(
     FelicaListener* listener,
     NfcGenericCallback callback,
+    NfcListenerLogHistory log_callback,
     void* context) {
     UNUSED(listener);
     UNUSED(callback);
     UNUSED(context);
+    listener->log_callback = log_callback;
 }
 
 const FelicaData* felica_listener_get_data(const FelicaListener* instance) {
@@ -217,6 +219,10 @@ NfcCommand felica_listener_run(NfcGenericEvent event, void* context) {
 void felica_listener_log_history(NfcLogger* logger, void* context) {
     FelicaListener* instance = context;
     nfc_logger_append_history(logger, &instance->history);
+
+    if(instance->log_callback) {
+        instance->log_callback(logger, instance->context);
+    }
 }
 
 const NfcListenerBase nfc_listener_felica = {
