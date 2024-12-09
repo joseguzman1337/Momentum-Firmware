@@ -5,6 +5,7 @@
 #include "iso15693_3_listener.h"
 
 #include "iso15693_3_i.h"
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +30,13 @@ typedef struct {
     Iso15693_3ExtensionHandler optional[ISO15693_3_OPTIONAL_COUNT];
 } Iso15693_3ExtensionHandlerTable;
 
+typedef struct {
+    NfcEventType event;
+    Iso15693_3ListenerState state;
+    Iso15693_3Error error;
+    NfcCommand command;
+} FURI_PACKED Iso15693_3ListenerHistoryData;
+
 struct Iso15693_3Listener {
     Nfc* nfc;
     Iso15693_3Data* data;
@@ -41,6 +49,9 @@ struct Iso15693_3Listener {
     Iso15693_3ListenerEventData iso15693_3_event_data;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    Iso15693_3ListenerHistoryData history_data;
+
     void* context;
 
     const Iso15693_3ExtensionHandlerTable* extension_table;

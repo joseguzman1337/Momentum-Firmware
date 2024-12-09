@@ -32,6 +32,9 @@ static Iso15693_3Poller* iso15693_3_poller_alloc(Nfc* nfc) {
     instance->general_event.event_data = &instance->iso15693_3_event;
     instance->general_event.instance = instance;
 
+    instance->history.base.protocol = NfcProtocolIso15693_3;
+    instance->history.base.data_block_size = sizeof(Iso15693_3PollerHistoryData);
+    instance->history.data = &instance->history_data;
     return instance;
 }
 
@@ -76,10 +79,12 @@ static NfcCommand iso15693_3_poller_run(NfcGenericEvent event, void* context) {
             if(error == Iso15693_3ErrorNone) {
                 instance->iso15693_3_event.type = Iso15693_3PollerEventTypeReady;
                 instance->iso15693_3_event_data.error = error;
+                instance->history_data.error = error;
                 command = instance->callback(instance->general_event, instance->context);
             } else {
                 instance->iso15693_3_event.type = Iso15693_3PollerEventTypeError;
                 instance->iso15693_3_event_data.error = error;
+                instance->history_data.error = error;
                 command = instance->callback(instance->general_event, instance->context);
                 // Add delay to switch context
                 furi_delay_ms(100);
@@ -91,6 +96,9 @@ static NfcCommand iso15693_3_poller_run(NfcGenericEvent event, void* context) {
         }
     }
 
+    instance->history_data.state = instance->state;
+    instance->history_data.event = nfc_event->type;
+    instance->history_data.command = command;
     return command;
 }
 
@@ -116,8 +124,8 @@ static bool iso15693_3_poller_detect(NfcGenericEvent event, void* context) {
 
 static void iso15693_3_poller_log_history(NfcLogger* logger, void* context) {
     Iso15693_3Poller* instance = context;
-    // nfc_logger_append_history(logger, &instance->history);
-    FURI_LOG_W(TAG, "Not implemented");
+    nfc_logger_append_history(logger, &instance->history);
+
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
     }
