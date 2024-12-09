@@ -28,6 +28,13 @@ typedef enum {
     MfDesfirePollerSessionStateStopRequest,
 } MfDesfirePollerSessionState;
 
+typedef struct {
+    Iso14443_4aPollerEventType event;
+    MfDesfirePollerState state;
+    MfDesfireError error;
+    NfcCommand command;
+} FURI_PACKED MfDesfirePollerHistoryData;
+
 struct MfDesfirePoller {
     Iso14443_4aPoller* iso14443_4a_poller;
     MfDesfirePollerSessionState session_state;
@@ -43,6 +50,8 @@ struct MfDesfirePoller {
     NfcGenericEvent general_event;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    MfDesfirePollerHistoryData history_data;
     void* context;
 };
 

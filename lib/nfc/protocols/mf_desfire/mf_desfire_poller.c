@@ -32,6 +32,9 @@ static MfDesfirePoller* mf_desfire_poller_alloc(Iso14443_4aPoller* iso14443_4a_p
     instance->general_event.event_data = &instance->mf_desfire_event;
     instance->general_event.instance = instance;
 
+    instance->history.base.protocol = NfcProtocolMfDesfire;
+    instance->history.base.data_block_size = sizeof(MfDesfirePollerHistoryData);
+    instance->history.data = &instance->history_data;
     return instance;
 }
 
@@ -230,6 +233,10 @@ static NfcCommand mf_desfire_poller_run(NfcGenericEvent event, void* context) {
         command = instance->callback(instance->general_event, instance->context);
     }
 
+    instance->history_data.error = instance->error;
+    instance->history_data.state = instance->state;
+    instance->history_data.event = iso14443_4a_event->type;
+    instance->history_data.command = command;
     return command;
 }
 
@@ -263,8 +270,8 @@ static bool mf_desfire_poller_detect(NfcGenericEvent event, void* context) {
 
 static void mf_desfire_poller_log_history(NfcLogger* logger, void* context) {
     MfDesfirePoller* instance = context;
-    // nfc_logger_append_history(logger, &instance->history);
-    FURI_LOG_W(TAG, "Not implemented");
+    nfc_logger_append_history(logger, &instance->history);
+
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
     }
