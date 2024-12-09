@@ -48,6 +48,7 @@ struct St25tbPoller {
     St25tbPollerEvent st25tb_event;
     St25tbPollerEventData st25tb_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

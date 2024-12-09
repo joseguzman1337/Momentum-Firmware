@@ -47,6 +47,7 @@ struct FelicaPoller {
     FelicaPollerEvent felica_event;
     FelicaPollerEventData felica_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     uint8_t block_index;
     NfcHistoryItem history;
     FelicaPollerHistoryData history_data;

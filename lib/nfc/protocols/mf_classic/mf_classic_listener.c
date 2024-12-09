@@ -693,7 +693,7 @@ void mf_classic_log_history(NfcLogger* logger, void* context) {
 
     FURI_LOG_W(TAG, "Log not implemeted yet");
     if(instance->log_callback) {
-        instance->log_callback(logger, context);
+        instance->log_callback(logger, instance->context);
     }
 }
 

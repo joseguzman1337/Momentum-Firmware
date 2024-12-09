@@ -37,6 +37,7 @@ struct SlixPoller {
     SlixPollerEvent slix_event;
     NfcGenericEvent general_event;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

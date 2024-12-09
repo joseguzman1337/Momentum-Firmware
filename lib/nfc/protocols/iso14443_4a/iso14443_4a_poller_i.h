@@ -40,6 +40,7 @@ struct Iso14443_4aPoller {
     Iso14443_4aPollerEvent iso14443_4a_event;
     NfcGenericEvent general_event;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

@@ -59,6 +59,7 @@ struct Iso14443_3aPoller {
     Iso14443_3aPollerEvent iso14443_3a_event;
     Iso14443_3aPollerEventData iso14443_3a_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     Iso14443_3aPollerHistoryData history_data;
     void* context;

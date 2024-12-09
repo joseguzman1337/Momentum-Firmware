@@ -102,6 +102,7 @@ struct MfUltralightPoller {
     MfUltralightPollerEvent mfu_event;
     MfUltralightPollerEventData mfu_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     MfUltralightPollerHistoryData history_data;
     void* context;

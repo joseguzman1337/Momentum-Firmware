@@ -51,13 +51,17 @@ static void st25tb_poller_free(St25tbPoller* instance) {
     free(instance);
 }
 
-static void
-    st25tb_poller_set_callback(St25tbPoller* instance, NfcGenericCallback callback, void* context) {
+static void st25tb_poller_set_callback(
+    St25tbPoller* instance,
+    NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
+    void* context) {
     furi_assert(instance);
     furi_assert(callback);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 static NfcCommand st25tb_poller_select_handler(St25tbPoller* instance) {
@@ -219,6 +223,15 @@ static bool st25tb_poller_detect(NfcGenericEvent event, void* context) {
     return protocol_detected;
 }
 
+static void st25tb_poller_log_history(NfcLogger* logger, void* context) {
+    St25tbPoller* instance = context;
+    // nfc_logger_append_history(logger, &instance->history);
+    FURI_LOG_W(TAG, "Not implemented");
+    if(instance->log_callback) {
+        instance->log_callback(logger, instance->context);
+    }
+}
+
 const NfcPollerBase nfc_poller_st25tb = {
     .alloc = (NfcPollerAlloc)st25tb_poller_alloc,
     .free = (NfcPollerFree)st25tb_poller_free,
@@ -226,4 +239,5 @@ const NfcPollerBase nfc_poller_st25tb = {
     .run = (NfcPollerRun)st25tb_poller_run,
     .detect = (NfcPollerDetect)st25tb_poller_detect,
     .get_data = (NfcPollerGetData)st25tb_poller_get_data,
+    .log_history = (NfcPollerLogHistory)st25tb_poller_log_history,
 };

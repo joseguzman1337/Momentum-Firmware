@@ -30,6 +30,7 @@ struct Iso15693_3Poller {
     Iso15693_3PollerEvent iso15693_3_event;
     Iso15693_3PollerEventData iso15693_3_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

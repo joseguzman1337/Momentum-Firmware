@@ -194,6 +194,7 @@ struct MfClassicPoller {
     MfClassicPollerEvent mfc_event;
     MfClassicPollerEventData mfc_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

@@ -206,12 +206,14 @@ void mf_ultralight_poller_free(MfUltralightPoller* instance) {
 static void mf_ultralight_poller_set_callback(
     MfUltralightPoller* instance,
     NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
     void* context) {
     furi_assert(instance);
     furi_assert(callback);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 const MfUltralightData* mf_ultralight_poller_get_data(MfUltralightPoller* instance) {
@@ -808,6 +810,10 @@ static bool mf_ultralight_poller_detect(NfcGenericEvent event, void* context) {
 static void mf_ultralight_poller_log_history(NfcLogger* logger, void* context) {
     MfUltralightPoller* instance = context;
     nfc_logger_append_history(logger, &instance->history);
+
+    if(instance->log_callback) {
+        instance->log_callback(logger, instance->context);
+    }
 }
 
 const NfcPollerBase mf_ultralight_poller = {

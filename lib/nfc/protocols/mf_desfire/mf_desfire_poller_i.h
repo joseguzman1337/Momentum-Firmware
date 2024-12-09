@@ -42,6 +42,7 @@ struct MfDesfirePoller {
     MfDesfirePollerEvent mf_desfire_event;
     NfcGenericEvent general_event;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

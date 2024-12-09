@@ -193,13 +193,17 @@ static const SlixPollerStateHandler slix_poller_state_handler[SlixPollerStateNum
     [SlixPollerStateReady] = slix_poller_handler_ready,
 };
 
-static void
-    slix_poller_set_callback(SlixPoller* instance, NfcGenericCallback callback, void* context) {
+static void slix_poller_set_callback(
+    SlixPoller* instance,
+    NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
+    void* context) {
     furi_assert(instance);
     furi_assert(callback);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 static NfcCommand slix_poller_run(NfcGenericEvent event, void* context) {
@@ -244,6 +248,15 @@ static bool slix_poller_detect(NfcGenericEvent event, void* context) {
     return protocol_detected;
 }
 
+static void slix_poller_log_history(NfcLogger* logger, void* context) {
+    SlixPoller* instance = context;
+    // nfc_logger_append_history(logger, &instance->history);
+    FURI_LOG_W(TAG, "Not implemented");
+    if(instance->log_callback) {
+        instance->log_callback(logger, instance->context);
+    }
+}
+
 const NfcPollerBase nfc_poller_slix = {
     .alloc = (NfcPollerAlloc)slix_poller_alloc,
     .free = (NfcPollerFree)slix_poller_free,
@@ -251,4 +264,5 @@ const NfcPollerBase nfc_poller_slix = {
     .run = (NfcPollerRun)slix_poller_run,
     .detect = (NfcPollerDetect)slix_poller_detect,
     .get_data = (NfcPollerGetData)slix_poller_get_data,
+    .log_history = (NfcPollerLogHistory)slix_poller_log_history,
 };

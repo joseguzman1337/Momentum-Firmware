@@ -42,6 +42,7 @@ struct MfPlusPoller {
     MfPlusPollerEvent mfp_event;
     MfPlusPollerEventData mfp_event_data;
     NfcGenericCallback callback;
+    NfcGenericLogHistoryCallback log_callback;
     void* context;
 };
 

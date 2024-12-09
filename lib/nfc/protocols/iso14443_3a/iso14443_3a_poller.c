@@ -55,12 +55,14 @@ static void iso14443_3a_poller_free_new(Iso14443_3aPoller* iso14443_3a_poller) {
 static void iso14443_3a_poller_set_callback(
     Iso14443_3aPoller* instance,
     NfcGenericCallback callback,
+    NfcGenericLogHistoryCallback log_callback,
     void* context) {
     furi_assert(instance);
     furi_assert(callback);
 
     instance->callback = callback;
     instance->context = context;
+    instance->log_callback = log_callback;
 }
 
 static NfcCommand iso14443_3a_poller_run(NfcGenericEvent event, void* context) {
@@ -132,6 +134,9 @@ static bool iso14443_3a_poller_detect(NfcGenericEvent event, void* context) {
 static void iso14443_3a_poller_log_history(NfcLogger* logger, void* context) {
     Iso14443_3aPoller* instance = context;
     nfc_logger_append_history(logger, &instance->history);
+    if(instance->log_callback) {
+        instance->log_callback(logger, instance->context);
+    }
 }
 
 const NfcPollerBase nfc_poller_iso14443_3a = {
