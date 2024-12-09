@@ -22,6 +22,9 @@ static Iso14443_4aListener*
     instance->generic_event.instance = instance;
     instance->generic_event.event_data = &instance->iso14443_4a_event;
 
+    instance->history.base.protocol = NfcProtocolIso14443_4a;
+    instance->history.base.data_block_size = sizeof(Iso14443_4aListenerHistoryData);
+    instance->history.data = &instance->history_data;
     return instance;
 }
 
@@ -96,13 +99,16 @@ static NfcCommand iso14443_4a_listener_run(NfcGenericEvent event, void* context)
         }
     }
 
+    instance->history_data.command = command;
+    instance->history_data.event = iso14443_3a_event->type;
+    instance->history_data.state = instance->state;
     return command;
 }
 
 void iso14443_4a_log_history(NfcLogger* logger, void* context) {
     Iso14443_4aListener* instance = context;
+    nfc_logger_append_history(logger, &instance->history);
 
-    FURI_LOG_W(TAG, "Log not implemeted yet");
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
     }

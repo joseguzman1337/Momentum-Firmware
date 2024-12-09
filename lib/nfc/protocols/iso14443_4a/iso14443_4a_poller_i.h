@@ -27,6 +27,14 @@ typedef enum {
     Iso14443_4aPollerSessionStateStopRequest,
 } Iso14443_4aPollerSessionState;
 
+typedef struct {
+    Iso14443_3aPollerEventType event;
+    Iso14443_4aPollerState state;
+    Iso14443_4aPollerSessionState session_state;
+    Iso14443_4aError error;
+    NfcCommand command;
+} FURI_PACKED Iso14443_4aPollerHistoryData;
+
 struct Iso14443_4aPoller {
     Iso14443_3aPoller* iso14443_3a_poller;
     Iso14443_4aPollerState poller_state;
@@ -41,6 +49,8 @@ struct Iso14443_4aPoller {
     NfcGenericEvent general_event;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    Iso14443_4aPollerHistoryData history_data;
     void* context;
 };
 
