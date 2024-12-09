@@ -5,6 +5,7 @@
 
 #include "iso14443_4b_poller.h"
 #include "iso14443_4b_i.h"
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,6 +25,14 @@ typedef enum {
     Iso14443_4bPollerSessionStateStopRequest,
 } Iso14443_4bPollerSessionState;
 
+typedef struct {
+    Iso14443_3bPollerEventType event;
+    Iso14443_4bPollerState state;
+    Iso14443_4bPollerSessionState session_state;
+    Iso14443_4bError error;
+    NfcCommand command;
+} FURI_PACKED Iso14443_4bPollerHistoryData;
+
 struct Iso14443_4bPoller {
     Iso14443_3bPoller* iso14443_3b_poller;
     Iso14443_4bPollerState poller_state;
@@ -38,6 +47,8 @@ struct Iso14443_4bPoller {
     NfcGenericEvent general_event;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    Iso14443_4bPollerHistoryData history_data;
     void* context;
 };
 
