@@ -2,6 +2,7 @@
 
 #include "iso14443_3b_poller.h"
 #include "iso14443_3b_i.h"
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +19,13 @@ typedef enum {
     Iso14443_3bPollerStateActivated,
 } Iso14443_3bPollerState;
 
+typedef struct {
+    NfcEventType event;
+    Iso14443_3bPollerState state;
+    Iso14443_3bError error;
+    NfcCommand command;
+} FURI_PACKED Iso14443_3bPollerHistoryData;
+
 struct Iso14443_3bPoller {
     Nfc* nfc;
     Iso14443_3bPollerState state;
@@ -30,6 +38,8 @@ struct Iso14443_3bPoller {
     Iso14443_3bPollerEventData iso14443_3b_event_data;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    Iso14443_3bPollerHistoryData history_data;
     void* context;
 };
 
