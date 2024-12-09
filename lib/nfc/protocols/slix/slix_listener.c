@@ -23,6 +23,9 @@ static SlixListener* slix_listener_alloc(Iso15693_3Listener* iso15693_3_listener
 
     slix_listener_init_iso15693_3_extensions(instance);
 
+    instance->history.base.protocol = NfcProtocolSlix;
+    instance->history.base.data_block_size = sizeof(SlixListenerHistoryData);
+    instance->history.data = &instance->history_data;
     return instance;
 }
 
@@ -66,18 +69,22 @@ static NfcCommand slix_listener_run(NfcGenericEvent event, void* context) {
 
     if(iso15693_3_event->type == Iso15693_3ListenerEventTypeCustomCommand) {
         const SlixError error = slix_listener_process_request(instance, rx_buffer);
+        instance->history_data.error = error;
         if(error == SlixErrorWrongPassword) {
             command = NfcCommandSleep;
         }
     }
 
+    instance->history_data.command = command;
+    instance->history_data.event = iso15693_3_event->type;
+    instance->history_data.session_state = instance->session_state;
     return command;
 }
 
 void slix_log_history(NfcLogger* logger, void* context) {
     UNUSED(logger);
     SlixListener* instance = context;
-    FURI_LOG_W(TAG, "Log not implemeted yet");
+    nfc_logger_append_history(logger, &instance->history);
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);

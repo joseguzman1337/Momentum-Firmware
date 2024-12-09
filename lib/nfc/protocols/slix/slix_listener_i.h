@@ -4,6 +4,7 @@
 
 #include "slix_listener.h"
 #include "slix_i.h"
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,13 @@ typedef struct {
     uint16_t random;
     bool password_match[SlixPasswordTypeCount];
 } SlixListenerSessionState;
+
+typedef struct {
+    Iso15693_3ListenerEventType event;
+    SlixListenerSessionState session_state;
+    SlixError error;
+    NfcCommand command;
+} FURI_PACKED SlixListenerHistoryData;
 
 struct SlixListener {
     Iso15693_3Listener* iso15693_3_listener;
@@ -26,6 +34,8 @@ struct SlixListener {
     SlixListenerEventData slix_event_data;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    SlixListenerHistoryData history_data;
     void* context;
 };
 
