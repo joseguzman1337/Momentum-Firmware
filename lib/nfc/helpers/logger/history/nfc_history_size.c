@@ -2,25 +2,54 @@
 #include "nfc_history_i.h"
 
 #include <nfc/protocols/iso14443_3a/iso14443_3a_listener_i.h>
+#include <nfc/protocols/iso14443_4a/iso14443_4a_listener_i.h>
 #include <nfc/protocols/mf_ultralight/mf_ultralight_listener_i.h>
+#include <nfc/protocols/iso15693_3/iso15693_3_listener_i.h>
 #include <nfc/protocols/felica/felica_listener_i.h>
+#include <nfc/protocols/slix/slix_listener_i.h>
 
 #include <nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
+#include <nfc/protocols/iso14443_3b/iso14443_3b_poller_i.h>
+#include <nfc/protocols/iso14443_4a/iso14443_4a_poller_i.h>
+#include <nfc/protocols/iso14443_4b/iso14443_4b_poller_i.h>
+#include <nfc/protocols/iso15693_3/iso15693_3_poller_i.h>
+#include <nfc/protocols/mf_desfire/mf_desfire_poller_i.h>
+#include <nfc/protocols/mf_plus/mf_plus_poller_i.h>
 #include <nfc/protocols/mf_ultralight/mf_ultralight_poller_i.h>
 #include <nfc/protocols/felica/felica_poller_i.h>
+#include <nfc/protocols/slix/slix_poller_i.h>
+#include <nfc/protocols/st25tb/st25tb_poller_i.h>
 
 #define TAG "NfcHistorySize"
 
 static const uint8_t listener_history_chain_size[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aListenerHistoryData),
+    [NfcProtocolIso14443_4a] = sizeof(Iso14443_4aListenerHistoryData),
+    [NfcProtocolIso15693_3] = sizeof(Iso15693_3ListenerHistoryData),
     [NfcProtocolMfUltralight] = sizeof(MfUltralightListenerHistoryData),
     [NfcProtocolFelica] = sizeof(FelicaListenerHistoryData),
+    [NfcProtocolSlix] = sizeof(SlixListenerHistoryData),
+    [NfcProtocolMfClassic] = 0, ///TODO: put proper size here
+    [NfcProtocolMfPlus] = 0,
+    [NfcProtocolMfDesfire] = 0,
+    [NfcProtocolIso14443_3b] = 0,
+    [NfcProtocolSt25tb] = 0,
+    [NfcProtocolIso14443_4b] = 0,
 };
 
 static const uint8_t poller_history_chain_size[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = sizeof(Iso14443_3aPollerHistoryData),
+    [NfcProtocolIso14443_3b] = sizeof(Iso14443_3bPollerHistoryData),
+    [NfcProtocolIso14443_4a] = sizeof(Iso14443_4aPollerHistoryData),
+    [NfcProtocolIso14443_4b] = sizeof(Iso14443_4bPollerHistoryData),
+    [NfcProtocolIso15693_3] = sizeof(Iso15693_3PollerHistoryData),
+    [NfcProtocolMfDesfire] = sizeof(MfDesfirePollerHistoryData),
+    [NfcProtocolMfPlus] = sizeof(MfPlusPollerHistoryData),
     [NfcProtocolMfUltralight] = sizeof(MfUltralightPollerHistoryData),
     [NfcProtocolFelica] = sizeof(FelicaPollerHistoryData),
+    [NfcProtocolSt25tb] = sizeof(St25tbPollerHistoryData),
+    [NfcProtocolSlix] = sizeof(SlixPollerHistoryData),
+    [NfcProtocolMfClassic] = 0, ///TODO: put proper size here
 };
 
 static uint8_t nfc_history_get_chain_size_bytes(NfcProtocol protocol, NfcMode mode) {
