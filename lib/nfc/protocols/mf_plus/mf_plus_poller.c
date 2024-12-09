@@ -38,6 +38,9 @@ MfPlusPoller* mf_plus_poller_alloc(Iso14443_4aPoller* iso14443_4a_poller) {
 
     instance->mfp_event.data = &instance->mfp_event_data;
 
+    instance->history.base.protocol = NfcProtocolMfPlus;
+    instance->history.base.data_block_size = sizeof(MfPlusPollerHistoryData);
+    instance->history.data = &instance->history_data;
     return instance;
 }
 
@@ -163,6 +166,10 @@ static NfcCommand mf_plus_poller_run(NfcGenericEvent event, void* context) {
         command = instance->callback(instance->general_event, instance->context);
     }
 
+    instance->history_data.error = instance->error;
+    instance->history_data.state = instance->state;
+    instance->history_data.event = iso14443_4a_event->type;
+    instance->history_data.command = command;
     return command;
 }
 
@@ -204,8 +211,8 @@ static bool mf_plus_poller_detect(NfcGenericEvent event, void* context) {
 
 static void mf_plus_poller_log_history(NfcLogger* logger, void* context) {
     MfPlusPoller* instance = context;
-    // nfc_logger_append_history(logger, &instance->history);
-    FURI_LOG_W(TAG, "Not implemented");
+    nfc_logger_append_history(logger, &instance->history);
+
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
     }

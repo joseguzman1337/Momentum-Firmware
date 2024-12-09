@@ -3,6 +3,7 @@
 #include "mf_desfire_poller.h"
 
 #include <lib/nfc/protocols/iso14443_4a/iso14443_4a_poller_i.h>
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,6 +3,7 @@
 #include "mf_plus_poller.h"
 
 #include <lib/nfc/protocols/iso14443_4a/iso14443_4a_poller_i.h>
+#include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +27,13 @@ typedef enum {
     MfPlusPollerStateNum,
 } MfPlusPollerState;
 
+typedef struct {
+    Iso14443_4aPollerEventType event;
+    MfPlusPollerState state;
+    MfPlusError error;
+    NfcCommand command;
+} FURI_PACKED MfPlusPollerHistoryData;
+
 struct MfPlusPoller {
     Iso14443_4aPoller* iso14443_4a_poller;
 
@@ -43,6 +51,8 @@ struct MfPlusPoller {
     MfPlusPollerEventData mfp_event_data;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcHistoryItem history;
+    MfPlusPollerHistoryData history_data;
     void* context;
 };
 
