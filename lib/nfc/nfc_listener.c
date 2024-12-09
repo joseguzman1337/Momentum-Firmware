@@ -56,7 +56,10 @@ static void nfc_listener_list_alloc(NfcListener* instance) {
         data_tmp = nfc_device_get_data_ptr(instance->nfc_dev, iter->child->protocol);
         iter->child->listener = iter->child->listener_api->alloc(iter->listener, data_tmp);
         iter->listener_api->set_callback(
-            iter->listener, iter->child->listener_api->run, iter->child->listener);
+            iter->listener,
+            iter->child->listener_api->run,
+            iter->child->listener_api->log_history,
+            iter->child->listener);
 
         iter = iter->child;
     } while(true);
@@ -115,23 +118,9 @@ NfcCommand nfc_listener_start_callback(NfcEvent event, void* context) {
     NfcListenerListElement* head_listener = instance->list.head;
     command = head_listener->listener_api->run(generic_event, head_listener->listener);
 
-    ///TODO: There is no need in this code for now, because there is a way to put nfc_logger to every
-    ///instance of a hierarchy during allocation, after that each listener will call some logging function,
-    ///with logger by iteslf. BUT maybe this can will be handy when it comes to call logging on each level.
-
     NfcLogger* logger = nfc_get_logger(instance->nfc);
     if(nfc_logger_enabled(logger)) {
-        NfcListenerListElement* iter = head_listener;
-        do {
-            if(iter->protocol == NfcProtocolInvalid) break;
-
-            if(iter->listener_api->log_history)
-                iter->listener_api->log_history(logger, iter->listener);
-
-            if(iter->child == NULL) break;
-
-            iter = iter->child;
-        } while(true);
+        head_listener->listener_api->log_history(logger, head_listener->listener);
     }
 
     return command;
@@ -141,7 +130,7 @@ void nfc_listener_start(NfcListener* instance, NfcGenericCallback callback, void
     furi_check(instance);
 
     NfcListenerListElement* tail_element = instance->list.tail;
-    tail_element->listener_api->set_callback(tail_element->listener, callback, context);
+    tail_element->listener_api->set_callback(tail_element->listener, callback, NULL, context);
     nfc_start(instance->nfc, nfc_listener_start_callback, instance);
 }
 
