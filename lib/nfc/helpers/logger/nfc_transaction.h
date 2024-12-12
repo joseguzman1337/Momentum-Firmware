@@ -19,9 +19,6 @@ typedef enum {
 
 typedef struct NfcTransaction NfcTransaction;
 
-///TODO: Think of moving major part of these functions to _i.h header and expose them only for logger.c under the hood
-///without putting them into api
-
 NfcTransaction* nfc_transaction_alloc(
     uint32_t id,
     FuriHalNfcEvent event,

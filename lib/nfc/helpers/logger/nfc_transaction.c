@@ -39,8 +39,7 @@ void nfc_transaction_free(NfcTransaction* instance) {
     free(instance);
 }
 
-///TODO: rename this to more obvious
-static NfcPacket* nfc_logger_get_packet(NfcTransaction* transaction, bool response) {
+static NfcPacket* nfc_transaction_get_packet(NfcTransaction* transaction, bool response) {
     furi_assert(transaction);
 
     NfcPacket* p;
@@ -68,7 +67,7 @@ void nfc_transaction_append(
     furi_assert(data);
     furi_assert(data_size > 0);
 
-    NfcPacket* p = nfc_logger_get_packet(transaction, response);
+    NfcPacket* p = nfc_transaction_get_packet(transaction, response);
     p->time = time;
     p->data_size = data_size;
     p->data = malloc(data_size);
@@ -99,7 +98,7 @@ void nfc_transaction_complete(NfcTransaction* instance, uint32_t time) {
     instance->header.end_time = time;
 }
 
-static bool nfc_logger_save_packet(Stream* stream, NfcPacket* packet) {
+static bool nfc_transaction_save_packet(Stream* stream, NfcPacket* packet) {
     bool result = false;
     do {
         if(!packet) {
@@ -131,12 +130,12 @@ bool nfc_transaction_save(Stream* stream, const NfcTransaction* transaction) {
 
         if(transaction->header.type == NfcTransactionTypeRequest ||
            transaction->header.type == NfcTransactionTypeRequestResponse) {
-            if(!nfc_logger_save_packet(stream, transaction->request)) break;
+            if(!nfc_transaction_save_packet(stream, transaction->request)) break;
         }
 
         if(transaction->header.type == NfcTransactionTypeResponse ||
            transaction->header.type == NfcTransactionTypeRequestResponse)
-            if(!nfc_logger_save_packet(stream, transaction->response)) break;
+            if(!nfc_transaction_save_packet(stream, transaction->response)) break;
 
         if(!nfc_history_save(stream, transaction->history)) break;
         result = true;
