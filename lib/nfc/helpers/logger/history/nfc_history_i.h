@@ -1,7 +1,6 @@
 #pragma once
 
 #include "nfc_history.h"
-#include "nfc_history_chain_data_type_i.h"
 
 #include <stream/file_stream.h>
 

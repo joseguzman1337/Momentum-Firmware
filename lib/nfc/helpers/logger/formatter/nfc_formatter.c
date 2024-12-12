@@ -5,7 +5,7 @@
 
 #include "nfc/helpers/logger/nfc_trace_data_type_i.h"
 #include "nfc/helpers/logger/nfc_transaction_data_type_i.h"
-#include "nfc/helpers/logger/history/nfc_history_data_type_i.h"
+#include "nfc/helpers/logger/history/nfc_history_chain_data_type_i.h"
 
 #include "common/nfc_transaction_formatter.h"
 
