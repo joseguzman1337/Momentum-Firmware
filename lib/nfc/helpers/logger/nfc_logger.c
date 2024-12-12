@@ -2,6 +2,7 @@
 #include "history/nfc_history_size.h"
 #include "formatter/nfc_formatter.h"
 #include <nfc_device.h>
+#include <furi_hal_cortex.h>
 
 #define TAG "NfcLogger"
 
@@ -12,13 +13,51 @@
 #define NFC_LOG_TEMP_FILE_PATH           NFC_LOG_FILE_PATH_BASE(NFC_LOG_TEMP_FILE_NAME)
 //EXT_PATH(NFC_LOG_FOLDER "/" NFC_LOG_TEMP_FILE_NAME)
 
+#define NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS (50)
+#define NFC_LOG_MESSAGE_QUEUE_TIMEOUT_US (NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS * 1000U)
+
+#define NFC_LOG_DWT_CYCCNT_CYCLES_PER_MESSAGE_QUEUE_TIMEOUT(inst_per_us) \
+    (NFC_LOG_MESSAGE_QUEUE_TIMEOUT_US * inst_per_us)
+#define NFC_LOG_DWT_CYCCNT_SECONDS_MAX(inst_per_us) (UINT32_MAX / inst_per_us)
+
+static uint32_t nfc_logger_get_time(NfcLogger* instance) {
+    uint32_t time = 0;
+    uint32_t inst_per_us = furi_hal_cortex_instructions_per_microsecond();
+
+    if(furi_mutex_acquire(instance->dwt_mutex, 10) == FuriStatusOk) {
+        uint32_t dwt_prev = instance->dwt_cnt_prev;
+
+        uint32_t dwt = DWT->CYCCNT;
+        time = (dwt < dwt_prev) ? ((UINT32_MAX - dwt_prev) + dwt) / inst_per_us :
+                                  (dwt - dwt_prev) / inst_per_us;
+
+        time += instance->dwt_second_per_ovf * instance->dwt_ovf_cnt;
+        furi_mutex_release(instance->dwt_mutex);
+    } else {
+        FURI_LOG_W(TAG, "Unable to acquire time mutex");
+    }
+    return time;
+}
+
+static inline void nfc_logger_check_dwt_overflow(NfcLogger* instance) {
+    if(furi_mutex_acquire(instance->dwt_mutex, 10) == FuriStatusOk) {
+        if(instance->dwt_cnt_prev - DWT->CYCCNT < instance->dwt_cycles_per_timeout_delay) {
+            while(instance->dwt_cnt_prev > DWT->CYCCNT)
+                ;
+            instance->dwt_ovf_cnt += 1;
+            instance->dwt_cnt_prev = DWT->CYCCNT;
+            ///TODO: remove this
+            FURI_LOG_D(TAG, "OVF = %lu", instance->dwt_ovf_cnt);
+        }
+        furi_mutex_release(instance->dwt_mutex);
+    } else {
+        FURI_LOG_W(TAG, "Unable to check DWT overflow");
+    }
+}
+
 static int32_t nfc_logger_thread_callback(void* context) {
     FURI_LOG_D(TAG, "Thread start");
     NfcLogger* instance = context;
-
-    const GpioPin* pin = furi_hal_resources_pin_by_number(2)->pin;
-    furi_hal_gpio_init_simple(pin, GpioModeOutputPushPull);
-    bool toggle = false;
 
     File* f = storage_file_alloc(instance->storage);
     if(!storage_file_open(f, NFC_LOG_TEMP_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
@@ -30,15 +69,16 @@ static int32_t nfc_logger_thread_callback(void* context) {
     storage_file_write(f, trace, sizeof(NfcTrace));
 
     while(!instance->exit || furi_message_queue_get_count(instance->transaction_queue)) {
+        nfc_logger_check_dwt_overflow(instance);
+
         NfcTransaction* ptr = NULL;
-        if(furi_message_queue_get(instance->transaction_queue, &ptr, 50) == FuriStatusErrorTimeout)
+        if(furi_message_queue_get(
+               instance->transaction_queue, &ptr, NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS) ==
+           FuriStatusErrorTimeout)
             continue;
 
         nfc_transaction_save_to_file(f, ptr);
-
         nfc_transaction_free(ptr);
-        furi_hal_gpio_write(pin, toggle);
-        toggle = !toggle;
     }
 
     storage_file_seek(f, 0, true);
@@ -176,6 +216,12 @@ NfcLogger* nfc_logger_alloc(void) {
     instance->filename = furi_string_alloc();
     instance->filter.transaction_filter = NfcLoggerTransactionFilterAll;
     instance->filter.history_filter = NfcLoggerHistoryLayerFilterAll;
+    instance->dwt_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
+
+    uint32_t inst_per_us = furi_hal_cortex_instructions_per_microsecond();
+    instance->dwt_cycles_per_timeout_delay =
+        NFC_LOG_DWT_CYCCNT_CYCLES_PER_MESSAGE_QUEUE_TIMEOUT(inst_per_us);
+    instance->dwt_second_per_ovf = NFC_LOG_DWT_CYCCNT_SECONDS_MAX(inst_per_us);
     return instance;
 }
 
@@ -193,6 +239,7 @@ static inline void nfc_logger_free_thread_and_queue(NfcLogger* instance) {
 void nfc_logger_free(NfcLogger* instance) {
     furi_assert(instance);
 
+    furi_mutex_free(instance->dwt_mutex);
     furi_record_close(RECORD_STORAGE);
     furi_string_free(instance->filename);
     nfc_logger_free_thread_and_queue(instance);
@@ -272,6 +319,8 @@ void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
         dt.second);
 
     furi_thread_start(instance->logger_thread);
+    instance->dwt_cnt_prev = DWT->CYCCNT;
+    instance->dwt_ovf_cnt = 0;
 }
 
 void nfc_logger_stop(NfcLogger* instance) {
