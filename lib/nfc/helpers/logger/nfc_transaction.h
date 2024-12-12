@@ -46,8 +46,7 @@ void nfc_transaction_append(
     const size_t data_size,
     bool response);
 void nfc_transaction_append_history(NfcTransaction* transaction, NfcHistoryItem* item);
-void nfc_transaction_save_to_file(Stream* stream, const NfcTransaction* transaction);
-
+bool nfc_transaction_save(Stream* stream, const NfcTransaction* transaction);
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr);
 
 #ifdef __cplusplus

@@ -101,25 +101,50 @@ void nfc_transaction_complete(NfcTransaction* instance, uint32_t time) {
     instance->header.end_time = time;
 }
 
-static void nfc_logger_save_packet(Stream* stream, NfcPacket* packet) {
-    if(packet) {
-        stream_write(stream, (uint8_t*)&packet->time, sizeof(uint32_t) * 2 + sizeof(size_t));
-        stream_write(stream, packet->data, packet->data_size);
-    }
+static bool nfc_logger_save_packet(Stream* stream, NfcPacket* packet) {
+    bool result = false;
+    do {
+        if(!packet) {
+            FURI_LOG_W(TAG, "Attempt to save empty packet");
+            break;
+        }
+
+        result = true;
+
+        size_t bytes_to_write = sizeof(uint32_t) * 2 + sizeof(size_t);
+        result &= stream_write(stream, (uint8_t*)&packet->time, bytes_to_write) == bytes_to_write;
+
+        bytes_to_write = packet->data_size;
+        result &= stream_write(stream, packet->data, bytes_to_write) == bytes_to_write;
+    } while(false);
+
+    return result;
 }
 
-void nfc_transaction_save_to_file(Stream* stream, const NfcTransaction* transaction) {
-    stream_write(stream, (uint8_t*)&(transaction->header), sizeof(NfcTransactionHeader));
+bool nfc_transaction_save(Stream* stream, const NfcTransaction* transaction) {
+    bool result = false;
+    do {
+        size_t bytes_to_write = sizeof(NfcTransactionHeader);
+        if(stream_write(stream, (uint8_t*)&(transaction->header), bytes_to_write) !=
+           bytes_to_write) {
+            FURI_LOG_E(TAG, "Failed to save transaction: %ld", transaction->header.id);
+            break;
+        }
 
-    if(transaction->header.type == NfcTransactionTypeRequest ||
-       transaction->header.type == NfcTransactionTypeRequestResponse)
-        nfc_logger_save_packet(stream, transaction->request);
+        if(transaction->header.type == NfcTransactionTypeRequest ||
+           transaction->header.type == NfcTransactionTypeRequestResponse) {
+            if(!nfc_logger_save_packet(stream, transaction->request)) break;
+        }
 
-    if(transaction->header.type == NfcTransactionTypeResponse ||
-       transaction->header.type == NfcTransactionTypeRequestResponse)
-        nfc_logger_save_packet(stream, transaction->response);
+        if(transaction->header.type == NfcTransactionTypeResponse ||
+           transaction->header.type == NfcTransactionTypeRequestResponse)
+            if(!nfc_logger_save_packet(stream, transaction->response)) break;
 
-    nfc_history_save(stream, transaction->history);
+        if(!nfc_history_save(stream, transaction->history)) break;
+        result = true;
+    } while(false);
+
+    return result;
 }
 
 ///TODO: rework this function so it will apply filter by itself and simply  skip

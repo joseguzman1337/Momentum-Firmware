@@ -55,38 +55,68 @@ static inline void nfc_logger_check_dwt_overflow(NfcLogger* instance) {
     }
 }
 
+static bool nfc_logger_trace_save(Stream* stream, NfcTrace* trace) {
+    bool result = false;
+    do {
+        if(!stream_seek(stream, 0, StreamOffsetFromStart)) {
+            FURI_LOG_E(TAG, "Seek failed");
+            break;
+        }
+
+        size_t bytes_to_write = sizeof(NfcTrace);
+        if(stream_write(stream, (uint8_t*)trace, bytes_to_write) != bytes_to_write) {
+            FURI_LOG_E(TAG, "Unable to save trace");
+            break;
+        }
+
+        result = true;
+    } while(false);
+    return result;
+}
+
 static int32_t nfc_logger_thread_callback(void* context) {
     FURI_LOG_D(TAG, "Thread start");
     NfcLogger* instance = context;
 
     Stream* stream = file_stream_alloc(instance->storage);
-    if(!file_stream_open(stream, NFC_LOG_TEMP_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
-        instance->state = NfcLoggerStateError;
-        nfc_logger_stop(instance);
-    }
+    do {
+        if(!file_stream_open(stream, NFC_LOG_TEMP_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
+            instance->state = NfcLoggerStateError;
+            FURI_LOG_E(TAG, "Unable to create temp log file");
+            break;
+        }
 
-    NfcTrace* trace = instance->trace;
-    stream_write(stream, (uint8_t*)trace, sizeof(NfcTrace));
+        if(!nfc_logger_trace_save(stream, instance->trace)) {
+            instance->state = NfcLoggerStateError;
+            break;
+        }
 
-    while(!instance->exit || furi_message_queue_get_count(instance->transaction_queue)) {
-        nfc_logger_check_dwt_overflow(instance);
+        while(!instance->exit || furi_message_queue_get_count(instance->transaction_queue)) {
+            nfc_logger_check_dwt_overflow(instance);
 
-        NfcTransaction* ptr = NULL;
-        if(furi_message_queue_get(
-               instance->transaction_queue, &ptr, NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS) ==
-           FuriStatusErrorTimeout)
-            continue;
+            NfcTransaction* ptr = NULL;
+            if(furi_message_queue_get(
+                   instance->transaction_queue, &ptr, NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS) ==
+               FuriStatusErrorTimeout)
+                continue;
 
-        nfc_transaction_save_to_file(stream, ptr);
-        nfc_transaction_free(ptr);
-    }
+            if(!nfc_transaction_save(stream, ptr)) {
+                instance->state = NfcLoggerStateError;
+                instance->exit = true;
+            }
 
-    stream_seek(stream, 0, StreamOffsetFromStart);
-    stream_write(stream, (uint8_t*)trace, sizeof(NfcTrace));
+            nfc_transaction_free(ptr);
+        }
 
+        if(!nfc_logger_trace_save(stream, instance->trace)) {
+            instance->state = NfcLoggerStateError;
+            break;
+        }
+    } while(false);
     stream_free(stream);
 
-    FURI_LOG_D(TAG, "Thread finish");
+    if(instance->state == NfcLoggerStateError)
+        FURI_LOG_E(TAG, "Logger thread stopped due to an error");
     return 0;
 }
 
@@ -282,7 +312,7 @@ static void nfc_logger_trace_free(NfcTrace* trace) {
 
 bool nfc_logger_enabled(NfcLogger* instance) {
     furi_assert(instance);
-    return instance->state != NfcLoggerStateDisabled;
+    return instance->state != NfcLoggerStateDisabled && instance->state != NfcLoggerStateError;
 }
 
 void nfc_logger_set_protocol(NfcLogger* instance, NfcProtocol protocol) {
@@ -366,8 +396,7 @@ void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
     furi_assert(instance);
     furi_assert(instance->transaction == NULL);
 
-    if(instance->state == NfcLoggerStateDisabled) return;
-
+    if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
     if(instance->transaction) {
         nfc_logger_transaction_end(instance);
     }
@@ -383,7 +412,8 @@ void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
 void nfc_logger_transaction_end(NfcLogger* instance) {
     furi_assert(instance);
     do {
-        if(instance->state == NfcLoggerStateDisabled) break;
+        if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError)
+            return;
         if(instance->state != NfcLoggerStateProcessing) break; ///TODO: maybe this can be deleted
         if(!instance->transaction) break;
 
@@ -411,7 +441,7 @@ void nfc_logger_append_request_data(
     furi_assert(instance);
     furi_assert(data);
     furi_assert(data_size > 0);
-    if(instance->state == NfcLoggerStateDisabled) return;
+    if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
     uint32_t time = nfc_logger_get_time(instance);
     nfc_transaction_append(instance->transaction, time, data, data_size, false);
 }
@@ -423,7 +453,7 @@ void nfc_logger_append_response_data(
     furi_assert(instance);
     furi_assert(data);
     furi_assert(data_size > 0);
-    if(instance->state == NfcLoggerStateDisabled) return;
+    if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
     uint32_t time = nfc_logger_get_time(instance);
     nfc_transaction_append(instance->transaction, time, data, data_size, true);
 }
@@ -432,6 +462,6 @@ void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
     furi_assert(instance);
     furi_assert(history);
 
-    if(instance->state == NfcLoggerStateDisabled) return;
+    if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
     nfc_transaction_append_history(instance->transaction, history);
 }

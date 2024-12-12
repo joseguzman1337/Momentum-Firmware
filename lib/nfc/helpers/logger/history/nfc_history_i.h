@@ -10,14 +10,13 @@
 extern "C" {
 #endif
 
-//uint8_t nfc_history_get_size_bytes(NfcProtocol protocol, NfcMode mode, uint8_t max_chain_count);
 NfcHistory* nfc_history_alloc(uint8_t history_size_bytes, uint8_t max_chain_count);
 void nfc_history_free(NfcHistory* instance);
 
 void nfc_history_append(NfcHistory* instance, const NfcHistoryItem* item);
 
 bool nfc_history_load(Stream* stream, NfcHistory** instance_ptr);
-void nfc_history_save(Stream* stream, const NfcHistory* instance);
+bool nfc_history_save(Stream* stream, const NfcHistory* instance);
 
 #ifdef __cplusplus
 }
