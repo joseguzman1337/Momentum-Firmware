@@ -68,7 +68,7 @@ void nfc_format_trace(
 NfcFormatter* nfc_formatter_alloc() {
     NfcFormatter* instance = malloc(sizeof(NfcFormatter));
 
-    const size_t width[] = {5, 10, 8, 3, 60, 3, 120};
+    const size_t width[] = {5, 10, 11, 3, 60, 3, 120};
     const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
     instance->table_columns_cnt = COUNT_OF(width);
     instance->table = table_alloc(instance->table_columns_cnt, width, names);

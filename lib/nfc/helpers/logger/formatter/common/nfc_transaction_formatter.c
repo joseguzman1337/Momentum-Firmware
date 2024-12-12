@@ -82,7 +82,7 @@ static void nfc_transaction_format_common(
         const NfcTransactionHeader* header = &transaction->header;
         uint32_t time = (header->type == NfcTransactionTypeFlagsOnly ||
                          header->type == NfcTransactionTypeEmpty) ?
-                            header->time :
+                            header->start_time :
                             transaction->request->time;
 
         if(desired_type != NfcTransactionTypeResponse ||
@@ -93,7 +93,7 @@ static void nfc_transaction_format_common(
         } else
             furi_string_printf(output->src, "TAG");
 
-        furi_string_printf(output->time, "%ld", time);
+        furi_string_printf(output->time, "%lu", time);
 
         if((header->type == NfcTransactionTypeRequest ||
             header->type == NfcTransactionTypeRequestResponse) &&
