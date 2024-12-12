@@ -6,9 +6,10 @@
 
 #define TAG "NfcLogger"
 
-#define NFC_LOG_FOLDER                   "nfc"
+#define NFC_LOG_FOLDER                   "nfc/log"
 #define NFC_LOG_TEMP_FILE_NAME           "log_temp.bin"
-#define NFC_LOG_FILE_PATH                EXT_PATH(NFC_LOG_FOLDER "/")
+#define NFC_LOG_FOLDER_PATH              EXT_PATH(NFC_LOG_FOLDER)
+#define NFC_LOG_FILE_PATH                NFC_LOG_FOLDER_PATH "/"
 #define NFC_LOG_FILE_PATH_BASE(filename) (NFC_LOG_FILE_PATH filename)
 #define NFC_LOG_TEMP_FILE_PATH           NFC_LOG_FILE_PATH_BASE(NFC_LOG_TEMP_FILE_NAME)
 //EXT_PATH(NFC_LOG_FOLDER "/" NFC_LOG_TEMP_FILE_NAME)
@@ -118,6 +119,16 @@ static int32_t nfc_logger_thread_callback(void* context) {
     if(instance->state == NfcLoggerStateError)
         FURI_LOG_E(TAG, "Logger thread stopped due to an error");
     return 0;
+}
+
+static bool nfc_logger_make_log_folder(Storage* storage) {
+    furi_assert(storage);
+    bool result = true;
+    if(!storage_simply_mkdir(storage, EXT_PATH(NFC_LOG_FOLDER))) {
+        FURI_LOG_W(TAG, "Unable to create log folder: %s", EXT_PATH(NFC_LOG_FOLDER));
+        result = false;
+    }
+    return result;
 }
 
 static bool nfc_logger_open_log(
@@ -292,6 +303,10 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatF
             instance->filter.transaction_filter = filter->transaction_filter;
             instance->filter.history_filter = filter->history_filter;
         }
+
+        if(!nfc_logger_make_log_folder(instance->storage)) {
+            instance->state = NfcLoggerStateError;
+        }
     } else {
         nfc_logger_free_thread_and_queue(instance);
         instance->state = NfcLoggerStateDisabled;
@@ -388,9 +403,6 @@ void nfc_logger_stop(NfcLogger* instance) {
         instance->state = NfcLoggerStateStopped;
     }
 }
-
-//------------------------------------------------------------------------------------------------------------------------
-//NfcTransaction some handlers
 
 void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
     furi_assert(instance);
