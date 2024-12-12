@@ -1,7 +1,6 @@
 #pragma once
 
 ///TODO: temporary added headers
-#include <storage/storage.h>
 #include <stream/file_stream.h>
 #include <toolbox/path.h>
 #include <furi_hal_nfc.h>
@@ -47,7 +46,7 @@ void nfc_transaction_append(
     const size_t data_size,
     bool response);
 void nfc_transaction_append_history(NfcTransaction* transaction, NfcHistoryItem* item);
-void nfc_transaction_save_to_file(File* file, const NfcTransaction* transaction);
+void nfc_transaction_save_to_file(Stream* stream, const NfcTransaction* transaction);
 
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr);
 

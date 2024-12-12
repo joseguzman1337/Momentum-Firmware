@@ -124,22 +124,21 @@ void nfc_history_append(NfcHistory* instance, const NfcHistoryItem* item) {
     } while(false);
 }
 
-static inline void nfc_history_chain_save(File* file, const NfcHistoryChain* chain) {
-    storage_file_write(file, &chain->length, sizeof(chain->length));
+static inline void nfc_history_chain_save(Stream* stream, const NfcHistoryChain* chain) {
+    stream_write(stream, &chain->length, sizeof(chain->length));
     for(size_t i = 0; i < chain->length; i++) {
         const NfcHistoryItemInternal* item = (NfcHistoryItemInternal*)&chain->items[i];
-        storage_file_write(file, &item->base, sizeof(NfcHistoryItemBase));
-        //&item->base + sizeof(NfcHistoryItemBase)
-        storage_file_write(file, item->data, item->base.data_block_size);
+        stream_write(stream, (uint8_t*)&item->base, sizeof(NfcHistoryItemBase));
+        stream_write(stream, item->data, item->base.data_block_size);
     }
 }
 
-void nfc_history_save(File* file, const NfcHistory* instance) {
-    furi_assert(file);
+void nfc_history_save(Stream* stream, const NfcHistory* instance) {
+    furi_assert(stream);
     furi_assert(instance);
-    storage_file_write(file, &instance->base, sizeof(NfcHistoryBase));
+    stream_write(stream, (uint8_t*)&instance->base, sizeof(NfcHistoryBase));
     for(uint8_t i = 0; i < instance->base.chain_count; i++) {
-        nfc_history_chain_save(file, &instance->chains[i]);
+        nfc_history_chain_save(stream, &instance->chains[i]);
     }
 }
 

@@ -80,7 +80,6 @@ void nfc_transaction_append(
 void nfc_transaction_append_history(NfcTransaction* transaction, NfcHistoryItem* item) {
     furi_assert(transaction);
 
-    // FURI_LOG_D(TAG, "Add history: %ld", transaction->id);
     if(transaction->header.type == NfcTransactionTypeEmpty) {
         transaction->header.type = NfcTransactionTypeFlagsOnly;
     }
@@ -102,26 +101,25 @@ void nfc_transaction_complete(NfcTransaction* instance, uint32_t time) {
     instance->header.end_time = time;
 }
 
-static void nfc_logger_save_packet(File* file, NfcPacket* packet) {
+static void nfc_logger_save_packet(Stream* stream, NfcPacket* packet) {
     if(packet) {
-        storage_file_write(file, &packet->time, sizeof(uint32_t) * 2 + sizeof(size_t));
-        storage_file_write(file, packet->data, packet->data_size);
+        stream_write(stream, (uint8_t*)&packet->time, sizeof(uint32_t) * 2 + sizeof(size_t));
+        stream_write(stream, packet->data, packet->data_size);
     }
 }
 
-void nfc_transaction_save_to_file(File* file, const NfcTransaction* transaction) {
-    //  FURI_LOG_D(TAG, "Save_tr: %ld", transaction->id);
-    storage_file_write(file, &(transaction->header), sizeof(NfcTransactionHeader));
+void nfc_transaction_save_to_file(Stream* stream, const NfcTransaction* transaction) {
+    stream_write(stream, (uint8_t*)&(transaction->header), sizeof(NfcTransactionHeader));
 
     if(transaction->header.type == NfcTransactionTypeRequest ||
        transaction->header.type == NfcTransactionTypeRequestResponse)
-        nfc_logger_save_packet(file, transaction->request);
+        nfc_logger_save_packet(stream, transaction->request);
 
     if(transaction->header.type == NfcTransactionTypeResponse ||
        transaction->header.type == NfcTransactionTypeRequestResponse)
-        nfc_logger_save_packet(file, transaction->response);
+        nfc_logger_save_packet(stream, transaction->response);
 
-    nfc_history_save(file, transaction->history);
+    nfc_history_save(stream, transaction->history);
 }
 
 ///TODO: rework this function so it will apply filter by itself and simply  skip
@@ -133,7 +131,6 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
     bool result = false;
     NfcTransaction* transaction = nfc_transaction_alloc_empty();
     do {
-        //storage_file_read(file, transaction, sizeof(NfcTransactionHeader));
         size_t bytes_read =
             stream_read(stream, (uint8_t*)transaction, sizeof(NfcTransactionHeader));
         if(bytes_read != sizeof(NfcTransactionHeader)) {
@@ -148,18 +145,15 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
 
             transaction->request->data = malloc(transaction->request->data_size);
             stream_read(stream, transaction->request->data, transaction->request->data_size);
-            //storage_file_read(file, transaction->request->data, transaction->request->data_size);
         }
 
         if(transaction->header.type == NfcTransactionTypeResponse ||
            transaction->header.type == NfcTransactionTypeRequestResponse) {
             transaction->response = malloc(sizeof(NfcPacket));
             stream_read(stream, (uint8_t*)transaction->response, sizeof(uint32_t) * 3);
-            //storage_file_read(file, transaction->response, sizeof(uint32_t) * 3);
 
             transaction->response->data = malloc(transaction->response->data_size);
             stream_read(stream, transaction->response->data, transaction->response->data_size);
-            //storage_file_read(file, transaction->response->data, transaction->response->data_size);
         }
 
         if(!nfc_history_load(stream, &transaction->history)) break;

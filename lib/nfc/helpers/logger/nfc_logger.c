@@ -59,14 +59,14 @@ static int32_t nfc_logger_thread_callback(void* context) {
     FURI_LOG_D(TAG, "Thread start");
     NfcLogger* instance = context;
 
-    File* f = storage_file_alloc(instance->storage);
-    if(!storage_file_open(f, NFC_LOG_TEMP_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
+    Stream* stream = file_stream_alloc(instance->storage);
+    if(!file_stream_open(stream, NFC_LOG_TEMP_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
         instance->state = NfcLoggerStateError;
         nfc_logger_stop(instance);
     }
 
     NfcTrace* trace = instance->trace;
-    storage_file_write(f, trace, sizeof(NfcTrace));
+    stream_write(stream, (uint8_t*)trace, sizeof(NfcTrace));
 
     while(!instance->exit || furi_message_queue_get_count(instance->transaction_queue)) {
         nfc_logger_check_dwt_overflow(instance);
@@ -77,15 +77,15 @@ static int32_t nfc_logger_thread_callback(void* context) {
            FuriStatusErrorTimeout)
             continue;
 
-        nfc_transaction_save_to_file(f, ptr);
+        nfc_transaction_save_to_file(stream, ptr);
         nfc_transaction_free(ptr);
     }
 
-    storage_file_seek(f, 0, true);
-    storage_file_write(f, trace, sizeof(NfcTrace));
+    stream_seek(stream, 0, StreamOffsetFromStart);
+    stream_write(stream, (uint8_t*)trace, sizeof(NfcTrace));
 
-    storage_file_close(f);
-    storage_file_free(f);
+    stream_free(stream);
+
     FURI_LOG_D(TAG, "Thread finish");
     return 0;
 }
