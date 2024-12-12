@@ -10,13 +10,14 @@ static NfcTransaction* nfc_transaction_alloc_empty() {
 NfcTransaction* nfc_transaction_alloc(
     uint32_t id,
     FuriHalNfcEvent event,
+    uint32_t time,
     uint8_t history_size_bytes,
     uint8_t max_chain_count) {
     NfcTransaction* t = nfc_transaction_alloc_empty(); //malloc(sizeof(NfcTransaction));
     t->header.type = NfcTransactionTypeEmpty;
     t->header.id = id;
     t->header.nfc_event = event;
-    t->header.time = furi_get_tick();
+    t->header.start_time = time;
     t->history = nfc_history_alloc(history_size_bytes, max_chain_count);
     return t;
 }
@@ -40,6 +41,7 @@ void nfc_transaction_free(NfcTransaction* instance) {
     free(instance);
 }
 
+///TODO: rename this to more obvious
 static NfcPacket* nfc_logger_get_packet(NfcTransaction* transaction, bool response) {
     furi_assert(transaction);
 
@@ -60,6 +62,7 @@ static NfcPacket* nfc_logger_get_packet(NfcTransaction* transaction, bool respon
 
 void nfc_transaction_append(
     NfcTransaction* transaction,
+    const uint32_t time,
     const uint8_t* data,
     const size_t data_size,
     bool response) {
@@ -68,10 +71,7 @@ void nfc_transaction_append(
     furi_assert(data_size > 0);
 
     NfcPacket* p = nfc_logger_get_packet(transaction, response);
-    //  FURI_LOG_D(
-    //      TAG, "Append_tr: %ld size: %d type: %02X", transaction->id, data_size, transaction->header.type);
-
-    p->time = furi_get_tick();
+    p->time = time;
     p->data_size = data_size;
     p->data = malloc(data_size);
     memcpy(p->data, data, data_size);
@@ -95,6 +95,11 @@ NfcTransactionType nfc_transaction_get_type(const NfcTransaction* instance) {
 uint32_t nfc_transaction_get_id(const NfcTransaction* instance) {
     furi_assert(instance);
     return instance->header.id;
+}
+
+void nfc_transaction_complete(NfcTransaction* instance, uint32_t time) {
+    furi_assert(instance);
+    instance->header.end_time = time;
 }
 
 static void nfc_logger_save_packet(File* file, NfcPacket* packet) {

@@ -12,7 +12,8 @@ typedef struct {
     uint32_t id;
     NfcTransactionType type;
     FuriHalNfcEvent nfc_event;
-    uint32_t time; ///TODO: optional
+    uint32_t start_time;
+    uint32_t end_time;
 } FURI_PACKED NfcTransactionHeader;
 
 struct FURI_PACKED NfcTransaction {
