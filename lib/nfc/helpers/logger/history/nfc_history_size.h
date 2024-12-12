@@ -1,6 +1,5 @@
 #pragma once
 
-#include <furi.h>
 #include "nfc_history_data_type_i.h"
 
 #ifdef __cplusplus

@@ -13,7 +13,7 @@ NfcTransaction* nfc_transaction_alloc(
     uint32_t time,
     uint8_t history_size_bytes,
     uint8_t max_chain_count) {
-    NfcTransaction* t = nfc_transaction_alloc_empty(); //malloc(sizeof(NfcTransaction));
+    NfcTransaction* t = nfc_transaction_alloc_empty();
     t->header.type = NfcTransactionTypeEmpty;
     t->header.id = id;
     t->header.nfc_event = event;
@@ -24,8 +24,6 @@ NfcTransaction* nfc_transaction_alloc(
 
 void nfc_transaction_free(NfcTransaction* instance) {
     furi_assert(instance);
-
-    // FURI_LOG_D(TAG, "Free_tr: %ld", instance->id);
 
     if(instance->request) {
         if(instance->request->data) free(instance->request->data);

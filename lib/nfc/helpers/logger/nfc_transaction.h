@@ -1,11 +1,9 @@
 #pragma once
 
-///TODO: temporary added headers
-#include <stream/file_stream.h>
-#include <toolbox/path.h>
-#include <furi_hal_nfc.h>
-
 #include "history/nfc_history.h"
+
+#include <stream/file_stream.h>
+#include <furi_hal_nfc.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,8 +22,6 @@ typedef struct NfcTransaction NfcTransaction;
 ///TODO: Think of moving major part of these functions to _i.h header and expose them only for logger.c under the hood
 ///without putting them into api
 
-/* NfcTransaction*
-    nfc_transaction_alloc(uint32_t id, FuriHalNfcEvent event, uint8_t history_size_bytes); */
 NfcTransaction* nfc_transaction_alloc(
     uint32_t id,
     FuriHalNfcEvent event,

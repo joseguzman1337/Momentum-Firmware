@@ -1,10 +1,9 @@
 #pragma once
 
 #include "nfc_history.h"
-#include <furi_hal_nfc.h>
-#include <stream/file_stream.h>
-
 #include "nfc_history_chain_data_type_i.h"
+
+#include <stream/file_stream.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,15 +1,6 @@
 #pragma once
 
 #include "nfc_logger.h"
-/* 
-#include <furi_hal_resources.h>
-#include <furi_hal_rtc.h>
-#include <storage/storage.h>
-#include <stream/file_stream.h>
-#include <toolbox/path.h>
-
-#include "nfc_transaction.h"
-#include "nfc_trace_data_type_i.h" */
 
 #ifdef __cplusplus
 extern "C" {
