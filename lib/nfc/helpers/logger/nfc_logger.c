@@ -373,11 +373,11 @@ void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
     }
 
     uint32_t id = instance->trace->transactions_count;
-    //FURI_LOG_D(TAG, "Begin_tr: %ld", id);
-
     instance->state = NfcLoggerStateProcessing;
-    instance->transaction =
-        nfc_transaction_alloc(id, event, instance->history_size_bytes, instance->max_chain_size);
+
+    uint32_t time = nfc_logger_get_time(instance);
+    instance->transaction = nfc_transaction_alloc(
+        id, event, time, instance->history_size_bytes, instance->max_chain_size);
 }
 
 void nfc_logger_transaction_end(NfcLogger* instance) {
@@ -387,6 +387,8 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
         if(instance->state != NfcLoggerStateProcessing) break; ///TODO: maybe this can be deleted
         if(!instance->transaction) break;
 
+        uint32_t time = nfc_logger_get_time(instance);
+        nfc_transaction_complete(instance->transaction, time);
         /*        if(nfc_transaction_get_type(instance->transaction) == NfcTransactionTypeEmpty) {
             nfc_transaction_free(instance->transaction);
         } else */
@@ -410,7 +412,8 @@ void nfc_logger_append_request_data(
     furi_assert(data);
     furi_assert(data_size > 0);
     if(instance->state == NfcLoggerStateDisabled) return;
-    nfc_transaction_append(instance->transaction, data, data_size, false);
+    uint32_t time = nfc_logger_get_time(instance);
+    nfc_transaction_append(instance->transaction, time, data, data_size, false);
 }
 
 void nfc_logger_append_response_data(
@@ -421,7 +424,8 @@ void nfc_logger_append_response_data(
     furi_assert(data);
     furi_assert(data_size > 0);
     if(instance->state == NfcLoggerStateDisabled) return;
-    nfc_transaction_append(instance->transaction, data, data_size, true);
+    uint32_t time = nfc_logger_get_time(instance);
+    nfc_transaction_append(instance->transaction, time, data, data_size, true);
 }
 
 void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
