@@ -3,14 +3,19 @@
 
 #include "protocols/nfc_protocol_formatters.h"
 
-#include "nfc/helpers/logger/nfc_trace_data_type_i.h"
-#include "nfc/helpers/logger/nfc_transaction_data_type_i.h"
-#include "nfc/helpers/logger/history/nfc_history_chain_data_type_i.h"
+#include <nfc/helpers/logger/nfc_trace_data_type_i.h>
+#include <nfc/helpers/logger/nfc_transaction_data_type_i.h>
+#include <nfc/helpers/logger/history/nfc_history_chain_data_type_i.h>
 
 #include "common/nfc_transaction_formatter.h"
 
 #include <nfc_device.h>
 #include <nfc/protocols/nfc_protocol.h>
+
+#include <flipper_application/flipper_application.h>
+#include <toolbox/path.h>
+
+#define TAG "NfcLoggerFormatter"
 
 static void
     nfc_format_trace_protocol_layers_description(NfcProtocol trace_protocol, FuriString* output) {
@@ -129,4 +134,131 @@ void nfc_formatter_format(
         nfc_format_transaction(instance, transaction, output);
     } else
         furi_string_printf(output, "NIMP");
+}
+
+static bool nfc_logger_open_log(
+    Stream* stream,
+    const char* file_name,
+    const char* extension,
+    FS_AccessMode access_mode,
+    FS_OpenMode open_mode) {
+    FuriString* file_path = furi_string_alloc();
+    path_concat(NFC_LOG_FILE_PATH, file_name, file_path);
+    furi_string_cat_str(file_path, extension);
+
+    bool result =
+        file_stream_open(stream, furi_string_get_cstr(file_path), access_mode, open_mode);
+
+    furi_string_free(file_path);
+    return result;
+}
+
+static bool nfc_logger_read_trace(Stream* stream, NfcTrace* trace) {
+    bool result = false;
+    do {
+        size_t read_bytes = stream_read(stream, (uint8_t*)trace, sizeof(NfcTrace));
+        if(read_bytes != sizeof(NfcTrace)) {
+            FURI_LOG_E(TAG, "Wrong trace size");
+            break;
+        }
+
+        if(trace->mode >= NfcModeNum) {
+            FURI_LOG_E(TAG, "Invalid mode %02X in trace", trace->mode);
+            break;
+        }
+
+        if(trace->protocol >= NfcProtocolNum) {
+            FURI_LOG_E(TAG, "Invalid protocol %02X in trace", trace->protocol);
+            break;
+        }
+
+        result = true;
+    } while(false);
+
+    return result;
+}
+
+void nfc_logger_convert_bin_to_text(
+    Storage* storage,
+    const char* file_name,
+    const NfcLoggerFormatFilter* filter) {
+    //File* text_log_file = storage_file_alloc(storage);
+    Stream* stream_bin = file_stream_alloc(storage);
+    Stream* stream_txt = file_stream_alloc(storage);
+
+    do {
+        NfcTrace trace;
+        if(!nfc_logger_open_log(stream_bin, file_name, ".bin", FSAM_READ, FSOM_OPEN_EXISTING)) {
+            FURI_LOG_E(TAG, "Unable to open log file: %s.bin", file_name);
+            break;
+        }
+
+        if(!nfc_logger_open_log(stream_txt, file_name, ".txt", FSAM_WRITE, FSOM_CREATE_NEW)) {
+            FURI_LOG_E(TAG, "Unable to create log file: %s.txt", file_name);
+            break;
+        }
+
+        if(!nfc_logger_read_trace(stream_bin, &trace)) break;
+
+        UNUSED(filter);
+        NfcFormatter* formatter = nfc_formatter_alloc();
+
+        FuriString* str = furi_string_alloc();
+        nfc_format_trace(formatter, file_name, &trace, str);
+        stream_write_string(stream_txt, str);
+
+        furi_string_reset(str);
+
+        nfc_format_table_header(formatter, str);
+        stream_write_string(stream_txt, str);
+
+        NfcTransaction* transaction;
+        while(nfc_transaction_read(stream_bin, &transaction)) {
+            FURI_LOG_D(
+                TAG,
+                "Id: %ld, chains: %d",
+                transaction->header.id,
+                transaction->history->base.chain_count);
+
+            furi_string_reset(str);
+            nfc_formatter_format(formatter, transaction, str);
+            stream_write_string(stream_txt, str);
+
+            nfc_transaction_free(transaction);
+        }
+
+        furi_string_free(str);
+        nfc_formatter_free(formatter);
+    } while(false);
+
+    stream_free(stream_bin);
+    stream_free(stream_txt);
+}
+
+void nfc_logger_formatter_run(Nfc* nfc) {
+    NfcLogger* logger = nfc_get_logger(nfc);
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+
+    const char* file_name = nfc_logger_get_latest_log_filename(logger);
+    NfcLoggerFormatFilter filter = {0};
+    nfc_logger_convert_bin_to_text(storage, file_name, &filter);
+
+    furi_record_close(RECORD_STORAGE);
+}
+
+/* Actual implementation of app<>plugin interface */
+static const NfcLoggerFormatterPlugin formatter_plugin = {
+    .format = nfc_logger_formatter_run,
+};
+
+/* Plugin descriptor to comply with basic plugin specification */
+static const FlipperAppPluginDescriptor formatter_plugin_descriptor = {
+    .appid = NFC_LOGGER_FORMATTER_PLUGIN_APP_ID,
+    .ep_api_version = NFC_LOGGER_FORMATTER_PLUGIN_API_VERSION,
+    .entry_point = &formatter_plugin,
+};
+
+/* Plugin entry point - must return a pointer to const descriptor  */
+const FlipperAppPluginDescriptor* formatter_plugin_ep(void) {
+    return &formatter_plugin_descriptor;
 }

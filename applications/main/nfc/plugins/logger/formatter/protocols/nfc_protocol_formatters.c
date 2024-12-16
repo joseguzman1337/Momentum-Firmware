@@ -23,7 +23,6 @@ const NfcProtocolFormatterBase* nfc_protocol_formatter_get(NfcProtocol protocol,
     furi_assert(protocol < NfcProtocolNum);
     furi_assert(mode < NfcModeNum);
 
-    furi_assert(mode == NfcModeListener);
     const NfcProtocolFormatterBase** formatters = (mode == NfcModeListener) ? listener_formatters :
                                                                               poller_formatters;
     return formatters[protocol];

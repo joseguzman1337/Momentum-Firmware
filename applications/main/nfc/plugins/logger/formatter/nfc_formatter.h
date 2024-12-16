@@ -4,8 +4,10 @@
 #include <nfc.h>
 
 #include "nfc_formatter_context.h"
-#include "nfc/helpers/logger/nfc_trace_data_type_i.h"
-#include "nfc/helpers/logger/nfc_transaction.h"
+#include <nfc/helpers/logger/nfc_trace_data_type_i.h>
+#include <nfc/helpers/logger/nfc_transaction.h>
+
+#include "../nfc_logger_formatter_plugin.h"
 
 #ifdef __cplusplus
 extern "C" {
