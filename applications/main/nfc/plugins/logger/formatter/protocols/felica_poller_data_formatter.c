@@ -1,6 +1,6 @@
 #include "nfc_hal_formatter.h"
 #include "nfc_protocol_formatter_base.h"
-#include <nfc/protocols/felica/felica_poller_i.h>
+#include <nfc/protocols/felica/felica_poller_history_data.h>
 
 static const char* commands[] = {
     [NfcCommandContinue] = "Continue",

@@ -1,6 +1,6 @@
 #include "nfc_hal_formatter.h"
 #include "nfc_protocol_formatter_base.h"
-#include <nfc/protocols/felica/felica_listener_i.h>
+#include <nfc/protocols/felica/felica_listener_history_data.h>
 
 static const char* states[] = {
     [Felica_ListenerStateActivated] = "Active",

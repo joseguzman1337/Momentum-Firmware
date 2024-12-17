@@ -1,9 +1,10 @@
 #pragma once
 
-#include <furi.h>
+#include "table.h"
+#include "nfc_transaction_string.h"
+
 #include <nfc_mode.h>
 #include <nfc/protocols/nfc_protocol.h>
-#include "table.h"
 
 #ifdef __cplusplus
 extern "C" {

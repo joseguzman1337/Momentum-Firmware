@@ -1,7 +1,7 @@
 #pragma once
 
 #include "iso14443_3a_poller_data_formatter.h"
-#include <nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
+#include <nfc/protocols/iso14443_3a/iso14443_3a_poller.h>
 
 #ifdef __cplusplus
 extern "C" {

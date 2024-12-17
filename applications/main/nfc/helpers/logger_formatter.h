@@ -9,7 +9,6 @@
 #include <core/string.h>
 
 #include <nfc/nfc.h>
-#include <nfc/nfc_device.h>
 
 #ifdef __cplusplus
 extern "C" {

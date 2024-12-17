@@ -1,6 +1,7 @@
 
 #include "iso14443_3a_listener_data_formatter_i.h"
 #include "nfc_hal_formatter.h"
+#include <nfc/protocols/iso14443_3a/iso14443_3a_listener_history_data.h>
 
 static const char* events[] = {
     [Iso14443_3aListenerEventTypeFieldOff] = "Field Off",

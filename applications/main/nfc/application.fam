@@ -255,3 +255,16 @@ App(
     sources=["nfc_cli.c"],
     order=30,
 )
+
+App(
+    appid="nfc_logger_formatter",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="formatter_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=[
+             "plugins/logger/formatter/*.c",
+             "plugins/logger/formatter/common/*.c",
+             "plugins/logger/formatter/protocols/*.c",
+            ],
+)

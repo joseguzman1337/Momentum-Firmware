@@ -1,12 +1,10 @@
 #pragma once
 
 #include <furi.h>
-#include <nfc.h>
+#include <nfc/helpers/logger/nfc_trace_data_type.h>
+#include <nfc/helpers/logger/transaction/nfc_transaction.h>
 
 #include "nfc_formatter_context.h"
-#include <nfc/helpers/logger/nfc_trace_data_type_i.h>
-#include <nfc/helpers/logger/nfc_transaction.h>
-
 #include "../nfc_logger_formatter_plugin.h"
 
 #ifdef __cplusplus
@@ -16,7 +14,7 @@ extern "C" {
 NfcFormatter* nfc_formatter_alloc(void);
 void nfc_formatter_free(NfcFormatter* instance);
 
-void nfc_format_table_header(const NfcFormatter* formatter, FuriString* output);
+void nfc_format_table_header(const NfcFormatter* instance, FuriString* output);
 
 void nfc_format_trace(
     NfcFormatter* instance,

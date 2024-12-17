@@ -1,16 +1,12 @@
 
 #include "nfc_formatter.h"
 
+#include "common/nfc_transaction_formatter.h"
 #include "protocols/nfc_protocol_formatters.h"
 
-#include <nfc/helpers/logger/nfc_trace_data_type_i.h>
-#include <nfc/helpers/logger/nfc_transaction_data_type_i.h>
-#include <nfc/helpers/logger/history/nfc_history_chain_data_type_i.h>
-
-#include "common/nfc_transaction_formatter.h"
-
-#include <nfc_device.h>
-#include <nfc/protocols/nfc_protocol.h>
+#include <nfc/helpers/logger/nfc_trace_data_type.h>
+#include <nfc/helpers/logger/transaction/nfc_transaction_data_type.h>
+#include <nfc/helpers/logger/history/nfc_history_chain_data_type.h>
 
 #include <flipper_application/flipper_application.h>
 #include <toolbox/path.h>
@@ -214,12 +210,6 @@ void nfc_logger_convert_bin_to_text(
 
         NfcTransaction* transaction;
         while(nfc_transaction_read(stream_bin, &transaction)) {
-            FURI_LOG_D(
-                TAG,
-                "Id: %ld, chains: %d",
-                transaction->header.id,
-                transaction->history->base.chain_count);
-
             furi_string_reset(str);
             nfc_formatter_format(formatter, transaction, str);
             stream_write_string(stream_txt, str);

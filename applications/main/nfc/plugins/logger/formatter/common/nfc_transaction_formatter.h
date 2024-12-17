@@ -1,9 +1,10 @@
 #pragma once
 
-#include <furi.h>
 #include "../nfc_formatter_context.h"
-#include "nfc/helpers/logger/nfc_trace_data_type_i.h"
-#include "nfc/helpers/logger/nfc_transaction.h"
+
+#include <furi.h>
+#include <nfc/helpers/logger/nfc_trace_data_type.h>
+#include <nfc/helpers/logger/transaction/nfc_transaction.h>
 
 #ifdef __cplusplus
 extern "C" {

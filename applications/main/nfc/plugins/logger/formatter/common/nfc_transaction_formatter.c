@@ -1,7 +1,7 @@
 #include "nfc_transaction_formatter.h"
-#include "../nfc_transaction_string.h"
-#include "nfc/helpers/logger/nfc_transaction_data_type_i.h"
 #include "nfc_history_formatter.h"
+
+#include <nfc/helpers/logger/transaction/nfc_transaction_data_type.h>
 
 static const char* nfc_transaction_get_type_name(NfcTransactionType type) {
     switch(type) {
