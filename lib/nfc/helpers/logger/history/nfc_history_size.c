@@ -2,24 +2,24 @@
 #include "nfc_history_i.h"
 #include "nfc_history_chain_data_type.h"
 
-#include <nfc/protocols/iso14443_3a/iso14443_3a_listener_i.h>
-#include <nfc/protocols/iso14443_4a/iso14443_4a_listener_i.h>
-#include <nfc/protocols/mf_ultralight/mf_ultralight_listener_i.h>
-#include <nfc/protocols/iso15693_3/iso15693_3_listener_i.h>
-#include <nfc/protocols/felica/felica_listener_i.h>
-#include <nfc/protocols/slix/slix_listener_i.h>
+#include <nfc/protocols/iso14443_3a/iso14443_3a_listener_history_data.h>
+#include <nfc/protocols/iso14443_4a/iso14443_4a_listener_history_data.h>
+#include <nfc/protocols/mf_ultralight/mf_ultralight_listener_history_data.h>
+#include <nfc/protocols/iso15693_3/iso15693_3_listener_history_data.h>
+#include <nfc/protocols/felica/felica_listener_history_data.h>
+#include <nfc/protocols/slix/slix_listener_history_data.h>
 
-#include <nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
-#include <nfc/protocols/iso14443_3b/iso14443_3b_poller_i.h>
-#include <nfc/protocols/iso14443_4a/iso14443_4a_poller_i.h>
-#include <nfc/protocols/iso14443_4b/iso14443_4b_poller_i.h>
-#include <nfc/protocols/iso15693_3/iso15693_3_poller_i.h>
-#include <nfc/protocols/mf_desfire/mf_desfire_poller_i.h>
-#include <nfc/protocols/mf_plus/mf_plus_poller_i.h>
-#include <nfc/protocols/mf_ultralight/mf_ultralight_poller_i.h>
-#include <nfc/protocols/felica/felica_poller_i.h>
-#include <nfc/protocols/slix/slix_poller_i.h>
-#include <nfc/protocols/st25tb/st25tb_poller_i.h>
+#include <nfc/protocols/iso14443_3a/iso14443_3a_poller_history_data.h>
+#include <nfc/protocols/iso14443_3b/iso14443_3b_poller_history_data.h>
+#include <nfc/protocols/iso14443_4a/iso14443_4a_poller_history_data.h>
+#include <nfc/protocols/iso14443_4b/iso14443_4b_poller_history_data.h>
+#include <nfc/protocols/iso15693_3/iso15693_3_poller_history_data.h>
+#include <nfc/protocols/mf_desfire/mf_desfire_poller_history_data.h>
+#include <nfc/protocols/mf_plus/mf_plus_poller_history_data.h>
+#include <nfc/protocols/mf_ultralight/mf_ultralight_poller_history_data.h>
+#include <nfc/protocols/felica/felica_poller_history_data.h>
+#include <nfc/protocols/slix/slix_poller_history_data.h>
+#include <nfc/protocols/st25tb/st25tb_poller_history_data.h>
 
 #define TAG "NfcHistorySize"
 

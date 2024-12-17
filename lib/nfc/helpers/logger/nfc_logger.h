@@ -12,6 +12,13 @@
 extern "C" {
 #endif
 
+#define NFC_LOG_FOLDER                   "nfc/log"
+#define NFC_LOG_TEMP_FILE_NAME           "log_temp.bin"
+#define NFC_LOG_FOLDER_PATH              EXT_PATH(NFC_LOG_FOLDER)
+#define NFC_LOG_FILE_PATH                NFC_LOG_FOLDER_PATH "/"
+#define NFC_LOG_FILE_PATH_BASE(filename) (NFC_LOG_FILE_PATH filename)
+#define NFC_LOG_TEMP_FILE_PATH           NFC_LOG_FILE_PATH_BASE(NFC_LOG_TEMP_FILE_NAME)
+
 typedef struct NfcLogger NfcLogger;
 
 typedef enum {
@@ -33,7 +40,7 @@ typedef enum {
 } NfcLoggerState;
 
 void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatFilter* filter);
-
+const char* nfc_logger_get_latest_log_filename(NfcLogger* instance);
 #ifdef __cplusplus
 }
 #endif

@@ -5,14 +5,6 @@
 
 #define TAG "NfcLogger"
 
-#define NFC_LOG_FOLDER                   "nfc/log"
-#define NFC_LOG_TEMP_FILE_NAME           "log_temp.bin"
-#define NFC_LOG_FOLDER_PATH              EXT_PATH(NFC_LOG_FOLDER)
-#define NFC_LOG_FILE_PATH                NFC_LOG_FOLDER_PATH "/"
-#define NFC_LOG_FILE_PATH_BASE(filename) (NFC_LOG_FILE_PATH filename)
-#define NFC_LOG_TEMP_FILE_PATH           NFC_LOG_FILE_PATH_BASE(NFC_LOG_TEMP_FILE_NAME)
-//EXT_PATH(NFC_LOG_FOLDER "/" NFC_LOG_TEMP_FILE_NAME)
-
 #define NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS (50)
 #define NFC_LOG_MESSAGE_QUEUE_TIMEOUT_US (NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS * 1000U)
 
@@ -130,48 +122,6 @@ static bool nfc_logger_make_log_folder(Storage* storage) {
     return result;
 }
 
-static bool nfc_logger_open_log(
-    Stream* stream,
-    const char* file_name,
-    const char* extension,
-    FS_AccessMode access_mode,
-    FS_OpenMode open_mode) {
-    FuriString* file_path = furi_string_alloc();
-    path_concat(NFC_LOG_FILE_PATH, file_name, file_path);
-    furi_string_cat_str(file_path, extension);
-
-    bool result =
-        file_stream_open(stream, furi_string_get_cstr(file_path), access_mode, open_mode);
-
-    furi_string_free(file_path);
-    return result;
-}
-
-static bool nfc_logger_read_trace(Stream* stream, NfcTrace* trace) {
-    bool result = false;
-    do {
-        size_t read_bytes = stream_read(stream, (uint8_t*)trace, sizeof(NfcTrace));
-        if(read_bytes != sizeof(NfcTrace)) {
-            FURI_LOG_E(TAG, "Wrong trace size");
-            break;
-        }
-
-        if(trace->mode >= NfcModeNum) {
-            FURI_LOG_E(TAG, "Invalid mode %02X in trace", trace->mode);
-            break;
-        }
-
-        if(trace->protocol >= NfcProtocolNum) {
-            FURI_LOG_E(TAG, "Invalid protocol %02X in trace", trace->protocol);
-            break;
-        }
-
-        result = true;
-    } while(false);
-
-    return result;
-}
-
 ///TODO: remove after debug
 static void nfc_logger_delete_all_logs(Storage* storage) {
     File* f = storage_file_alloc(storage);
@@ -196,57 +146,6 @@ static void nfc_logger_delete_all_logs(Storage* storage) {
     } while(false);
     furi_string_free(str);
     storage_file_free(f);
-}
-
-static void nfc_logger_convert_bin_to_text(
-    Storage* storage,
-    const char* file_name,
-    const NfcLoggerFormatFilter* filter) {
-    //File* text_log_file = storage_file_alloc(storage);
-    Stream* stream_bin = file_stream_alloc(storage);
-    Stream* stream_txt = file_stream_alloc(storage);
-
-    do {
-        NfcTrace trace;
-        if(!nfc_logger_open_log(stream_bin, file_name, ".bin", FSAM_READ, FSOM_OPEN_EXISTING)) {
-            FURI_LOG_E(TAG, "Unable to open log file: %s.bin", file_name);
-            break;
-        }
-
-        if(!nfc_logger_open_log(stream_txt, file_name, ".txt", FSAM_WRITE, FSOM_CREATE_NEW)) {
-            FURI_LOG_E(TAG, "Unable to create log file: %s.txt", file_name);
-            break;
-        }
-
-        if(!nfc_logger_read_trace(stream_bin, &trace)) break;
-
-        UNUSED(filter);
-        NfcFormatter* formatter = nfc_formatter_alloc();
-
-        FuriString* str = furi_string_alloc();
-        nfc_format_trace(formatter, file_name, &trace, str);
-        stream_write_string(stream_txt, str);
-
-        furi_string_reset(str);
-
-        nfc_format_table_header(formatter, str);
-        stream_write_string(stream_txt, str);
-
-        NfcTransaction* transaction;
-        while(nfc_transaction_read(stream_bin, &transaction)) {
-            furi_string_reset(str);
-            nfc_formatter_format(formatter, transaction, str);
-            stream_write_string(stream_txt, str);
-
-            nfc_transaction_free(transaction);
-        }
-
-        furi_string_free(str);
-        nfc_formatter_free(formatter);
-    } while(false);
-
-    stream_free(stream_bin);
-    stream_free(stream_txt);
 }
 
 NfcLogger* nfc_logger_alloc(void) {
@@ -310,6 +209,11 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatF
         nfc_logger_free_thread_and_queue(instance);
         instance->state = NfcLoggerStateDisabled;
     }
+}
+
+const char* nfc_logger_get_latest_log_filename(NfcLogger* instance) {
+    furi_assert(instance);
+    return furi_string_get_cstr(instance->filename);
 }
 
 static NfcTrace* nfc_logger_trace_alloc(NfcProtocol protocol, NfcMode mode) {
@@ -389,16 +293,9 @@ void nfc_logger_stop(NfcLogger* instance) {
         ///TODO: Maybe rename with storage_common_rename(instance->storage) would be better?
 
         furi_string_free(str);
-
-        ///TODO: Re-save temp.bin log file to file_name and save in readable or flipper_format
-
-        if(status == FSE_OK) {
-            nfc_logger_convert_bin_to_text(
-                instance->storage, furi_string_get_cstr(instance->filename), &instance->filter);
-        }
+        UNUSED(status);
 
         nfc_logger_trace_free(instance->trace);
-        furi_string_reset(instance->filename);
         instance->state = NfcLoggerStateStopped;
     }
 }
