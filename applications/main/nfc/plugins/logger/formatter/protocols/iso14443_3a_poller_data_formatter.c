@@ -1,5 +1,5 @@
 #include "iso14443_3a_poller_data_formatter_i.h"
-#include "../_nfc_hal/nfc_hal_formatter.h"
+#include "nfc_hal_formatter.h"
 
 static const char* states[] = {
     [Iso14443_3aPollerStateIdle] = "Idle",

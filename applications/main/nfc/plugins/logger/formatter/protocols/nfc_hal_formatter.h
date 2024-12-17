@@ -1,4 +1,5 @@
 #pragma once
+
 #include <nfc.h>
 #include <furi_hal_nfc.h>
 

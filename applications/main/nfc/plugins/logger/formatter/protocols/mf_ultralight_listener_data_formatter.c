@@ -1,12 +1,8 @@
 
 #include "mf_ultralight_listener_data_formatter.h"
-#include "../iso14443_3a/iso14443_3a_listener_data_formatter_i.h"
-//#include "../../common/nfc_transaction_formatter.h"
+#include "nfc_hal_formatter.h"
+#include "iso14443_3a_listener_data_formatter_i.h"
 #include <nfc/protocols/mf_ultralight/mf_ultralight_listener_i.h>
-/* 
-static const char* events[] = {
-    [MfUltralightListenerEventTypeAuth] = "Auth",
-}; */
 
 static const char* mfu_cmd[] = {
     [MfUltralightCommandNotFound] = "NotFound",
@@ -29,16 +25,14 @@ static void mf_ultralight_listener_data_format(
     const NfcPacket* request,
     const NfcHistoryData* data,
     FuriString* output) {
-    const MfUltralightListenerHistoryData* mf_ultralight_data = data;
     UNUSED(request);
-    FURI_LOG_D(
+    const MfUltralightListenerHistoryData* mf_ultralight_data = data;
+    /*   FURI_LOG_D(
         "MFU",
         "E_%02X, MFU_%02X, C_%02X",
         mf_ultralight_data->event,
         mf_ultralight_data->mfu_command,
-        mf_ultralight_data->command);
-
-    UNUSED(output);
+        mf_ultralight_data->command); */
 
     const char* event_text =
         iso14443_3a_listener_data_format_event_type(mf_ultralight_data->event);

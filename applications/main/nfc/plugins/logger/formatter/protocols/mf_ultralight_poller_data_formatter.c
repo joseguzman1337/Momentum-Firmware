@@ -1,5 +1,7 @@
 #include "mf_ultralight_poller_data_formatter.h"
-#include "../iso14443_3a/iso14443_3a_poller_data_formatter_i.h"
+#include "nfc_hal_formatter.h"
+#include "iso14443_3a_poller_data_formatter_i.h"
+
 #include <nfc/protocols/mf_ultralight/mf_ultralight_poller_i.h>
 
 static const char* poller_states[MfUltralightPollerStateNum] = {
@@ -38,12 +40,12 @@ static void mf_ultralight_poller_data_format(
     FuriString* output) {
     const MfUltralightPollerHistoryData* mf_ultralight_data = data;
     UNUSED(request);
-    FURI_LOG_D(
+    /*  FURI_LOG_D(
         "MFU",
         "E_%02X, MFU_%02X, C_%02X",
         mf_ultralight_data->event,
         mf_ultralight_data->state,
-        mf_ultralight_data->command);
+        mf_ultralight_data->command); */
 
     const char* event_text = iso14443_3a_poller_data_format_event_type(mf_ultralight_data->event);
     const char* state_text = poller_states[mf_ultralight_data->state];
