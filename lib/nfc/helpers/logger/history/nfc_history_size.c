@@ -1,6 +1,6 @@
 #include "nfc_history_size.h"
 #include "nfc_history_i.h"
-#include "nfc_history_chain_data_type_i.h"
+#include "nfc_history_chain_data_type.h"
 
 #include <nfc/protocols/iso14443_3a/iso14443_3a_listener_i.h>
 #include <nfc/protocols/iso14443_4a/iso14443_4a_listener_i.h>

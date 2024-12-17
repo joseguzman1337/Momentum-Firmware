@@ -1,6 +1,5 @@
 #include "nfc_logger_context.h"
 #include "history/nfc_history_size.h"
-#include "formatter/nfc_formatter.h"
 #include <nfc_device.h>
 #include <furi_hal_cortex.h>
 

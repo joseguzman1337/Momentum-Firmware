@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "nfc_history_data_type_i.h"
+#include "nfc_history_data_type.h"
 
 #ifdef __cplusplus
 extern "C" {
