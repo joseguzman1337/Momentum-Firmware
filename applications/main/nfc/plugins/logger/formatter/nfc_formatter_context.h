@@ -1,7 +1,7 @@
 #pragma once
 
-#include "table.h"
-#include "nfc_transaction_string.h"
+#include "helpers/table.h"
+#include "helpers/nfc_transaction_string.h"
 
 #include <nfc_mode.h>
 #include <nfc/protocols/nfc_protocol.h>

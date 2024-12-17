@@ -265,6 +265,7 @@ App(
     sources=[
              "plugins/logger/formatter/*.c",
              "plugins/logger/formatter/common/*.c",
+             "plugins/logger/formatter/helpers/*.c",
              "plugins/logger/formatter/protocols/*.c",
             ],
 )
