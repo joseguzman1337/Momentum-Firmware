@@ -1,23 +1,10 @@
 #pragma once
 
-#include "history/nfc_history.h"
-
-#include <stream/file_stream.h>
-#include <furi_hal_nfc.h>
+#include "nfc_transaction_data_type.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum {
-    NfcTransactionTypeEmpty,
-    NfcTransactionTypeFlagsOnly,
-    NfcTransactionTypeRequest,
-    NfcTransactionTypeResponse, //TODO: remove this, because NFC cannot send response without request
-    NfcTransactionTypeRequestResponse,
-} NfcTransactionType;
-
-typedef struct NfcTransaction NfcTransaction;
 
 NfcTransaction* nfc_transaction_alloc(
     uint32_t id,
@@ -28,7 +15,6 @@ NfcTransaction* nfc_transaction_alloc(
 
 void nfc_transaction_complete(NfcTransaction* instance, uint32_t time);
 
-void nfc_transaction_free(NfcTransaction* instance);
 NfcTransactionType nfc_transaction_get_type(const NfcTransaction* instance);
 uint32_t nfc_transaction_get_id(const NfcTransaction* instance);
 
@@ -40,7 +26,6 @@ void nfc_transaction_append(
     bool response);
 void nfc_transaction_append_history(NfcTransaction* transaction, NfcHistoryItem* item);
 bool nfc_transaction_save(Stream* stream, const NfcTransaction* transaction);
-bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr);
 
 #ifdef __cplusplus
 }

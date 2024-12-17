@@ -1,5 +1,5 @@
-#include "nfc_logger_i.h"
 #include "nfc_transaction_i.h"
+#include "../history/nfc_history_i.h"
 
 #define TAG "NfcTransaction"
 
@@ -144,8 +144,6 @@ bool nfc_transaction_save(Stream* stream, const NfcTransaction* transaction) {
     return result;
 }
 
-///TODO: rework this function so it will apply filter by itself and simply  skip
-///transactions which don't match to filter values;
 bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
     furi_assert(stream);
     furi_assert(transaction_ptr);
