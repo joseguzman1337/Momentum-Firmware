@@ -1,7 +1,7 @@
 #pragma once
 
+#include "slix_poller_history_data.h"
 #include <nfc/protocols/iso15693_3/iso15693_3_poller_i.h>
-#include "slix_poller.h"
 #include <helpers/logger/nfc_logger_i.h>
 
 #define SLIX_POLLER_SET_PASSWORD_FWT (100000)
@@ -9,24 +9,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum {
-    SlixPollerStateIdle,
-    SlixPollerStateGetNxpSysInfo,
-    SlixPollerStateReadSignature,
-    SlixPollerStateCheckPrivacyPassword,
-    SlixPollerStatePrivacyUnlock,
-    SlixPollerStateReady,
-    SlixPollerStateError,
-    SlixPollerStateNum,
-} SlixPollerState;
-
-typedef struct {
-    Iso15693_3PollerEventType event;
-    SlixPollerState state;
-    SlixError error;
-    NfcCommand command;
-} FURI_PACKED SlixPollerHistoryData;
 
 struct SlixPoller {
     Iso15693_3Poller* iso15693_3_poller;

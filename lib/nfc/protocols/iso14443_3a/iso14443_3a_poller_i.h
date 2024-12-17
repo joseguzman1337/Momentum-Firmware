@@ -1,6 +1,7 @@
 #pragma once
 
 #include "iso14443_3a_poller.h"
+#include "iso14443_3a_poller_history_data.h"
 
 #include <toolbox/bit_buffer.h>
 #include <helpers/logger/nfc_logger_i.h>
@@ -32,20 +33,6 @@ typedef struct {
     Iso14443_3aSelResp sel_resp;
     uint8_t cascade_level;
 } Iso14443_3aPollerColRes;
-
-typedef enum {
-    Iso14443_3aPollerStateIdle,
-    Iso14443_3aPollerStateColResInProgress,
-    Iso14443_3aPollerStateColResFailed,
-    Iso14443_3aPollerStateActivated,
-} Iso14443_3aPollerState;
-
-typedef struct {
-    NfcEventType event;
-    Iso14443_3aPollerState state;
-    Iso14443_3aError error;
-    NfcCommand command;
-} FURI_PACKED Iso14443_3aPollerHistoryData;
 
 struct Iso14443_3aPoller {
     Nfc* nfc;

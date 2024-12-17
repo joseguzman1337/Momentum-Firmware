@@ -11,12 +11,6 @@
 extern "C" {
 #endif
 
-typedef enum {
-    Iso15693_3ListenerStateReady,
-    Iso15693_3ListenerStateSelected,
-    Iso15693_3ListenerStateQuiet,
-} Iso15693_3ListenerState;
-
 typedef struct {
     bool selected;
     bool addressed;
@@ -29,13 +23,6 @@ typedef struct {
     Iso15693_3ExtensionHandler mandatory[ISO15693_3_MANDATORY_COUNT];
     Iso15693_3ExtensionHandler optional[ISO15693_3_OPTIONAL_COUNT];
 } Iso15693_3ExtensionHandlerTable;
-
-typedef struct {
-    NfcEventType event;
-    Iso15693_3ListenerState state;
-    Iso15693_3Error error;
-    NfcCommand command;
-} FURI_PACKED Iso15693_3ListenerHistoryData;
 
 struct Iso15693_3Listener {
     Nfc* nfc;

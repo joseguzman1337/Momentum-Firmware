@@ -1,6 +1,7 @@
 #pragma once
 
 #include "felica_poller.h"
+#include "felica_poller_history_data.h"
 #include <toolbox/bit_buffer.h>
 #include <helpers/logger/nfc_logger_i.h>
 
@@ -14,25 +15,6 @@ extern "C" {
 
 #define FELICA_POLLER_CMD_POLLING_REQ_CODE  (0x00U)
 #define FELICA_POLLER_CMD_POLLING_RESP_CODE (0x01U)
-
-typedef enum {
-    FelicaPollerStateIdle,
-    FelicaPollerStateActivated,
-    FelicaPollerStateAuthenticateInternal,
-    FelicaPollerStateAuthenticateExternal,
-    FelicaPollerStateReadBlocks,
-    FelicaPollerStateReadSuccess,
-    FelicaPollerStateReadFailed,
-
-    FelicaPollerStateNum
-} FelicaPollerState;
-
-typedef struct {
-    NfcEventType event;
-    FelicaPollerState state;
-    FelicaError error;
-    NfcCommand command;
-} FURI_PACKED FelicaPollerHistoryData;
 
 struct FelicaPoller {
     Nfc* nfc;

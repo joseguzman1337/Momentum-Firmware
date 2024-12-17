@@ -3,24 +3,13 @@
 #include <nfc/protocols/nfc_generic_event.h>
 
 #include "slix_listener.h"
+#include "slix_listener_history_data.h"
 #include "slix_i.h"
 #include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct {
-    uint16_t random;
-    bool password_match[SlixPasswordTypeCount];
-} SlixListenerSessionState;
-
-typedef struct {
-    Iso15693_3ListenerEventType event;
-    SlixListenerSessionState session_state;
-    SlixError error;
-    NfcCommand command;
-} FURI_PACKED SlixListenerHistoryData;
 
 struct SlixListener {
     Iso15693_3Listener* iso15693_3_listener;

@@ -1,23 +1,13 @@
 #pragma once
 
 #include "iso14443_3a_listener.h"
+#include "iso14443_3a_listener_history_data.h"
 #include <nfc/protocols/nfc_generic_event.h>
 #include <helpers/logger/nfc_logger_i.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum {
-    Iso14443_3aListenerStateIdle,
-    Iso14443_3aListenerStateActive,
-} Iso14443_3aListenerState;
-
-typedef struct {
-    NfcEventType event;
-    Iso14443_3aListenerState state;
-    NfcCommand command;
-} FURI_PACKED Iso14443_3aListenerHistoryData;
 
 struct Iso14443_3aListener {
     Nfc* nfc;

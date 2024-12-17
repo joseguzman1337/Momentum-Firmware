@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mf_ultralight_poller.h"
+#include "mf_ultralight_poller_history_data.h"
 #include <lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
 #include <helpers/logger/nfc_logger_i.h>
 #include <lib/bit_lib/bit_lib.h>
@@ -47,37 +48,6 @@ typedef union {
     MfUltralightPollerReadTearingFlagCommand tearing_flag_cmd;
     MfUltralightData* data;
 } MfUltralightPollerContextData;
-
-typedef enum {
-    MfUltralightPollerStateIdle,
-    MfUltralightPollerStateRequestMode,
-    MfUltralightPollerStateReadVersion,
-    MfUltralightPollerStateDetectMfulC,
-    MfUltralightPollerStateDetectNtag203,
-    MfUltralightPollerStateGetFeatureSet,
-    MfUltralightPollerStateReadSignature,
-    MfUltralightPollerStateReadCounters,
-    MfUltralightPollerStateReadTearingFlags,
-    MfUltralightPollerStateAuth,
-    MfUltralightPollerStateAuthMfulC,
-    MfUltralightPollerStateReadPages,
-    MfUltralightPollerStateTryDefaultPass,
-    MfUltralightPollerStateCheckMfulCAuthStatus,
-    MfUltralightPollerStateReadFailed,
-    MfUltralightPollerStateReadSuccess,
-    MfUltralightPollerStateRequestWriteData,
-    MfUltralightPollerStateWritePages,
-    MfUltralightPollerStateWriteFail,
-    MfUltralightPollerStateWriteSuccess,
-
-    MfUltralightPollerStateNum,
-} MfUltralightPollerState;
-
-typedef struct {
-    Iso14443_3aPollerEventType event;
-    MfUltralightPollerState state;
-    NfcCommand command;
-} FURI_PACKED MfUltralightPollerHistoryData;
 
 struct MfUltralightPoller {
     Iso14443_3aPoller* iso14443_3a_poller;

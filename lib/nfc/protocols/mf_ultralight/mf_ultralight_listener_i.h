@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mf_ultralight_listener.h"
-#include <lib/nfc/protocols/iso14443_3a/iso14443_3a_listener.h>
+#include "mf_ultralight_listener_history_data.h"
 #include <nfc/protocols/nfc_generic_event.h>
 
 #ifdef __cplusplus
@@ -17,16 +17,6 @@ typedef enum {
     MfUltralightListenerAccessTypeRead,
     MfUltralightListenerAccessTypeWrite,
 } MfUltralightListenerAccessType;
-
-typedef enum {
-    MfUltralightCommandNotFound,
-    MfUltralightCommandProcessed,
-    MfUltralightCommandProcessedACK,
-    MfUltralightCommandProcessedSilent,
-    MfUltralightCommandNotProcessedNAK,
-    MfUltralightCommandNotProcessedSilent,
-    MfUltralightCommandNotProcessedAuthNAK,
-} MfUltralightCommand;
 
 typedef MfUltralightCommand (
     *MfUltralightListenerCommandCallback)(MfUltralightListener* instance, BitBuffer* buf);
@@ -49,13 +39,6 @@ typedef struct {
 
 typedef uint16_t MfUltralightStaticLockData;
 typedef uint32_t MfUltralightDynamicLockData;
-
-typedef struct {
-    //MfUltralightListenerEventType event;
-    Iso14443_3aListenerEventType event;
-    MfUltralightCommand mfu_command;
-    NfcCommand command;
-} FURI_PACKED MfUltralightListenerHistoryData;
 
 struct MfUltralightListener {
     Iso14443_3aListener* iso14443_3a_listener;
