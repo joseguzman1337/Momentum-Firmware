@@ -219,7 +219,7 @@ static void nfc_protocol_support_scene_read_on_exit(NfcApp* instance) {
     popup_reset(instance->popup);
 
     if(instance->logger_enabled) {
-        nfc_logger_format(instance->nfc);
+        nfc_logger_format(instance->nfc, &instance->logger_config);
     }
 
     nfc_blink_stop(instance);
@@ -682,7 +682,7 @@ static void nfc_protocol_support_scene_emulate_stop_listener(NfcApp* instance) {
     }
 
     if(instance->logger_enabled) {
-        nfc_logger_format(instance->nfc);
+        nfc_logger_format(instance->nfc, &instance->logger_config);
     }
 
     nfc_listener_free(instance->listener);

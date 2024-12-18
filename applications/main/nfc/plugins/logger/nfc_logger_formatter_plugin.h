@@ -1,19 +1,13 @@
-/**
- *
- * @note the APPID field MUST end with `_parser` so the applicaton would know that this particular file
- * is a supported card plugin.
- *
- * @see nfc_supported_cards.h
- */
 #pragma once
 
 #include <furi/core/string.h>
 
 #include <nfc/nfc.h>
 #include <nfc/nfc_device.h>
+#include "nfc_logger_config_data_type.h"
 
 /**
- * @brief Unique string identifier for supported card plugins.
+ * @brief Unique string identifier for logger plugin.
  */
 #define NFC_LOGGER_FORMATTER_PLUGIN_APP_ID "NfcLoggerFormatterPlugin"
 
@@ -22,11 +16,10 @@
  */
 #define NFC_LOGGER_FORMATTER_PLUGIN_API_VERSION 1
 
-typedef void (*NfcLoggerFormatterPluginFormat)(Nfc* nfc);
+typedef void (*NfcLoggerFormatterPluginFormat)(Nfc* nfc, const NfcLoggerFormatterConfig* config);
+
 /**
- * @brief Supported card plugin interface.
- *
- * For a minimally functional plugin, only the parse() function must be implemented.
+ * @brief Plugin interface.
  */
 typedef struct {
     NfcLoggerFormatterPluginFormat format;

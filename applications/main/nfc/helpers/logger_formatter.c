@@ -6,10 +6,12 @@
 #include <loader/firmware_api/firmware_api.h>
 
 #include "../plugins/logger/nfc_logger_formatter_plugin.h"
-#define TAG "LogFormatPlugin"
 
-void nfc_logger_format(Nfc* nfc) {
-    FURI_LOG_I(TAG, "Starting");
+#define TAG "LogFormatPluginLoader"
+
+void nfc_logger_format(Nfc* nfc, const NfcLoggerFormatterConfig* config) {
+    furi_assert(nfc);
+    furi_assert(config);
 
     Storage* storage = furi_record_open(RECORD_STORAGE);
 
@@ -48,10 +50,9 @@ void nfc_logger_format(Nfc* nfc) {
         furi_check(strcmp(app_descriptor->appid, NFC_LOGGER_FORMATTER_PLUGIN_APP_ID) == 0);
 
         const NfcLoggerFormatterPlugin* plugin = app_descriptor->entry_point;
-        plugin->format(nfc);
+        plugin->format(nfc, config);
     } while(false);
     flipper_application_free(app);
 
     furi_record_close(RECORD_STORAGE);
-    FURI_LOG_I(TAG, "Goodbye!");
 }

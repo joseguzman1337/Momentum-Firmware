@@ -2,6 +2,7 @@
 
 #include "helpers/table.h"
 #include "helpers/nfc_transaction_string.h"
+#include "../nfc_logger_config_data_type.h"
 
 #include <nfc_mode.h>
 #include <nfc/protocols/nfc_protocol.h>
@@ -21,7 +22,7 @@ typedef struct {
     NfcMode mode;
     uint8_t table_columns_cnt;
     NfcHistoryCrcStatus crc_from_history;
-    // NfcLoggerFormatFilter filter;
+    const NfcLoggerFormatterConfig* config;
     Table* table;
 } NfcFormatter;
 

@@ -28,7 +28,6 @@ static const char* nfc_history_crc_status_message[] = {
 
 static void
     nfc_transaction_format_crc_status(const NfcFormatter* formatter, FuriString* crc_status_str) {
-    //NfcHistoryCrcStatus status = nfc_history_find_crc_status(history);
     furi_string_printf(
         crc_status_str, nfc_history_crc_status_message[formatter->crc_from_history]);
 }
@@ -114,11 +113,9 @@ static void nfc_transaction_format_common(
 inline static void nfc_transaction_format_request(
     const NfcFormatter* instance,
     const NfcTransaction* transaction,
-    //NfcLoggerHistoryLayerFilter filter,
     NfcTransactionString* output) {
     furi_assert(output);
     furi_assert(transaction);
-    // UNUSED(filter);
 
     nfc_transaction_format_common(instance, transaction, NfcTransactionTypeRequest, output);
     nfc_histroy_format_annotation(
@@ -149,7 +146,11 @@ void nfc_format_transaction(
     NfcTransactionString* tr_str = nfc_transaction_string_alloc();
 
     do {
-        // if(!rzac_filter_apply(filter->transaction_filter, type)) break;
+        /*  if(instance->f == NfcLoggerTransactionFilterPayloadOnly &&
+           (type == NfcTransactionTypeRequestResponse || type == NfcTransactionTypeRequest ||
+            type == NfcTransactionTypeResponse)) {
+            result = true;
+        } */
 
         Table* table = instance->table;
         const uint8_t count = instance->table_columns_cnt;

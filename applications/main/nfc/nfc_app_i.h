@@ -36,6 +36,8 @@
 #include "helpers/felica_auth.h"
 #include "helpers/slix_unlock.h"
 
+#include "plugins/logger/nfc_logger_config_data_type.h"
+
 #include <dialogs/dialogs.h>
 #include <storage/storage.h>
 #include <toolbox/path.h>
@@ -118,6 +120,7 @@ struct NfcApp {
     FuriString* text_box_store;
     uint8_t byte_input_store[NFC_BYTE_INPUT_STORE_SIZE];
     bool logger_enabled;
+    NfcLoggerFormatterConfig logger_config;
 
     NfcDetectedProtocols* detected_protocols;
 

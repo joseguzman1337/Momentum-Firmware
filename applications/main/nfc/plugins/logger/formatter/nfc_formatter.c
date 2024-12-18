@@ -1,8 +1,9 @@
 
-#include "nfc_formatter.h"
+//#include "nfc_formatter.h"
 
-#include "common/nfc_transaction_formatter.h"
-#include "protocols/nfc_protocol_formatters.h"
+#include <furi.h>
+#include <nfc/helpers/logger/nfc_trace_data_type.h>
+#include <nfc/helpers/logger/transaction/nfc_transaction.h>
 
 #include <nfc/helpers/logger/nfc_trace_data_type.h>
 #include <nfc/helpers/logger/transaction/nfc_transaction_data_type.h>
@@ -10,6 +11,12 @@
 
 #include <flipper_application/flipper_application.h>
 #include <toolbox/path.h>
+
+#include "nfc_formatter_context.h"
+#include "../nfc_logger_formatter_plugin.h"
+
+#include "common/nfc_transaction_formatter.h"
+#include "protocols/nfc_protocol_formatters.h"
 
 #define TAG "NfcLoggerFormatter"
 
@@ -60,20 +67,10 @@ static void nfc_format_trace(
     nfc_format_trace_protocol_layers_description(trace->protocol, output);
 }
 
-/* static bool rzac_filter_apply(NfcLoggerTransactionFilter filter, NfcTransactionType type) {
-    bool result = (filter == NfcLoggerTransactionFilterAll);
-    if(filter == NfcLoggerTransactionFilterPayloadOnly &&
-       (type == NfcTransactionTypeRequestResponse || type == NfcTransactionTypeRequest ||
-        type == NfcTransactionTypeResponse)) {
-        result = true;
-    }
-
-    return result;
-} */
-
-static NfcFormatter* nfc_formatter_alloc() {
+static NfcFormatter* nfc_formatter_alloc(const NfcLoggerFormatterConfig* config) {
     NfcFormatter* instance = malloc(sizeof(NfcFormatter));
 
+    instance->config = config;
     const size_t width[] = {5, 10, 11, 3, 60, 3, 120};
     const char* names[] = {"Id", "Type", "Time", "Src", "Data", "CRC", "Annotation"};
     instance->table_columns_cnt = COUNT_OF(width);
@@ -127,7 +124,6 @@ static void nfc_formatter_format(
     furi_assert(instance->protocol != NfcProtocolInvalid);
 
     instance->crc_from_history = nfc_history_get_crc_status(transaction->history, instance->mode);
-
     ///TODO: This If needs to be removed. nfc_format_transaction must guarantee that all protocols
     //will behave as expected
     if(instance->protocol == NfcProtocolIso14443_3a ||
@@ -178,11 +174,10 @@ static bool nfc_logger_read_trace(Stream* stream, NfcTrace* trace) {
     return result;
 }
 
-void nfc_logger_convert_bin_to_text(
+static void nfc_logger_convert_bin_to_text(
     Storage* storage,
     FuriString* file_path,
-    const NfcLoggerFormatFilter* filter) {
-    //File* text_log_file = storage_file_alloc(storage);
+    const NfcLoggerFormatterConfig* config) {
     Stream* stream_bin = file_stream_alloc(storage);
     Stream* stream_txt = file_stream_alloc(storage);
 
@@ -200,8 +195,7 @@ void nfc_logger_convert_bin_to_text(
 
         if(!nfc_logger_read_trace(stream_bin, &trace)) break;
 
-        UNUSED(filter);
-        NfcFormatter* formatter = nfc_formatter_alloc();
+        NfcFormatter* formatter = nfc_formatter_alloc(config);
 
         FuriString* str = furi_string_alloc();
         nfc_format_trace(formatter, file_path, &trace, str);
@@ -229,14 +223,13 @@ void nfc_logger_convert_bin_to_text(
     stream_free(stream_txt);
 }
 
-void nfc_logger_formatter_run(Nfc* nfc) {
+void nfc_logger_formatter_run(Nfc* nfc, const NfcLoggerFormatterConfig* config) {
     NfcLogger* logger = nfc_get_logger(nfc);
     Storage* storage = furi_record_open(RECORD_STORAGE);
     FuriString* file_path = furi_string_alloc();
 
     nfc_logger_get_path_to_latest_log_file(logger, file_path);
-    NfcLoggerFormatFilter filter = {0};
-    nfc_logger_convert_bin_to_text(storage, file_path, &filter);
+    nfc_logger_convert_bin_to_text(storage, file_path, config);
 
     furi_string_free(file_path);
     furi_record_close(RECORD_STORAGE);
