@@ -31,20 +31,25 @@ static void
     nfc_protocol_layer_list_free(protocols);
 }
 
-void nfc_format_trace(
+static void nfc_format_trace(
     NfcFormatter* instance,
-    const char* file_name,
+    FuriString* file_path,
     const NfcTrace* trace,
     FuriString* output) {
     furi_assert(instance);
-    furi_assert(file_name);
+    furi_assert(file_path);
     furi_assert(trace);
     furi_assert(output);
 
     instance->protocol = trace->protocol;
     instance->mode = trace->mode;
 
-    furi_string_printf(output, "Trace info\nName: %s\n", file_name);
+    FuriString* file_name = furi_string_alloc();
+    path_extract_filename(file_path, file_name, true);
+
+    furi_string_printf(output, "Trace info\nName: %s\n", furi_string_get_cstr(file_name));
+    furi_string_free(file_name);
+
     furi_string_cat_printf(
         output,
         "Protocol: %s\nMode: %s\nTransaction count: %d\n\n",
@@ -66,7 +71,7 @@ void nfc_format_trace(
     return result;
 } */
 
-NfcFormatter* nfc_formatter_alloc() {
+static NfcFormatter* nfc_formatter_alloc() {
     NfcFormatter* instance = malloc(sizeof(NfcFormatter));
 
     const size_t width[] = {5, 10, 11, 3, 60, 3, 120};
@@ -79,13 +84,13 @@ NfcFormatter* nfc_formatter_alloc() {
     return instance;
 }
 
-void nfc_formatter_free(NfcFormatter* instance) {
+static void nfc_formatter_free(NfcFormatter* instance) {
     furi_assert(instance);
     table_free(instance->table);
     free(instance);
 }
 
-void nfc_format_table_header(const NfcFormatter* instance, FuriString* output) {
+static void nfc_format_table_header(const NfcFormatter* instance, FuriString* output) {
     furi_assert(instance);
     table_printf_header(instance->table, output);
 }
@@ -115,7 +120,7 @@ static NfcHistoryCrcStatus
     return status;
 }
 
-void nfc_formatter_format(
+static void nfc_formatter_format(
     NfcFormatter* instance,
     const NfcTransaction* transaction,
     FuriString* output) {
@@ -134,12 +139,11 @@ void nfc_formatter_format(
 
 static bool nfc_logger_open_log(
     Stream* stream,
-    const char* file_name,
+    FuriString* file_path_no_ext,
     const char* extension,
     FS_AccessMode access_mode,
     FS_OpenMode open_mode) {
-    FuriString* file_path = furi_string_alloc();
-    path_concat(NFC_LOG_FILE_PATH, file_name, file_path);
+    FuriString* file_path = furi_string_alloc_set(file_path_no_ext);
     furi_string_cat_str(file_path, extension);
 
     bool result =
@@ -176,7 +180,7 @@ static bool nfc_logger_read_trace(Stream* stream, NfcTrace* trace) {
 
 void nfc_logger_convert_bin_to_text(
     Storage* storage,
-    const char* file_name,
+    FuriString* file_path,
     const NfcLoggerFormatFilter* filter) {
     //File* text_log_file = storage_file_alloc(storage);
     Stream* stream_bin = file_stream_alloc(storage);
@@ -184,13 +188,13 @@ void nfc_logger_convert_bin_to_text(
 
     do {
         NfcTrace trace;
-        if(!nfc_logger_open_log(stream_bin, file_name, ".bin", FSAM_READ, FSOM_OPEN_EXISTING)) {
-            FURI_LOG_E(TAG, "Unable to open log file: %s.bin", file_name);
+        if(!nfc_logger_open_log(stream_bin, file_path, ".bin", FSAM_READ, FSOM_OPEN_EXISTING)) {
+            FURI_LOG_E(TAG, "Unable to open log file: %s.bin", furi_string_get_cstr(file_path));
             break;
         }
 
-        if(!nfc_logger_open_log(stream_txt, file_name, ".txt", FSAM_WRITE, FSOM_CREATE_NEW)) {
-            FURI_LOG_E(TAG, "Unable to create log file: %s.txt", file_name);
+        if(!nfc_logger_open_log(stream_txt, file_path, ".txt", FSAM_WRITE, FSOM_CREATE_NEW)) {
+            FURI_LOG_E(TAG, "Unable to create log file: %s.txt", furi_string_get_cstr(file_path));
             break;
         }
 
@@ -200,7 +204,7 @@ void nfc_logger_convert_bin_to_text(
         NfcFormatter* formatter = nfc_formatter_alloc();
 
         FuriString* str = furi_string_alloc();
-        nfc_format_trace(formatter, file_name, &trace, str);
+        nfc_format_trace(formatter, file_path, &trace, str);
         stream_write_string(stream_txt, str);
 
         furi_string_reset(str);
@@ -228,11 +232,13 @@ void nfc_logger_convert_bin_to_text(
 void nfc_logger_formatter_run(Nfc* nfc) {
     NfcLogger* logger = nfc_get_logger(nfc);
     Storage* storage = furi_record_open(RECORD_STORAGE);
+    FuriString* file_path = furi_string_alloc();
 
-    const char* file_name = nfc_logger_get_latest_log_filename(logger);
+    nfc_logger_get_path_to_latest_log_file(logger, file_path);
     NfcLoggerFormatFilter filter = {0};
-    nfc_logger_convert_bin_to_text(storage, file_name, &filter);
+    nfc_logger_convert_bin_to_text(storage, file_path, &filter);
 
+    furi_string_free(file_path);
     furi_record_close(RECORD_STORAGE);
 }
 
