@@ -5,6 +5,7 @@
 
 #define TAG "NfcLogger"
 
+#define NFC_LOG_TEMP_FILE_NAME           "log_temp.bin"
 #define NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS (50)
 #define NFC_LOG_MESSAGE_QUEUE_TIMEOUT_US (NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS * 1000U)
 
@@ -71,8 +72,12 @@ static int32_t nfc_logger_thread_callback(void* context) {
     NfcLogger* instance = context;
 
     Stream* stream = file_stream_alloc(instance->storage);
+    FuriString* temp_file_path = furi_string_alloc_set(instance->log_folder_path);
+    path_append(temp_file_path, NFC_LOG_TEMP_FILE_NAME);
+
     do {
-        if(!file_stream_open(stream, NFC_LOG_TEMP_FILE_PATH, FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
+        if(!file_stream_open(
+               stream, furi_string_get_cstr(temp_file_path), FSAM_READ_WRITE, FSOM_CREATE_ALWAYS)) {
             instance->state = NfcLoggerStateError;
             FURI_LOG_E(TAG, "Unable to create temp log file");
             break;
@@ -105,36 +110,38 @@ static int32_t nfc_logger_thread_callback(void* context) {
             break;
         }
     } while(false);
+
     stream_free(stream);
+    furi_string_free(temp_file_path);
 
     if(instance->state == NfcLoggerStateError)
         FURI_LOG_E(TAG, "Logger thread stopped due to an error");
     return 0;
 }
 
-static bool nfc_logger_make_log_folder(Storage* storage) {
+static bool nfc_logger_make_log_folder(Storage* storage, const char* log_folder_path) {
     furi_assert(storage);
     bool result = true;
-    if(!storage_simply_mkdir(storage, EXT_PATH(NFC_LOG_FOLDER))) {
-        FURI_LOG_W(TAG, "Unable to create log folder: %s", EXT_PATH(NFC_LOG_FOLDER));
+    if(!storage_simply_mkdir(storage, log_folder_path)) {
+        FURI_LOG_W(TAG, "Unable to create log folder: %s", log_folder_path);
         result = false;
     }
     return result;
 }
 
 ///TODO: remove after debug
-static void nfc_logger_delete_all_logs(Storage* storage) {
+static void nfc_logger_delete_all_logs(Storage* storage, const char* log_folder_path) {
     File* f = storage_file_alloc(storage);
     FuriString* str = furi_string_alloc();
     do {
-        if(!storage_dir_open(f, EXT_PATH(NFC_LOG_FOLDER))) break;
+        if(!storage_dir_open(f, log_folder_path)) break;
         FileInfo f_info;
         char name[50];
         memset(name, 0, sizeof(name));
 
         while(storage_dir_read(f, &f_info, name, sizeof(name))) {
             if(strstr(name, "LOG")) {
-                path_concat(EXT_PATH(NFC_LOG_FOLDER), name, str);
+                path_concat(log_folder_path, name, str);
                 FS_Error err = storage_common_remove(storage, furi_string_get_cstr(str));
                 if(err == FSE_OK)
                     FURI_LOG_D(TAG, "Delete %s", name);
@@ -153,8 +160,7 @@ NfcLogger* nfc_logger_alloc(void) {
 
     instance->storage = furi_record_open(RECORD_STORAGE);
     instance->filename = furi_string_alloc();
-    instance->filter.transaction_filter = NfcLoggerTransactionFilterAll;
-    instance->filter.history_filter = NfcLoggerHistoryLayerFilterAll;
+    instance->log_folder_path = furi_string_alloc();
     instance->dwt_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
 
     uint32_t inst_per_us = furi_hal_cortex_instructions_per_microsecond();
@@ -181,12 +187,16 @@ void nfc_logger_free(NfcLogger* instance) {
     furi_mutex_free(instance->dwt_mutex);
     furi_record_close(RECORD_STORAGE);
     furi_string_free(instance->filename);
+    furi_string_free(instance->log_folder_path);
     nfc_logger_free_thread_and_queue(instance);
 
     free(instance);
 }
 
-void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatFilter* filter) {
+void nfc_logger_config(NfcLogger* instance, bool enabled, const char* log_folder_path) {
+    furi_assert(instance);
+    furi_assert(log_folder_path);
+
     if(enabled) {
         FuriThread* thread =
             furi_thread_alloc_ex(TAG, 1024U, nfc_logger_thread_callback, instance);
@@ -197,13 +207,10 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatF
         instance->transaction_queue = furi_message_queue_alloc(150, sizeof(NfcTransaction*));
         instance->state = NfcLoggerStateIdle;
 
-        if(filter) {
-            instance->filter.transaction_filter = filter->transaction_filter;
-            instance->filter.history_filter = filter->history_filter;
-        }
-
-        if(!nfc_logger_make_log_folder(instance->storage)) {
+        if(!nfc_logger_make_log_folder(instance->storage, log_folder_path)) {
             instance->state = NfcLoggerStateError;
+        } else {
+            furi_string_set_str(instance->log_folder_path, log_folder_path);
         }
     } else {
         nfc_logger_free_thread_and_queue(instance);
@@ -211,9 +218,11 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const NfcLoggerFormatF
     }
 }
 
-const char* nfc_logger_get_latest_log_filename(NfcLogger* instance) {
+void nfc_logger_get_path_to_latest_log_file(NfcLogger* instance, FuriString* output) {
     furi_assert(instance);
-    return furi_string_get_cstr(instance->filename);
+    furi_assert(output);
+    furi_string_set(output, instance->log_folder_path);
+    path_append(output, furi_string_get_cstr(instance->filename));
 }
 
 static NfcTrace* nfc_logger_trace_alloc(NfcProtocol protocol, NfcMode mode) {
@@ -245,7 +254,7 @@ void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
     furi_assert(mode < NfcModeNum);
 
     if(instance->state == NfcLoggerStateDisabled) return;
-    nfc_logger_delete_all_logs(instance->storage);
+    nfc_logger_delete_all_logs(instance->storage, furi_string_get_cstr(instance->log_folder_path));
 
     instance->max_chain_size = 3;
     instance->history_size_bytes =
@@ -285,14 +294,19 @@ void nfc_logger_stop(NfcLogger* instance) {
     //    nfc_logger_free_thread_and_queue(instance);
 
     if(instance->state != NfcLoggerStateError) {
-        FuriString* str = furi_string_alloc_set_str(NFC_LOG_FILE_PATH);
-        furi_string_cat(str, instance->filename);
+        FuriString* temp_file_path = furi_string_alloc_set(instance->log_folder_path);
+        path_append(temp_file_path, NFC_LOG_TEMP_FILE_NAME);
+
+        FuriString* str = furi_string_alloc_set(instance->log_folder_path);
+        path_append(str, furi_string_get_cstr(instance->filename));
         furi_string_cat_str(str, ".bin");
+
         FS_Error status = storage_common_copy(
-            instance->storage, NFC_LOG_TEMP_FILE_PATH, furi_string_get_cstr(str));
+            instance->storage, furi_string_get_cstr(temp_file_path), furi_string_get_cstr(str));
         ///TODO: Maybe rename with storage_common_rename(instance->storage) would be better?
 
         furi_string_free(str);
+        furi_string_free(temp_file_path);
         UNUSED(status);
 
         nfc_logger_trace_free(instance->trace);

@@ -24,7 +24,7 @@ struct NfcLogger {
     uint32_t dwt_cycles_per_timeout_delay;
     FuriMutex* dwt_mutex;
 
-    NfcLoggerFormatFilter filter;
+    FuriString* log_folder_path;
     FuriString* filename;
     Storage* storage;
     FuriThread* logger_thread;
