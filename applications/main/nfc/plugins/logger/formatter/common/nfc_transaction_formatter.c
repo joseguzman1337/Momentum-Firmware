@@ -3,22 +3,13 @@
 
 #include <nfc/helpers/logger/transaction/nfc_transaction_data_type.h>
 
-static const char* nfc_transaction_get_type_name(NfcTransactionType type) {
-    switch(type) {
-    case NfcTransactionTypeEmpty:
-        return "HalNfc";
-    case NfcTransactionTypeFlagsOnly:
-        return "FlagsOnly";
-    case NfcTransactionTypeRequest:
-        return "Request";
-    case NfcTransactionTypeResponse:
-        return "Response";
-    case NfcTransactionTypeRequestResponse:
-        return "Full";
-    default:
-        return "Unknown";
-    }
-}
+static const char* nfc_transaction_type_name[] = {
+    [NfcTransactionTypeEmpty] = "HalNfc",
+    [NfcTransactionTypeFlagsOnly] = "FlagsOnly",
+    [NfcTransactionTypeRequest] = "Request",
+    [NfcTransactionTypeResponse] = "Response",
+    [NfcTransactionTypeRequestResponse] = "Full",
+};
 
 static const char* nfc_history_crc_status_message[] = {
     [NfcHistoryCrcNotSet] = "",
@@ -87,7 +78,7 @@ static void nfc_transaction_format_common(
         if(desired_type != NfcTransactionTypeResponse ||
            header->type != NfcTransactionTypeRequestResponse) {
             furi_string_printf(output->id, "%ld", header->id);
-            furi_string_printf(output->type, "%s", nfc_transaction_get_type_name(header->type));
+            furi_string_printf(output->type, "%s", nfc_transaction_type_name[header->type]);
             furi_string_printf(output->src, "RDR");
         } else
             furi_string_printf(output->src, "TAG");
