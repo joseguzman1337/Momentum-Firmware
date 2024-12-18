@@ -11,21 +11,21 @@
 extern "C" {
 #endif
 
-NfcFormatter* nfc_formatter_alloc(void);
-void nfc_formatter_free(NfcFormatter* instance);
+typedef enum {
+    NfcLoggerTransactionFilterAll,
+    NfcLoggerTransactionFilterPayloadOnly,
+} NfcLoggerTransactionFilter;
 
-void nfc_format_table_header(const NfcFormatter* instance, FuriString* output);
+typedef enum {
+    NfcLoggerHistoryLayerFilterAll,
+    NfcLoggerHistoryLayerFilterTopProtocolOnly,
+} NfcLoggerHistoryLayerFilter;
 
-void nfc_format_trace(
-    NfcFormatter* instance,
-    const char* file_name,
-    const NfcTrace* trace,
-    FuriString* output);
+typedef struct {
+    NfcLoggerTransactionFilter transaction_filter;
+    NfcLoggerHistoryLayerFilter history_filter;
+} NfcLoggerFormatFilter;
 
-void nfc_formatter_format(
-    NfcFormatter* instance,
-    const NfcTransaction* transaction,
-    FuriString* output);
 #ifdef __cplusplus
 }
 #endif

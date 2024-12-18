@@ -6,11 +6,6 @@
 extern "C" {
 #endif
 
-typedef enum {
-    NfcLoggerHistoryLayerFilterAll,
-    NfcLoggerHistoryLayerFilterTopProtocolOnly,
-} NfcLoggerHistoryLayerFilter;
-
 typedef struct NfcHistory NfcHistory;
 
 #ifdef __cplusplus
