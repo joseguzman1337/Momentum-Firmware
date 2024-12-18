@@ -128,7 +128,7 @@ static void nfc_formatter_format(
     //will behave as expected
     if(instance->protocol == NfcProtocolIso14443_3a ||
        instance->protocol == NfcProtocolMfUltralight || instance->protocol == NfcProtocolFelica) {
-        nfc_format_transaction(instance, transaction, output);
+        nfc_transaction_format(instance, transaction, output);
     } else
         furi_string_printf(output, "NIMP");
 }

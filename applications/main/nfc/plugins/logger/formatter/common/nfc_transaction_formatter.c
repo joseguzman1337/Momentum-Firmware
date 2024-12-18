@@ -136,7 +136,19 @@ inline static void nfc_transaction_format_response(
     nfc_transaction_format_common(instance, transaction, NfcTransactionTypeResponse, output);
 }
 
-void nfc_format_transaction(
+static bool nfc_transaction_filter_check(
+    const NfcLoggerTransactionFilter transaction_filter,
+    const NfcTransactionType type) {
+    bool result = true;
+    if(transaction_filter == NfcLoggerTransactionFilterPayloadOnly &&
+       (type != NfcTransactionTypeRequestResponse && type != NfcTransactionTypeRequest &&
+        type != NfcTransactionTypeResponse)) {
+        result = false;
+    }
+    return result;
+}
+
+void nfc_transaction_format(
     const NfcFormatter* instance,
     const NfcTransaction* transaction,
     FuriString* output) {
@@ -146,24 +158,22 @@ void nfc_format_transaction(
     NfcTransactionString* tr_str = nfc_transaction_string_alloc();
 
     do {
-        /*  if(instance->f == NfcLoggerTransactionFilterPayloadOnly &&
-           (type == NfcTransactionTypeRequestResponse || type == NfcTransactionTypeRequest ||
-            type == NfcTransactionTypeResponse)) {
-            result = true;
-        } */
+        const NfcLoggerTransactionFilter filter = instance->config->transaction_filter;
+        const NfcTransactionType type = transaction->header.type;
+        if(!nfc_transaction_filter_check(filter, type)) {
+            break;
+        }
 
         Table* table = instance->table;
         const uint8_t count = instance->table_columns_cnt;
 
-        if(transaction->header.type != NfcTransactionTypeResponse) {
+        if(type != NfcTransactionTypeResponse) {
             nfc_transaction_string_reset(tr_str);
-            nfc_transaction_format_request(
-                instance, transaction, /* instance->filter.history_filter, */ tr_str);
+            nfc_transaction_format_request(instance, transaction, tr_str);
             table_printf_row_array(table, output, (FuriString**)tr_str, count);
         }
 
-        if(transaction->header.type == NfcTransactionTypeResponse ||
-           transaction->header.type == NfcTransactionTypeRequestResponse) {
+        if(type == NfcTransactionTypeResponse || type == NfcTransactionTypeRequestResponse) {
             nfc_transaction_string_reset(tr_str);
             nfc_transaction_format_response(instance, transaction, tr_str);
             table_printf_row_array(table, output, (FuriString**)tr_str, count);

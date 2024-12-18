@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-void nfc_format_transaction(
+void nfc_transaction_format(
     const NfcFormatter* instance,
     const NfcTransaction* transaction,
     FuriString* output);
