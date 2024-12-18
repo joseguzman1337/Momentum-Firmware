@@ -117,6 +117,7 @@ struct NfcApp {
     char text_store[NFC_TEXT_STORE_SIZE + 1];
     FuriString* text_box_store;
     uint8_t byte_input_store[NFC_BYTE_INPUT_STORE_SIZE];
+    bool logger_enabled;
 
     NfcDetectedProtocols* detected_protocols;
 

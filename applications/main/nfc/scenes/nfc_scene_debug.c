@@ -3,6 +3,7 @@
 enum SubmenuDebugIndex {
     SubmenuDebugIndexField,
     SubmenuDebugIndexApdu,
+    SubmenuDebugIndexLogger,
 };
 
 void nfc_scene_debug_submenu_callback(void* context, uint32_t index) {
@@ -17,6 +18,13 @@ void nfc_scene_debug_on_enter(void* context) {
 
     submenu_add_item(
         submenu, "Field", SubmenuDebugIndexField, nfc_scene_debug_submenu_callback, nfc);
+
+    submenu_add_item(
+        submenu,
+        nfc->logger_enabled ? "Disable Logger" : "Enable Logger",
+        SubmenuDebugIndexLogger,
+        nfc_scene_debug_submenu_callback,
+        nfc);
 
     submenu_set_selected_item(
         submenu, scene_manager_get_scene_state(nfc->scene_manager, NfcSceneDebug));
@@ -33,6 +41,13 @@ bool nfc_scene_debug_on_event(void* context, SceneManagerEvent event) {
             scene_manager_set_scene_state(
                 nfc->scene_manager, NfcSceneDebug, SubmenuDebugIndexField);
             scene_manager_next_scene(nfc->scene_manager, NfcSceneField);
+            consumed = true;
+        } else if(event.event == SubmenuDebugIndexLogger) {
+            nfc->logger_enabled ^= 1;
+            submenu_change_item_label(
+                nfc->submenu,
+                SubmenuDebugIndexLogger,
+                nfc->logger_enabled ? "Disable Logger" : "Enable Logger");
             consumed = true;
         }
     }
