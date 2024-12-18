@@ -11,7 +11,7 @@
 
 #include "nfc_protocol_support_defs.h"
 #include "nfc_protocol_support_gui_common.h"
-
+#include "helpers/logger_formatter.h"
 /**
  * @brief Common scene entry handler.
  *
@@ -150,6 +150,8 @@ static void nfc_protocol_support_scene_read_on_enter(NfcApp* instance) {
 
     view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewPopup);
 
+    nfc_logger_config(nfc_get_logger(instance->nfc), instance->logger_enabled, NFC_LOG_FOLDER);
+
     const NfcProtocol protocol = nfc_detected_protocols_get_selected(instance->detected_protocols);
     instance->poller = nfc_poller_alloc(instance->nfc, protocol);
 
@@ -215,6 +217,10 @@ static bool nfc_protocol_support_scene_read_on_event(NfcApp* instance, SceneMana
 
 static void nfc_protocol_support_scene_read_on_exit(NfcApp* instance) {
     popup_reset(instance->popup);
+
+    if(instance->logger_enabled) {
+        nfc_logger_format(instance->nfc);
+    }
 
     nfc_blink_stop(instance);
 }
@@ -608,6 +614,7 @@ static void nfc_protocol_support_scene_emulate_on_enter(NfcApp* instance) {
     text_box_set_focus(text_box, TextBoxFocusEnd);
     furi_string_reset(instance->text_box_store);
 
+    nfc_logger_config(nfc_get_logger(instance->nfc), instance->logger_enabled, NFC_LOG_FOLDER);
     // instance->listener is allocated in the respective on_enter() handler
     nfc_protocol_support[protocol]->scene_emulate.on_enter(instance);
 
@@ -672,6 +679,10 @@ static void nfc_protocol_support_scene_emulate_stop_listener(NfcApp* instance) {
             nfc_device_set_data(instance->nfc_device, protocol, data);
             nfc_save_shadow_file(instance);
         }
+    }
+
+    if(instance->logger_enabled) {
+        nfc_logger_format(instance->nfc);
     }
 
     nfc_listener_free(instance->listener);
