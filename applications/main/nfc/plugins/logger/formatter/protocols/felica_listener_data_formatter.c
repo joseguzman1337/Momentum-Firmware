@@ -7,13 +7,6 @@ static const char* states[] = {
     [Felica_ListenerStateIdle] = "Idle",
 };
 
-static const char* commands[] = {
-    [NfcCommandContinue] = "Continue",
-    [NfcCommandReset] = "Reset",
-    [NfcCommandSleep] = "Sleep",
-    [NfcCommandStop] = "Stop",
-};
-
 static const char* felica_errors[] = {
     [FelicaErrorNone] = "None",
     [FelicaErrorNotPresent] = "NotPresent",
@@ -43,7 +36,7 @@ static void felica_listener_format_data(
 
     const char* event_text = nfc_hal_data_format_event_type(felica_data->event);
     const char* state_text = states[felica_data->state];
-    const char* command_text = commands[felica_data->command];
+    const char* command_text = nfc_hal_data_format_nfc_command(felica_data->command);
     const char* error = felica_errors[felica_data->error];
 
     furi_string_printf(

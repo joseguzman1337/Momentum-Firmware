@@ -8,6 +8,8 @@ extern "C" {
 #endif
 
 const char* nfc_hal_data_format_event_type(const NfcEventType event);
+const char* nfc_hal_data_format_nfc_command(const NfcCommand command);
+
 void nfc_hal_data_format_hal_event_type(const FuriHalNfcEvent event, FuriString* output);
 
 #ifdef __cplusplus

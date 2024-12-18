@@ -15,13 +15,6 @@ static const char* states[] = {
     [Iso14443_3aListenerStateIdle] = "Idle",
 };
 
-static const char* commands[] = {
-    [NfcCommandContinue] = "Continue",
-    [NfcCommandReset] = "Reset",
-    [NfcCommandSleep] = "Sleep",
-    [NfcCommandStop] = "Stop",
-};
-
 static void iso14443_3a_listener_data_format(
     const NfcPacket* request,
     const NfcHistoryData* data,
@@ -37,7 +30,7 @@ static void iso14443_3a_listener_data_format(
 
     const char* event_text = nfc_hal_data_format_event_type(iso14443_3a_data->event);
     const char* state_text = states[iso14443_3a_data->state];
-    const char* command_text = commands[iso14443_3a_data->command];
+    const char* command_text = nfc_hal_data_format_nfc_command(iso14443_3a_data->command);
     furi_string_printf(output, "E=%s, S=%s, C=%s", event_text, state_text, command_text);
 }
 

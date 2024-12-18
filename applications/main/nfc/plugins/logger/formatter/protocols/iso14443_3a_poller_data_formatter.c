@@ -9,13 +9,6 @@ static const char* states[] = {
     [Iso14443_3aPollerStateActivated] = "Activated",
 };
 
-static const char* commands[] = {
-    [NfcCommandContinue] = "Continue",
-    [NfcCommandReset] = "Reset",
-    [NfcCommandSleep] = "Sleep",
-    [NfcCommandStop] = "Stop",
-};
-
 static const char* poller_events[] = {
     [Iso14443_3aPollerEventTypeError] = "Error",
     [Iso14443_3aPollerEventTypeReady] = "Ready",
@@ -34,7 +27,7 @@ static void iso14443_3a_poller_data_format(
 
     const char* event_text = nfc_hal_data_format_event_type(poller_data->event);
     const char* state_text = states[poller_data->state];
-    const char* command_text = commands[poller_data->command];
+    const char* command_text = nfc_hal_data_format_nfc_command(poller_data->command);
     furi_string_printf(output, "E=%s, S=%s, C=%s", event_text, state_text, command_text);
 }
 

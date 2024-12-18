@@ -32,6 +32,17 @@ static const char* hal_nfc_events[] = {
     [12] = "Abort",
 };
 
+static const char* commands[] = {
+    [NfcCommandContinue] = "Continue",
+    [NfcCommandReset] = "Reset",
+    [NfcCommandSleep] = "Sleep",
+    [NfcCommandStop] = "Stop",
+};
+
+const char* nfc_hal_data_format_nfc_command(const NfcCommand command) {
+    return commands[command];
+}
+
 const char* nfc_hal_data_format_event_type(const NfcEventType event) {
     return events[event];
 }

@@ -27,13 +27,6 @@ static const char* poller_states[MfUltralightPollerStateNum] = {
     [MfUltralightPollerStateWriteSuccess] = "Write Success",
 };
 
-static const char* commands[] = {
-    [NfcCommandContinue] = "Continue",
-    [NfcCommandReset] = "Reset",
-    [NfcCommandSleep] = "Sleep",
-    [NfcCommandStop] = "Stop",
-};
-
 static void mf_ultralight_poller_data_format(
     const NfcPacket* request,
     const NfcHistoryData* data,
@@ -49,7 +42,7 @@ static void mf_ultralight_poller_data_format(
 
     const char* event_text = iso14443_3a_poller_data_format_event_type(mf_ultralight_data->event);
     const char* state_text = poller_states[mf_ultralight_data->state];
-    const char* result_text = commands[mf_ultralight_data->command];
+    const char* result_text = nfc_hal_data_format_nfc_command(mf_ultralight_data->command);
     furi_string_printf(output, "E=%s, MFU: %s, R=%s", event_text, state_text, result_text);
 }
 
