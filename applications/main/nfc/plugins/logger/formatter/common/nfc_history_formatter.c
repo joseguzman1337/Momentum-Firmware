@@ -23,8 +23,7 @@ void nfc_histroy_format_annotation(
     for(size_t i = 0; i < history->base.chain_count; i++) {
         for(size_t j = 0; j < history->chains[i].length; j++) {
             furi_string_reset(layer_parsed_str);
-            const NfcHistoryItemInternal* item =
-                (NfcHistoryItemInternal*)&(history->chains[i].items[j]);
+            const NfcHistoryItem* item = &(history->chains[i].items[j]);
 
             if(filter == NfcLoggerHistoryLayerFilterTopProtocolOnly &&
                item->base.protocol != instance->protocol)
@@ -32,7 +31,7 @@ void nfc_histroy_format_annotation(
 
             const NfcProtocolFormatterBase* protocol_formatter =
                 nfc_protocol_formatter_get(item->base.protocol, instance->mode);
-            protocol_formatter->format_history(request, item->data, layer_parsed_str);
+            protocol_formatter->format_history(request, &item->data, layer_parsed_str);
 
             const char* format =
                 (filter == NfcLoggerHistoryLayerFilterTopProtocolOnly) ? "L%d(%s)" : "->L%d(%s)";

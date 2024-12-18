@@ -3,6 +3,11 @@
 
 #define TAG "NfcHistory"
 
+typedef struct {
+    NfcHistoryItemBase base;
+    uint8_t data[];
+} FURI_PACKED NfcHistoryItemInternal;
+
 NfcHistory* nfc_history_alloc(uint8_t history_size_bytes, uint8_t max_chain_count) {
     NfcHistory* history = malloc(history_size_bytes);
     history->base.history_size_bytes = history_size_bytes;

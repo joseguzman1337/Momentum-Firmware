@@ -21,11 +21,6 @@ typedef struct {
     NfcHistoryData* data;
 } FURI_PACKED NfcHistoryItem;
 
-typedef struct {
-    NfcHistoryItemBase base;
-    uint8_t data[];
-} FURI_PACKED NfcHistoryItemInternal;
-
 #ifdef __cplusplus
 }
 #endif
