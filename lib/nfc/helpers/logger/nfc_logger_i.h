@@ -7,6 +7,14 @@
 extern "C" {
 #endif
 
+typedef enum {
+    NfcLoggerStateDisabled,
+    NfcLoggerStateIdle,
+    NfcLoggerStateProcessing,
+    NfcLoggerStateStopped,
+    NfcLoggerStateError
+} NfcLoggerState;
+
 NfcLogger* nfc_logger_alloc(void);
 void nfc_logger_free(NfcLogger* instance);
 
