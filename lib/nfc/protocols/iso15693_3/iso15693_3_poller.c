@@ -72,6 +72,7 @@ static NfcCommand iso15693_3_poller_run(NfcGenericEvent event, void* context) {
     Iso15693_3Poller* instance = context;
     NfcEvent* nfc_event = event.event_data;
     NfcCommand command = NfcCommandContinue;
+    instance->history_data.event = nfc_event->type;
 
     if(nfc_event->type == NfcEventTypePollerReady) {
         if(instance->state != Iso15693_3PollerStateActivated) {
@@ -97,7 +98,6 @@ static NfcCommand iso15693_3_poller_run(NfcGenericEvent event, void* context) {
     }
 
     instance->history_data.state = instance->state;
-    instance->history_data.event = nfc_event->type;
     instance->history_data.command = command;
     return command;
 }
