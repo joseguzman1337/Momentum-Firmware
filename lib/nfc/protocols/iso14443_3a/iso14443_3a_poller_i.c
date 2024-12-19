@@ -43,6 +43,12 @@ static Iso14443_3aError iso14443_3a_poller_standard_frame_exchange(
     do {
         NfcError error =
             nfc_poller_trx(instance->nfc, instance->tx_buffer, instance->rx_buffer, fwt);
+
+        nfc_logger_append_response_data(
+            logger,
+            bit_buffer_get_data(instance->rx_buffer),
+            bit_buffer_get_size_bytes(instance->rx_buffer));
+
         if(error != NfcErrorNone) {
             ret = iso14443_3a_poller_process_error(error);
             break;
@@ -53,8 +59,6 @@ static Iso14443_3aError iso14443_3a_poller_standard_frame_exchange(
             ret = Iso14443_3aErrorWrongCrc;
             break;
         }
-        nfc_logger_append_response_data(
-            logger, bit_buffer_get_data(rx_buffer), bit_buffer_get_size_bytes(rx_buffer));
 
         iso14443_crc_trim(rx_buffer);
     } while(false);
@@ -102,6 +106,20 @@ Iso14443_3aError iso14443_3a_poller_halt(Iso14443_3aPoller* instance) {
     return Iso14443_3aErrorNone;
 }
 
+static void iso14443_3a_poller_save_activation_history(
+    Iso14443_3aPoller* instance,
+    Iso14443_3aError error,
+    bool end_transaction) {
+    instance->history_data.state = instance->state;
+    instance->history_data.command = NfcCommandContinue;
+    instance->history_data.error = error;
+    NfcLogger* logger = nfc_get_logger(instance->nfc);
+    nfc_logger_append_history(logger, &instance->history);
+    if(end_transaction) {
+        nfc_logger_transaction_end(logger);
+    }
+}
+
 Iso14443_3aError
     iso14443_3a_poller_activate(Iso14443_3aPoller* instance, Iso14443_3aData* iso14443_3a_data) {
     furi_check(instance);
@@ -117,8 +135,9 @@ Iso14443_3aError
 
     // Halt if necessary
     if(instance->state != Iso14443_3aPollerStateIdle) {
-        iso14443_3a_poller_halt(instance);
+        Iso14443_3aError error = iso14443_3a_poller_halt(instance);
         instance->state = Iso14443_3aPollerStateIdle;
+        iso14443_3a_poller_save_activation_history(instance, error, true);
     }
 
     NfcError error = NfcErrorNone;
@@ -200,6 +219,7 @@ Iso14443_3aError
                     FURI_LOG_E(TAG, "Sel request failed: %d", ret);
                     instance->state = Iso14443_3aPollerStateColResFailed;
                     ret = Iso14443_3aErrorColResFailed;
+                    iso14443_3a_poller_save_activation_history(instance, ret, true);
                     break;
                 }
                 if(bit_buffer_get_size_bytes(instance->rx_buffer) !=
@@ -207,8 +227,10 @@ Iso14443_3aError
                     FURI_LOG_E(TAG, "Sel response wrong length");
                     instance->state = Iso14443_3aPollerStateColResFailed;
                     ret = Iso14443_3aErrorColResFailed;
+                    iso14443_3a_poller_save_activation_history(instance, ret, true);
                     break;
                 }
+                iso14443_3a_poller_save_activation_history(instance, ret, true);
                 bit_buffer_write_bytes(
                     instance->rx_buffer,
                     &instance->col_res.sel_resp,
