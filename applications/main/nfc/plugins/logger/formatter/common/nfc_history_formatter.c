@@ -31,6 +31,8 @@ void nfc_histroy_format_annotation(
 
             const NfcProtocolFormatterBase* protocol_formatter =
                 nfc_protocol_formatter_get(item->base.protocol, instance->mode);
+            if(!protocol_formatter) break;
+
             protocol_formatter->format_history(request, &item->data, layer_parsed_str);
 
             const char* format =

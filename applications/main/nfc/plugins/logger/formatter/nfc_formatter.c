@@ -98,6 +98,8 @@ static NfcHistoryCrcStatus
     for(size_t i = 0; i < chain->length; i++) {
         NfcProtocol protocol = chain->items[i].base.protocol;
         const NfcProtocolFormatterBase* formatter = nfc_protocol_formatter_get(protocol, mode);
+        if(!formatter) break;
+
         const NfcHistoryGetCrcStatusCallback crc_callback = formatter->get_crc_status;
         if(!crc_callback) continue;
 
@@ -126,11 +128,11 @@ static void nfc_formatter_format(
     instance->crc_from_history = nfc_history_get_crc_status(transaction->history, instance->mode);
     ///TODO: This If needs to be removed. nfc_format_transaction must guarantee that all protocols
     //will behave as expected
-    if(instance->protocol == NfcProtocolIso14443_3a ||
-       instance->protocol == NfcProtocolMfUltralight || instance->protocol == NfcProtocolFelica) {
-        nfc_transaction_format(instance, transaction, output);
-    } else
-        furi_string_printf(output, "NIMP");
+    /*   if(instance->protocol == NfcProtocolIso14443_3a ||
+       instance->protocol == NfcProtocolMfUltralight || instance->protocol == NfcProtocolFelica) { */
+    nfc_transaction_format(instance, transaction, output);
+    /*  } else
+        furi_string_printf(output, "NIMP"); */
 }
 
 static bool nfc_logger_open_log(
