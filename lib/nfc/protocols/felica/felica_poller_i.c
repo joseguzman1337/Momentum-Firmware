@@ -39,7 +39,9 @@ FelicaError felica_poller_frame_exchange(
             nfc_poller_trx(instance->nfc, instance->tx_buffer, instance->rx_buffer, fwt);
 
         nfc_logger_append_response_data(
-            logger, bit_buffer_get_data(rx_buffer), bit_buffer_get_size_bytes(rx_buffer));
+            logger,
+            bit_buffer_get_data(instance->rx_buffer),
+            bit_buffer_get_size_bytes(instance->rx_buffer));
 
         if(error != NfcErrorNone) {
             ret = felica_poller_process_error(error);
