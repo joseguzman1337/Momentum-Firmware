@@ -364,6 +364,20 @@ void nfc_logger_append_request_data(
     furi_assert(data);
     furi_assert(data_size > 0);
     if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
+
+    bool begin_new_transaction = false;
+    if(instance->transaction) {
+        NfcTransactionType type = nfc_transaction_get_type(instance->transaction);
+        begin_new_transaction =
+            (type == NfcTransactionTypeRequest || type == NfcTransactionTypeRequestResponse);
+    } else {
+        begin_new_transaction = true;
+    }
+
+    if(begin_new_transaction) {
+        nfc_logger_transaction_begin(instance, FuriHalNfcEventTxStart);
+    }
+
     uint32_t time = nfc_logger_get_time(instance);
     nfc_transaction_append(instance->transaction, time, data, data_size, false);
 }
@@ -385,5 +399,7 @@ void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
     furi_assert(history);
 
     if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
-    nfc_transaction_append_history(instance->transaction, history);
+    if(instance->transaction) {
+        nfc_transaction_append_history(instance->transaction, history);
+    }
 }
