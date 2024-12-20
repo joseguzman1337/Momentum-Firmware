@@ -1,5 +1,6 @@
 #include "nfc_protocol_formatters.h"
 #include "iso14443_3a_listener_data_formatter.h"
+#include "iso15693_3_listener_data_formatter.h"
 #include "mf_ultralight_listener_data_formatter.h"
 #include "felica_listener_data_formatter.h"
 
@@ -15,7 +16,7 @@ static const NfcProtocolFormatterBase* listener_formatters[NfcProtocolNum] = {
     [NfcProtocolIso14443_3b] = NULL,
     [NfcProtocolIso14443_4a] = NULL,
     [NfcProtocolIso14443_4b] = NULL,
-    [NfcProtocolIso15693_3] = NULL,
+    [NfcProtocolIso15693_3] = &iso15693_3_listener_data_formatter,
     [NfcProtocolFelica] = &felica_listener_data_formatter,
     [NfcProtocolMfUltralight] = &mf_ultralight_listener_data_formatter,
     [NfcProtocolMfClassic] = NULL,

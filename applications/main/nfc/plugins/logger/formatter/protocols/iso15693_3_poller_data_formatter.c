@@ -1,4 +1,5 @@
-#include "iso15693_3_poller_data_formatter.h"
+#include "iso15693_3_poller_data_formatter_i.h"
+#include "iso15693_3_error_formatter.h"
 #include "nfc_hal_formatter.h"
 #include <nfc/protocols/iso15693_3/iso15693_3_poller_history_data.h>
 
@@ -9,6 +10,15 @@ static const char* states[] = {
     [Iso15693_3PollerStateActivated] = "Activated",
 };
 
+static const char* events[] = {
+    [Iso15693_3PollerEventTypeError] = "Error",
+    [Iso15693_3PollerEventTypeReady] = "Ready",
+};
+
+const char* iso15693_3_poller_data_format_event_type(const Iso15693_3PollerEventType event) {
+    return events[event];
+}
+
 static void iso15693_3_poller_data_format(
     const NfcPacket* response,
     const NfcHistoryData* data,
@@ -18,8 +28,11 @@ static void iso15693_3_poller_data_format(
 
     const char* event_text = nfc_hal_data_format_event_type(poller_data->event);
     const char* state_text = states[poller_data->state];
+    const char* error_text = iso15693_3_format_error(poller_data->error);
     const char* command_text = nfc_hal_data_format_nfc_command(poller_data->command);
-    furi_string_printf(output, "E=%s, S=%s, C=%s", event_text, state_text, command_text);
+
+    furi_string_printf(
+        output, "E=%s, S=%s, Err=%s, C=%s", event_text, state_text, error_text, command_text);
 }
 
 static NfcHistoryCrcStatus iso15693_3_poller_get_crc_status(const NfcHistoryData* data) {
