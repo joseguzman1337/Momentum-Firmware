@@ -68,16 +68,9 @@ typedef enum {
     MfUltralightPollerStateWritePages,
     MfUltralightPollerStateWriteFail,
     MfUltralightPollerStateWriteSuccess,
-    MfUltralightPollerStateDictAttack,
 
     MfUltralightPollerStateNum,
 } MfUltralightPollerState;
-
-typedef struct {
-    uint8_t sectors_total;
-    bool auth_success; 
-    bool is_card_present;
-} MfUltralightPollerDictAttackContext;
 
 struct MfUltralightPoller {
     Iso14443_3aPoller* iso14443_3a_poller;
@@ -96,7 +89,6 @@ struct MfUltralightPoller {
     uint8_t tearing_flag_total;
     uint16_t current_page;
     MfUltralightError error;
-    MfUltralightPollerDictAttackContext dict_attack_ctx;
     mbedtls_des3_context des_context;
 
     NfcGenericEvent general_event;

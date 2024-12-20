@@ -15,6 +15,7 @@ enum {
     SubmenuIndexUnlockByReader,
     SubmenuIndexUnlockByPassword,
     SubmenuIndexWrite,
+    SubmenuIndexDictAttack
 };
 
 enum {
@@ -150,7 +151,8 @@ static NfcCommand
         }
         if(!mf_ultralight_event->data->auth_context.skip_auth) {
             mf_ultralight_event->data->auth_context.password = instance->mf_ul_auth->password;
-            mf_ultralight_event->data->auth_context.tdes_key = instance->mf_ul_auth->tdes_key;
+            mf_ultralight_event->data->key_request_data.key = instance->mf_ul_auth->tdes_key;
+            // TODO: Key provided attribute is not set
         }
     } else if(mf_ultralight_event->type == MfUltralightPollerEventTypeAuthSuccess) {
         instance->mf_ul_auth->pack = mf_ultralight_event->data->auth_context.pack;
@@ -201,6 +203,14 @@ static void nfc_scene_read_and_saved_menu_on_enter_mf_ultralight(NfcApp* instanc
             SubmenuIndexUnlock,
             nfc_protocol_support_common_submenu_callback,
             instance);
+        if(data->type == MfUltralightTypeMfulC) {
+            submenu_add_item(
+                submenu,
+                "Unlock with Dictionary",
+                SubmenuIndexDictAttack,
+                nfc_protocol_support_common_submenu_callback,
+                instance);
+        }
     } else if(
         data->type == MfUltralightTypeNTAG213 || data->type == MfUltralightTypeNTAG215 ||
         data->type == MfUltralightTypeNTAG216 || data->type == MfUltralightTypeUL11 ||
@@ -268,6 +278,12 @@ static bool nfc_scene_read_and_saved_menu_on_event_mf_ultralight(
             consumed = true;
         } else if(event.event == SubmenuIndexCommonEdit) {
             scene_manager_next_scene(instance->scene_manager, NfcSceneSetUid);
+            consumed = true;
+        } else if(event.event == SubmenuIndexDictAttack) {
+            if(!scene_manager_search_and_switch_to_previous_scene(
+                   instance->scene_manager, NfcSceneMfUltralightCDictAttack)) {
+                scene_manager_next_scene(instance->scene_manager, NfcSceneMfUltralightCDictAttack);
+            }
             consumed = true;
         }
     }
