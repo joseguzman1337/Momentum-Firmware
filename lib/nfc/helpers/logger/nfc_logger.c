@@ -362,24 +362,28 @@ void nfc_logger_append_request_data(
     const size_t data_size) {
     furi_assert(instance);
     furi_assert(data);
-    furi_assert(data_size > 0);
-    if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
 
-    bool begin_new_transaction = false;
-    if(instance->transaction) {
-        NfcTransactionType type = nfc_transaction_get_type(instance->transaction);
-        begin_new_transaction =
-            (type == NfcTransactionTypeRequest || type == NfcTransactionTypeRequestResponse);
-    } else {
-        begin_new_transaction = true;
-    }
+    do {
+        if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError)
+            break;
+        if(data_size == 0) break;
 
-    if(begin_new_transaction) {
-        nfc_logger_transaction_begin(instance, FuriHalNfcEventTxStart);
-    }
+        bool begin_new_transaction = false;
+        if(instance->transaction) {
+            NfcTransactionType type = nfc_transaction_get_type(instance->transaction);
+            begin_new_transaction =
+                (type == NfcTransactionTypeRequest || type == NfcTransactionTypeRequestResponse);
+        } else {
+            begin_new_transaction = true;
+        }
 
-    uint32_t time = nfc_logger_get_time(instance);
-    nfc_transaction_append(instance->transaction, time, data, data_size, false);
+        if(begin_new_transaction) {
+            nfc_logger_transaction_begin(instance, FuriHalNfcEventTxStart);
+        }
+
+        uint32_t time = nfc_logger_get_time(instance);
+        nfc_transaction_append(instance->transaction, time, data, data_size, false);
+    } while(false);
 }
 
 void nfc_logger_append_response_data(
@@ -388,10 +392,15 @@ void nfc_logger_append_response_data(
     const size_t data_size) {
     furi_assert(instance);
     furi_assert(data);
-    furi_assert(data_size > 0);
-    if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
-    uint32_t time = nfc_logger_get_time(instance);
-    nfc_transaction_append(instance->transaction, time, data, data_size, true);
+
+    do {
+        if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError)
+            break;
+        if(data_size == 0) break;
+
+        uint32_t time = nfc_logger_get_time(instance);
+        nfc_transaction_append(instance->transaction, time, data, data_size, true);
+    } while(false);
 }
 
 void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
