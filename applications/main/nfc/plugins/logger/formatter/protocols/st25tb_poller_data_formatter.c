@@ -3,7 +3,7 @@
 #include "nfc_hal_formatter.h"
 #include <nfc/protocols/st25tb/st25tb_poller_history_data.h>
 
-const char* errors[] = {
+static const char* errors[] = {
     [St25tbErrorNone] = "None",
     [St25tbErrorNotPresent] = "Not Present",
     [St25tbErrorColResFailed] = "Collision Failed",
@@ -15,7 +15,7 @@ const char* errors[] = {
     [St25tbErrorWriteFailed] = "Write Failed",
 };
 
-const char* states[] = {
+static const char* states[] = {
     [St25tbPollerStateSelect] = "Select",
     [St25tbPollerStateRequestMode] = "Request Mode",
     [St25tbPollerStateRead] = "Read",
