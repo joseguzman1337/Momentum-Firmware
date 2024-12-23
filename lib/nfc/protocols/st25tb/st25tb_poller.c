@@ -200,6 +200,8 @@ static NfcCommand st25tb_poller_run(NfcGenericEvent event, void* context) {
     NfcEvent* nfc_event = event.event_data;
     NfcCommand command = NfcCommandContinue;
 
+    instance->history_data.event = nfc_event->type;
+
     furi_assert(instance->state < St25tbPollerStateNum);
 
     if(nfc_event->type == NfcEventTypePollerReady) {
@@ -207,7 +209,6 @@ static NfcCommand st25tb_poller_run(NfcGenericEvent event, void* context) {
     }
 
     instance->history_data.state = instance->state;
-    instance->history_data.event = nfc_event->type;
     instance->history_data.command = command;
     return command;
 }
