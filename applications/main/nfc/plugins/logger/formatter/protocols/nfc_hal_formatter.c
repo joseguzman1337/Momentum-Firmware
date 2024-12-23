@@ -1,7 +1,5 @@
 #include "nfc_hal_formatter.h"
 
-//static const char* common_names[] = {};
-
 static const char* events[] = {
     [NfcEventTypeUserAbort] = "Abort",
     [NfcEventTypeFieldOn] = "Field On",
