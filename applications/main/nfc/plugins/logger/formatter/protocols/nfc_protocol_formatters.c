@@ -14,6 +14,7 @@
 #include "iso15693_3_poller_data_formatter.h"
 #include "mf_ultralight_poller_data_formatter.h"
 #include "mf_plus_poller_data_formatter.h"
+#include "mf_desfire_poller_data_formatter.h"
 #include "felica_poller_data_formatter.h"
 #include "slix_poller_data_formatter.h"
 #include "st25tb_poller_data_formatter.h"
@@ -28,7 +29,7 @@ static const NfcProtocolFormatterBase* listener_formatters[NfcProtocolNum] = {
     [NfcProtocolIso15693_3] = &iso15693_3_listener_data_formatter,
     [NfcProtocolFelica] = &felica_listener_data_formatter,
     [NfcProtocolMfUltralight] = &mf_ultralight_listener_data_formatter,
-    [NfcProtocolMfClassic] = NULL,
+    [NfcProtocolMfClassic] = NULL, ///TODO: Add MfClassic support
     [NfcProtocolMfPlus] = NULL,
     [NfcProtocolMfDesfire] = NULL,
     [NfcProtocolSlix] = &slix_listener_data_formatter,
@@ -43,9 +44,9 @@ static const NfcProtocolFormatterBase* poller_formatters[NfcProtocolNum] = {
     [NfcProtocolIso15693_3] = &iso15693_3_poller_data_formatter,
     [NfcProtocolFelica] = &felica_poller_data_formatter,
     [NfcProtocolMfUltralight] = &mf_ultralight_poller_data_formatter,
-    [NfcProtocolMfClassic] = NULL,
+    [NfcProtocolMfClassic] = NULL, ///TODO: Add MfClassic support
     [NfcProtocolMfPlus] = &mf_plus_poller_data_formatter,
-    [NfcProtocolMfDesfire] = NULL,
+    [NfcProtocolMfDesfire] = &mf_desfire_poller_data_formatter,
     [NfcProtocolSlix] = &slix_poller_data_formatter,
     [NfcProtocolSt25tb] = &st25tb_poller_data_formatter,
 };
