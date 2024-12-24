@@ -267,5 +267,10 @@ App(
              "plugins/logger/formatter/common/*.c",
              "plugins/logger/formatter/helpers/*.c",
              "plugins/logger/formatter/protocols/*.c",
+             "plugins/logger/formatter/protocols/felica/*.c",
+             "plugins/logger/formatter/protocols/iso14443_3a/*.c",
+             "plugins/logger/formatter/protocols/iso14443_3b/*.c",
+             "plugins/logger/formatter/protocols/iso14443_4a/*.c",
+             "plugins/logger/formatter/protocols/iso14443_4b/*.c",
             ],
 )

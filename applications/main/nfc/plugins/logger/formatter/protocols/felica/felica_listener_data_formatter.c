@@ -1,6 +1,11 @@
-#include "nfc_hal_formatter.h"
-#include "nfc_protocol_formatter_base.h"
-#include <nfc/protocols/felica/felica_poller_history_data.h>
+#include "../nfc_hal/nfc_hal_formatter.h"
+#include "../nfc_protocol_formatter_base.h"
+#include <nfc/protocols/felica/felica_listener_history_data.h>
+
+static const char* states[] = {
+    [Felica_ListenerStateActivated] = "Active",
+    [Felica_ListenerStateIdle] = "Idle",
+};
 
 static const char* felica_errors[] = {
     [FelicaErrorNone] = "None",
@@ -14,21 +19,11 @@ static const char* felica_errors[] = {
     [FelicaErrorTimeout] = "Timeout",
 };
 
-static const char* states[FelicaPollerStateNum] = {
-    [FelicaPollerStateIdle] = "Idle",
-    [FelicaPollerStateActivated] = "Activated",
-    [FelicaPollerStateAuthenticateInternal] = "Auth Internal",
-    [FelicaPollerStateAuthenticateExternal] = "Auth External",
-    [FelicaPollerStateReadBlocks] = "Read Blocks",
-    [FelicaPollerStateReadSuccess] = "Read Success",
-    [FelicaPollerStateReadFailed] = "Read Failed",
-};
-
-static void felica_poller_format_data(
+static void felica_listener_format_data(
     const NfcPacket* packet,
     const NfcHistoryData* data,
     FuriString* output) {
-    const FelicaPollerHistoryData* felica_data = data;
+    const FelicaListenerHistoryData* felica_data = data;
 
     UNUSED(packet);
 
@@ -45,15 +40,15 @@ static void felica_poller_format_data(
     const char* error = felica_errors[felica_data->error];
 
     furi_string_printf(
-        output, "E=%s, S=%s, FelicaError: %s, C=%s", event_text, state_text, error, command_text);
+        output, "E=%s, S=%s, Felica: %s, C=%s", event_text, state_text, error, command_text);
 }
 
 static NfcHistoryCrcStatus felica_get_crc_status(const NfcHistoryData* data) {
-    const FelicaPollerHistoryData* poller_data = data;
-    return (poller_data->error == FelicaErrorWrongCrc) ? NfcHistoryCrcBad : NfcHistoryCrcOk;
+    const FelicaListenerHistoryData* felica_data = data;
+    return (felica_data->error == FelicaErrorWrongCrc) ? NfcHistoryCrcBad : NfcHistoryCrcOk;
 }
 
-const NfcProtocolFormatterBase felica_poller_data_formatter = {
-    .format_history = felica_poller_format_data,
+const NfcProtocolFormatterBase felica_listener_data_formatter = {
+    .format_history = felica_listener_format_data,
     .get_crc_status = felica_get_crc_status,
 };
