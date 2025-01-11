@@ -1,9 +1,12 @@
 #include "../bad_kb_app_i.h"
 #include <furi_hal.h>
 #include <furi_hal_usb_hid.h>
+#include <furi_hal_speaker.h>
 #include "ble_hid.h"
 #include "ducky_script.h"
 #include "ducky_script_i.h"
+
+#define TAG "BadKb"
 
 typedef int32_t (*DuckyCmdCallback)(BadKbScript* bad_kb, const char* line, int32_t param);
 
@@ -224,6 +227,65 @@ static int32_t ducky_fnc_waitforbutton(BadKbScript* bad_kb, const char* line, in
     return SCRIPT_STATE_WAIT_FOR_BTN;
 }
 
+#define SPKR_HANDLE_TIMEOUT 200
+static int32_t ducky_fnc_beep(BadKbScript* bad_kb, const char* line, int32_t param) {
+    UNUSED(param);
+
+    // Remove the command from the line buffer
+    line = &line[ducky_get_command_len(line) + 1];
+
+    uint32_t frequency = 0;
+    uint32_t duration_ms = 0;
+
+    if(!ducky_get_number(line, &frequency)) {
+        return ducky_error(bad_kb, "Invalid beep frequency");
+    }
+
+    uint32_t freq_string_len = strcspn(line, " ");
+
+    if(freq_string_len == strlen(line)) {
+        return ducky_error(bad_kb, "Malformed beep command");
+    }
+
+    // Remove the frequency from the line buffer
+    line = &line[strcspn(line, " ")];
+
+    if(!ducky_get_number(line, &duration_ms)) {
+        return ducky_error(bad_kb, "Invalid beep duration");
+    }
+
+    if(!furi_hal_speaker_acquire(SPKR_HANDLE_TIMEOUT)) {
+        // There's no good reason anything should be using the speaker at this point
+        // But we also don't want to stop the script because of it
+        FURI_LOG_E(TAG, "Failed to acquire speaker handle");
+        return 0;
+    }
+    furi_hal_speaker_start(frequency, bad_kb->speaker_volume);
+    furi_delay_ms(duration_ms);
+    furi_hal_speaker_stop();
+    furi_hal_speaker_release();
+    return 0;
+}
+
+static int32_t ducky_fnc_setvolume(BadKbScript* bad_kb, const char* line, int32_t param) {
+    UNUSED(param);
+
+    // Remove the command from the line buffer
+    line = &line[ducky_get_command_len(line) + 1];
+
+    float new_volume = 0.0f;
+    char* strtof_end = NULL;
+
+    new_volume = strtof(line, &strtof_end);
+
+    if(strtof_end == line || new_volume > 1.0f || new_volume < 0.0f) {
+        return ducky_error(bad_kb, "Invalid volume value");
+    }
+
+    bad_kb->speaker_volume = new_volume;
+    return 0;
+}
+
 static const DuckyCmd ducky_commands[] = {
     {"REM", NULL, -1},
     {"ID", NULL, -1},
@@ -247,6 +309,8 @@ static const DuckyCmd ducky_commands[] = {
     {"WAIT_FOR_BUTTON_PRESS", ducky_fnc_waitforbutton, -1},
     {"MEDIA", ducky_fnc_media, -1},
     {"GLOBE", ducky_fnc_globe, -1},
+    {"BEEP", ducky_fnc_beep, -1},
+    {"VOLUME", ducky_fnc_setvolume, -1}
 };
 
 #define TAG "BadKb"

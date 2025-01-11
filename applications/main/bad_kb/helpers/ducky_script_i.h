@@ -41,6 +41,8 @@ struct BadKbScript {
     FuriString* string_print;
     size_t string_print_pos;
 
+    float speaker_volume;
+
     Bt* bt;
     BadKbApp* app;
 };
