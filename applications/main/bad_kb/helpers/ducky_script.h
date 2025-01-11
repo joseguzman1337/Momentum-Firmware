@@ -10,6 +10,9 @@ extern "C" {
 
 #include "../bad_kb_app.h"
 
+#define VALUE_OFF "OFF"
+#define VALUE_ON "ON"
+
 typedef enum {
     LevelRssi122_100,
     LevelRssi99_80,

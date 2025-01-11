@@ -191,6 +191,7 @@ static int32_t ducky_fnc_media(BadKbScript* bad_kb, const char* line, int32_t pa
     } else {
         furi_hal_hid_kb_press(key);
         furi_hal_hid_kb_release(key);
+
     }
     return 0;
 }
@@ -267,6 +268,40 @@ static int32_t ducky_fnc_beep(BadKbScript* bad_kb, const char* line, int32_t par
     return 0;
 }
 
+static int32_t ducky_fnc_setcaps(BadKbScript* bad_kb, const char* line, int32_t param) {
+    UNUSED(param);
+
+    line = &line[ducky_get_command_len(line) + 1];
+    uint8_t current_led_state = furi_hal_hid_get_led_state();
+
+    if(strncmp(line, VALUE_ON, strlen(line)) == 0) {
+        if(!(current_led_state & HID_KB_LED_CAPS)) {
+            if(bad_kb->bt) {
+                ble_profile_hid_kb_press(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
+                furi_delay_ms(bt_timeout);
+                ble_profile_hid_kb_release(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
+            } else {
+                furi_hal_hid_kb_press(HID_KEYBOARD_CAPS_LOCK);
+                furi_hal_hid_kb_release(HID_KEYBOARD_CAPS_LOCK);
+            }
+        }
+    } else if(strncmp(line, VALUE_OFF, strlen(line)) == 0) {
+        if(current_led_state & HID_KB_LED_CAPS) {
+            if(bad_kb->bt) {
+                ble_profile_hid_kb_press(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
+                furi_delay_ms(bt_timeout);
+                ble_profile_hid_kb_release(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
+            } else {
+                furi_hal_hid_kb_press(HID_KEYBOARD_CAPS_LOCK);
+                furi_hal_hid_kb_release(HID_KEYBOARD_CAPS_LOCK);
+            }
+        }
+    } else {
+        return ducky_error(bad_kb, "Cannot set caps to value \"%s\"", line);
+    }
+    return 0;
+}
+
 static int32_t ducky_fnc_setvolume(BadKbScript* bad_kb, const char* line, int32_t param) {
     UNUSED(param);
 
@@ -310,7 +345,8 @@ static const DuckyCmd ducky_commands[] = {
     {"MEDIA", ducky_fnc_media, -1},
     {"GLOBE", ducky_fnc_globe, -1},
     {"BEEP", ducky_fnc_beep, -1},
-    {"VOLUME", ducky_fnc_setvolume, -1}
+    {"VOLUME", ducky_fnc_setvolume, -1},
+    {"CAPS", ducky_fnc_setcaps, -1}
 };
 
 #define TAG "BadKb"
