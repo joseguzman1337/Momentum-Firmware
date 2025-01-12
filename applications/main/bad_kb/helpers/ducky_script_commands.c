@@ -8,6 +8,10 @@
 
 #define TAG "BadKb"
 
+// TODO: Redefining this, should be in a header file instead
+#define BADKB_ASCII_TO_KEY(script, x) \
+    (((uint8_t)x < 128) ? (script->layout[(uint8_t)x]) : HID_KEYBOARD_NONE)
+
 typedef int32_t (*DuckyCmdCallback)(BadKbScript* bad_kb, const char* line, int32_t param);
 
 typedef struct {
@@ -321,6 +325,72 @@ static int32_t ducky_fnc_setvolume(BadKbScript* bad_kb, const char* line, int32_
     return 0;
 }
 
+#define LETTER_COUNT 26
+static int32_t ducky_fnc_random(BadKbScript* bad_kb, const char* line, int32_t param) {
+    static const char* SPECIALS = "!@#$%^&*()-_.";
+    UNUSED(bad_kb);
+    UNUSED(line);
+
+    uint8_t random_val = furi_hal_random_get();
+    char char_to_write = '\0';
+
+    switch(param) {
+        case RandLetter:
+            // Flip a coin to decide if it's upper or lowercase
+            const char start = furi_hal_random_get() % 2 == 0 ? 'a' : 'A';
+            char_to_write = start + random_val % LETTER_COUNT;
+            break;
+
+        case RandLetterLower:
+            char_to_write = 'a' + random_val % LETTER_COUNT;
+            break;
+
+        case RandLetterUpper:
+            char_to_write = 'A' + random_val % LETTER_COUNT;
+            break;
+
+        case RandDigit:
+            char_to_write = '0' + random_val % 10;
+            break;
+
+        case RandSpecial:
+            char_to_write = SPECIALS[random_val % strlen(SPECIALS)];
+            break;
+
+        case RandAnyChar:
+            switch (furi_hal_random_get() % 3) {
+            case 0:
+                const char start = furi_hal_random_get() % 2 == 0 ? 'a' : 'A';
+                char_to_write = start + random_val % LETTER_COUNT;
+                break;
+
+            case 1:
+                char_to_write = '0' + random_val % 10;
+                break;
+
+            case 2:
+                char_to_write = SPECIALS[random_val % strlen(SPECIALS)];
+                break;
+            }
+            break;
+
+        default:
+            // Shouldn't ever happen, if it does, it's a logic error
+            furi_crash("Invalid parameter passed to ducky_fnc_random");
+            return 0;
+    }
+    const uint16_t keycode = BADKB_ASCII_TO_KEY(bad_kb, char_to_write);
+    if(bad_kb->bt) {
+        ble_profile_hid_kb_press(bad_kb->app->ble_hid, keycode);
+        furi_delay_ms(bt_timeout);
+        ble_profile_hid_kb_release(bad_kb->app->ble_hid, keycode);
+    } else {
+        furi_hal_hid_kb_press(keycode);
+        furi_hal_hid_kb_release(keycode);
+    }
+    return 0;
+}
+
 static const DuckyCmd ducky_commands[] = {
     {"REM", NULL, -1},
     {"ID", NULL, -1},
@@ -346,10 +416,14 @@ static const DuckyCmd ducky_commands[] = {
     {"GLOBE", ducky_fnc_globe, -1},
     {"BEEP", ducky_fnc_beep, -1},
     {"VOLUME", ducky_fnc_setvolume, -1},
-    {"CAPS", ducky_fnc_setcaps, -1}
+    {"CAPS", ducky_fnc_setcaps, -1},
+    {"RANDOM_LETTER", ducky_fnc_random, RandLetter},
+    {"RANDOM_UPPERCASE_LETTER", ducky_fnc_random, RandLetterUpper},
+    {"RANDOM_LOWERCASE_LETTER", ducky_fnc_random, RandLetterLower},
+    {"RANDOM_NUMBER", ducky_fnc_random, RandDigit},
+    {"RANDOM_SPECIAL", ducky_fnc_random, RandSpecial},
+    {"RANDOM_CHAR", ducky_fnc_random, RandAnyChar},
 };
-
-#define TAG "BadKb"
 
 #define WORKER_TAG TAG "Worker"
 
