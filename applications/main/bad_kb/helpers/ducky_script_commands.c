@@ -8,9 +8,6 @@
 
 #define TAG "BadKb"
 
-// TODO: Redefining this, should be in a header file instead
-
-
 typedef int32_t (*DuckyCmdCallback)(BadKbScript* bad_kb, const char* line, int32_t param);
 
 typedef struct {
@@ -292,11 +289,13 @@ static int32_t ducky_fnc_setcaps(BadKbScript* bad_kb, const char* line, int32_t 
     if(strncmp(line, VALUE_ON, strlen(line)) == 0) {
         if(!(bad_kb->led_state & HID_KB_LED_CAPS)) {
             ducky_send_over_current(bad_kb, HID_KEYBOARD_CAPS_LOCK);
+            // Set the capslock bit
             bad_kb->led_state |= HID_KB_LED_CAPS;
         }
     } else if(strncmp(line, VALUE_OFF, strlen(line)) == 0) {
         if(bad_kb->led_state & HID_KB_LED_CAPS) {
             ducky_send_over_current(bad_kb, HID_KEYBOARD_CAPS_LOCK);
+            // Clear the capslock bit
             bad_kb->led_state &= (~HID_KB_LED_CAPS);
         }
     } else {
@@ -335,7 +334,7 @@ static int32_t ducky_fnc_random(BadKbScript* bad_kb, const char* line, int32_t p
 
     switch(param) {
         case RandLetter:
-            // Flip a coin to decide if it's upper or lowercase
+            // Flip a coin to decide if it's upper or lowercase (lol)
             const char start = furi_hal_random_get() % 2 == 0 ? 'a' : 'A';
             char_to_write = start + random_val % LETTER_COUNT;
             break;
