@@ -16,6 +16,7 @@ extern "C" {
 #define SCRIPT_STATE_WAIT_FOR_BTN (-6)
 
 #define FILE_BUFFER_LEN 16
+#define DEFAULT_VOLUME 0.5f
 
 struct BadKbScript {
     FuriThread* thread;

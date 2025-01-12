@@ -20,6 +20,22 @@ typedef struct {
     int32_t param;
 } DuckyCmd;
 
+// Helper function
+// Sends a keypress over USB HID or BT HID depending on the script settings
+// Returns false if send fails, true otherwise
+static bool ducky_send_over_current(BadKbScript* bad_kb, uint16_t button) {
+    bool result = true;
+    if(bad_kb->bt) {
+        result = result && ble_profile_hid_kb_press(bad_kb->app->ble_hid, button);
+        furi_delay_ms(bt_timeout);
+        result = result && ble_profile_hid_kb_release(bad_kb->app->ble_hid, button);
+    } else {
+        result = result && furi_hal_hid_kb_press(button);
+        result = result && furi_hal_hid_kb_release(button);
+    }
+    return result;
+}
+
 static int32_t ducky_fnc_delay(BadKbScript* bad_kb, const char* line, int32_t param) {
     UNUSED(param);
 
@@ -188,15 +204,7 @@ static int32_t ducky_fnc_media(BadKbScript* bad_kb, const char* line, int32_t pa
     if(key == HID_CONSUMER_UNASSIGNED) {
         return ducky_error(bad_kb, "No keycode defined for %s", line);
     }
-    if(bad_kb->bt) {
-        ble_profile_hid_kb_press(bad_kb->app->ble_hid, key);
-        furi_delay_ms(bt_timeout);
-        ble_profile_hid_kb_release(bad_kb->app->ble_hid, key);
-    } else {
-        furi_hal_hid_kb_press(key);
-        furi_hal_hid_kb_release(key);
-
-    }
+    ducky_send_over_current(bad_kb, key);
     return 0;
 }
 
@@ -279,27 +287,11 @@ static int32_t ducky_fnc_setcaps(BadKbScript* bad_kb, const char* line, int32_t 
     uint8_t current_led_state = furi_hal_hid_get_led_state();
 
     if(strncmp(line, VALUE_ON, strlen(line)) == 0) {
-        if(!(current_led_state & HID_KB_LED_CAPS)) {
-            if(bad_kb->bt) {
-                ble_profile_hid_kb_press(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
-                furi_delay_ms(bt_timeout);
-                ble_profile_hid_kb_release(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
-            } else {
-                furi_hal_hid_kb_press(HID_KEYBOARD_CAPS_LOCK);
-                furi_hal_hid_kb_release(HID_KEYBOARD_CAPS_LOCK);
-            }
-        }
+        if(!(current_led_state & HID_KB_LED_CAPS))
+            ducky_send_over_current(bad_kb, HID_KEYBOARD_CAPS_LOCK);
     } else if(strncmp(line, VALUE_OFF, strlen(line)) == 0) {
-        if(current_led_state & HID_KB_LED_CAPS) {
-            if(bad_kb->bt) {
-                ble_profile_hid_kb_press(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
-                furi_delay_ms(bt_timeout);
-                ble_profile_hid_kb_release(bad_kb->app->ble_hid, HID_KEYBOARD_CAPS_LOCK);
-            } else {
-                furi_hal_hid_kb_press(HID_KEYBOARD_CAPS_LOCK);
-                furi_hal_hid_kb_release(HID_KEYBOARD_CAPS_LOCK);
-            }
-        }
+        if(current_led_state & HID_KB_LED_CAPS)
+            ducky_send_over_current(bad_kb, HID_KEYBOARD_CAPS_LOCK);
     } else {
         return ducky_error(bad_kb, "Cannot set caps to value \"%s\"", line);
     }
@@ -380,14 +372,7 @@ static int32_t ducky_fnc_random(BadKbScript* bad_kb, const char* line, int32_t p
             return 0;
     }
     const uint16_t keycode = BADKB_ASCII_TO_KEY(bad_kb, char_to_write);
-    if(bad_kb->bt) {
-        ble_profile_hid_kb_press(bad_kb->app->ble_hid, keycode);
-        furi_delay_ms(bt_timeout);
-        ble_profile_hid_kb_release(bad_kb->app->ble_hid, keycode);
-    } else {
-        furi_hal_hid_kb_press(keycode);
-        furi_hal_hid_kb_release(keycode);
-    }
+    ducky_send_over_current(bad_kb, keycode);
     return 0;
 }
 
