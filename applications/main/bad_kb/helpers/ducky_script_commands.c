@@ -283,15 +283,23 @@ static int32_t ducky_fnc_beep(BadKbScript* bad_kb, const char* line, int32_t par
 static int32_t ducky_fnc_setcaps(BadKbScript* bad_kb, const char* line, int32_t param) {
     UNUSED(param);
 
+    // It seems the internal led state isn't updated often enough
+    // So we just keep our own
+    if(bad_kb->led_state == LEDS_NOT_UPDATED)
+        bad_kb->led_state = furi_hal_hid_get_led_state();
+
     line = &line[ducky_get_command_len(line) + 1];
-    uint8_t current_led_state = furi_hal_hid_get_led_state();
 
     if(strncmp(line, VALUE_ON, strlen(line)) == 0) {
-        if(!(current_led_state & HID_KB_LED_CAPS))
+        if(!(bad_kb->led_state & HID_KB_LED_CAPS)) {
             ducky_send_over_current(bad_kb, HID_KEYBOARD_CAPS_LOCK);
+            bad_kb->led_state |= HID_KB_LED_CAPS;
+        }
     } else if(strncmp(line, VALUE_OFF, strlen(line)) == 0) {
-        if(current_led_state & HID_KB_LED_CAPS)
+        if(bad_kb->led_state & HID_KB_LED_CAPS) {
             ducky_send_over_current(bad_kb, HID_KEYBOARD_CAPS_LOCK);
+            bad_kb->led_state &= (~HID_KB_LED_CAPS);
+        }
     } else {
         return ducky_error(bad_kb, "Cannot set caps to value \"%s\"", line);
     }

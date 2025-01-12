@@ -16,6 +16,8 @@ extern "C" {
 #define SCRIPT_STATE_WAIT_FOR_BTN (-6)
 
 #define FILE_BUFFER_LEN 16
+
+#define LEDS_NOT_UPDATED 255
 #define DEFAULT_VOLUME 0.5f
 
 struct BadKbScript {
@@ -43,6 +45,7 @@ struct BadKbScript {
     size_t string_print_pos;
 
     float speaker_volume;
+    uint8_t led_state;
 
     Bt* bt;
     BadKbApp* app;
