@@ -9,8 +9,7 @@
 #define TAG "BadKb"
 
 // TODO: Redefining this, should be in a header file instead
-#define BADKB_ASCII_TO_KEY(script, x) \
-    (((uint8_t)x < 128) ? (script->layout[(uint8_t)x]) : HID_KEYBOARD_NONE)
+
 
 typedef int32_t (*DuckyCmdCallback)(BadKbScript* bad_kb, const char* line, int32_t param);
 

@@ -13,6 +13,9 @@ extern "C" {
 #define VALUE_OFF "OFF"
 #define VALUE_ON "ON"
 
+#define BADKB_ASCII_TO_KEY(script, x) \
+    (((uint8_t)x < 128) ? (script->layout[(uint8_t)x]) : HID_KEYBOARD_NONE)
+
 typedef enum {
     LevelRssi122_100,
     LevelRssi99_80,

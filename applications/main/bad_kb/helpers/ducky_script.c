@@ -17,9 +17,6 @@
 
 #define WORKER_TAG TAG "Worker"
 
-#define BADKB_ASCII_TO_KEY(script, x) \
-    (((uint8_t)x < 128) ? (script->layout[(uint8_t)x]) : HID_KEYBOARD_NONE)
-
 // Delays for waiting between HID key press and key release
 const uint8_t bt_hid_delays[LevelRssiNum] = {
     60, // LevelRssi122_100
