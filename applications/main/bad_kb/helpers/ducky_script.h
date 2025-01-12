@@ -50,6 +50,15 @@ typedef enum {
     BadKbStateFileError,
 } BadKbWorkerState;
 
+typedef enum {
+    RandLetterLower,
+    RandLetterUpper,
+    RandLetter,
+    RandDigit,
+    RandSpecial,
+    RandAnyChar
+} RandomKeyType;
+
 typedef struct {
     BadKbWorkerState state;
     bool is_bt;
