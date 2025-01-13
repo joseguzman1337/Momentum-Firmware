@@ -1,6 +1,6 @@
 
 #include "st25tb_poller_data_formatter.h"
-#include "nfc_hal_formatter.h"
+#include "../nfc_hal/nfc_hal_formatter.h"
 #include <nfc/protocols/st25tb/st25tb_poller_history_data.h>
 
 static const char* errors[] = {

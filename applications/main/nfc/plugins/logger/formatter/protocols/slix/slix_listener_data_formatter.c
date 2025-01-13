@@ -1,7 +1,7 @@
 
 #include "slix_listener_data_formatter.h"
 #include "slix_error_formatter.h"
-#include "nfc_hal_formatter.h"
+#include "../nfc_hal/nfc_hal_formatter.h"
 #include "iso15693_3_listener_data_formatter_i.h"
 #include <nfc/protocols/slix/slix_listener_history_data.h>
 
