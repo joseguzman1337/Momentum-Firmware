@@ -26,6 +26,7 @@ typedef NfcHistoryCrcStatus (*NfcHistoryGetCrcStatusCallback)(const NfcHistoryDa
 
 typedef struct {
     NfcHistoryItemDataFormatCallback format_history;
+    NfcHistoryItemDataFormatCallback format_history_simplified;
     // NfcTransactionFormatCallback format_transaction;
     NfcHistoryGetCrcStatusCallback get_crc_status;
 } NfcProtocolFormatterBase;

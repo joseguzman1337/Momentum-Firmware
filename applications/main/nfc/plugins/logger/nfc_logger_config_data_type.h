@@ -11,7 +11,8 @@ typedef enum {
 
 typedef enum {
     NfcLoggerHistoryLayerFilterAll,
-    NfcLoggerHistoryLayerFilterTopProtocolOnly,
+    NfcLoggerHistoryLayerFilterTopProtocol,
+    NfcLoggerHistoryLayerFilterTopProtocolSimplified
 } NfcLoggerHistoryLayerFilter;
 
 typedef struct {

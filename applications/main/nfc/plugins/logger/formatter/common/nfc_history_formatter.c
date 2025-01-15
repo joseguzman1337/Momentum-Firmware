@@ -12,7 +12,7 @@ void nfc_histroy_format_annotation(
     furi_assert(instance);
     furi_assert(annotation);
 
-    NfcLoggerHistoryLayerFilter filter = instance->config->history_filter;
+    const NfcLoggerHistoryLayerFilter filter = instance->config->history_filter;
 
     FuriString* layer_parsed_str = furi_string_alloc();
     if(filter == NfcLoggerHistoryLayerFilterAll) {
@@ -25,7 +25,8 @@ void nfc_histroy_format_annotation(
             furi_string_reset(layer_parsed_str);
             const NfcHistoryItem* item = &(history->chains[i].items[j]);
 
-            if(filter == NfcLoggerHistoryLayerFilterTopProtocolOnly &&
+            if((filter == NfcLoggerHistoryLayerFilterTopProtocol ||
+                filter == NfcLoggerHistoryLayerFilterTopProtocolSimplified) &&
                item->base.protocol != instance->protocol)
                 continue;
 
@@ -33,12 +34,19 @@ void nfc_histroy_format_annotation(
                 nfc_protocol_formatter_get(item->base.protocol, instance->mode);
             if(!protocol_formatter) break;
 
-            protocol_formatter->format_history(request, &item->data, layer_parsed_str);
+            if(filter == NfcLoggerHistoryLayerFilterAll ||
+               filter == NfcLoggerHistoryLayerFilterTopProtocol) {
+                protocol_formatter->format_history(request, &item->data, layer_parsed_str);
 
-            const char* format =
-                (filter == NfcLoggerHistoryLayerFilterTopProtocolOnly) ? "L%d(%s)" : "->L%d(%s)";
-            furi_string_cat_printf(
-                annotation, format, j + 1, furi_string_get_cstr(layer_parsed_str));
+                const char* format =
+                    (filter == NfcLoggerHistoryLayerFilterTopProtocol) ? "L%d(%s)" : "->L%d(%s)";
+                furi_string_cat_printf(
+                    annotation, format, j + 1, furi_string_get_cstr(layer_parsed_str));
+            } else if(filter == NfcLoggerHistoryLayerFilterTopProtocolSimplified) {
+                protocol_formatter->format_history_simplified(
+                    request, &item->data, layer_parsed_str);
+                furi_string_printf(annotation, "%s", furi_string_get_cstr(layer_parsed_str));
+            }
         }
     }
 
