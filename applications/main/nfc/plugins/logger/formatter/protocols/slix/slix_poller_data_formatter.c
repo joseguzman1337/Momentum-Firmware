@@ -1,7 +1,7 @@
 
 #include "slix_poller_data_formatter.h"
 #include "slix_error_formatter.h"
-#include "iso15693_3_poller_data_formatter_i.h"
+#include "../iso15693_3/iso15693_3_poller_data_formatter_i.h"
 #include "../nfc_hal/nfc_hal_formatter.h"
 #include <nfc/protocols/slix/slix_poller_history_data.h>
 
