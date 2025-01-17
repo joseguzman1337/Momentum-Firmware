@@ -279,7 +279,6 @@ void nfc_logger_stop(NfcLogger* instance) {
 
     instance->exit = true;
     furi_thread_join(instance->logger_thread);
-    //    nfc_logger_free_thread_and_queue(instance);
 
     if(instance->state != NfcLoggerStateError) {
         FuriString* temp_file_path = furi_string_alloc_set(instance->log_folder_path);
@@ -297,9 +296,9 @@ void nfc_logger_stop(NfcLogger* instance) {
         furi_string_free(temp_file_path);
         UNUSED(status);
 
-        nfc_logger_trace_free(instance->trace);
         instance->state = NfcLoggerStateStopped;
     }
+    nfc_logger_trace_free(instance->trace);
 }
 
 void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
