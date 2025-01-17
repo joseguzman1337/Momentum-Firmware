@@ -162,23 +162,18 @@ NfcLogger* nfc_logger_alloc(void) {
     instance->filename = furi_string_alloc();
     instance->log_folder_path = furi_string_alloc();
     instance->dwt_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
+    ///TODO: tune queue size to reduce memory usage
+    instance->transaction_queue = furi_message_queue_alloc(150, sizeof(NfcTransaction*));
+
+    FuriThread* thread = furi_thread_alloc_ex(TAG, 1024U, nfc_logger_thread_callback, instance);
+    furi_thread_set_priority(thread, FuriThreadPriorityLow);
+    instance->logger_thread = thread;
 
     uint32_t inst_per_us = furi_hal_cortex_instructions_per_microsecond();
     instance->dwt_cycles_per_timeout_delay =
         NFC_LOG_DWT_CYCCNT_CYCLES_PER_MESSAGE_QUEUE_TIMEOUT(inst_per_us);
     instance->dwt_second_per_ovf = NFC_LOG_DWT_CYCCNT_SECONDS_MAX(inst_per_us);
     return instance;
-}
-
-static inline void nfc_logger_free_thread_and_queue(NfcLogger* instance) {
-    if(instance->logger_thread) {
-        furi_thread_free(instance->logger_thread);
-        instance->logger_thread = NULL;
-    }
-    if(instance->transaction_queue) {
-        furi_message_queue_free(instance->transaction_queue);
-        instance->transaction_queue = NULL;
-    }
 }
 
 void nfc_logger_free(NfcLogger* instance) {
@@ -188,7 +183,8 @@ void nfc_logger_free(NfcLogger* instance) {
     furi_record_close(RECORD_STORAGE);
     furi_string_free(instance->filename);
     furi_string_free(instance->log_folder_path);
-    nfc_logger_free_thread_and_queue(instance);
+    furi_message_queue_free(instance->transaction_queue);
+    furi_thread_free(instance->logger_thread);
 
     free(instance);
 }
@@ -198,13 +194,6 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const char* log_folder
     furi_assert(log_folder_path);
 
     if(enabled) {
-        FuriThread* thread =
-            furi_thread_alloc_ex(TAG, 1024U, nfc_logger_thread_callback, instance);
-        furi_thread_set_priority(thread, FuriThreadPriorityLow);
-        instance->logger_thread = thread;
-
-        ///TODO: tune queue size to reduce memory usage
-        instance->transaction_queue = furi_message_queue_alloc(150, sizeof(NfcTransaction*));
         instance->state = NfcLoggerStateIdle;
 
         if(!nfc_logger_make_log_folder(instance->storage, log_folder_path)) {
@@ -213,7 +202,6 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const char* log_folder
             furi_string_set_str(instance->log_folder_path, log_folder_path);
         }
     } else {
-        nfc_logger_free_thread_and_queue(instance);
         instance->state = NfcLoggerStateDisabled;
     }
 }
