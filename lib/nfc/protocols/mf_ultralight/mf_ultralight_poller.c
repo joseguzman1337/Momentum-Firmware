@@ -258,6 +258,11 @@ static NfcCommand mf_ultralight_poller_handler_read_version(MfUltralightPoller* 
         instance->data->type = mf_ultralight_get_type_by_version(&instance->data->version);
         instance->state = MfUltralightPollerStateGetFeatureSet;
     } else {
+        instance->history_data.state = instance->state;
+        instance->history_data.command = NfcCommandContinue;
+        instance->history_data.error = instance->error;
+        mf_ultralight_poller_save_history(instance);
+
         FURI_LOG_D(TAG, "Didn't response. Check Ultralight C");
         iso14443_3a_poller_halt(instance->iso14443_3a_poller);
         instance->state = MfUltralightPollerStateDetectMfulC;
@@ -288,6 +293,11 @@ static NfcCommand mf_ultralight_poller_handler_check_ntag_203(MfUltralightPoller
         FURI_LOG_D(TAG, "NTAG203 detected");
         instance->data->type = MfUltralightTypeNTAG203;
     } else {
+        instance->history_data.state = instance->state;
+        instance->history_data.command = NfcCommandContinue;
+        instance->history_data.error = instance->error;
+        mf_ultralight_poller_save_history(instance);
+
         FURI_LOG_D(TAG, "Original Ultralight detected");
         iso14443_3a_poller_halt(instance->iso14443_3a_poller);
         instance->data->type = MfUltralightTypeOrigin;

@@ -33,6 +33,7 @@ typedef enum {
 typedef struct {
     Iso14443_3aPollerEventType event;
     MfUltralightPollerState state;
+    MfUltralightError error;
     NfcCommand command;
 } FURI_PACKED MfUltralightPollerHistoryData;
 

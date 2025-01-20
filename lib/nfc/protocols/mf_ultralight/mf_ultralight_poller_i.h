@@ -95,6 +95,7 @@ bool mf_ultralight_poller_ntag_i2c_addr_lin_to_tag(
 
 MfUltralightError mf_ultralight_poller_authentication_test(MfUltralightPoller* instance);
 
+void mf_ultralight_poller_save_history(MfUltralightPoller* instance);
 #ifdef __cplusplus
 }
 #endif
