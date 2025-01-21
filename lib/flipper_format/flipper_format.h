@@ -541,6 +541,15 @@ bool flipper_format_read_comment(FlipperFormat* flipper_format, const char* key,
  * @return     True on success (key found and value read), false otherwise
  */
 bool flipper_format_read_comment_cstr(FlipperFormat* flipper_format, const char* key, char* data);
+
+/** Write empty line (Improves readability for human based parsing)
+ *
+ * @param      flipper_format  Pointer to a FlipperFormat instance
+ *
+ * @return     True on success
+ */
+bool flipper_format_write_empty_line(FlipperFormat* flipper_format);
+
 /** Removes the first matching key and its value. Sets the RW pointer to a
  * position of deleted data.
  *

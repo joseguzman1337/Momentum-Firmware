@@ -465,6 +465,12 @@ bool flipper_format_read_comment_cstr(FlipperFormat* flipper_format, const char*
     }
     furi_string_free(string);
     return result;
+
+}
+
+bool flipper_format_write_empty_line(FlipperFormat* flipper_format) {
+    furi_check(flipper_format);
+    return flipper_format_stream_write_eol(flipper_format->stream);
 }
 
 bool flipper_format_delete_key(FlipperFormat* flipper_format, const char* key) {

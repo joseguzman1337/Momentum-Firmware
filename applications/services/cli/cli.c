@@ -8,6 +8,7 @@
 #include <flipper_application/plugins/plugin_manager.h>
 #include <loader/firmware_api/firmware_api.h>
 #include <inttypes.h>
+#include <stdlib.h>
 
 #define TAG "CliSrv"
 
@@ -208,6 +209,36 @@ static void cli_execute_command(Cli* cli, CliCommand* command, FuriString* args)
     }
 }
 
+static size_t cli_string_distance(const char* s1, const char* s2) {
+    size_t distance = 0;
+
+    while(*s1 && *s2) {
+        if(*s1++ != *s2++) distance++;
+    }
+    while(*s1++)
+        distance++;
+    while(*s2++)
+        distance++;
+
+    return distance;
+}
+
+static void cli_find_similar_command(Cli* cli, const char* input, FuriString* suggestion) {
+    size_t min_distance = (size_t)-1;
+    size_t max_allowed = (strlen(input) + 1) / 2;
+    furi_string_reset(suggestion);
+
+    CliCommandTree_it_t it;
+    for(CliCommandTree_it(it, cli->commands); !CliCommandTree_end_p(it); CliCommandTree_next(it)) {
+        const char* cmd_name = furi_string_get_cstr(*CliCommandTree_ref(it)->key_ptr);
+        size_t distance = cli_string_distance(input, cmd_name);
+        if(distance < min_distance && distance <= max_allowed) {
+            min_distance = distance;
+            furi_string_set(suggestion, cmd_name);
+        }
+    }
+}
+
 static void cli_handle_enter(Cli* cli) {
     cli_normalize_line(cli);
 
@@ -245,9 +276,21 @@ static void cli_handle_enter(Cli* cli) {
     } else {
         furi_check(furi_mutex_release(cli->mutex) == FuriStatusOk);
         cli_nl(cli);
-        printf(
-            "`%s` command not found, use `help` or `?` to list all available commands",
-            furi_string_get_cstr(command));
+        FuriString* suggestion = furi_string_alloc();
+        cli_find_similar_command(cli, furi_string_get_cstr(command), suggestion);
+
+        if(furi_string_empty(suggestion)) {
+            printf(
+                "`%s` command not found, use `help` or `?` to list all available commands",
+                furi_string_get_cstr(command));
+        } else {
+            printf(
+                "`%s` command not found, did you mean `%s`? Use `help` or `?` to list all available commands",
+                furi_string_get_cstr(command),
+                furi_string_get_cstr(suggestion));
+        }
+
+        furi_string_free(suggestion);
         cli_putc(cli, CliKeyBell);
     }
 
@@ -533,9 +576,9 @@ void cli_session_open(Cli* cli, void* session) {
     cli->session = session;
     if(cli->session != NULL) {
         cli->session->init();
-        furi_thread_set_stdout_callback(cli->session->tx_stdout);
+        furi_thread_set_stdout_callback(cli->session->tx_stdout, NULL);
     } else {
-        furi_thread_set_stdout_callback(NULL);
+        furi_thread_set_stdout_callback(NULL, NULL);
     }
     furi_semaphore_release(cli->idle_sem);
     furi_check(furi_mutex_release(cli->mutex) == FuriStatusOk);
@@ -549,7 +592,7 @@ void cli_session_close(Cli* cli) {
         cli->session->deinit();
     }
     cli->session = NULL;
-    furi_thread_set_stdout_callback(NULL);
+    furi_thread_set_stdout_callback(NULL, NULL);
     furi_check(furi_mutex_release(cli->mutex) == FuriStatusOk);
 }
 
@@ -563,9 +606,9 @@ int32_t cli_srv(void* p) {
     furi_record_create(RECORD_CLI, cli);
 
     if(cli->session != NULL) {
-        furi_thread_set_stdout_callback(cli->session->tx_stdout);
+        furi_thread_set_stdout_callback(cli->session->tx_stdout, NULL);
     } else {
-        furi_thread_set_stdout_callback(NULL);
+        furi_thread_set_stdout_callback(NULL, NULL);
     }
 
     if(furi_hal_is_normal_boot()) {
