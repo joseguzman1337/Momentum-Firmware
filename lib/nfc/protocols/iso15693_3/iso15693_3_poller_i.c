@@ -80,7 +80,7 @@ Iso15693_3Error iso15693_3_poller_send_frame(
         iso13239_crc_trim(instance->rx_buffer);
         bit_buffer_copy(rx_buffer, instance->rx_buffer);
     } while(false);
-    instance->history_modified = true;
+    instance->history.base.modified = true;
     return ret;
 }
 
@@ -92,12 +92,7 @@ static void iso15693_3_poller_save_activation_history(
     instance->history_data.state = instance->state;
     instance->history_data.command = NfcCommandContinue;
     instance->history_data.error = error;
-    instance->history_modified = true;
-    /*     NfcLogger* logger = nfc_get_logger(instance->nfc);
-    nfc_logger_append_history(logger, &instance->history);
-    if(end_transaction) {
-        nfc_logger_transaction_end(logger);
-    } */
+    instance->history.base.modified = true;
 }
 
 Iso15693_3Error iso15693_3_poller_activate(Iso15693_3Poller* instance, Iso15693_3Data* data) {

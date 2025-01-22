@@ -66,7 +66,7 @@ static NfcCommand slix_poller_handler_get_nfc_system_info(SlixPoller* instance) 
             instance->poller_state = SlixPollerStateError;
         }
         instance->history_data.error = instance->error;
-        instance->history_modified = true;
+        instance->history.base.modified = true;
     } else {
         instance->poller_state = SlixPollerStateReadSignature;
     }
@@ -83,7 +83,7 @@ static NfcCommand slix_poller_handler_read_signature(SlixPoller* instance) {
             instance->poller_state = SlixPollerStateError;
         }
         instance->history_data.error = instance->error;
-        instance->history_modified = true;
+        instance->history.base.modified = true;
     } else {
         instance->poller_state = SlixPollerStateCheckPrivacyPassword;
     }
@@ -236,7 +236,7 @@ static NfcCommand slix_poller_run(NfcGenericEvent event, void* context) {
     }
 
     instance->history_data.command = command;
-    instance->history_modified = true;
+    instance->history.base.modified = true;
     return command;
 }
 
@@ -263,10 +263,7 @@ static bool slix_poller_detect(NfcGenericEvent event, void* context) {
 static void slix_poller_log_history(NfcLogger* logger, void* context) {
     SlixPoller* instance = context;
 
-    if(instance->history_modified) {
-        nfc_logger_append_history(logger, &instance->history);
-        instance->history_modified = false;
-    }
+    nfc_logger_append_history(logger, &instance->history);
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);

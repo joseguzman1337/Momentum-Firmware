@@ -29,7 +29,6 @@ struct SlixPoller {
     NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     SlixPollerHistoryData history_data;
-    bool history_modified;
     void* context;
 };
 

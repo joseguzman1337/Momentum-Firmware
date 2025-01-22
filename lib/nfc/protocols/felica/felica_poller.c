@@ -293,7 +293,7 @@ static NfcCommand felica_poller_run(NfcGenericEvent event, void* context) {
 
     instance->history_data.command = command;
     instance->history_data.event = nfc_event->type;
-
+    instance->history.base.modified = true;
     return command;
 }
 

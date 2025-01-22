@@ -210,6 +210,7 @@ static NfcCommand st25tb_poller_run(NfcGenericEvent event, void* context) {
 
     instance->history_data.state = instance->state;
     instance->history_data.command = command;
+    instance->history.base.modified = true;
     return command;
 }
 

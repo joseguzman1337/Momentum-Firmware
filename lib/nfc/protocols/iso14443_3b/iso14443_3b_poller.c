@@ -88,7 +88,7 @@ static NfcCommand iso14443_3b_poller_run(NfcGenericEvent event, void* context) {
                 instance->iso14443_3b_event.type = Iso14443_3bPollerEventTypeError;
                 instance->iso14443_3b_event_data.error = error;
                 instance->history_data.error = error;
-                instance->history_modified = true;
+                instance->history.base.modified = true;
                 command = instance->callback(instance->general_event, instance->context);
                 // Add delay to switch context
                 furi_delay_ms(100);
@@ -96,7 +96,7 @@ static NfcCommand iso14443_3b_poller_run(NfcGenericEvent event, void* context) {
         } else {
             instance->iso14443_3b_event.type = Iso14443_3bPollerEventTypeReady;
             instance->iso14443_3b_event_data.error = Iso14443_3bErrorNone;
-            instance->history_modified = true;
+            instance->history.base.modified = true;
             command = instance->callback(instance->general_event, instance->context);
         }
     }
@@ -126,10 +126,7 @@ static bool iso14443_3b_poller_detect(NfcGenericEvent event, void* context) {
 
 static void iso14443_3b_poller_log_history(NfcLogger* logger, void* context) {
     Iso14443_3bPoller* instance = context;
-    if(instance->history_modified) {
-        nfc_logger_append_history(logger, &instance->history);
-        instance->history_modified = false;
-    }
+    nfc_logger_append_history(logger, &instance->history);
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);

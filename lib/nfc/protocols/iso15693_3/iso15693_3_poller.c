@@ -124,10 +124,7 @@ static bool iso15693_3_poller_detect(NfcGenericEvent event, void* context) {
 
 static void iso15693_3_poller_log_history(NfcLogger* logger, void* context) {
     Iso15693_3Poller* instance = context;
-    if(instance->history_modified) {
-        nfc_logger_append_history(logger, &instance->history);
-        instance->history_modified = false;
-    }
+    nfc_logger_append_history(logger, &instance->history);
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);

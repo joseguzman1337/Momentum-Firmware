@@ -67,11 +67,7 @@ static NfcCommand iso14443_4a_poller_handler_read_ats(Iso14443_4aPoller* instanc
         instance->poller_state = Iso14443_4aPollerStateError;
     }
 
-    /*     instance->history_data.error = error;
-    instance->history_data.command = NfcCommandContinue;
-    instance->history_data.state = instance->poller_state;
-    instance->history_modified = true; */
-    instance->history_modified = true;
+    instance->history.base.modified = true;
 
     return NfcCommandContinue;
 }
@@ -86,7 +82,7 @@ static NfcCommand iso14443_4a_poller_handler_error(Iso14443_4aPoller* instance) 
 
 static NfcCommand iso14443_4a_poller_handler_ready(Iso14443_4aPoller* instance) {
     instance->iso14443_4a_event.type = Iso14443_4aPollerEventTypeReady;
-    instance->history_modified = true;
+    instance->history.base.modified = true;
     NfcCommand command = instance->callback(instance->general_event, instance->context);
 
     return command;
@@ -162,12 +158,7 @@ static bool iso14443_4a_poller_detect(NfcGenericEvent event, void* context) {
 
 static void iso14443_4a_poller_log_history(NfcLogger* logger, void* context) {
     Iso14443_4aPoller* instance = context;
-
-    if(instance->history_modified) {
-        nfc_logger_append_history(logger, &instance->history);
-        instance->history_modified = false;
-    }
-
+    nfc_logger_append_history(logger, &instance->history);
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
     }

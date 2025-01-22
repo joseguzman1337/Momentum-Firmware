@@ -261,9 +261,7 @@ static NfcCommand mf_ultralight_poller_handler_read_version(MfUltralightPoller* 
         instance->history_data.state = instance->state;
         instance->history_data.command = NfcCommandContinue;
         instance->history_data.error = instance->error;
-        instance->history_modified = true;
-        // NfcLogger* logger = nfc_get_logger(instance->iso14443_3a_poller->nfc);
-        // nfc_logger_save_poller_history(logger);
+        instance->history.base.modified = true;
 
         FURI_LOG_D(TAG, "Didn't response. Check Ultralight C");
         iso14443_3a_poller_halt(instance->iso14443_3a_poller);
@@ -298,9 +296,7 @@ static NfcCommand mf_ultralight_poller_handler_check_ntag_203(MfUltralightPoller
         instance->history_data.state = instance->state;
         instance->history_data.command = NfcCommandContinue;
         instance->history_data.error = instance->error;
-        instance->history_modified = true;
-        // NfcLogger* logger = nfc_get_logger(instance->iso14443_3a_poller->nfc);
-        // nfc_logger_save_poller_history(logger);
+        instance->history.base.modified = true;
 
         FURI_LOG_D(TAG, "Original Ultralight detected");
         iso14443_3a_poller_halt(instance->iso14443_3a_poller);
@@ -799,7 +795,7 @@ static NfcCommand mf_ultralight_poller_run(NfcGenericEvent event, void* context)
 
     instance->history_data.event = iso14443_3a_event->type;
     instance->history_data.command = command;
-    instance->history_modified = true;
+    instance->history.base.modified = true;
     return command;
 }
 
@@ -824,10 +820,7 @@ static bool mf_ultralight_poller_detect(NfcGenericEvent event, void* context) {
 
 static void mf_ultralight_poller_log_history(NfcLogger* logger, void* context) {
     MfUltralightPoller* instance = context;
-    if(instance->history_modified) {
-        nfc_logger_append_history(logger, &instance->history);
-        instance->history_modified = false;
-    }
+    nfc_logger_append_history(logger, &instance->history);
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);

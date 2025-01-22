@@ -108,15 +108,11 @@ Iso14443_3aError iso14443_3a_poller_halt(Iso14443_3aPoller* instance) {
 
 static void iso14443_3a_poller_save_activation_history(
     Iso14443_3aPoller* instance,
-    Iso14443_3aError error,
-    bool end_transaction) {
+    Iso14443_3aError error) {
     instance->history_data.state = instance->state;
     instance->history_data.command = NfcCommandContinue;
     instance->history_data.error = error;
-    NfcLogger* logger = nfc_get_logger(instance->nfc);
-    UNUSED(end_transaction);
-    UNUSED(logger);
-    // nfc_logger_save_poller_history(logger);
+    instance->history.base.modified = true;
 }
 
 Iso14443_3aError
@@ -136,7 +132,7 @@ Iso14443_3aError
     if(instance->state != Iso14443_3aPollerStateIdle) {
         Iso14443_3aError error = iso14443_3a_poller_halt(instance);
         instance->state = Iso14443_3aPollerStateIdle;
-        iso14443_3a_poller_save_activation_history(instance, error, true);
+        iso14443_3a_poller_save_activation_history(instance, error);
     }
 
     NfcError error = NfcErrorNone;
@@ -218,7 +214,7 @@ Iso14443_3aError
                     FURI_LOG_E(TAG, "Sel request failed: %d", ret);
                     instance->state = Iso14443_3aPollerStateColResFailed;
                     ret = Iso14443_3aErrorColResFailed;
-                    iso14443_3a_poller_save_activation_history(instance, ret, true);
+                    iso14443_3a_poller_save_activation_history(instance, ret);
                     break;
                 }
                 if(bit_buffer_get_size_bytes(instance->rx_buffer) !=
@@ -226,10 +222,10 @@ Iso14443_3aError
                     FURI_LOG_E(TAG, "Sel response wrong length");
                     instance->state = Iso14443_3aPollerStateColResFailed;
                     ret = Iso14443_3aErrorColResFailed;
-                    iso14443_3a_poller_save_activation_history(instance, ret, true);
+                    iso14443_3a_poller_save_activation_history(instance, ret);
                     break;
                 }
-                iso14443_3a_poller_save_activation_history(instance, ret, true);
+                iso14443_3a_poller_save_activation_history(instance, ret);
                 bit_buffer_write_bytes(
                     instance->rx_buffer,
                     &instance->col_res.sel_resp,
@@ -316,6 +312,7 @@ Iso14443_3aError iso14443_3a_poller_send_standard_frame(
 
     Iso14443_3aError ret =
         iso14443_3a_poller_standard_frame_exchange(instance, tx_buffer, rx_buffer, fwt);
+    instance->history.base.modified = true;
 
     return ret;
 }

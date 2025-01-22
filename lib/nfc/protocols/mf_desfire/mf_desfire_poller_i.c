@@ -30,22 +30,11 @@ MfDesfireError mf_desfire_process_status_code(uint8_t status_code) {
     }
 }
 
-static void mf_desfire_poller_save_history(
-    MfDesfirePoller* instance,
-    MfDesfireError error,
-    bool end_transaction) {
+static void mf_desfire_poller_save_history(MfDesfirePoller* instance, MfDesfireError error) {
     instance->history_data.state = instance->state;
     instance->history_data.command = NfcCommandContinue;
     instance->history_data.error = error;
-    //instance->iso14443_4a_poller->history_modified = true;
-    instance->history_modified = true;
-    UNUSED(end_transaction);
-    /*     Nfc* nfc = instance->iso14443_4a_poller->iso14443_3a_poller->nfc;
-    NfcLogger* logger = nfc_get_logger(nfc);
-    nfc_logger_append_history(logger, &instance->history);
-    if(end_transaction) {
-        nfc_logger_transaction_end(logger);
-    } */
+    instance->history.base.modified = true;
 }
 
 MfDesfireError mf_desfire_send_chunks(
@@ -69,7 +58,7 @@ MfDesfireError mf_desfire_send_chunks(
             error = mf_desfire_process_error(iso14443_4a_error);
             break;
         }
-        mf_desfire_poller_save_history(instance, error, true);
+        mf_desfire_poller_save_history(instance, error);
 
         bit_buffer_reset(instance->tx_buffer);
         bit_buffer_append_byte(instance->tx_buffer, MF_DESFIRE_STATUS_ADDITIONAL_FRAME);
@@ -89,7 +78,7 @@ MfDesfireError mf_desfire_send_chunks(
                 error = mf_desfire_process_error(iso14443_4a_error);
                 break;
             }
-            mf_desfire_poller_save_history(instance, error, true);
+            mf_desfire_poller_save_history(instance, error);
 
             const size_t rx_size = bit_buffer_get_size_bytes(instance->rx_buffer);
             const size_t rx_capacity_remaining =
@@ -107,7 +96,7 @@ MfDesfireError mf_desfire_send_chunks(
         uint8_t err_code = bit_buffer_get_byte(instance->rx_buffer, 0);
         error = mf_desfire_process_status_code(err_code);
     } else {
-        mf_desfire_poller_save_history(instance, error, true);
+        mf_desfire_poller_save_history(instance, error);
     }
 
     return error;

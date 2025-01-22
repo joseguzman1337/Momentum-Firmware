@@ -36,7 +36,6 @@ struct MfPlusPoller {
     NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     MfPlusPollerHistoryData history_data;
-    bool history_modified;
     void* context;
 };
 

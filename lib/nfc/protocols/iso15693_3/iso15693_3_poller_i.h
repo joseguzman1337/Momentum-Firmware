@@ -28,7 +28,6 @@ struct Iso15693_3Poller {
     NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     Iso15693_3PollerHistoryData history_data;
-    bool history_modified;
     void* context;
 };
 
