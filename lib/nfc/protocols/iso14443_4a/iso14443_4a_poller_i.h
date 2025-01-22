@@ -29,6 +29,7 @@ struct Iso14443_4aPoller {
     NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     Iso14443_4aPollerHistoryData history_data;
+    bool history_modified;
     void* context;
 };
 

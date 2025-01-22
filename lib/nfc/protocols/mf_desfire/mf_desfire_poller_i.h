@@ -33,6 +33,7 @@ struct MfDesfirePoller {
     NfcGenericLogHistoryCallback log_callback;
     NfcHistoryItem history;
     MfDesfirePollerHistoryData history_data;
+    bool history_modified;
     void* context;
 };
 
