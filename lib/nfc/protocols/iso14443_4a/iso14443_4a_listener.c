@@ -102,6 +102,7 @@ static NfcCommand iso14443_4a_listener_run(NfcGenericEvent event, void* context)
     instance->history_data.command = command;
     instance->history_data.event = iso14443_3a_event->type;
     instance->history_data.state = instance->state;
+    instance->history.base.modified = true;
     return command;
 }
 

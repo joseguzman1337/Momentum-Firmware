@@ -78,11 +78,11 @@ static NfcCommand slix_listener_run(NfcGenericEvent event, void* context) {
     instance->history_data.command = command;
     instance->history_data.event = iso15693_3_event->type;
     instance->history_data.session_state = instance->session_state;
+    instance->history.base.modified = true;
     return command;
 }
 
 void slix_log_history(NfcLogger* logger, void* context) {
-    UNUSED(logger);
     SlixListener* instance = context;
     nfc_logger_append_history(logger, &instance->history);
 

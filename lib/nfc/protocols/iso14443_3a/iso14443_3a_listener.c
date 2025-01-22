@@ -123,6 +123,7 @@ NfcCommand iso14443_3a_listener_run(NfcGenericEvent event, void* context) {
     instance->history_data.command = command;
     instance->history_data.event = nfc_event->type;
     instance->history_data.state = instance->state;
+    instance->history.base.modified = true;
     return command;
 }
 
