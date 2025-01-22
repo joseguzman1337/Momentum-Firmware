@@ -12,6 +12,7 @@ extern "C" {
 typedef void NfcHistoryData;
 
 typedef struct {
+    bool modified;
     NfcProtocol protocol;
     uint8_t data_block_size;
 } FURI_PACKED NfcHistoryItemBase;

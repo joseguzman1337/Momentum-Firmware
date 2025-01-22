@@ -400,6 +400,9 @@ void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
     furi_assert(history);
 
     if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
+    if(!history->base.modified) return;
+
+    history->base.modified = false;
     if(instance->transaction) {
         nfc_transaction_append_history(instance->transaction, history);
     }
