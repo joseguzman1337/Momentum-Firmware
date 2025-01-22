@@ -326,6 +326,11 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
         if(instance->state != NfcLoggerStateProcessing) break; ///TODO: maybe this can be deleted
         if(!instance->transaction) break;
 
+        ///TODO: try same approach for listener in order to remove this check
+        if(instance->trace->mode == NfcModePoller) {
+            instance->log_callback(instance, instance->log_context);
+        }
+
         uint32_t time = nfc_logger_get_time(instance);
         nfc_transaction_complete(instance->transaction, time);
         /*        if(nfc_transaction_get_type(instance->transaction) == NfcTransactionTypeEmpty) {
