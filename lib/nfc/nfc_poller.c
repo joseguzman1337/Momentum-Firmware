@@ -88,7 +88,11 @@ NfcPoller* nfc_poller_alloc(Nfc* nfc, NfcProtocol protocol) {
     instance->protocol = protocol;
     nfc_poller_list_alloc(instance);
 
+    ///TODO: Simplify this
     nfc_logger_set_protocol(nfc_get_logger(nfc), instance->protocol);
+    NfcPollerListElement* head_poller = instance->list.head;
+    nfc_logger_set_poller_log_callback(
+        nfc_get_logger(nfc), head_poller->poller, instance->list.head->poller_api->log_history);
     return instance;
 }
 
@@ -114,11 +118,6 @@ static NfcCommand nfc_poller_start_callback(NfcEvent event, void* context) {
     if(event.type == NfcEventTypePollerReady) {
         NfcPollerListElement* head_poller = instance->list.head;
         command = head_poller->poller_api->run(poller_event, head_poller->poller);
-
-        NfcLogger* logger = nfc_get_logger(instance->nfc);
-        if(nfc_logger_enabled(logger)) {
-            head_poller->poller_api->log_history(logger, head_poller->poller);
-        }
     }
 
     if(instance->session_state == NfcPollerSessionStateStopRequest) {
