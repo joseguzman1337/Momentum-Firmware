@@ -114,10 +114,9 @@ static void iso14443_3a_poller_save_activation_history(
     instance->history_data.command = NfcCommandContinue;
     instance->history_data.error = error;
     NfcLogger* logger = nfc_get_logger(instance->nfc);
-    nfc_logger_append_history(logger, &instance->history);
-    if(end_transaction) {
-        nfc_logger_transaction_end(logger);
-    }
+    UNUSED(end_transaction);
+    UNUSED(logger);
+    // nfc_logger_save_poller_history(logger);
 }
 
 Iso14443_3aError

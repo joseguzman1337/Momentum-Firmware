@@ -170,6 +170,7 @@ static NfcCommand mf_plus_poller_run(NfcGenericEvent event, void* context) {
     instance->history_data.state = instance->state;
     instance->history_data.event = iso14443_4a_event->type;
     instance->history_data.command = command;
+    instance->history_modified = true;
     return command;
 }
 
@@ -211,7 +212,10 @@ static bool mf_plus_poller_detect(NfcGenericEvent event, void* context) {
 
 static void mf_plus_poller_log_history(NfcLogger* logger, void* context) {
     MfPlusPoller* instance = context;
-    nfc_logger_append_history(logger, &instance->history);
+    if(instance->history_modified) {
+        nfc_logger_append_history(logger, &instance->history);
+        instance->history_modified = false;
+    }
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);

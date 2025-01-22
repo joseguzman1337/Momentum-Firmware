@@ -104,11 +104,11 @@ static MfUltralightError mf_ultralight_poller_send_authenticate_cmd(
     return ret;
 }
 
-void mf_ultralight_poller_save_history(MfUltralightPoller* instance) {
+/* void mf_ultralight_poller_save_history(MfUltralightPoller* instance) {
     NfcLogger* logger = nfc_get_logger(instance->iso14443_3a_poller->nfc);
     nfc_logger_append_history(logger, &instance->iso14443_3a_poller->history);
     nfc_logger_append_history(logger, &instance->history);
-}
+} */
 
 MfUltralightError mf_ultralight_poller_authentication_test(MfUltralightPoller* instance) {
     furi_check(instance);
@@ -122,7 +122,10 @@ MfUltralightError mf_ultralight_poller_authentication_test(MfUltralightPoller* i
     instance->history_data.state = instance->state;
     instance->history_data.command = NfcCommandContinue;
     instance->history_data.error = error;
-    mf_ultralight_poller_save_history(instance);
+    instance->history_modified = true;
+    //NfcLogger* logger = nfc_get_logger(instance->iso14443_3a_poller->nfc);
+    //nfc_logger_save_poller_history(logger);
+    //mf_ultralight_poller_save_history(instance);
 
     return error;
 }

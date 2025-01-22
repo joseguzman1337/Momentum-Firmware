@@ -112,6 +112,9 @@ Iso14443_4aError iso14443_4a_poller_send_block(
         }
     } while(false);
 
+    instance->history_data.error = error;
+    instance->history_modified = true;
+
     return error;
 }
 

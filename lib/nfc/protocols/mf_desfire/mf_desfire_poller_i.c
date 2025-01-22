@@ -37,12 +37,15 @@ static void mf_desfire_poller_save_history(
     instance->history_data.state = instance->state;
     instance->history_data.command = NfcCommandContinue;
     instance->history_data.error = error;
-    Nfc* nfc = instance->iso14443_4a_poller->iso14443_3a_poller->nfc;
+    //instance->iso14443_4a_poller->history_modified = true;
+    instance->history_modified = true;
+    UNUSED(end_transaction);
+    /*     Nfc* nfc = instance->iso14443_4a_poller->iso14443_3a_poller->nfc;
     NfcLogger* logger = nfc_get_logger(nfc);
     nfc_logger_append_history(logger, &instance->history);
     if(end_transaction) {
         nfc_logger_transaction_end(logger);
-    }
+    } */
 }
 
 MfDesfireError mf_desfire_send_chunks(

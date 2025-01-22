@@ -59,7 +59,6 @@ static NfcCommand iso14443_4a_poller_handler_idle(Iso14443_4aPoller* instance) {
 
 static NfcCommand iso14443_4a_poller_handler_read_ats(Iso14443_4aPoller* instance) {
     Iso14443_4aError error = iso14443_4a_poller_read_ats(instance, &instance->data->ats_data);
-    instance->history_data.error = error;
     if(error == Iso14443_4aErrorNone) {
         FURI_LOG_D(TAG, "Read ATS success");
         instance->poller_state = Iso14443_4aPollerStateReady;
@@ -67,6 +66,12 @@ static NfcCommand iso14443_4a_poller_handler_read_ats(Iso14443_4aPoller* instanc
         FURI_LOG_D(TAG, "Failed to read ATS");
         instance->poller_state = Iso14443_4aPollerStateError;
     }
+
+    /*     instance->history_data.error = error;
+    instance->history_data.command = NfcCommandContinue;
+    instance->history_data.state = instance->poller_state;
+    instance->history_modified = true; */
+    instance->history_modified = true;
 
     return NfcCommandContinue;
 }
@@ -81,7 +86,9 @@ static NfcCommand iso14443_4a_poller_handler_error(Iso14443_4aPoller* instance) 
 
 static NfcCommand iso14443_4a_poller_handler_ready(Iso14443_4aPoller* instance) {
     instance->iso14443_4a_event.type = Iso14443_4aPollerEventTypeReady;
+    instance->history_modified = true;
     NfcCommand command = instance->callback(instance->general_event, instance->context);
+
     return command;
 }
 
@@ -155,7 +162,11 @@ static bool iso14443_4a_poller_detect(NfcGenericEvent event, void* context) {
 
 static void iso14443_4a_poller_log_history(NfcLogger* logger, void* context) {
     Iso14443_4aPoller* instance = context;
-    nfc_logger_append_history(logger, &instance->history);
+
+    if(instance->history_modified) {
+        nfc_logger_append_history(logger, &instance->history);
+        instance->history_modified = false;
+    }
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);

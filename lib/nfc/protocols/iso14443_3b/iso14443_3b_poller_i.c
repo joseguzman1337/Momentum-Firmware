@@ -31,14 +31,16 @@ static void iso14443_3b_poller_save_history(
     Iso14443_3bPoller* instance,
     Iso14443_3bError error,
     bool end_transaction) {
+    UNUSED(end_transaction);
     instance->history_data.state = instance->state;
     instance->history_data.command = NfcCommandContinue;
     instance->history_data.error = error;
-    NfcLogger* logger = nfc_get_logger(instance->nfc);
+    instance->history_modified = true;
+    /*     NfcLogger* logger = nfc_get_logger(instance->nfc);
     nfc_logger_append_history(logger, &instance->history);
     if(end_transaction) {
         nfc_logger_transaction_end(logger);
-    }
+    } */
 }
 
 static Iso14443_3bError iso14443_3b_poller_frame_exchange(

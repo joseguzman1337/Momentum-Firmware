@@ -65,6 +65,8 @@ static NfcCommand slix_poller_handler_get_nfc_system_info(SlixPoller* instance) 
         } else {
             instance->poller_state = SlixPollerStateError;
         }
+        instance->history_data.error = instance->error;
+        instance->history_modified = true;
     } else {
         instance->poller_state = SlixPollerStateReadSignature;
     }
@@ -80,6 +82,8 @@ static NfcCommand slix_poller_handler_read_signature(SlixPoller* instance) {
         } else {
             instance->poller_state = SlixPollerStateError;
         }
+        instance->history_data.error = instance->error;
+        instance->history_modified = true;
     } else {
         instance->poller_state = SlixPollerStateCheckPrivacyPassword;
     }
@@ -221,6 +225,9 @@ static NfcCommand slix_poller_run(NfcGenericEvent event, void* context) {
 
     NfcCommand command = NfcCommandContinue;
 
+    instance->history_data.state = instance->poller_state;
+    instance->history_data.event = iso15693_3_event->type;
+
     if(iso15693_3_event->type == Iso15693_3PollerEventTypeReady) {
         command = slix_poller_state_handler[instance->poller_state](instance);
     } else if(iso15693_3_event->type == Iso15693_3PollerEventTypeError) {
@@ -228,10 +235,8 @@ static NfcCommand slix_poller_run(NfcGenericEvent event, void* context) {
         command = slix_poller_state_handler[instance->poller_state](instance);
     }
 
-    instance->history_data.error = instance->error;
-    instance->history_data.state = instance->poller_state;
-    instance->history_data.event = iso15693_3_event->type;
     instance->history_data.command = command;
+    instance->history_modified = true;
     return command;
 }
 
@@ -257,7 +262,12 @@ static bool slix_poller_detect(NfcGenericEvent event, void* context) {
 
 static void slix_poller_log_history(NfcLogger* logger, void* context) {
     SlixPoller* instance = context;
-    nfc_logger_append_history(logger, &instance->history);
+
+    if(instance->history_modified) {
+        nfc_logger_append_history(logger, &instance->history);
+        instance->history_modified = false;
+    }
+
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
     }
