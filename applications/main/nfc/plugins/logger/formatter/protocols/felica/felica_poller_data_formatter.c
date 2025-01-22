@@ -45,7 +45,7 @@ static void felica_poller_format_data(
     const char* error = felica_errors[felica_data->error];
 
     furi_string_printf(
-        output, "E=%s, S=%s, FelicaError: %s, C=%s", event_text, state_text, error, command_text);
+        output, "E=%s, S=%s, Err: %s, C=%s", event_text, state_text, error, command_text);
 }
 
 static NfcHistoryCrcStatus felica_get_crc_status(const NfcHistoryData* data) {
