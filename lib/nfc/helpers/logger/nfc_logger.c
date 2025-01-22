@@ -399,3 +399,14 @@ void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history) {
         nfc_transaction_append_history(instance->transaction, history);
     }
 }
+
+void nfc_logger_set_poller_log_callback(
+    NfcLogger* instance,
+    NfcGenericInstance* poller,
+    NfcGenericLogHistoryCallback callback) {
+    furi_assert(instance);
+    furi_assert(poller);
+    furi_assert(callback);
+    instance->log_context = poller;
+    instance->log_callback = callback;
+}

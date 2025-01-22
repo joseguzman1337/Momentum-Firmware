@@ -29,6 +29,9 @@ struct NfcLogger {
     Storage* storage;
     FuriThread* logger_thread;
     FuriMessageQueue* transaction_queue;
+    NfcGenericInstance* log_context;
+    NfcGenericLogHistoryCallback log_callback;
+
     bool exit;
 };
 

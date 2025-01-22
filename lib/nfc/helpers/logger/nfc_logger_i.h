@@ -2,6 +2,7 @@
 
 #include "nfc_logger.h"
 #include "transaction/nfc_transaction_i.h"
+#include <nfc_poller.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +40,10 @@ void nfc_logger_append_response_data(
 
 void nfc_logger_append_history(NfcLogger* instance, NfcHistoryItem* history);
 
+void nfc_logger_set_poller_log_callback(
+    NfcLogger* instance,
+    NfcGenericInstance* poller,
+    NfcGenericLogHistoryCallback callback);
 #ifdef __cplusplus
 }
 #endif
