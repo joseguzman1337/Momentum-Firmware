@@ -1,5 +1,7 @@
 #include "infrared_app_i.h"
 
+#include "infrared_settings.h"
+
 #include <furi_hal_power.h>
 
 #include <string.h>
@@ -153,6 +155,10 @@ static InfraredApp* infrared_alloc(void) {
     InfraredAppState* app_state = &infrared->app_state;
     app_state->is_learning_new_remote = false;
     app_state->is_debug_enabled = furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug);
+    app_state->is_transmitting = false;
+    app_state->is_otg_enabled = false;
+    app_state->is_easy_mode = false;
+    app_state->is_decode_enabled = true;
     app_state->edit_target = InfraredEditTargetNone;
     app_state->edit_mode = InfraredEditModeNone;
     app_state->current_button_index = InfraredButtonIndexNone;
@@ -503,12 +509,7 @@ void infrared_enable_otg(InfraredApp* infrared, bool enable) {
 static void infrared_load_settings(InfraredApp* infrared) {
     InfraredSettings settings = {0};
 
-    if(!saved_struct_load(
-           INFRARED_SETTINGS_PATH,
-           &settings,
-           sizeof(InfraredSettings),
-           INFRARED_SETTINGS_MAGIC,
-           INFRARED_SETTINGS_VERSION)) {
+    if(!infrared_settings_load(&settings)) {
         FURI_LOG_D(TAG, "Failed to load settings, using defaults");
         // infrared_save_settings(infrared);
     }
@@ -517,20 +518,17 @@ static void infrared_load_settings(InfraredApp* infrared) {
     if(settings.tx_pin < FuriHalInfraredTxPinMax) {
         infrared_enable_otg(infrared, settings.otg_enabled);
     }
+    infrared->app_state.is_easy_mode = settings.easy_mode;
 }
 
 void infrared_save_settings(InfraredApp* infrared) {
     InfraredSettings settings = {
         .tx_pin = infrared->app_state.tx_pin,
         .otg_enabled = infrared->app_state.is_otg_enabled,
+        .easy_mode = infrared->app_state.is_easy_mode,
     };
 
-    if(!saved_struct_save(
-           INFRARED_SETTINGS_PATH,
-           &settings,
-           sizeof(InfraredSettings),
-           INFRARED_SETTINGS_MAGIC,
-           INFRARED_SETTINGS_VERSION)) {
+    if(!infrared_settings_save(&settings)) {
         FURI_LOG_E(TAG, "Failed to save settings");
     }
 }
