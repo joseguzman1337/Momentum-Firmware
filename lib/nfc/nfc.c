@@ -362,10 +362,10 @@ NfcError nfc_listener_tx(Nfc* instance, const BitBuffer* tx_buffer) {
     }
 
     const uint8_t* data = bit_buffer_get_data(tx_buffer);
-    size_t data_size = bit_buffer_get_size_bytes(tx_buffer);
-    nfc_logger_append_response_data(instance->logger, data, data_size);
 
     FuriHalNfcError error = furi_hal_nfc_listener_tx(data, bit_buffer_get_size(tx_buffer));
+    nfc_logger_append_response_data(instance->logger, data, bit_buffer_get_size_bytes(tx_buffer));
+
     if(error != FuriHalNfcErrorNone) {
         FURI_LOG_D(TAG, "Failed in listener TX");
         ret = nfc_process_hal_error(error);
@@ -529,11 +529,6 @@ NfcLogger* nfc_get_logger(Nfc* instance) {
     furi_assert(instance);
     return instance->logger;
 }
-
-/* void nfc_enable_logger(Nfc* instance) {
-    furi_assert(instance);
-    nfc_logger_config(instance->logger, true);
-} */
 
 NfcError nfc_iso14443a_listener_set_col_res_data(
     Nfc* instance,
