@@ -71,7 +71,8 @@ static void nfc_transaction_format_common(
     do {
         const NfcTransactionHeader* header = &transaction->header;
         uint32_t time = (header->type == NfcTransactionTypeFlagsOnly ||
-                         header->type == NfcTransactionTypeEmpty) ?
+                         header->type == NfcTransactionTypeEmpty ||
+                         header->type == NfcTransactionTypeResponse) ?
                             header->start_time :
                             transaction->request->time;
 
