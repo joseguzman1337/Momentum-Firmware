@@ -284,6 +284,7 @@ App(
             "plugins/logger/formatter/protocols/mf_plus/mf_plus_poller_data_formatter.c",
             "plugins/logger/formatter/protocols/mf_ultralight/mf_ultralight_listener_data_formatter.c",
             "plugins/logger/formatter/protocols/mf_ultralight/mf_ultralight_poller_data_formatter.c",
+            "plugins/logger/formatter/protocols/mf_classic/mf_classic_listener_data_formatter.c",
             "plugins/logger/formatter/protocols/nfc_hal/nfc_hal_formatter.c",
             "plugins/logger/formatter/protocols/slix/slix_error_formatter.c",
             "plugins/logger/formatter/protocols/slix/slix_listener_data_formatter.c",

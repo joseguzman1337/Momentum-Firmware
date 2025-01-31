@@ -4,6 +4,7 @@
 #include "iso14443_4a/iso14443_4a_listener_data_formatter.h"
 #include "iso15693_3/iso15693_3_listener_data_formatter.h"
 #include "mf_ultralight/mf_ultralight_listener_data_formatter.h"
+#include "mf_classic/mf_classic_listener_data_formatter.h"
 #include "felica/felica_listener_data_formatter.h"
 #include "slix/slix_listener_data_formatter.h"
 
@@ -29,7 +30,7 @@ static const NfcProtocolFormatterBase* listener_formatters[NfcProtocolNum] = {
     [NfcProtocolIso15693_3] = &iso15693_3_listener_data_formatter,
     [NfcProtocolFelica] = &felica_listener_data_formatter,
     [NfcProtocolMfUltralight] = &mf_ultralight_listener_data_formatter,
-    [NfcProtocolMfClassic] = NULL, ///TODO: Add MfClassic support
+    [NfcProtocolMfClassic] = &mf_classic_listener_data_formatter,
     [NfcProtocolMfPlus] = NULL,
     [NfcProtocolMfDesfire] = NULL,
     [NfcProtocolSlix] = &slix_listener_data_formatter,
