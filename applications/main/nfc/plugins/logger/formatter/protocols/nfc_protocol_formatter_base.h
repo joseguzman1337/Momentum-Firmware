@@ -10,6 +10,11 @@
 extern "C" {
 #endif
 
+typedef bool (*NfcTransactionDecryptCallback)(
+    const NfcPacket* input,
+    NfcHistoryData* item,
+    NfcPacket* output);
+
 typedef void (*NfcHistoryItemDataFormatCallback)(
     const NfcPacket* packet,
     const NfcHistoryData* data,
@@ -27,7 +32,7 @@ typedef NfcHistoryCrcStatus (*NfcHistoryGetCrcStatusCallback)(const NfcHistoryDa
 typedef struct {
     NfcHistoryItemDataFormatCallback format_history;
     NfcHistoryItemDataFormatCallback format_history_simplified;
-    // NfcTransactionFormatCallback format_transaction;
+    NfcTransactionDecryptCallback decrypt;
     NfcHistoryGetCrcStatusCallback get_crc_status;
 } NfcProtocolFormatterBase;
 

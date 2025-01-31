@@ -64,3 +64,16 @@ const NfcProtocolFormatterBase* nfc_protocol_formatter_get(NfcProtocol protocol,
     }
     return formatter;
 }
+
+NfcTransactionDecryptCallback
+    nfc_protocol_formatter_get_decrypt_callback(NfcProtocol protocol, NfcMode mode) {
+    furi_assert(protocol < NfcProtocolNum);
+    furi_assert(mode < NfcModeNum);
+
+    const NfcProtocolFormatterBase* formatter = nfc_protocol_formatter_get(protocol, mode);
+    return formatter->decrypt;
+}
+
+bool nfc_protocol_formatter_support_decryption(NfcProtocol protocol, NfcMode mode) {
+    return nfc_protocol_formatter_get_decrypt_callback(protocol, mode) != NULL;
+}
