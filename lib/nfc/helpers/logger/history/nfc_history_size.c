@@ -5,6 +5,7 @@
 #include <nfc/protocols/iso14443_3a/iso14443_3a_listener_history_data.h>
 #include <nfc/protocols/iso14443_4a/iso14443_4a_listener_history_data.h>
 #include <nfc/protocols/mf_ultralight/mf_ultralight_listener_history_data.h>
+#include <nfc/protocols/mf_classic/mf_classic_listener_history_data.h>
 #include <nfc/protocols/iso15693_3/iso15693_3_listener_history_data.h>
 #include <nfc/protocols/felica/felica_listener_history_data.h>
 #include <nfc/protocols/slix/slix_listener_history_data.h>
@@ -30,7 +31,7 @@ static const uint8_t listener_history_chain_size[NfcProtocolNum] = {
     [NfcProtocolMfUltralight] = sizeof(MfUltralightListenerHistoryData),
     [NfcProtocolFelica] = sizeof(FelicaListenerHistoryData),
     [NfcProtocolSlix] = sizeof(SlixListenerHistoryData),
-    [NfcProtocolMfClassic] = 0, ///TODO: put proper size here
+    [NfcProtocolMfClassic] = sizeof(MfClassicListenerHistoryData),
     [NfcProtocolMfPlus] = 0,
     [NfcProtocolMfDesfire] = 0,
     [NfcProtocolIso14443_3b] = 0,
