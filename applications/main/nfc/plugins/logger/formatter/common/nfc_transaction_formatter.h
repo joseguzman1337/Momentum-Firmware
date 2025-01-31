@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 void nfc_transaction_format(
-    const NfcFormatter* instance,
+    NfcFormatter* instance,
     const NfcTransaction* transaction,
     FuriString* output);
 #ifdef __cplusplus

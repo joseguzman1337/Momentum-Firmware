@@ -18,6 +18,8 @@ void nfc_histroy_format_annotation(
     const FuriHalNfcEvent nfc_event,
     FuriString* annotation);
 
+const NfcHistoryItem* nfc_history_get_item(const NfcHistory* history, const NfcProtocol protocol);
+
 #ifdef __cplusplus
 }
 #endif

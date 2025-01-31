@@ -126,13 +126,8 @@ static void nfc_formatter_format(
     furi_assert(instance->protocol != NfcProtocolInvalid);
 
     instance->crc_from_history = nfc_history_get_crc_status(transaction->history, instance->mode);
-    ///TODO: This If needs to be removed. nfc_format_transaction must guarantee that all protocols
-    //will behave as expected
-    /*   if(instance->protocol == NfcProtocolIso14443_3a ||
-       instance->protocol == NfcProtocolMfUltralight || instance->protocol == NfcProtocolFelica) { */
+
     nfc_transaction_format(instance, transaction, output);
-    /*  } else
-        furi_string_printf(output, "NIMP"); */
 }
 
 static bool nfc_logger_open_log(

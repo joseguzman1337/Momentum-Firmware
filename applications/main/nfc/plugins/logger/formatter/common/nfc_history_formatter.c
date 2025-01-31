@@ -108,3 +108,16 @@ void nfc_histroy_format_annotation(
 
     furi_string_free(layer_parsed_str);
 }
+
+const NfcHistoryItem* nfc_history_get_item(const NfcHistory* history, const NfcProtocol protocol) {
+    for(size_t i = 0; i < history->base.chain_count; i++) {
+        for(size_t j = 0; j < history->chains[i].length; j++) {
+            const NfcHistoryItem* item = &(history->chains[i].items[j]);
+            if(item->base.protocol != protocol) continue;
+            return item;
+        }
+    }
+
+    FURI_LOG_W("NfcHistory", "Item for protocol %X not found", protocol);
+    return NULL;
+}
