@@ -654,6 +654,10 @@ NfcError nfc_iso14443a_listener_tx_custom_parity(Nfc* instance, const BitBuffer*
     size_t tx_bits = bit_buffer_get_size(tx_buffer);
 
     error = furi_hal_nfc_iso14443a_listener_tx_custom_parity(tx_data, tx_parity, tx_bits);
+
+    size_t tx_size = bit_buffer_get_size_bytes(tx_buffer);
+    nfc_logger_append_response_data(instance->logger, tx_data, tx_size);
+
     ret = nfc_process_hal_error(error);
 
     return ret;
