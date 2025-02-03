@@ -304,19 +304,27 @@ void nfc_logger_stop(NfcLogger* instance) {
 
 void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
     furi_assert(instance);
-    furi_assert(instance->transaction == NULL);
 
     if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError) return;
+
+    bool update_existing = false;
     if(instance->transaction) {
-        nfc_logger_transaction_end(instance);
+        NfcTransactionType type = nfc_transaction_get_type(instance->transaction);
+        if(type != NfcTransactionTypeEmpty)
+            nfc_logger_transaction_end(instance);
+        else
+            update_existing = true;
     }
 
     uint32_t id = instance->trace->transactions_count;
     instance->state = NfcLoggerStateProcessing;
-
     uint32_t time = nfc_logger_get_time(instance);
-    instance->transaction = nfc_transaction_alloc(
-        id, event, time, instance->history_size_bytes, instance->max_chain_size);
+    if(!update_existing) {
+        instance->transaction = nfc_transaction_alloc(
+            id, event, time, instance->history_size_bytes, instance->max_chain_size);
+    } else {
+        nfc_transaction_refresh(instance->transaction, id, event, time);
+    }
 }
 
 void nfc_logger_transaction_end(NfcLogger* instance) {
@@ -326,6 +334,9 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
             return;
         if(instance->state != NfcLoggerStateProcessing) break; ///TODO: maybe this can be deleted
         if(!instance->transaction) break;
+        if((nfc_transaction_get_type(instance->transaction) == NfcTransactionTypeEmpty) &&
+           instance->skip_empty_transactions)
+            break;
 
         ///TODO: try same approach for listener in order to remove this check
         if(instance->trace->mode == NfcModePoller) {
