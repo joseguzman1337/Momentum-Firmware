@@ -1,4 +1,5 @@
 #include "nfc_transaction_i.h"
+#include "nfc_transaction_data_type.h"
 #include "../history/nfc_history_i.h"
 
 #define TAG "NfcTransaction"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nfc_transaction_data_type.h"
+#include "nfc_transaction.h"
 
 #ifdef __cplusplus
 extern "C" {
