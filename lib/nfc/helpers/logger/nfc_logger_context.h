@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 struct NfcLogger {
+    bool skip_empty_transactions;
     NfcLoggerState state;
     NfcProtocol protocol;
     NfcTrace* trace;

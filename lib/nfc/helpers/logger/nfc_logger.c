@@ -234,6 +234,7 @@ void nfc_logger_set_protocol(NfcLogger* instance, NfcProtocol protocol) {
     furi_assert(instance);
     furi_assert(protocol < NfcProtocolNum);
     instance->protocol = protocol;
+    instance->skip_empty_transactions = protocol == NfcProtocolMfClassic;
 }
 
 void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
