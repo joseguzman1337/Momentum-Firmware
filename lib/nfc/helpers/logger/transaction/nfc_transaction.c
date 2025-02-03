@@ -23,6 +23,18 @@ NfcTransaction* nfc_transaction_alloc(
     return t;
 }
 
+void nfc_transaction_refresh(
+    NfcTransaction* instance,
+    uint32_t id,
+    FuriHalNfcEvent event,
+    uint32_t time) {
+    furi_assert(instance);
+    instance->header.id = id;
+    instance->header.nfc_event = event;
+    instance->header.start_time = time;
+    instance->header.type = NfcTransactionTypeEmpty;
+}
+
 void nfc_transaction_free(NfcTransaction* instance) {
     furi_assert(instance);
 
