@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mf_classic_poller.h"
+#include "mf_classic_poller_history_data.h"
 #include <lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
 #include <bit_lib/bit_lib.h>
 #include <nfc/helpers/iso14443_crc.h>
@@ -144,6 +145,10 @@ struct MfClassicPoller {
     MfClassicPollerEventData mfc_event_data;
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
+    NfcLogger* logger;
+    NfcHistoryItem history;
+    MfClassicPollerHistoryData history_data;
+
     void* context;
 };
 

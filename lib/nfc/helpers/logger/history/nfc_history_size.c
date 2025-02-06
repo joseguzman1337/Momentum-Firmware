@@ -14,6 +14,7 @@
 #include <nfc/protocols/iso14443_3b/iso14443_3b_poller_history_data.h>
 #include <nfc/protocols/iso14443_4a/iso14443_4a_poller_history_data.h>
 #include <nfc/protocols/iso14443_4b/iso14443_4b_poller_history_data.h>
+#include <nfc/protocols/mf_classic/mf_classic_poller_history_data.h>
 #include <nfc/protocols/iso15693_3/iso15693_3_poller_history_data.h>
 #include <nfc/protocols/mf_desfire/mf_desfire_poller_history_data.h>
 #include <nfc/protocols/mf_plus/mf_plus_poller_history_data.h>
@@ -51,7 +52,7 @@ static const uint8_t poller_history_chain_size[NfcProtocolNum] = {
     [NfcProtocolFelica] = sizeof(FelicaPollerHistoryData),
     [NfcProtocolSt25tb] = sizeof(St25tbPollerHistoryData),
     [NfcProtocolSlix] = sizeof(SlixPollerHistoryData),
-    [NfcProtocolMfClassic] = 0, ///TODO: put proper size here
+    [NfcProtocolMfClassic] = sizeof(MfClassicPollerHistoryData),
 };
 
 static uint8_t nfc_history_get_chain_size_bytes(NfcProtocol protocol, NfcMode mode) {
