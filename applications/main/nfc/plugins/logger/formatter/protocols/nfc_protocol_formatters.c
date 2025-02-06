@@ -16,6 +16,7 @@
 #include "mf_ultralight/mf_ultralight_poller_data_formatter.h"
 #include "mf_plus/mf_plus_poller_data_formatter.h"
 #include "mf_desfire/mf_desfire_poller_data_formatter.h"
+#include "mf_classic/mf_classic_poller_data_formatter.h"
 #include "felica/felica_poller_data_formatter.h"
 #include "slix/slix_poller_data_formatter.h"
 #include "st25tb/st25tb_poller_data_formatter.h"
@@ -45,7 +46,7 @@ static const NfcProtocolFormatterBase* poller_formatters[NfcProtocolNum] = {
     [NfcProtocolIso15693_3] = &iso15693_3_poller_data_formatter,
     [NfcProtocolFelica] = &felica_poller_data_formatter,
     [NfcProtocolMfUltralight] = &mf_ultralight_poller_data_formatter,
-    [NfcProtocolMfClassic] = NULL, ///TODO: Add MfClassic support
+    [NfcProtocolMfClassic] = &mf_classic_poller_data_formatter,
     [NfcProtocolMfPlus] = &mf_plus_poller_data_formatter,
     [NfcProtocolMfDesfire] = &mf_desfire_poller_data_formatter,
     [NfcProtocolSlix] = &slix_poller_data_formatter,
