@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+size_t nfc_transaction_get_size(uint8_t history_size_bytes);
 NfcTransaction* nfc_transaction_alloc(
     uint32_t id,
     FuriHalNfcEvent event,

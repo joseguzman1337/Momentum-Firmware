@@ -4,8 +4,8 @@
 
 #define TAG "NfcTransaction"
 
-static NfcTransaction* nfc_transaction_alloc_empty() {
-    return malloc(sizeof(NfcTransaction));
+size_t nfc_transaction_get_size(uint8_t history_size_bytes) {
+    return (history_size_bytes + sizeof(NfcTransaction));
 }
 
 NfcTransaction* nfc_transaction_alloc(
@@ -14,7 +14,7 @@ NfcTransaction* nfc_transaction_alloc(
     uint32_t time,
     uint8_t history_size_bytes,
     uint8_t max_chain_count) {
-    NfcTransaction* t = nfc_transaction_alloc_empty();
+    NfcTransaction* t = malloc(sizeof(NfcTransaction));
     t->header.type = NfcTransactionTypeEmpty;
     t->header.id = id;
     t->header.nfc_event = event;
@@ -162,7 +162,7 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
     furi_assert(transaction_ptr);
 
     bool result = false;
-    NfcTransaction* transaction = nfc_transaction_alloc_empty();
+    NfcTransaction* transaction = malloc(sizeof(NfcTransaction));
     do {
         size_t bytes_read =
             stream_read(stream, (uint8_t*)transaction, sizeof(NfcTransactionHeader));
