@@ -129,32 +129,6 @@ static bool nfc_logger_make_log_folder(Storage* storage, const char* log_folder_
     return result;
 }
 
-///TODO: remove after debug
-static void nfc_logger_delete_all_logs(Storage* storage, const char* log_folder_path) {
-    File* f = storage_file_alloc(storage);
-    FuriString* str = furi_string_alloc();
-    do {
-        if(!storage_dir_open(f, log_folder_path)) break;
-        FileInfo f_info;
-        char name[50];
-        memset(name, 0, sizeof(name));
-
-        while(storage_dir_read(f, &f_info, name, sizeof(name))) {
-            if(strstr(name, "LOG")) {
-                path_concat(log_folder_path, name, str);
-                FS_Error err = storage_common_remove(storage, furi_string_get_cstr(str));
-                if(err == FSE_OK)
-                    FURI_LOG_D(TAG, "Delete %s", name);
-                else
-                    FURI_LOG_W(TAG, "Unable to remove %s err %02X", name, err);
-            }
-        }
-        storage_dir_close(f);
-    } while(false);
-    furi_string_free(str);
-    storage_file_free(f);
-}
-
 NfcLogger* nfc_logger_alloc(void) {
     NfcLogger* instance = malloc(sizeof(NfcLogger));
 
@@ -286,7 +260,6 @@ void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
     furi_assert(mode < NfcModeNum);
 
     if(instance->state == NfcLoggerStateDisabled) return;
-    nfc_logger_delete_all_logs(instance->storage, furi_string_get_cstr(instance->log_folder_path));
 
     instance->max_chain_size = 3;
     instance->history_size_bytes =
