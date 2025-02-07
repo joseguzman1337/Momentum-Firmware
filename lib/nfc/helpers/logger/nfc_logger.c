@@ -225,6 +225,13 @@ static void nfc_logger_trace_free(NfcTrace* trace) {
     free(trace);
 }
 
+static inline void nfc_logger_wait_for_free_memory(NfcLogger* instance) {
+    while(memmgr_heap_get_max_free_block() <
+          (nfc_transaction_get_size(instance->history_size_bytes) * 10)) {
+        furi_delay_ms(5);
+    }
+}
+
 bool nfc_logger_enabled(NfcLogger* instance) {
     furi_assert(instance);
     return instance->state != NfcLoggerStateDisabled && instance->state != NfcLoggerStateError;
@@ -318,11 +325,13 @@ void nfc_logger_transaction_begin(NfcLogger* instance, FuriHalNfcEvent event) {
 
     uint32_t id = instance->trace->transactions_count;
     instance->state = NfcLoggerStateProcessing;
-    uint32_t time = nfc_logger_get_time(instance);
     if(!update_existing) {
+        nfc_logger_wait_for_free_memory(instance);
+        uint32_t time = nfc_logger_get_time(instance);
         instance->transaction = nfc_transaction_alloc(
             id, event, time, instance->history_size_bytes, instance->max_chain_size);
     } else {
+        uint32_t time = nfc_logger_get_time(instance);
         nfc_transaction_refresh(instance->transaction, id, event, time);
     }
 }
