@@ -218,10 +218,6 @@ static bool nfc_protocol_support_scene_read_on_event(NfcApp* instance, SceneMana
 static void nfc_protocol_support_scene_read_on_exit(NfcApp* instance) {
     popup_reset(instance->popup);
 
-    if(instance->logger_enabled) {
-        nfc_logger_format(instance->nfc, &instance->logger_config);
-    }
-
     nfc_blink_stop(instance);
 }
 
@@ -325,6 +321,10 @@ static void nfc_protocol_support_scene_read_success_on_enter(NfcApp* instance) {
     } else {
         const NfcProtocol protocol = nfc_device_get_protocol(instance->nfc_device);
         nfc_protocol_support[protocol]->scene_read_success.on_enter(instance);
+    }
+
+    if(instance->logger_enabled) {
+        nfc_logger_format(instance->nfc, &instance->logger_config);
     }
 
     furi_string_free(temp_str);
