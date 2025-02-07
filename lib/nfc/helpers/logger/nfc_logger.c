@@ -261,7 +261,7 @@ void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
 
     if(instance->state == NfcLoggerStateDisabled) return;
 
-    instance->max_chain_size = 3;
+    instance->max_chain_size = 2;
     instance->history_size_bytes =
         nfc_history_get_size_bytes(instance->protocol, mode, instance->max_chain_size);
 
