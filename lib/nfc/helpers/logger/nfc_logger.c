@@ -139,7 +139,7 @@ NfcLogger* nfc_logger_alloc(void) {
     ///TODO: tune queue size to reduce memory usage
     instance->transaction_queue = furi_message_queue_alloc(150, sizeof(NfcTransaction*));
 
-    FuriThread* thread = furi_thread_alloc_ex(TAG, 1024U, nfc_logger_thread_callback, instance);
+    FuriThread* thread = furi_thread_alloc_ex(TAG, 512U, nfc_logger_thread_callback, instance);
     furi_thread_set_priority(thread, FuriThreadPriorityLow);
     instance->logger_thread = thread;
 
