@@ -206,11 +206,47 @@ void nfc_logger_config(NfcLogger* instance, bool enabled, const char* log_folder
     }
 }
 
-void nfc_logger_get_path_to_latest_log_file(NfcLogger* instance, FuriString* output) {
+bool nfc_logger_raw_log_file_present(NfcLogger* instance, FuriString* output) {
     furi_assert(instance);
     furi_assert(output);
-    furi_string_set(output, instance->log_folder_path);
-    path_append(output, furi_string_get_cstr(instance->filename));
+    bool result = false;
+
+    File* f = storage_file_alloc(instance->storage);
+
+    if(storage_dir_open(f, furi_string_get_cstr(instance->log_folder_path))) {
+        FileInfo f_info;
+        char name[50];
+        memset(name, 0, sizeof(name));
+
+        while(storage_dir_read(f, &f_info, name, sizeof(name))) {
+            if(f_info.flags & FSF_DIRECTORY) {
+                continue;
+            }
+
+            if(strcmp(name, NFC_LOG_TEMP_FILE_NAME) == 0) continue;
+            char* file_ext = strstr(name, ".bin");
+            if((file_ext == NULL) || (strcmp(file_ext, ".bin") != 0)) {
+                continue;
+            }
+
+            *file_ext = '\0';
+            furi_string_set(output, instance->log_folder_path);
+            path_append(output, name);
+            furi_string_cat_str(output, ".txt");
+            if(storage_file_exists(instance->storage, furi_string_get_cstr(output))) {
+                furi_string_reset(output);
+                continue;
+            } else {
+                size_t extension_index = furi_string_search_rchar(output, '.');
+                furi_string_left(output, extension_index);
+                result = true;
+                break;
+            }
+        }
+        storage_dir_close(f);
+    }
+    storage_file_free(f);
+    return result;
 }
 
 static NfcTrace* nfc_logger_trace_alloc(NfcProtocol protocol, NfcMode mode) {

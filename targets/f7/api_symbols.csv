@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,87.0,,
+Version,+,89.0,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
@@ -2838,7 +2838,7 @@ Function,+,nfc_listener_start,void,"NfcListener*, NfcGenericCallback, void*"
 Function,+,nfc_listener_stop,void,NfcListener*
 Function,+,nfc_listener_tx,NfcError,"Nfc*, const BitBuffer*"
 Function,+,nfc_logger_config,void,"NfcLogger*, _Bool, const char*"
-Function,+,nfc_logger_get_path_to_latest_log_file,void,"NfcLogger*, FuriString*"
+Function,+,nfc_logger_raw_log_file_present,_Bool,"NfcLogger*, FuriString*"
 Function,+,nfc_poller_alloc,NfcPoller*,"Nfc*, NfcProtocol"
 Function,+,nfc_poller_detect,_Bool,NfcPoller*
 Function,+,nfc_poller_free,void,NfcPoller*

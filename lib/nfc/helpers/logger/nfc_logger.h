@@ -15,7 +15,7 @@ extern "C" {
 typedef struct NfcLogger NfcLogger;
 
 void nfc_logger_config(NfcLogger* instance, bool enabled, const char* log_folder_path);
-void nfc_logger_get_path_to_latest_log_file(NfcLogger* instance, FuriString* output);
+bool nfc_logger_raw_log_file_present(NfcLogger* instance, FuriString* output);
 #ifdef __cplusplus
 }
 #endif
