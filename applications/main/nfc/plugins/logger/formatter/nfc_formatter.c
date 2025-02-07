@@ -225,8 +225,9 @@ void nfc_logger_formatter_run(Nfc* nfc, const NfcLoggerFormatterConfig* config) 
     Storage* storage = furi_record_open(RECORD_STORAGE);
     FuriString* file_path = furi_string_alloc();
 
-    nfc_logger_get_path_to_latest_log_file(logger, file_path);
-    nfc_logger_convert_bin_to_text(storage, file_path, config);
+    while(nfc_logger_raw_log_file_present(logger, file_path)) {
+        nfc_logger_convert_bin_to_text(storage, file_path, config);
+    }
 
     furi_string_free(file_path);
     furi_record_close(RECORD_STORAGE);
