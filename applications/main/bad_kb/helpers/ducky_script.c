@@ -197,6 +197,120 @@ int32_t ducky_error(BadKbScript* bad_kb, const char* text, ...) {
     return SCRIPT_STATE_ERROR;
 }
 
+void ducky_map_insert(Map** map, const char* key, const char* value) {
+    Map* entry = (Map*)malloc(sizeof(Map));
+    entry->key = key;
+    entry->value = value;
+    HASH_ADD_KEYPTR(hh, *map, entry->key, strlen(entry->key), entry);
+}
+
+const char* ducky_map_get(Map* map, const char* key) {
+    Map* entry;
+    if(key[0] == '$' || key[0] == '#') key++;
+    HASH_FIND_STR(map, key, entry);
+    return entry ? entry->value : NULL;
+}
+
+void ducky_map_free(Map** map) {
+    Map* current_entry, *tmp;
+    HASH_ITER(hh, *map, current_entry, tmp) {
+        HASH_DEL(*map, current_entry);
+        free(current_entry);
+    }
+}
+
+void ducky_maps_free(BadKbScript* bad_kb) {
+    ducky_map_free(&(bad_kb->variables));
+    ducky_map_free(&(bad_kb->constants));
+    ducky_map_free(&(bad_kb->constants_sharp));
+}
+
+int32_t ducky_define(BadKbScript* bad_kb, const char* param, bool is_constant) {
+
+    char* space_pos;
+    // Variables must be assigned using =
+    if(!is_constant)
+        if (strchr(param, '=') == NULL)
+            return ducky_error(bad_kb, "No valid assignment for variable", param);
+        else {
+            // get variable name and value splitting the string
+            space_pos = strchr(param, '=');
+        }
+    else {
+        // get variable name and value splitting the string
+        space_pos = strchr(param, ' ');
+    }
+
+    if(space_pos == NULL) return ducky_error(bad_kb, "No valid name for variable or constant", param);
+
+
+    size_t var_name_length = space_pos - param;
+    // Remove ending spaces from the variable name
+    while(var_name_length > 0 && param[var_name_length - 1] == ' ')
+        var_name_length--;
+
+    // Memory allocation
+    char* var_name = (char*)malloc(var_name_length + 1);
+    if (!var_name) {
+        free(var_name); // free var_name before exit
+        return ducky_error(bad_kb, "Var name NULL", param);
+    }
+
+    // Copy variable name and add the null terminator
+    memcpy(var_name, param, var_name_length);
+    var_name[var_name_length] = '\0';
+
+
+    // Check if the variable starts with a '$' and remove it
+    if(is_constant) {
+        if (var_name[0] == '$')
+            return ducky_error(bad_kb, "Constant cannot start with $", var_name);
+        else if(var_name[0] == '#' && ducky_map_get(bad_kb->constants_sharp, var_name) != NULL)
+            return ducky_error(bad_kb, "Multiple #constant definition for %s", var_name);
+        else if(var_name[0] != '#' && ducky_map_get(bad_kb->constants, var_name) != NULL)
+            return ducky_error(bad_kb, "%s - %s", var_name, ducky_map_get(bad_kb->constants, var_name));
+    }
+    else {
+        if (var_name[0] != '$')
+            return ducky_error(bad_kb, "Variable must start with $", var_name);
+    }
+
+    // Memory allocation
+    size_t var_value_length = strlen(space_pos + 1);
+
+    // Remove starting spaces from the variable value
+    while(*(space_pos+1) == ' ') {
+        space_pos++;
+        var_value_length--;
+    }
+
+    char* var_value = (char*)malloc(var_value_length + 1);
+    if (!var_value) {
+        free(var_name); // free var_name before exit
+        free(var_value); // free var_name before exit
+        return ducky_error(bad_kb, "Var value is NULL", param);
+    }
+
+    // Copy variable value and add the null terminator
+    memcpy(var_value, space_pos + 1, var_value_length);
+    var_value[var_value_length] = '\0';
+
+    if(var_name == NULL || var_value == NULL)
+        return ducky_error(bad_kb, "Var name or value is NULL", param);
+
+    // TODO: Add the variable in the hashmap here
+    if (is_constant)
+        if (var_name[0] == '#')
+            ducky_map_insert(&(bad_kb->constants_sharp), ++var_name, var_value);
+        else
+            ducky_map_insert(&(bad_kb->constants), var_name, var_value);
+    else
+        ducky_map_insert(&(bad_kb->variables), ++var_name, var_value);
+    FURI_LOG_D(WORKER_TAG, "Var Name: %s - Var Value: %s", var_name, var_value);
+
+    return 0;
+}
+
 bool ducky_string(BadKbScript* bad_kb, const char* param) {
     uint32_t i = 0;
 
@@ -659,6 +773,7 @@ static int32_t bad_kb_worker(void* context) {
                     } else {
                         furi_hal_hid_kb_release_all();
                     }
+                    ducky_maps_free(bad_kb);
                 } else if(flags & WorkerEvtDisconnect) {
                     worker_state = BadKbStateNotConnected; // Disconnected
                     if(bad_kb->bt) {
@@ -666,6 +781,7 @@ static int32_t bad_kb_worker(void* context) {
                     } else {
                         furi_hal_hid_kb_release_all();
                     }
+                    ducky_maps_free(bad_kb);
                 } else if(flags & WorkerEvtPauseResume) {
                     pause_state = BadKbStateRunning;
                     worker_state = BadKbStatePaused; // Pause
@@ -692,10 +808,12 @@ static int32_t bad_kb_worker(void* context) {
                     } else {
                         furi_hal_hid_kb_release_all();
                     }
+                    ducky_maps_free(bad_kb);
                 } else if(delay_val == SCRIPT_STATE_END) { // End of script
                     delay_val = 0;
                     worker_state = BadKbStateIdle;
                     bad_kb->st.state = BadKbStateDone;
+                    ducky_maps_free(bad_kb);
                     if(bad_kb->bt) {
                         ble_profile_hid_kb_release_all(bad_kb->app->ble_hid);
                     } else {
@@ -902,6 +1020,7 @@ void bad_kb_script_close(BadKbScript* bad_kb) {
     furi_thread_free(bad_kb->thread);
     furi_string_free(bad_kb->file_path);
     furi_string_free(bad_kb->keyboard_layout);
+    ducky_maps_free(bad_kb);
     free(bad_kb);
 }
 

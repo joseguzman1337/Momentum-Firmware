@@ -17,6 +17,20 @@ extern "C" {
 
 #define FILE_BUFFER_LEN 16
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "uthash.h"
+
+//TODO: handle the max number of variables error
+#define MAX_MAP_SIZE 256
+
+typedef struct {
+    const char* key;   // Key
+    const char* value; // Value
+    UT_hash_handle hh; // Makes this structure hashable
+} Map;
+
+
 struct BadKbScript {
     FuriThread* thread;
     BadKbState st;
@@ -40,6 +54,11 @@ struct BadKbScript {
 
     FuriString* string_print;
     size_t string_print_pos;
+
+    // TODO: Add variables set here
+    Map* variables;
+    Map* constants;
+    Map* constants_sharp;
 
     Bt* bt;
     BadKbApp* app;
@@ -67,9 +86,17 @@ bool ducky_altstring(BadKbScript* bad_kb, const char* param);
 
 bool ducky_string(BadKbScript* bad_kb, const char* param);
 
+int32_t ducky_define(BadKbScript* bad_kb, const char* param, bool is_constant);
+
 int32_t ducky_execute_cmd(BadKbScript* bad_kb, const char* line);
 
 int32_t ducky_error(BadKbScript* bad_kb, const char* text, ...);
+
+void ducky_map_insert(Map** map, const char* key, const char* value);
+
+const char* ducky_map_get(Map* map, const char* key);
+
+void ducky_map_free(Map** map);
 
 #ifdef __cplusplus
 }

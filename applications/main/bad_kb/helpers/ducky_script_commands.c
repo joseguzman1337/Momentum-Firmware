@@ -59,15 +59,66 @@ static int32_t ducky_fnc_defstrdelay(BadKbScript* bad_kb, const char* line, int3
     return 0;
 }
 
+static int32_t ducky_fnc_define(BadKbScript* bad_kb, const char* line, int32_t param) {
+    line = &line[ducky_get_command_len(line) + 1];
+    return ducky_define(bad_kb, line, param);
+}
+
+// Function to check if a character is valid in a variable name
+int is_valid_var_char(char c, int is_first) {
+    if (is_first) {
+        return isalpha(c) || c == '_'; // First character must be a letter or underscore
+    }
+    return isalnum(c) || c == '_'; // Subsequent characters can be letters, digits, or underscores
+}
+
 static int32_t ducky_fnc_string(BadKbScript* bad_kb, const char* line, int32_t param) {
     line = &line[ducky_get_command_len(line) + 1];
-    furi_string_set_str(bad_kb->string_print, line);
+
+    char* token = strtok((char*)line, " ");
+    bool first = true;
+    // TODO: loosing the amount of possible spaces in the string. Fix it
+
+    while (token != NULL) {
+        // create a temp map in which look for the value
+        Map* temp_map = bad_kb->constants;
+        // check if the token is a variable or a constant
+        if (token[0] == '#')
+            temp_map = bad_kb->constants_sharp;
+        else if (token[0] == '$')
+            temp_map = bad_kb->variables;
+
+        char* next_token = strtok(NULL, " ");
+
+        size_t space_count = 0;
+        if (next_token != NULL)
+            space_count = next_token - (token + strlen(token));
+
+
+        if (first) {
+            if (ducky_map_get(temp_map, token) == NULL)
+                furi_string_set_str(bad_kb->string_print, token);
+            else
+                furi_string_set_str(bad_kb->string_print, ducky_map_get(temp_map, token));
+            first = false;
+        }
+        else {
+            if (ducky_map_get(temp_map, token) == NULL)
+                furi_string_cat_str(bad_kb->string_print, token);
+            else
+            furi_string_cat_str(bad_kb->string_print, ducky_map_get(temp_map, token));
+        }
+        for (size_t i = 0; i < space_count; ++i)
+            furi_string_cat_str(bad_kb->string_print, " ");
+
+        token = next_token;
+    }
+
     if(param == 1) {
         furi_string_cat(bad_kb->string_print, "\n");
     }
 
-    if(bad_kb->stringdelay == 0 &&
-       bad_kb->defstringdelay == 0) { // stringdelay not set - run command immediately
+    if(bad_kb->stringdelay == 0 && bad_kb->defstringdelay == 0) { // stringdelay not set - run command immediately
         bool state = ducky_string(bad_kb, furi_string_get_cstr(bad_kb->string_print));
         if(!state) {
             return ducky_error(bad_kb, "Invalid string %s", line);
@@ -229,6 +280,8 @@ static const DuckyCmd ducky_commands[] = {
     {"ID", NULL, -1},
     {"BT_ID", NULL, -1},
     {"DELAY", ducky_fnc_delay, -1},
+    {"DEFINE", ducky_fnc_define, 1},
+    {"VAR", ducky_fnc_define, 0},
     {"STRING", ducky_fnc_string, 0},
     {"STRINGLN", ducky_fnc_string, 1},
     {"DEFAULT_DELAY", ducky_fnc_defdelay, -1},
