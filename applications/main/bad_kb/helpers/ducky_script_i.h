@@ -21,9 +21,6 @@ extern "C" {
 #include <stdlib.h>
 #include "uthash.h"
 
-//TODO: handle the max number of variables error
-#define MAX_MAP_SIZE 256
-
 typedef struct {
     const char* key;   // Key
     const char* value; // Value
@@ -55,7 +52,6 @@ struct BadKbScript {
     FuriString* string_print;
     size_t string_print_pos;
 
-    // TODO: Add variables set here
     Map* variables;
     Map* constants;
     Map* constants_sharp;

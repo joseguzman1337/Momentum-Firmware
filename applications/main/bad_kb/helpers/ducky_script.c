@@ -298,7 +298,6 @@ int32_t ducky_define(BadKbScript* bad_kb, const char* param, bool is_constant) {
     if(var_name == NULL || var_value == NULL)
         return ducky_error(bad_kb, "Var name or value is NULL", param);
 
-    // TODO: Add the variable in the hashmap here
     if (is_constant)
         if (var_name[0] == '#')
             ducky_map_insert(&(bad_kb->constants_sharp), ++var_name, var_value);

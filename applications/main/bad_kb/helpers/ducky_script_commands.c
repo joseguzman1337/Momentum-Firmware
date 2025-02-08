@@ -77,7 +77,6 @@ static int32_t ducky_fnc_string(BadKbScript* bad_kb, const char* line, int32_t p
 
     char* token = strtok((char*)line, " ");
     bool first = true;
-    // TODO: loosing the amount of possible spaces in the string. Fix it
 
     while (token != NULL) {
         // create a temp map in which look for the value
