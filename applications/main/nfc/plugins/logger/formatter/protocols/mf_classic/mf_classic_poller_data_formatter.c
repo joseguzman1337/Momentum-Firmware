@@ -85,9 +85,8 @@ static bool mf_classic_poller_decrypt_payload(
 }
 
 static NfcHistoryCrcStatus mf_classic_poller_get_crc_status(const NfcHistoryData* data) {
-    UNUSED(data);
-    ///TODO: implement crc check logic
-    return NfcHistoryCrcOk;
+    const MfClassicPollerHistoryData* mf_classic_data = data;
+    return mf_classic_data->crc_ok ? NfcHistoryCrcOk : NfcHistoryCrcBad;
 }
 
 const NfcProtocolFormatterBase mf_classic_poller_data_formatter = {
