@@ -1,15 +1,28 @@
 #include "../nfc_app_i.h"
+#include "helpers/logger_formatter.h"
 
 enum SubmenuDebugIndex {
     SubmenuDebugIndexField,
     SubmenuDebugIndexApdu,
     SubmenuDebugIndexLogger,
+    SubmenuDebugIndexFormatLogs,
 };
 
 void nfc_scene_debug_submenu_callback(void* context, uint32_t index) {
     NfcApp* nfc = context;
 
     view_dispatcher_send_custom_event(nfc->view_dispatcher, index);
+}
+
+static void nfc_scene_debug_add_format_logs_button(NfcApp* nfc) {
+    if(!nfc->logger_enabled) return;
+    nfc_logger_config(nfc_get_logger(nfc->nfc), nfc->logger_enabled, NFC_LOG_FOLDER);
+    submenu_add_item(
+        nfc->submenu,
+        "Format logs",
+        SubmenuDebugIndexFormatLogs,
+        nfc_scene_debug_submenu_callback,
+        nfc);
 }
 
 void nfc_scene_debug_on_enter(void* context) {
@@ -25,6 +38,8 @@ void nfc_scene_debug_on_enter(void* context) {
         SubmenuDebugIndexLogger,
         nfc_scene_debug_submenu_callback,
         nfc);
+
+    nfc_scene_debug_add_format_logs_button(nfc);
 
     submenu_set_selected_item(
         submenu, scene_manager_get_scene_state(nfc->scene_manager, NfcSceneDebug));
@@ -48,7 +63,10 @@ bool nfc_scene_debug_on_event(void* context, SceneManagerEvent event) {
                 nfc->submenu,
                 SubmenuDebugIndexLogger,
                 nfc->logger_enabled ? "Disable Logger" : "Enable Logger");
+            nfc_scene_debug_add_format_logs_button(nfc);
             consumed = true;
+        } else if(event.event == SubmenuDebugIndexFormatLogs) {
+            nfc_logger_format(nfc->nfc, &nfc->logger_config);
         }
     }
     return consumed;
