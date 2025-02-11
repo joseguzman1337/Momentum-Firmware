@@ -166,10 +166,7 @@ bool nfc_transaction_read(Stream* stream, NfcTransaction** transaction_ptr) {
     do {
         size_t bytes_read =
             stream_read(stream, (uint8_t*)transaction, sizeof(NfcTransactionHeader));
-        if(bytes_read != sizeof(NfcTransactionHeader)) {
-            FURI_LOG_E(TAG, "Unable to read transaction from file");
-            break;
-        }
+        if(bytes_read != sizeof(NfcTransactionHeader)) break;
 
         if(transaction->header.type == NfcTransactionTypeRequest ||
            transaction->header.type == NfcTransactionTypeRequestResponse) {

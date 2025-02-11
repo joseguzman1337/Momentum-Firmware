@@ -190,6 +190,7 @@ static void nfc_logger_convert_bin_to_text(
             break;
         }
 
+        FURI_LOG_D(TAG, "Processing log file: %s", furi_string_get_cstr(file_path));
         if(!nfc_logger_read_trace(stream_bin, &trace)) break;
 
         NfcFormatter* formatter = nfc_formatter_alloc(config);
@@ -204,16 +205,24 @@ static void nfc_logger_convert_bin_to_text(
         stream_write_string(stream_txt, str);
 
         NfcTransaction* transaction;
+        size_t transaction_cnt = 0;
         while(nfc_transaction_read(stream_bin, &transaction)) {
             furi_string_reset(str);
             nfc_formatter_format(formatter, transaction, str);
             stream_write_string(stream_txt, str);
 
             nfc_transaction_free(transaction);
+            transaction_cnt++;
         }
 
         furi_string_free(str);
         nfc_formatter_free(formatter);
+
+        FURI_LOG_I(
+            TAG,
+            "Log file %s processed, %d transactions saved",
+            furi_string_get_cstr(file_path),
+            transaction_cnt);
     } while(false);
 
     stream_free(stream_bin);

@@ -118,6 +118,5 @@ const NfcHistoryItem* nfc_history_get_item(const NfcHistory* history, const NfcP
         }
     }
 
-    FURI_LOG_W("NfcHistory", "Item for protocol %X not found", protocol);
     return NULL;
 }
