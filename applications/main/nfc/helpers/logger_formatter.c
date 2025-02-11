@@ -40,12 +40,6 @@ void nfc_logger_format(Nfc* nfc, const NfcLoggerFormatterConfig* config) {
         const FlipperAppPluginDescriptor* app_descriptor =
             flipper_application_plugin_get_descriptor(app);
 
-        FURI_LOG_I(
-            TAG,
-            "Loaded plugin for appid '%s', API %lu",
-            app_descriptor->appid,
-            app_descriptor->ep_api_version);
-
         furi_check(app_descriptor->ep_api_version == 1);
         furi_check(strcmp(app_descriptor->appid, NFC_LOGGER_FORMATTER_PLUGIN_APP_ID) == 0);
 

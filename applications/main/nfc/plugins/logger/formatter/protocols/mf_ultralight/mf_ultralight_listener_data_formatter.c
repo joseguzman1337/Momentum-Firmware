@@ -20,12 +20,6 @@ static void mf_ultralight_listener_data_format(
     FuriString* output) {
     UNUSED(request);
     const MfUltralightListenerHistoryData* mf_ultralight_data = data;
-    /*   FURI_LOG_D(
-        "MFU",
-        "E_%02X, MFU_%02X, C_%02X",
-        mf_ultralight_data->event,
-        mf_ultralight_data->mfu_command,
-        mf_ultralight_data->command); */
 
     const char* event_text =
         iso14443_3a_listener_data_format_event_type(mf_ultralight_data->event);
