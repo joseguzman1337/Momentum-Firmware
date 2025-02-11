@@ -21,12 +21,6 @@ static void iso14443_3a_listener_data_format(
     FuriString* output) {
     const Iso14443_3aListenerHistoryData* iso14443_3a_data = data;
     UNUSED(request);
-    FURI_LOG_D(
-        "ISO14",
-        "E_%02X, S_%02X, C_%02X",
-        iso14443_3a_data->event,
-        iso14443_3a_data->state,
-        iso14443_3a_data->command);
 
     const char* event_text = nfc_hal_data_format_event_type(iso14443_3a_data->event);
     const char* state_text = states[iso14443_3a_data->state];

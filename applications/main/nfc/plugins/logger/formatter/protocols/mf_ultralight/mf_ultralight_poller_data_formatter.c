@@ -33,12 +33,6 @@ static void mf_ultralight_poller_data_format(
     FuriString* output) {
     const MfUltralightPollerHistoryData* mf_ultralight_data = data;
     UNUSED(request);
-    /*  FURI_LOG_D(
-        "MFU",
-        "E_%02X, MFU_%02X, C_%02X",
-        mf_ultralight_data->event,
-        mf_ultralight_data->state,
-        mf_ultralight_data->command); */
 
     const char* event_text = iso14443_3a_poller_data_format_event_type(mf_ultralight_data->event);
     const char* state_text = poller_states[mf_ultralight_data->state];

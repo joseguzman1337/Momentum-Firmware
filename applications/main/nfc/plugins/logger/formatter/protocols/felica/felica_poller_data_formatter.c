@@ -29,15 +29,7 @@ static void felica_poller_format_data(
     const NfcHistoryData* data,
     FuriString* output) {
     const FelicaPollerHistoryData* felica_data = data;
-
     UNUSED(packet);
-
-    FURI_LOG_D(
-        "Felica",
-        "E_%02X, S_%02X, C_%02X",
-        felica_data->event,
-        felica_data->state,
-        felica_data->command);
 
     const char* event_text = nfc_hal_data_format_event_type(felica_data->event);
     const char* state_text = states[felica_data->state];
