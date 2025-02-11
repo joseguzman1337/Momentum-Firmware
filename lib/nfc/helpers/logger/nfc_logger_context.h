@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 struct NfcLogger {
+    uint8_t trace_count;
     bool skip_empty_transactions;
     NfcLoggerState state;
     NfcProtocol protocol;

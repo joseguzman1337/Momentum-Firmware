@@ -272,13 +272,14 @@ void nfc_logger_start(NfcLogger* instance, NfcMode mode) {
     furi_hal_rtc_get_datetime(&dt);
     furi_string_printf(
         instance->filename,
-        "LOG-%.4d%.2d%.2d-%.2d%.2d%.2d",
+        "LOG-%.4d%.2d%.2d-%.2d%.2d%.2d-%d",
         dt.year,
         dt.month,
         dt.day,
         dt.hour,
         dt.minute,
-        dt.second);
+        dt.second,
+        instance->trace_count);
 
     furi_thread_start(instance->logger_thread);
     instance->dwt_cnt_prev = DWT->CYCCNT;
@@ -314,7 +315,15 @@ void nfc_logger_stop(NfcLogger* instance) {
         UNUSED(status);
 
         instance->state = NfcLoggerStateStopped;
+        instance->trace_count++;
     }
+
+    FURI_LOG_I(
+        TAG,
+        "Saved %d transacrions to %s",
+        instance->trace->transactions_count,
+        furi_string_get_cstr(instance->filename));
+
     nfc_logger_trace_free(instance->trace);
 }
 
