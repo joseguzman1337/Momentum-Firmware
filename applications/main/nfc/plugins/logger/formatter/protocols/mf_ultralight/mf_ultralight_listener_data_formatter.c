@@ -34,6 +34,15 @@ static void mf_ultralight_listener_data_format(
     furi_string_printf(output, "E=%s, MFU: %s, R=%s", event_text, process_text, result_text);
 }
 
+static void mf_ultralight_listener_data_format_simplified(
+    const NfcPacket* request,
+    const NfcHistoryData* data,
+    FuriString* output) {
+    UNUSED(request);
+    UNUSED(data);
+    furi_string_printf(output, "Simplified test");
+}
+
 static NfcHistoryCrcStatus mf_ultralight_listener_get_crc_status(const NfcHistoryData* data) {
     const MfUltralightListenerHistoryData* mf_ultralight_data = data;
     NfcHistoryCrcStatus status = NfcHistoryCrcNotSet;
@@ -46,5 +55,6 @@ static NfcHistoryCrcStatus mf_ultralight_listener_get_crc_status(const NfcHistor
 
 const NfcProtocolFormatterBase mf_ultralight_listener_data_formatter = {
     .format_history = mf_ultralight_listener_data_format,
+    .format_history_simplified = mf_ultralight_listener_data_format_simplified,
     .get_crc_status = mf_ultralight_listener_get_crc_status,
 };
