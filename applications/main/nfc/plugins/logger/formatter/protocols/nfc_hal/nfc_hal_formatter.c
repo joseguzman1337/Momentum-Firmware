@@ -1,4 +1,5 @@
 #include "nfc_hal_formatter.h"
+#include <furi_hal_nfc.h>
 
 static const char* events[] = {
     [NfcEventTypeUserAbort] = "Abort",
@@ -13,21 +14,20 @@ static const char* events[] = {
     [NfcEventTypePollerReady] = "PollerReady",
 };
 
-///TODO: Replace numbers with bit defines which will be placed in furi_hal_nfc.h
 static const char* hal_nfc_events[] = {
-    [0] = "OscOn",
-    [1] = "Field On",
-    [2] = "Field Off",
-    [3] = "Active",
-    [4] = "TxStart",
-    [5] = "TxEnd",
-    [6] = "RxStart",
-    [7] = "RxEnd",
-    [8] = "Collision",
-    [9] = "FwtExpired",
-    [10] = "BlockTxExpired",
-    [11] = "Timeout",
-    [12] = "Abort",
+    [FuriHalNfcBitMaskOscOn] = "OscOn",
+    [FuriHalNfcBitMaskFieldOn] = "Field On",
+    [FuriHalNfcBitMaskFieldOff] = "Field Off",
+    [FuriHalNfcBitMaskListenerActive] = "Active",
+    [FuriHalNfcBitMaskTxStart] = "TxStart",
+    [FuriHalNfcBitMaskTxEnd] = "TxEnd",
+    [FuriHalNfcBitMaskRxStart] = "RxStart",
+    [FuriHalNfcBitMaskRxEnd] = "RxEnd",
+    [FuriHalNfcBitMaskCollision] = "Collision",
+    [FuriHalNfcBitMaskTimerFwtExpired] = "FwtExpired",
+    [FuriHalNfcBitMaskTimerBlockTxExpired] = "BlockTxExpired",
+    [FuriHalNfcBitMaskTimeout] = "Timeout",
+    [FuriHalNfcBitMaskAbortRequest] = "Abort",
 };
 
 static const char* commands[] = {
