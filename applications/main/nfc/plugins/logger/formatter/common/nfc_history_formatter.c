@@ -86,6 +86,7 @@ void nfc_histroy_format_annotation(
     const FuriHalNfcEvent nfc_event,
     FuriString* annotation) {
     furi_assert(instance);
+    furi_assert(history);
     furi_assert(annotation);
 
     const NfcLoggerHistoryLayerFilter filter = instance->config->history_filter;

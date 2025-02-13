@@ -89,6 +89,7 @@ void nfc_transaction_append(
 
 void nfc_transaction_append_history(NfcTransaction* transaction, NfcHistoryItem* item) {
     furi_assert(transaction);
+    furi_assert(item);
 
     if(transaction->header.type == NfcTransactionTypeEmpty) {
         transaction->header.type = NfcTransactionTypeFlagsOnly;
@@ -132,6 +133,9 @@ static bool nfc_transaction_save_packet(Stream* stream, NfcPacket* packet) {
 }
 
 bool nfc_transaction_save(Stream* stream, const NfcTransaction* transaction) {
+    furi_assert(stream);
+    furi_assert(transaction);
+
     bool result = false;
     do {
         size_t bytes_to_write = sizeof(NfcTransactionHeader);

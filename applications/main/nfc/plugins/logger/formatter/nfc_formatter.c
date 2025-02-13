@@ -1,6 +1,3 @@
-
-//#include "nfc_formatter.h"
-
 #include <furi.h>
 #include <nfc/helpers/logger/nfc_trace_data_type.h>
 #include <nfc/helpers/logger/transaction/nfc_transaction.h>
@@ -230,6 +227,9 @@ static void nfc_logger_convert_bin_to_text(
 }
 
 void nfc_logger_formatter_run(Nfc* nfc, const NfcLoggerFormatterConfig* config) {
+    furi_assert(nfc);
+    furi_assert(config);
+
     NfcLogger* logger = nfc_get_logger(nfc);
     Storage* storage = furi_record_open(RECORD_STORAGE);
     FuriString* file_path = furi_string_alloc();

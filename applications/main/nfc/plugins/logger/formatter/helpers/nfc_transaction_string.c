@@ -10,6 +10,8 @@ NfcTransactionString* nfc_transaction_string_alloc() {
 }
 
 void nfc_transaction_string_reset(NfcTransactionString* instance) {
+    furi_assert(instance);
+
     FuriString** array = (FuriString**)instance;
     for(size_t i = 0; i < (sizeof(NfcTransactionString) / sizeof(FuriString*)); i++) {
         furi_string_reset(array[i]);

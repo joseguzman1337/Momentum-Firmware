@@ -80,7 +80,6 @@ Table* table_alloc(size_t column_count, const size_t* columns_width, const char*
         table->column_count,
         table->aligns,
         table->delimeters_data.column);
-    // furi_string_printf()
     return table;
 }
 
