@@ -81,7 +81,6 @@ Iso14443_4aError iso14443_4a_poller_send_block(
         }
 
         instance->history_data.error = error;
-        instance->history.base.modified = true;
 
         if(bit_buffer_starts_with_byte(instance->rx_buffer, ISO14443_4A_SWTX)) {
             do {

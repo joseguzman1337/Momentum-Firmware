@@ -10,8 +10,8 @@
 #define NFC_LOG_MESSAGE_QUEUE_TIMEOUT_US (NFC_LOG_MESSAGE_QUEUE_TIMEOUT_MS * 1000U)
 
 #define NFC_LOG_DWT_CYCCNT_CYCLES_PER_MESSAGE_QUEUE_TIMEOUT(inst_per_us) \
-    (NFC_LOG_MESSAGE_QUEUE_TIMEOUT_US * inst_per_us)
-#define NFC_LOG_DWT_CYCCNT_SECONDS_MAX(inst_per_us) (UINT32_MAX / inst_per_us)
+    (NFC_LOG_MESSAGE_QUEUE_TIMEOUT_US * (inst_per_us))
+#define NFC_LOG_DWT_CYCCNT_SECONDS_MAX(inst_per_us) (UINT32_MAX / (inst_per_us))
 
 static uint32_t nfc_logger_get_time(NfcLogger* instance) {
     uint32_t time = 0;
@@ -320,8 +320,8 @@ void nfc_logger_stop(NfcLogger* instance) {
 
     FURI_LOG_I(
         TAG,
-        "Saved %d transacrions to %s",
-        instance->trace->transactions_count,
+        "Saved %lu transacrions to %s",
+        (uint32_t)instance->trace->transactions_count,
         furi_string_get_cstr(instance->filename));
 
     nfc_logger_trace_free(instance->trace);

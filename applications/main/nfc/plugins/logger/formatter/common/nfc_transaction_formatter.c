@@ -20,7 +20,7 @@ static const char* nfc_history_crc_status_message[] = {
 static void
     nfc_transaction_format_crc_status(const NfcFormatter* formatter, FuriString* crc_status_str) {
     furi_string_printf(
-        crc_status_str, nfc_history_crc_status_message[formatter->crc_from_history]);
+        crc_status_str, "%s", nfc_history_crc_status_message[formatter->crc_from_history]);
 }
 
 static void
@@ -89,7 +89,7 @@ static void nfc_transaction_format_common(
 
         if(desired_type != NfcTransactionTypeResponse ||
            header->type != NfcTransactionTypeRequestResponse) {
-            furi_string_printf(output->id, "%ld", header->id);
+            furi_string_printf(output->id, "%lu", header->id);
             furi_string_printf(output->type, "%s", nfc_transaction_type_name[header->type]);
             furi_string_printf(output->src, "RDR");
         } else

@@ -137,7 +137,7 @@ bool nfc_transaction_save(Stream* stream, const NfcTransaction* transaction) {
         size_t bytes_to_write = sizeof(NfcTransactionHeader);
         if(stream_write(stream, (uint8_t*)&(transaction->header), bytes_to_write) !=
            bytes_to_write) {
-            FURI_LOG_E(TAG, "Failed to save transaction: %ld", transaction->header.id);
+            FURI_LOG_E(TAG, "Failed to save transaction: %lu", transaction->header.id);
             break;
         }
 

@@ -59,10 +59,10 @@ static void nfc_format_trace(
 
     furi_string_cat_printf(
         output,
-        "Protocol: %s\nMode: %s\nTransaction count: %d\n\n",
+        "Protocol: %s\nMode: %s\nTransaction count: %lu\n\n",
         nfc_device_get_protocol_name(trace->protocol),
         trace->mode == NfcModeListener ? "NfcListener" : "NfcPoller",
-        trace->transactions_count);
+        (uint32_t)trace->transactions_count);
 
     nfc_format_trace_protocol_layers_description(trace->protocol, output);
 }
@@ -220,9 +220,9 @@ static void nfc_logger_convert_bin_to_text(
 
         FURI_LOG_I(
             TAG,
-            "Log file %s processed, %d transactions saved",
+            "Log file %s processed, %lu transactions saved",
             furi_string_get_cstr(file_path),
-            transaction_cnt);
+            (uint32_t)transaction_cnt);
     } while(false);
 
     stream_free(stream_bin);
