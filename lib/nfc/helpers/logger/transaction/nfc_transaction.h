@@ -12,7 +12,7 @@ typedef enum {
     NfcTransactionTypeEmpty,
     NfcTransactionTypeFlagsOnly,
     NfcTransactionTypeRequest,
-    NfcTransactionTypeResponse, //TODO: remove this, because NFC cannot send response without request
+    NfcTransactionTypeResponse,
     NfcTransactionTypeRequestResponse,
 } NfcTransactionType;
 

@@ -34,7 +34,6 @@ void nfc_history_append(NfcHistory* instance, const NfcHistoryItem* item) {
         if(base->chain_count == 0) base->chain_count += 1;
 
         uint8_t current_chain_index = base->chain_count - 1;
-        ///TODO: split this into some static inline functions
         if(instance->chains[current_chain_index].length == base->max_chain_count) {
             base->chain_count += 1;
             current_chain_index += 1;

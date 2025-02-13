@@ -39,8 +39,6 @@ static inline void nfc_logger_check_dwt_overflow(NfcLogger* instance) {
                 ;
             instance->dwt_ovf_cnt += 1;
             instance->dwt_cnt_prev = DWT->CYCCNT;
-            ///TODO: remove this
-            FURI_LOG_D(TAG, "OVF = %lu", instance->dwt_ovf_cnt);
         }
         furi_mutex_release(instance->dwt_mutex);
     } else {
@@ -136,10 +134,9 @@ NfcLogger* nfc_logger_alloc(void) {
     instance->filename = furi_string_alloc();
     instance->log_folder_path = furi_string_alloc();
     instance->dwt_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
-    ///TODO: tune queue size to reduce memory usage
     instance->transaction_queue = furi_message_queue_alloc(150, sizeof(NfcTransaction*));
 
-    FuriThread* thread = furi_thread_alloc_ex(TAG, 512U, nfc_logger_thread_callback, instance);
+    FuriThread* thread = furi_thread_alloc_ex(TAG, 1024U, nfc_logger_thread_callback, instance);
     furi_thread_set_priority(thread, FuriThreadPriorityLow);
     instance->logger_thread = thread;
 
@@ -359,22 +356,19 @@ void nfc_logger_transaction_end(NfcLogger* instance) {
     do {
         if(instance->state == NfcLoggerStateDisabled || instance->state == NfcLoggerStateError)
             return;
-        if(instance->state != NfcLoggerStateProcessing) break; ///TODO: maybe this can be deleted
+        if(instance->state != NfcLoggerStateProcessing) break;
         if(!instance->transaction) break;
         if((nfc_transaction_get_type(instance->transaction) == NfcTransactionTypeEmpty) &&
            instance->skip_empty_transactions)
             break;
 
-        ///TODO: try same approach for listener in order to remove this check
         if(instance->trace->mode == NfcModePoller) {
             instance->log_callback(instance, instance->log_context);
         }
 
         uint32_t time = nfc_logger_get_time(instance);
         nfc_transaction_complete(instance->transaction, time);
-        /*        if(nfc_transaction_get_type(instance->transaction) == NfcTransactionTypeEmpty) {
-            nfc_transaction_free(instance->transaction);
-        } else */
+
         if(furi_message_queue_put(instance->transaction_queue, &instance->transaction, 10) !=
            FuriStatusOk) {
             instance->state = NfcLoggerStateError;
