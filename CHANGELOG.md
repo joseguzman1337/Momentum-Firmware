@@ -9,7 +9,12 @@
 ### Added:
 - Apps:
   - Games: Quadrastic (by @ivanbarsukov)
-- OFW: RFID: EM4305 support (by @Astrrra)
+- RFID:
+  - OFW: EM4305 support (by @Astrrra)
+  - OFW: Noralsy Format/Brand protocol (by @zinongli)
+- OFW: BadKB: Mouse control (by @jetrp1)
+- OFW: Infrared: Universal IR signal selection (by @portasynthinca3)
+- OFW: NFC: Disney Infinity KDF plugin (by @bettse)
 - Desktop:
   - UL: Option to prevent Auto Lock when connected to USB/RPC (by @Dmitry422)
   - OFW: Add the Showtime animation (by @Astrrra)
@@ -39,12 +44,14 @@
 ### Fixed:
 - Asset Packs: Fix level-up animations not being themed (by @Willy-JL)
 - About: Fix missing Prev. button when invoked from Device Info keybind (by @Willy-JL)
-- OFW: uFBT: Bumped action version in example github workflow for project template (by @hedger)
 - OFW: NFC: ST25TB poller mode check (by @RebornedBrain)
 - Furi:
   - OFW: EventLoop unsubscribe fix (by @gsurkov & @portasynthinca3)
   - OFW: Various bug fixes and improvements (by @skotopes)
   - OFW: Ensure that `furi_record_create()` is passed a non-NULL data pointer (by @dcoles)
+- OFW: CLI: Fixed repeat in subghz tx_from_file command (by @Jnesselr)
+- OFW: VSCode: Disabled auto-update for clangd since correct version is in the toolchain (by @hedger)
+- OFW: uFBT: Bumped action version in example github workflow for project template (by @hedger)
 
 ### Removed:
 - JS: Removed old `widget` module, replaced by new `gui/widget` view
