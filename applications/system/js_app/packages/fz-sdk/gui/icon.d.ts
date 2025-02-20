@@ -1,4 +1,4 @@
-export type BuiltinIcon = "DolphinWait_59x54" | "js_script_10px";
+export type BuiltinIcon = string;
 
 export type IconData = symbol & { "__tag__": "icon" };
 // introducing a nominal type in a hacky way; the `__tag__` property doesn't really exist.

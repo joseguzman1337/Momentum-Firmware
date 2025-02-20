@@ -1,28 +1,16 @@
 #include "../../js_modules.h"
 #include <assets_icons.h>
 
-typedef struct {
-    const char* name;
-    const Icon* data;
-} IconDefinition;
-
-#define ICON_DEF(icon)                   \
-    (IconDefinition) {                   \
-        .name = #icon, .data = &I_##icon \
-    }
-
-static const IconDefinition builtin_icons[] = {
-    ICON_DEF(DolphinWait_59x54),
-    ICON_DEF(js_script_10px),
-};
-
 static void js_gui_icon_get_builtin(struct mjs* mjs) {
     const char* icon_name;
     JS_FETCH_ARGS_OR_RETURN(mjs, JS_EXACTLY, JS_ARG_STR(&icon_name));
 
-    for(size_t i = 0; i < COUNT_OF(builtin_icons); i++) {
-        if(strcmp(icon_name, builtin_icons[i].name) == 0) {
-            mjs_return(mjs, mjs_mk_foreign(mjs, (void*)builtin_icons[i].data));
+    for(size_t i = 0; i < ICON_PATHS_COUNT; i++) {
+        if(ICON_PATHS[i].path == NULL) continue;
+        const char* iter_name = strrchr(ICON_PATHS[i].path, '/');
+        if(iter_name++ == NULL) continue;
+        if(strcmp(icon_name, iter_name) == 0) {
+            mjs_return(mjs, mjs_mk_foreign(mjs, (void*)ICON_PATHS[i].icon));
             return;
         }
     }
