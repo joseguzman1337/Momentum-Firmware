@@ -273,10 +273,7 @@ static bool mf_desfire_poller_detect(NfcGenericEvent event, void* context) {
 
 static void mf_desfire_poller_log_history(NfcLogger* logger, void* context) {
     MfDesfirePoller* instance = context;
-    //if(instance->history_modified) {
     nfc_logger_append_history(logger, &instance->history);
-    //instance->history_modified = false;
-    //}
 
     if(instance->log_callback) {
         instance->log_callback(logger, instance->context);
