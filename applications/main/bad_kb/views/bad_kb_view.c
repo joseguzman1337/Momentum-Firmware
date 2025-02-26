@@ -1,4 +1,3 @@
-#include "../bad_kb_app_i.h"
 #include "bad_kb_view.h"
 #include "../helpers/ducky_script.h"
 #include <toolbox/path.h>
@@ -20,17 +19,14 @@ typedef struct {
     BadKbState state;
     bool pause_wait;
     uint8_t anim_frame;
+    BadKbHidInterface interface;
+    Bt* bt;
 } BadKbModel;
 
 static void bad_kb_draw_callback(Canvas* canvas, void* _model) {
     BadKbModel* model = _model;
-    BadKbWorkerState state = model->state.state;
 
-    FuriString* disp_str = furi_string_alloc_set(
-        state == BadKbStateInit ? "( . . . )" :
-        model->state.is_bt      ? "(BT) " :
-                                  "(USB) ");
-    furi_string_cat_str(disp_str, model->file_name);
+    FuriString* disp_str = furi_string_alloc_set(model->file_name);
     elements_string_fit_width(canvas, disp_str, 128 - 2);
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 2, 8, furi_string_get_cstr(disp_str));
@@ -40,8 +36,8 @@ static void bad_kb_draw_callback(Canvas* canvas, void* _model) {
     } else {
         furi_string_printf(disp_str, "(%s)", model->layout);
     }
-    if(model->state.pin) {
-        furi_string_cat_printf(disp_str, "  PIN: %ld", model->state.pin);
+    if(model->interface == BadKbHidInterfaceBle && model->bt->pin_code) {
+        furi_string_cat_printf(disp_str, "  PIN: %ld", model->bt->pin_code);
     } else {
         uint32_t e = model->state.elapsed;
         furi_string_cat_printf(disp_str, "  %02lu:%02lu.%ld", e / 60 / 1000, e / 1000, e % 1000);
@@ -52,12 +48,19 @@ static void bad_kb_draw_callback(Canvas* canvas, void* _model) {
 
     furi_string_reset(disp_str);
 
-    canvas_draw_icon(canvas, 22, 24, &I_UsbTree_48x22);
+    if(model->interface == BadKbHidInterfaceBle) {
+        canvas_draw_icon(canvas, 22, 24, &I_Bad_BLE_48x22);
+    } else {
+        canvas_draw_icon(canvas, 22, 24, &I_UsbTree_48x22);
+    }
+
+    BadKbWorkerState state = model->state.state;
 
     if((state == BadKbStateIdle) || (state == BadKbStateDone) ||
        (state == BadKbStateNotConnected)) {
         elements_button_center(canvas, "Run");
         elements_button_left(canvas, "Config");
+        elements_button_right(canvas, model->interface == BadKbHidInterfaceBle ? "USB" : "BLE");
     } else if((state == BadKbStateRunning) || (state == BadKbStateDelay)) {
         elements_button_center(canvas, "Stop");
         if(!model->pause_wait) {
@@ -220,11 +223,15 @@ BadKb* bad_kb_view_alloc(void) {
     view_set_draw_callback(bad_kb->view, bad_kb_draw_callback);
     view_set_input_callback(bad_kb->view, bad_kb_input_callback);
 
+    with_view_model(
+        bad_kb->view, BadKbModel * model, { model->bt = furi_record_open(RECORD_BT); }, true);
+
     return bad_kb;
 }
 
 void bad_kb_view_free(BadKb* bad_kb) {
     furi_assert(bad_kb);
+    furi_record_close(RECORD_BT);
     view_free(bad_kb->view);
     free(bad_kb);
 }
@@ -262,14 +269,6 @@ void bad_kb_view_set_layout(BadKb* bad_kb, const char* layout) {
 
 void bad_kb_view_set_state(BadKb* bad_kb, BadKbState* st) {
     furi_assert(st);
-    uint32_t pin = 0;
-    if(bad_kb->context != NULL) {
-        BadKbApp* app = bad_kb->context;
-        if(app->bt != NULL) {
-            pin = app->bt->pin;
-        }
-    }
-    st->pin = pin;
     with_view_model(
         bad_kb->view,
         BadKbModel * model,
@@ -281,6 +280,10 @@ void bad_kb_view_set_state(BadKb* bad_kb, BadKbState* st) {
             }
         },
         true);
+}
+
+void bad_kb_view_set_interface(BadKb* bad_kb, BadKbHidInterface interface) {
+    with_view_model(bad_kb->view, BadKbModel * model, { model->interface = interface; }, true);
 }
 
 bool bad_kb_view_is_idle_state(BadKb* bad_kb) {

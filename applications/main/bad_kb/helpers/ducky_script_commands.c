@@ -1,7 +1,5 @@
-#include "../bad_kb_app_i.h"
 #include <furi_hal.h>
-#include <furi_hal_usb_hid.h>
-#include "ble_hid.h"
+#include <lib/toolbox/strint.h>
 #include "ducky_script.h"
 #include "ducky_script_i.h"
 
@@ -95,17 +93,9 @@ static int32_t ducky_fnc_sysrq(BadKbScript* bad_kb, const char* line, int32_t pa
 
     line = &line[ducky_get_command_len(line) + 1];
     uint16_t key = ducky_get_keycode(bad_kb, line, true);
-    if(bad_kb->bt) {
-        ble_profile_hid_kb_press(
-            bad_kb->app->ble_hid, KEY_MOD_LEFT_ALT | HID_KEYBOARD_PRINT_SCREEN);
-        ble_profile_hid_kb_press(bad_kb->app->ble_hid, key);
-        furi_delay_ms(bt_timeout);
-        ble_profile_hid_kb_release_all(bad_kb->app->ble_hid);
-    } else {
-        furi_hal_hid_kb_press(KEY_MOD_LEFT_ALT | HID_KEYBOARD_PRINT_SCREEN);
-        furi_hal_hid_kb_press(key);
-        furi_hal_hid_kb_release_all();
-    }
+    bad_kb->hid->kb_press(bad_kb->hid_inst, KEY_MOD_LEFT_ALT | HID_KEYBOARD_PRINT_SCREEN);
+    bad_kb->hid->kb_press(bad_kb->hid_inst, key);
+    bad_kb->hid->release_all(bad_kb->hid_inst);
     return 0;
 }
 
@@ -135,42 +125,58 @@ static int32_t ducky_fnc_altstring(BadKbScript* bad_kb, const char* line, int32_
 
 static int32_t ducky_fnc_hold(BadKbScript* bad_kb, const char* line, int32_t param) {
     UNUSED(param);
-
     line = &line[ducky_get_command_len(line) + 1];
-    uint16_t key = ducky_get_keycode(bad_kb, line, true);
-    if(key == HID_KEYBOARD_NONE) {
-        return ducky_error(bad_kb, "No keycode defined for %s", line);
-    }
-    bad_kb->key_hold_nb++;
+
     if(bad_kb->key_hold_nb > (HID_KB_MAX_KEYS - 1)) {
-        return ducky_error(bad_kb, "Too many keys are hold");
+        return ducky_error(bad_kb, "Too many keys are held");
     }
-    if(bad_kb->bt) {
-        ble_profile_hid_kb_press(bad_kb->app->ble_hid, key);
-    } else {
-        furi_hal_hid_kb_press(key);
+
+    // Handle Mouse Keys here
+    uint16_t key = ducky_get_mouse_keycode_by_name(line);
+    if(key != HID_MOUSE_NONE) {
+        bad_kb->key_hold_nb++;
+        bad_kb->hid->mouse_press(bad_kb->hid_inst, key);
+        return 0;
     }
-    return 0;
+
+    // Handle Keyboard keys here
+    key = ducky_get_keycode(bad_kb, line, true);
+    if(key != HID_KEYBOARD_NONE) {
+        bad_kb->key_hold_nb++;
+        bad_kb->hid->kb_press(bad_kb->hid_inst, key);
+        return 0;
+    }
+
+    // keyboard and mouse were none
+    return ducky_error(bad_kb, "Unknown keycode for %s", line);
 }
 
 static int32_t ducky_fnc_release(BadKbScript* bad_kb, const char* line, int32_t param) {
     UNUSED(param);
-
     line = &line[ducky_get_command_len(line) + 1];
-    uint16_t key = ducky_get_keycode(bad_kb, line, true);
-    if(key == HID_KEYBOARD_NONE) {
-        return ducky_error(bad_kb, "No keycode defined for %s", line);
-    }
+
     if(bad_kb->key_hold_nb == 0) {
-        return ducky_error(bad_kb, "No keys are hold");
+        return ducky_error(bad_kb, "No keys are held");
     }
-    bad_kb->key_hold_nb--;
-    if(bad_kb->bt) {
-        ble_profile_hid_kb_release(bad_kb->app->ble_hid, key);
-    } else {
-        furi_hal_hid_kb_release(key);
+
+    // Handle Mouse Keys here
+    uint16_t key = ducky_get_mouse_keycode_by_name(line);
+    if(key != HID_MOUSE_NONE) {
+        bad_kb->key_hold_nb--;
+        bad_kb->hid->mouse_release(bad_kb->hid_inst, key);
+        return 0;
     }
-    return 0;
+
+    //Handle Keyboard Keys here
+    key = ducky_get_keycode(bad_kb, line, true);
+    if(key != HID_KEYBOARD_NONE) {
+        bad_kb->key_hold_nb--;
+        bad_kb->hid->kb_release(bad_kb->hid_inst, key);
+        return 0;
+    }
+
+    // keyboard and mouse were none
+    return ducky_error(bad_kb, "No keycode defined for %s", line);
 }
 
 static int32_t ducky_fnc_media(BadKbScript* bad_kb, const char* line, int32_t param) {
@@ -181,14 +187,8 @@ static int32_t ducky_fnc_media(BadKbScript* bad_kb, const char* line, int32_t pa
     if(key == HID_CONSUMER_UNASSIGNED) {
         return ducky_error(bad_kb, "No keycode defined for %s", line);
     }
-    if(bad_kb->bt) {
-        ble_profile_hid_kb_press(bad_kb->app->ble_hid, key);
-        furi_delay_ms(bt_timeout);
-        ble_profile_hid_kb_release(bad_kb->app->ble_hid, key);
-    } else {
-        furi_hal_hid_kb_press(key);
-        furi_hal_hid_kb_release(key);
-    }
+    bad_kb->hid->consumer_press(bad_kb->hid_inst, key);
+    bad_kb->hid->consumer_release(bad_kb->hid_inst, key);
     return 0;
 }
 
@@ -201,18 +201,10 @@ static int32_t ducky_fnc_globe(BadKbScript* bad_kb, const char* line, int32_t pa
         return ducky_error(bad_kb, "No keycode defined for %s", line);
     }
 
-    if(bad_kb->bt) {
-        ble_profile_hid_consumer_key_press(bad_kb->app->ble_hid, HID_CONSUMER_FN_GLOBE);
-        ble_profile_hid_kb_press(bad_kb->app->ble_hid, key);
-        furi_delay_ms(bt_timeout);
-        ble_profile_hid_kb_release(bad_kb->app->ble_hid, key);
-        ble_profile_hid_consumer_key_release(bad_kb->app->ble_hid, HID_CONSUMER_FN_GLOBE);
-    } else {
-        furi_hal_hid_consumer_key_press(HID_CONSUMER_FN_GLOBE);
-        furi_hal_hid_kb_press(key);
-        furi_hal_hid_kb_release(key);
-        furi_hal_hid_consumer_key_release(HID_CONSUMER_FN_GLOBE);
-    }
+    bad_kb->hid->consumer_press(bad_kb->hid_inst, HID_CONSUMER_FN_GLOBE);
+    bad_kb->hid->kb_press(bad_kb->hid_inst, key);
+    bad_kb->hid->kb_release(bad_kb->hid_inst, key);
+    bad_kb->hid->consumer_release(bad_kb->hid_inst, HID_CONSUMER_FN_GLOBE);
     return 0;
 }
 
@@ -224,10 +216,48 @@ static int32_t ducky_fnc_waitforbutton(BadKbScript* bad_kb, const char* line, in
     return SCRIPT_STATE_WAIT_FOR_BTN;
 }
 
+static int32_t ducky_fnc_mouse_scroll(BadKbScript* bad_kb, const char* line, int32_t param) {
+    UNUSED(param);
+
+    line = &line[strcspn(line, " ") + 1];
+    int32_t mouse_scroll_dist = 0;
+
+    if(strint_to_int32(line, NULL, &mouse_scroll_dist, 10) != StrintParseNoError) {
+        return ducky_error(bad_kb, "Invalid Number %s", line);
+    }
+
+    bad_kb->hid->mouse_scroll(bad_kb->hid_inst, mouse_scroll_dist);
+
+    return 0;
+}
+
+static int32_t ducky_fnc_mouse_move(BadKbScript* bad_kb, const char* line, int32_t param) {
+    UNUSED(param);
+
+    line = &line[strcspn(line, " ") + 1];
+    int32_t mouse_move_x = 0;
+    int32_t mouse_move_y = 0;
+
+    if(strint_to_int32(line, NULL, &mouse_move_x, 10) != StrintParseNoError) {
+        return ducky_error(bad_kb, "Invalid Number %s", line);
+    }
+
+    line = &line[strcspn(line, " ") + 1];
+
+    if(strint_to_int32(line, NULL, &mouse_move_y, 10) != StrintParseNoError) {
+        return ducky_error(bad_kb, "Invalid Number %s", line);
+    }
+
+    bad_kb->hid->mouse_move(bad_kb->hid_inst, mouse_move_x, mouse_move_y);
+
+    return 0;
+}
+
 static const DuckyCmd ducky_commands[] = {
     {"REM", NULL, -1},
     {"ID", NULL, -1},
     {"BT_ID", NULL, -1},
+    {"BLE_ID", NULL, -1},
     {"DELAY", ducky_fnc_delay, -1},
     {"STRING", ducky_fnc_string, 0},
     {"STRINGLN", ducky_fnc_string, 1},
@@ -247,6 +277,10 @@ static const DuckyCmd ducky_commands[] = {
     {"WAIT_FOR_BUTTON_PRESS", ducky_fnc_waitforbutton, -1},
     {"MEDIA", ducky_fnc_media, -1},
     {"GLOBE", ducky_fnc_globe, -1},
+    {"MOUSEMOVE", ducky_fnc_mouse_move, -1},
+    {"MOUSE_MOVE", ducky_fnc_mouse_move, -1},
+    {"MOUSESCROLL", ducky_fnc_mouse_scroll, -1},
+    {"MOUSE_SCROLL", ducky_fnc_mouse_scroll, -1},
 };
 
 #define TAG "BadKb"
@@ -266,7 +300,7 @@ int32_t ducky_execute_cmd(BadKbScript* bad_kb, const char* line) {
             if(ducky_commands[i].callback == NULL) {
                 return 0;
             } else {
-                return ((ducky_commands[i].callback)(bad_kb, line, ducky_commands[i].param));
+                return (ducky_commands[i].callback)(bad_kb, line, ducky_commands[i].param);
             }
         }
     }

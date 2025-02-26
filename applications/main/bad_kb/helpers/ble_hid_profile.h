@@ -1,5 +1,7 @@
 #pragma once
 
+// Based on <lib/ble_profile/extra_profiles/hid_profile.h>
+
 #include <furi_ble/profile_interface.h>
 
 #ifdef __cplusplus

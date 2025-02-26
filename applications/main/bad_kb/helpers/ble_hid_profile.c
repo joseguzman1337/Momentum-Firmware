@@ -1,9 +1,11 @@
-#include "ble_hid.h"
+#include "ble_hid_profile.h"
+
+// Based on <lib/ble_profile/extra_profiles/hid_profile.c>
 
 #include <furi_hal_usb_hid.h>
 #include <services/dev_info_service.h>
 #include <services/battery_service.h>
-#include "ble_hid_svc.h"
+#include "ble_hid_service.h"
 
 #include <furi.h>
 #include <usb_hid.h>
@@ -394,12 +396,13 @@ static GapConfig template_config = {
 };
 
 static void ble_profile_hid_get_config(GapConfig* config, FuriHalBleProfileParams profile_params) {
+    furi_check(profile_params);
     BleProfileHidParams* hid_profile_params = profile_params;
 
     furi_check(config);
     memcpy(config, &template_config, sizeof(GapConfig));
 
-    // Set mac address
+    // Set MAC address
     memcpy(config->mac_address, hid_profile_params->mac, sizeof(config->mac_address));
 
     // Set advertise name

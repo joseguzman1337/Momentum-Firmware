@@ -29,9 +29,8 @@ static bool bad_kb_layout_select(BadKbApp* bad_kb) {
 void bad_kb_scene_config_layout_on_enter(void* context) {
     BadKbApp* bad_kb = context;
 
-    if(bad_kb_layout_select(bad_kb)) {
-        bad_kb_script_set_keyboard_layout(bad_kb->bad_kb_script, bad_kb->keyboard_layout);
-    }
+    bad_kb_layout_select(bad_kb);
+
     scene_manager_previous_scene(bad_kb->scene_manager);
 }
 

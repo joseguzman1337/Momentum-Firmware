@@ -1,5 +1,9 @@
 #include "../bad_kb_app_i.h"
 
+typedef enum {
+    BadKbCustomEventErrorBack,
+} BadKbCustomEvent;
+
 static void
     bad_kb_scene_error_event_callback(GuiButtonType result, InputType type, void* context) {
     furi_assert(context);

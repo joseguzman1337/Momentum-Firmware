@@ -25,11 +25,6 @@ static bool bad_kb_file_select(BadKbApp* bad_kb) {
         furi_record_close(RECORD_DIALOGS);
         if(res == DialogMessageButtonRight) {
             storage_common_migrate(storage, EXT_PATH("badkb"), BAD_KB_APP_BASE_FOLDER);
-            if(bad_kb->conn_init_thread) {
-                furi_thread_join(bad_kb->conn_init_thread);
-            }
-            bad_kb_load_settings(bad_kb);
-            bad_kb_config_adjust(&bad_kb->config);
         }
     }
     storage_simply_mkdir(storage, BAD_KB_APP_BASE_FOLDER);
@@ -58,10 +53,7 @@ void bad_kb_scene_file_select_on_enter(void* context) {
     }
 
     if(bad_kb_file_select(bad_kb)) {
-        bad_kb->bad_kb_script =
-            bad_kb_script_open(bad_kb->file_path, bad_kb->is_bt ? bad_kb->bt : NULL, bad_kb);
-        bad_kb_script_set_keyboard_layout(bad_kb->bad_kb_script, bad_kb->keyboard_layout);
-
+        scene_manager_set_scene_state(bad_kb->scene_manager, BadKbSceneWork, true);
         scene_manager_next_scene(bad_kb->scene_manager, BadKbSceneWork);
     } else {
         view_dispatcher_stop(bad_kb->view_dispatcher);

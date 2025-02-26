@@ -20,4 +20,6 @@ void bad_kb_view_set_layout(BadKb* bad_kb, const char* layout);
 
 void bad_kb_view_set_state(BadKb* bad_kb, BadKbState* st);
 
+void bad_kb_view_set_interface(BadKb* bad_kb, BadKbHidInterface interface);
+
 bool bad_kb_view_is_idle_state(BadKb* bad_kb);

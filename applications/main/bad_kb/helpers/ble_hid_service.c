@@ -1,5 +1,8 @@
-#include "ble_hid_svc.h"
-#include "app_common.h"
+#include "ble_hid_service.h"
+
+// Based on <lib/ble_profile/extra_services/hid_service.c>
+
+#include "app_common.h" // IWYU pragma: keep
 #include <ble/ble.h>
 #include <furi_ble/event_dispatcher.h>
 #include <furi_ble/gatt.h>
@@ -170,7 +173,7 @@ static BleEventAckStatus ble_svc_hid_event_handler(void* event, void* context) {
     return ret;
 }
 
-BleServiceHid* ble_svc_hid_start() {
+BleServiceHid* ble_svc_hid_start(void) {
     BleServiceHid* hid_svc = malloc(sizeof(BleServiceHid));
 
     // Register event handler

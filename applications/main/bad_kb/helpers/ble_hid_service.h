@@ -1,5 +1,7 @@
 #pragma once
 
+// Based on <lib/ble_profile/extra_services/hid_service.h>
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -9,7 +11,7 @@ extern "C" {
 
 typedef struct BleServiceHid BleServiceHid;
 
-BleServiceHid* ble_svc_hid_start();
+BleServiceHid* ble_svc_hid_start(void);
 
 void ble_svc_hid_stop(BleServiceHid* service);
 

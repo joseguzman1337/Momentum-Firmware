@@ -7,6 +7,7 @@ extern "C" {
 #include <furi.h>
 #include <furi_hal.h>
 #include "ducky_script.h"
+#include "bad_kb_hid.h"
 
 #define SCRIPT_STATE_ERROR        (-1)
 #define SCRIPT_STATE_END          (-2)
@@ -17,12 +18,19 @@ extern "C" {
 
 #define FILE_BUFFER_LEN 16
 
+#define HID_MOUSE_INVALID 0
+#define HID_MOUSE_NONE    0
+
 struct BadKbScript {
+    BadKbHidInterface* interface;
+    BadKbHidConfig* hid_cfg;
+    bool load_id_cfg;
+    const BadKbHidApi* hid;
+    void* hid_inst;
     FuriThread* thread;
     BadKbState st;
 
     FuriString* file_path;
-    FuriString* keyboard_layout;
     uint8_t file_buf[FILE_BUFFER_LEN + 1];
     uint8_t buf_start;
     uint8_t buf_len;
@@ -40,9 +48,6 @@ struct BadKbScript {
 
     FuriString* string_print;
     size_t string_print_pos;
-
-    Bt* bt;
-    BadKbApp* app;
 };
 
 uint16_t ducky_get_keycode(BadKbScript* bad_kb, const char* param, bool accept_chars);
@@ -54,6 +59,8 @@ bool ducky_is_line_end(const char chr);
 uint16_t ducky_get_keycode_by_name(const char* param);
 
 uint16_t ducky_get_media_keycode_by_name(const char* param);
+
+uint8_t ducky_get_mouse_keycode_by_name(const char* param);
 
 bool ducky_get_number(const char* param, uint32_t* val);
 
