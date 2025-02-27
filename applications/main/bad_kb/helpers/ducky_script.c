@@ -259,9 +259,12 @@ static bool ducky_set_ble_id(BadKbScript* bad_kb, const char* line) {
 
     for(size_t i = 0; i < sizeof(ble_hid_cfg->mac); i++) {
         const char* hex_byte = &line[i * 3];
-        if(sscanf(hex_byte, "%02hhX", &ble_hid_cfg->mac[sizeof(ble_hid_cfg->mac) - 1 - i]) != 1) {
+        // This sscanf() doesn't work well with %02hhX, need to use a u32
+        uint32_t temp_uint;
+        if(sscanf(hex_byte, "%02lX", &temp_uint) != 1) {
             return false;
         }
+        ble_hid_cfg->mac[sizeof(ble_hid_cfg->mac) - 1 - i] = temp_uint;
     }
 
     strlcpy(ble_hid_cfg->name, line + mac_len, sizeof(ble_hid_cfg->name));
