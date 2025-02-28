@@ -10,19 +10,19 @@ extern "C" {
 #include "ble_hid_profile.h"
 
 typedef enum {
-    BadKbHidInterfaceUsb,
-    BadKbHidInterfaceBle,
-    BadKbHidInterfaceMAX,
-} BadKbHidInterface;
+    BadUsbHidInterfaceUsb,
+    BadUsbHidInterfaceBle,
+    BadUsbHidInterfaceMAX,
+} BadUsbHidInterface;
 
 typedef struct {
     BleProfileHidParams ble;
     FuriHalUsbHidConfig usb;
-} BadKbHidConfig;
+} BadUsbHidConfig;
 
 typedef struct {
-    void (*adjust_config)(BadKbHidConfig* hid_cfg);
-    void* (*init)(BadKbHidConfig* hid_cfg);
+    void (*adjust_config)(BadUsbHidConfig* hid_cfg);
+    void* (*init)(BadUsbHidConfig* hid_cfg);
     void (*deinit)(void* inst);
     void (*set_state_callback)(void* inst, HidStateCallback cb, void* context);
     bool (*is_connected)(void* inst);
@@ -37,11 +37,11 @@ typedef struct {
     bool (*consumer_release)(void* inst, uint16_t button);
     bool (*release_all)(void* inst);
     uint8_t (*get_led_state)(void* inst);
-} BadKbHidApi;
+} BadUsbHidApi;
 
-const BadKbHidApi* bad_kb_hid_get_interface(BadKbHidInterface interface);
+const BadUsbHidApi* bad_usb_hid_get_interface(BadUsbHidInterface interface);
 
-void bad_kb_hid_ble_remove_pairing(void);
+void bad_usb_hid_ble_remove_pairing(void);
 
 #ifdef __cplusplus
 }

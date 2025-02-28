@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-typedef struct BadKbApp BadKbApp;
+typedef struct BadUsbApp BadUsbApp;
 
 #ifdef __cplusplus
 }

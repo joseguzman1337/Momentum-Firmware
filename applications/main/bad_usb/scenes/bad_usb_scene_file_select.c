@@ -1,10 +1,10 @@
-#include "../bad_kb_app_i.h"
+#include "../bad_usb_app_i.h"
 #include <storage/storage.h>
 
-static bool bad_kb_file_select(BadKbApp* bad_kb) {
-    furi_assert(bad_kb);
+static bool bad_usb_file_select(BadUsbApp* bad_usb) {
+    furi_assert(bad_usb);
 
-    bad_kb_app_show_loading_popup(bad_kb, true);
+    bad_usb_app_show_loading_popup(bad_usb, true);
     Storage* storage = furi_record_open(RECORD_STORAGE);
     if(storage_dir_exists(storage, EXT_PATH("badkb"))) {
         DialogMessage* message = dialog_message_alloc();
@@ -24,48 +24,48 @@ static bool bad_kb_file_select(BadKbApp* bad_kb) {
         dialog_message_free(message);
         furi_record_close(RECORD_DIALOGS);
         if(res == DialogMessageButtonRight) {
-            storage_common_migrate(storage, EXT_PATH("badkb"), BAD_KB_APP_BASE_FOLDER);
+            storage_common_migrate(storage, EXT_PATH("badkb"), BAD_USB_APP_BASE_FOLDER);
         }
     }
-    storage_simply_mkdir(storage, BAD_KB_APP_BASE_FOLDER);
+    storage_simply_mkdir(storage, BAD_USB_APP_BASE_FOLDER);
     furi_record_close(RECORD_STORAGE);
-    bad_kb_app_show_loading_popup(bad_kb, false);
+    bad_usb_app_show_loading_popup(bad_usb, false);
 
     DialogsFileBrowserOptions browser_options;
     dialog_file_browser_set_basic_options(
-        &browser_options, BAD_KB_APP_SCRIPT_EXTENSION, &I_badkb_10px);
-    browser_options.base_path = BAD_KB_APP_BASE_FOLDER;
+        &browser_options, BAD_USB_APP_SCRIPT_EXTENSION, &I_badusb_10px);
+    browser_options.base_path = BAD_USB_APP_BASE_FOLDER;
     browser_options.skip_assets = true;
 
     // Input events and views are managed by file_browser
     bool res = dialog_file_browser_show(
-        bad_kb->dialogs, bad_kb->file_path, bad_kb->file_path, &browser_options);
+        bad_usb->dialogs, bad_usb->file_path, bad_usb->file_path, &browser_options);
 
     return res;
 }
 
-void bad_kb_scene_file_select_on_enter(void* context) {
-    BadKbApp* bad_kb = context;
+void bad_usb_scene_file_select_on_enter(void* context) {
+    BadUsbApp* bad_usb = context;
 
-    if(bad_kb->bad_kb_script) {
-        bad_kb_script_close(bad_kb->bad_kb_script);
-        bad_kb->bad_kb_script = NULL;
+    if(bad_usb->bad_usb_script) {
+        bad_usb_script_close(bad_usb->bad_usb_script);
+        bad_usb->bad_usb_script = NULL;
     }
 
-    if(bad_kb_file_select(bad_kb)) {
-        scene_manager_set_scene_state(bad_kb->scene_manager, BadKbSceneWork, true);
-        scene_manager_next_scene(bad_kb->scene_manager, BadKbSceneWork);
+    if(bad_usb_file_select(bad_usb)) {
+        scene_manager_set_scene_state(bad_usb->scene_manager, BadUsbSceneWork, true);
+        scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneWork);
     } else {
-        view_dispatcher_stop(bad_kb->view_dispatcher);
+        view_dispatcher_stop(bad_usb->view_dispatcher);
     }
 }
 
-bool bad_kb_scene_file_select_on_event(void* context, SceneManagerEvent event) {
+bool bad_usb_scene_file_select_on_event(void* context, SceneManagerEvent event) {
     UNUSED(context);
     UNUSED(event);
     return false;
 }
 
-void bad_kb_scene_file_select_on_exit(void* context) {
+void bad_usb_scene_file_select_on_exit(void* context) {
     UNUSED(context);
 }

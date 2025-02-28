@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bad_kb_app.h"
-#include "scenes/bad_kb_scene.h"
+#include "bad_usb_app.h"
+#include "scenes/bad_usb_scene.h"
 #include "helpers/ducky_script.h"
-#include "helpers/bad_kb_hid.h"
+#include "helpers/bad_usb_hid.h"
 
 #include <gui/gui.h>
 #include <assets_icons.h>
@@ -17,19 +17,19 @@
 #include <gui/modules/loading.h>
 #include <gui/modules/widget.h>
 #include <gui/modules/popup.h>
-#include "views/bad_kb_view.h"
+#include "views/bad_usb_view.h"
 #include <furi_hal_usb.h>
 
-#define BAD_KB_APP_BASE_FOLDER        EXT_PATH("badusb")
-#define BAD_KB_APP_PATH_LAYOUT_FOLDER BAD_KB_APP_BASE_FOLDER "/assets/layouts"
-#define BAD_KB_APP_SCRIPT_EXTENSION   ".txt"
-#define BAD_KB_APP_LAYOUT_EXTENSION   ".kl"
+#define BAD_USB_APP_BASE_FOLDER        EXT_PATH("badusb")
+#define BAD_USB_APP_PATH_LAYOUT_FOLDER BAD_USB_APP_BASE_FOLDER "/assets/layouts"
+#define BAD_USB_APP_SCRIPT_EXTENSION   ".txt"
+#define BAD_USB_APP_LAYOUT_EXTENSION   ".kl"
 
 typedef enum {
-    BadKbAppErrorNoFiles,
-} BadKbAppError;
+    BadUsbAppErrorNoFiles,
+} BadUsbAppError;
 
-struct BadKbApp {
+struct BadUsbApp {
     Gui* gui;
     ViewDispatcher* view_dispatcher;
     SceneManager* scene_manager;
@@ -47,27 +47,27 @@ struct BadKbApp {
     char usb_name_buf[HID_MANUF_PRODUCT_NAME_LEN];
     uint16_t usb_vidpid_buf[2];
 
-    BadKbAppError error;
+    BadUsbAppError error;
     FuriString* file_path;
     FuriString* keyboard_layout;
-    BadKb* bad_kb_view;
-    BadKbScript* bad_kb_script;
+    BadUsb* bad_usb_view;
+    BadUsbScript* bad_usb_script;
 
-    BadKbHidInterface interface;
-    BadKbHidConfig user_hid_cfg;
-    BadKbHidConfig script_hid_cfg;
+    BadUsbHidInterface interface;
+    BadUsbHidConfig user_hid_cfg;
+    BadUsbHidConfig script_hid_cfg;
 };
 
 typedef enum {
-    BadKbAppViewWidget,
-    BadKbAppViewPopup,
-    BadKbAppViewWork,
-    BadKbAppViewConfig,
-    BadKbAppViewByteInput,
-    BadKbAppViewTextInput,
-    BadKbAppViewLoading,
-} BadKbAppView;
+    BadUsbAppViewWidget,
+    BadUsbAppViewPopup,
+    BadUsbAppViewWork,
+    BadUsbAppViewConfig,
+    BadUsbAppViewByteInput,
+    BadUsbAppViewTextInput,
+    BadUsbAppViewLoading,
+} BadUsbAppView;
 
-void bad_kb_set_interface(BadKbApp* app, BadKbHidInterface interface);
+void bad_usb_set_interface(BadUsbApp* app, BadUsbHidInterface interface);
 
-void bad_kb_app_show_loading_popup(BadKbApp* app, bool show);
+void bad_usb_app_show_loading_popup(BadUsbApp* app, bool show);

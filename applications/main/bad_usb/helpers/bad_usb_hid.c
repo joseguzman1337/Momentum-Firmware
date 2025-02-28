@@ -1,19 +1,19 @@
-#include "bad_kb_hid.h"
+#include "bad_usb_hid.h"
 #include "ble_hid_profile.h"
 #include <bt/bt_service/bt.h>
 #include <bt/bt_service/bt_i.h>
 #include <storage/storage.h>
 
-#define TAG "BadKB HID"
+#define TAG "BadUSB HID"
 
 #define HID_BT_KEYS_STORAGE_NAME ".bt_hid.keys"
 
-void hid_usb_adjust_config(BadKbHidConfig* hid_cfg) {
+void hid_usb_adjust_config(BadUsbHidConfig* hid_cfg) {
     if(hid_cfg->usb.vid == 0) hid_cfg->usb.vid = HID_VID_DEFAULT;
     if(hid_cfg->usb.pid == 0) hid_cfg->usb.pid = HID_PID_DEFAULT;
 }
 
-void* hid_usb_init(BadKbHidConfig* hid_cfg) {
+void* hid_usb_init(BadUsbHidConfig* hid_cfg) {
     FuriHalUsbInterface* usb_if_prev = furi_hal_usb_get_config();
     furi_hal_usb_unlock();
     hid_usb_adjust_config(hid_cfg);
@@ -94,7 +94,7 @@ uint8_t hid_usb_get_led_state(void* inst) {
     return furi_hal_hid_get_led_state();
 }
 
-static const BadKbHidApi hid_api_usb = {
+static const BadUsbHidApi hid_api_usb = {
     .adjust_config = hid_usb_adjust_config,
     .init = hid_usb_init,
     .deinit = hid_usb_deinit,
@@ -130,29 +130,29 @@ static void hid_ble_connection_status_callback(BtStatus status, void* context) {
     }
 }
 
-void hid_ble_adjust_config(BadKbHidConfig* hid_cfg) {
+void hid_ble_adjust_config(BadUsbHidConfig* hid_cfg) {
     const uint8_t* normal_mac = furi_hal_version_get_ble_mac();
     uint8_t empty_mac[GAP_MAC_ADDR_SIZE] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     uint8_t default_mac[GAP_MAC_ADDR_SIZE] = {0x6c, 0x7a, 0xd8, 0xac, 0x57, 0x72}; // furi_hal_bt
     if(memcmp(hid_cfg->ble.mac, empty_mac, sizeof(hid_cfg->ble.mac)) == 0 ||
        memcmp(hid_cfg->ble.mac, normal_mac, sizeof(hid_cfg->ble.mac)) == 0 ||
        memcmp(hid_cfg->ble.mac, default_mac, sizeof(hid_cfg->ble.mac)) == 0) {
-        // Derive badkb MAC from Flipper MAC
+        // Derive badusb MAC from Flipper MAC
         memcpy(hid_cfg->ble.mac, normal_mac, sizeof(hid_cfg->ble.mac));
         hid_cfg->ble.mac[2]++;
-        uint16_t badkb_mac_xor = 0x0002;
-        hid_cfg->ble.mac[0] ^= badkb_mac_xor;
-        hid_cfg->ble.mac[1] ^= badkb_mac_xor >> 8;
+        uint16_t badusb_mac_xor = 0x0002;
+        hid_cfg->ble.mac[0] ^= badusb_mac_xor;
+        hid_cfg->ble.mac[1] ^= badusb_mac_xor >> 8;
     }
 
     if(hid_cfg->ble.name[0] == '\0') {
-        // Derive badkb name from Flipper name
-        const char* badkb_device_name_prefix = "BadKB";
+        // Derive badusb name from Flipper name
+        const char* badusb_device_name_prefix = "BadKB";
         snprintf(
             hid_cfg->ble.name,
             sizeof(hid_cfg->ble.name),
             "%s %s",
-            badkb_device_name_prefix,
+            badusb_device_name_prefix,
             furi_hal_version_get_name_ptr());
     }
 
@@ -161,7 +161,7 @@ void hid_ble_adjust_config(BadKbHidConfig* hid_cfg) {
     }
 }
 
-void* hid_ble_init(BadKbHidConfig* hid_cfg) {
+void* hid_ble_init(BadUsbHidConfig* hid_cfg) {
     BleHidInstance* ble_hid = malloc(sizeof(BleHidInstance));
     ble_hid->bt = furi_record_open(RECORD_BT);
     ble_hid->bt->suppress_pin_screen = true;
@@ -273,7 +273,7 @@ uint8_t hid_ble_get_led_state(void* inst) {
     return 0;
 }
 
-static const BadKbHidApi hid_api_ble = {
+static const BadUsbHidApi hid_api_ble = {
     .adjust_config = hid_ble_adjust_config,
     .init = hid_ble_init,
     .deinit = hid_ble_deinit,
@@ -292,15 +292,15 @@ static const BadKbHidApi hid_api_ble = {
     .get_led_state = hid_ble_get_led_state,
 };
 
-const BadKbHidApi* bad_kb_hid_get_interface(BadKbHidInterface interface) {
-    if(interface == BadKbHidInterfaceUsb) {
+const BadUsbHidApi* bad_usb_hid_get_interface(BadUsbHidInterface interface) {
+    if(interface == BadUsbHidInterfaceUsb) {
         return &hid_api_usb;
     } else {
         return &hid_api_ble;
     }
 }
 
-void bad_kb_hid_ble_remove_pairing(void) {
+void bad_usb_hid_ble_remove_pairing(void) {
     Bt* bt = furi_record_open(RECORD_BT);
     bt_disconnect(bt);
 

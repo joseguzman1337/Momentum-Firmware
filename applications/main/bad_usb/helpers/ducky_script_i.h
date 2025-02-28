@@ -7,7 +7,7 @@ extern "C" {
 #include <furi.h>
 #include <furi_hal.h>
 #include "ducky_script.h"
-#include "bad_kb_hid.h"
+#include "bad_usb_hid.h"
 
 #define SCRIPT_STATE_ERROR        (-1)
 #define SCRIPT_STATE_END          (-2)
@@ -21,14 +21,14 @@ extern "C" {
 #define HID_MOUSE_INVALID 0
 #define HID_MOUSE_NONE    0
 
-struct BadKbScript {
-    BadKbHidInterface* interface;
-    BadKbHidConfig* hid_cfg;
+struct BadUsbScript {
+    BadUsbHidInterface* interface;
+    BadUsbHidConfig* hid_cfg;
     bool load_id_cfg;
-    const BadKbHidApi* hid;
+    const BadUsbHidApi* hid;
     void* hid_inst;
     FuriThread* thread;
-    BadKbState st;
+    BadUsbState st;
 
     FuriString* file_path;
     uint8_t file_buf[FILE_BUFFER_LEN + 1];
@@ -50,7 +50,7 @@ struct BadKbScript {
     size_t string_print_pos;
 };
 
-uint16_t ducky_get_keycode(BadKbScript* bad_kb, const char* param, bool accept_chars);
+uint16_t ducky_get_keycode(BadUsbScript* bad_usb, const char* param, bool accept_chars);
 
 uint32_t ducky_get_command_len(const char* line);
 
@@ -64,19 +64,19 @@ uint8_t ducky_get_mouse_keycode_by_name(const char* param);
 
 bool ducky_get_number(const char* param, uint32_t* val);
 
-void ducky_numlock_on(BadKbScript* bad_kb);
+void ducky_numlock_on(BadUsbScript* bad_usb);
 
-bool ducky_numpad_press(BadKbScript* bad_kb, const char num);
+bool ducky_numpad_press(BadUsbScript* bad_usb, const char num);
 
-bool ducky_altchar(BadKbScript* bad_kb, const char* charcode);
+bool ducky_altchar(BadUsbScript* bad_usb, const char* charcode);
 
-bool ducky_altstring(BadKbScript* bad_kb, const char* param);
+bool ducky_altstring(BadUsbScript* bad_usb, const char* param);
 
-bool ducky_string(BadKbScript* bad_kb, const char* param);
+bool ducky_string(BadUsbScript* bad_usb, const char* param);
 
-int32_t ducky_execute_cmd(BadKbScript* bad_kb, const char* line);
+int32_t ducky_execute_cmd(BadUsbScript* bad_usb, const char* line);
 
-int32_t ducky_error(BadKbScript* bad_kb, const char* text, ...);
+int32_t ducky_error(BadUsbScript* bad_usb, const char* text, ...);
 
 #ifdef __cplusplus
 }
