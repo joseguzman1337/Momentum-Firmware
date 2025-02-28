@@ -1,4 +1,7 @@
 ### Breaking Changes:
+- BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
+  - Should be more reliable with BLE, will be easier to keep updated
+  - Previous settings and pairing will be reset, need to reconfigure and pair again
 - UL: Desktop: Option to prevent Auto Lock when connected to USB/RPC (by @Dmitry422)
   - Desktop settings will be reset, need to reconfigure
   - Keybinds will remain configured
@@ -8,9 +11,6 @@
 - OFW: JS: New `gui/widget` view, replaces old `widget` module (by @portasynthinca3)
   - Scripts using `widget` module will need to be updated
   - Check the `gui.js` example for reference usage
-- BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
-  - Should be more reliable with BLE, will be easier to keep updated
-  - Previous settings and pairing will be reset, need to reconfigure and pair again
 
 ### Added:
 - Apps:
@@ -50,6 +50,7 @@
   - Pinball0: Prevent tilt before ball is in play, fixed Endless table by making bottom portal extend full width (by @rdefeo)
 - BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
   - Additionally, can now customize MAC address when BLE Remember is enabled
+  - Also added `BLE_ID` command, same as `BT_ID`
 - NFC:
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
@@ -74,7 +75,7 @@
   - UL: Fix GangQi protocol (by @DoberBit and @mishamyte)
   - UL: Came Atomo button hold simulation with full cycle to allow proper pairing with receiver (by @xMasterX)
 - OFW: NFC: ST25TB poller mode check (by @RebornedBrain)
-- RFID: Fix Detection Conflict Between Securakey and Noralsy Format (by @zinongli)
+- OFW: RFID: Fix Detection Conflict Between Securakey and Noralsy Format (by @zinongli)
 - Furi:
   - OFW: EventLoop unsubscribe fix (by @gsurkov & @portasynthinca3)
   - OFW: Various bug fixes and improvements (by @skotopes)
