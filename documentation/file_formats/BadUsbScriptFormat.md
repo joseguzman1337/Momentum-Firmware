@@ -189,7 +189,10 @@ Example:
 ID 1234:abcd Flipper Devices:Flipper Zero
 ```
 
-VID and PID are hex codes and are mandatory. Manufacturer and Product are text strings and are optional.
+> [!IMPORTANT]
+> 
+> VID and PID are hex codes and are mandatory. 
+> Manufacturer and Product are text strings and are optional.
 
 ## Mouse Commands
 

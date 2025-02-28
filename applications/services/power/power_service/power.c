@@ -362,21 +362,6 @@ static void power_check_battery_level_change(Power* power) {
     }
 }
 
-static void power_check_charge_cap(Power* power) {
-    uint32_t cap = momentum_settings.charge_cap;
-    if(power->info.charge >= cap && cap < 100) {
-        if(!power->is_charge_capped) { // Suppress charging if charge reaches custom cap
-            power->is_charge_capped = true;
-            furi_hal_power_suppress_charge_enter();
-        }
-    } else {
-        if(power->is_charge_capped) { // Start charging again if charge below custom cap
-            power->is_charge_capped = false;
-            furi_hal_power_suppress_charge_exit();
-        }
-    }
-}
-
 static void power_handle_shutdown(Power* power) {
     furi_hal_power_off();
     // Notify user if USB is plugged
@@ -568,6 +553,24 @@ static void power_message_callback(FuriEventLoopObject* object, void* context) {
     }
 }
 
+static void power_charge_supress(Power* power) {
+    // if charge_supress_percent selected (not OFF) and current charge level equal or higher than selected level
+    // then we start supression if we not supress it before.
+    if(power->settings.charge_supress_percent &&
+       power->info.charge >= power->settings.charge_supress_percent) {
+        if(!power->charge_is_supressed) {
+            power->charge_is_supressed = true;
+            furi_hal_power_suppress_charge_enter();
+        }
+        // disable supression if charge_supress_percent OFF but charge still supressed
+    } else {
+        if(power->charge_is_supressed) {
+            power->charge_is_supressed = false;
+            furi_hal_power_suppress_charge_exit();
+        }
+    }
+}
+
 static void power_tick_callback(void* context) {
     furi_assert(context);
     Power* power = context;
@@ -580,8 +583,8 @@ static void power_tick_callback(void* context) {
     power_check_charging_state(power);
     // Check and notify about battery level change
     power_check_battery_level_change(power);
-    // Check charge cap, compare with user setting and (un)suppress charging
-    power_check_charge_cap(power);
+    // charge supress arm/disarm
+    power_charge_supress(power);
     // Update battery view port
     view_port_enabled_set(
         power->battery_view_port, momentum_settings.battery_icon != BatteryIconOff);
@@ -618,7 +621,7 @@ static void power_storage_callback(const void* message, void* context) {
     }
 }
 
-// load inital settings from file for power service
+// loading and initializing power service settings
 static void power_init_settings(Power* power) {
     Storage* storage = furi_record_open(RECORD_STORAGE);
     furi_pubsub_subscribe(storage_get_pubsub(storage), power_storage_callback, power);
@@ -631,6 +634,7 @@ static void power_init_settings(Power* power) {
     power_settings_load(&power->settings);
     power_settings_apply(power);
     furi_record_close(RECORD_STORAGE);
+    power->charge_is_supressed = false;
 }
 
 static Power* power_alloc(void) {
@@ -644,7 +648,7 @@ static Power* power_alloc(void) {
     Gui* gui = furi_record_open(RECORD_GUI);
 
     // auto_poweroff
-    //---define subscription to loader events message (info about started apps) and defina callback for this
+    //---define subscription to loader events message (info about started apps) and define callback for this
     Loader* loader = furi_record_open(RECORD_LOADER);
     furi_pubsub_subscribe(loader_get_pubsub(loader), power_loader_callback, power);
     power->input_events_pubsub = furi_record_open(RECORD_INPUT_EVENTS);
@@ -688,7 +692,7 @@ int32_t power_srv(void* p) {
 
     Power* power = power_alloc();
 
-    // load inital settings for power service
+    // power service settings initialization
     power_init_settings(power);
 
     power_update_info(power);

@@ -42,7 +42,7 @@ struct Power {
     PowerSettings settings;
     FuriTimer* auto_poweroff_timer;
     bool app_running;
-    bool is_charge_capped;
+    bool charge_is_supressed;
     FuriPubSub* input_events_pubsub;
     FuriPubSub* ascii_events_pubsub;
     FuriPubSubSubscription* input_events_subscription;
