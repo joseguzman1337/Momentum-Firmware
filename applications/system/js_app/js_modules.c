@@ -269,6 +269,8 @@ static const char* extra_features[] = {
     "baseline", // dummy "feature"
     "gpio-pwm",
     "gui-widget",
+    "serial-framing",
+    "gui-widget-extras",
 
     // extra modules
     "blebeacon",
@@ -277,13 +279,11 @@ static const char* extra_features[] = {
     "subghz",
     "usbdisk",
     "vgm",
-    "widget",
 
     // extra features
     "gui-textinput-illegalsymbols",
     "storage-virtual",
     "usbdisk-createimage",
-    "widget-addicon",
 };
 
 /**

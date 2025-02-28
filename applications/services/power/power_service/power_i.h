@@ -35,6 +35,7 @@ struct Power {
 
     bool battery_low;
     bool show_battery_low_warning;
+    bool is_otg_requested;
     uint8_t battery_level;
     uint8_t power_off_timeout;
 
@@ -59,6 +60,7 @@ typedef enum {
     PowerMessageTypeGetInfo,
     PowerMessageTypeIsBatteryHealthy,
     PowerMessageTypeShowBatteryLowWarning,
+    PowerMessageTypeSwitchOTG,
 
     PowerMessageTypeGetSettings,
     PowerMessageTypeSetSettings,

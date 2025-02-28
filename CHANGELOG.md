@@ -21,10 +21,16 @@
 - Desktop:
   - UL: Option to prevent Auto Lock when connected to USB/RPC (by @Dmitry422)
   - OFW: Add the Showtime animation (by @Astrrra)
-- OFW: JS: Features & bugfixes, SDK 0.2 (by @portasynthinca3)
-  - New `gui/widget` view, replaces old `widget` module
-  - Support for PWM in `gpio` module
-  - Stop `eventloop` on request and error
+- JS:
+  - OFW: Features & bugfixes, SDK 0.2 (by @portasynthinca3)
+    - New `gui/widget` view, replaces old `widget` module
+    - Support for PWM in `gpio` module
+    - Stop `eventloop` on request and error
+  - OFW: SDK 0.3
+    - Backport of missing features to new `gui/widget` (by @Willy-JL)
+    - UART framing data/stop/parity bits options in `serial` module (by @portasynthinca3)
+- OFW: Furi: UART framing mode selection, support for different data/stop/parity bits (by @portasynthinca3)
+- OFW: GUI: Widget elements for line, rect and circle with fill options (by @Willy-JL)
 
 ### Updated:
 - Apps:
@@ -40,19 +46,27 @@
   - Additionally, can now customize MAC address when BLE Remember is enabled
 - NFC:
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
+  - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)
 - Infrared:
   - OFW: Add Fujitsu ASTG12LVCC to AC Universal Remote (by @KereruA0i)
   - OFW: Increase max carrier limit to 1000000 (by @skotopes)
-- OFW: API: Update mbedtls & expose AES (by @portasynthinca3)
+- OFW: Power: Added OTG controls to Power service, remembers OTG when unplugging USB (by @Astrrra & @skotopes)
+- OFW: GUI: Updated Button Panel with more options for button handling (by @Akiva-Cohen)
+- Furi:
+  - OFW: Update heap4 implementation, enabled heap corruption detection (by @portasynthinca3)
+  - OFW: Update mbedtls & expose AES to API (by @portasynthinca3)
+  - OFW: Stdio API improvements, pipe stdout timeout (by @portasynthinca3)
 
 ### Fixed:
 - Asset Packs: Fix level-up animations not being themed (by @Willy-JL)
 - About: Fix missing Prev. button when invoked from Device Info keybind (by @Willy-JL)
 - OFW: NFC: ST25TB poller mode check (by @RebornedBrain)
+- RFID: Fix Detection Conflict Between Securakey and Noralsy Format (by @zinongli)
 - Furi:
   - OFW: EventLoop unsubscribe fix (by @gsurkov & @portasynthinca3)
   - OFW: Various bug fixes and improvements (by @skotopes)
+  - OFW: Clear IRQ status before calling user handler, fixes some interrupt edge cases / weirdness (by @mammothbane)
   - OFW: Ensure that `furi_record_create()` is passed a non-NULL data pointer (by @dcoles)
 - OFW: CLI: Fixed repeat in subghz tx_from_file command (by @Jnesselr)
 - OFW: VSCode: Disabled auto-update for clangd since correct version is in the toolchain (by @hedger)
