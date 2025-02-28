@@ -5,11 +5,19 @@
 - OFW: JS: New `gui/widget` view, replaces old `widget` module (by @portasynthinca3)
   - Scripts using `widget` module will need to be updated
   - Check the `gui.js` example for reference usage
+- BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
+  - Should be more reliable with BLE, will be easier to keep updated
+  - Previous settings and pairing will be reset, need to reconfigure and pair again
 
 ### Added:
 - Apps:
   - Games: Quadrastic (by @ivanbarsukov)
-- OFW: RFID: EM4305 support (by @Astrrra)
+- RFID:
+  - OFW: EM4305 support (by @Astrrra)
+  - OFW: Noralsy Format/Brand protocol (by @zinongli)
+- OFW: BadKB: Mouse control (by @jetrp1)
+- OFW: Infrared: Universal IR signal selection (by @portasynthinca3)
+- OFW: NFC: Disney Infinity KDF plugin (by @bettse)
 - Desktop:
   - UL: Option to prevent Auto Lock when connected to USB/RPC (by @Dmitry422)
   - OFW: Add the Showtime animation (by @Astrrra)
@@ -28,6 +36,8 @@
   - Metroflip: Big refactor with plugins and assets to save RAM, RavKav moved to Calypso parser (by @luu176), unified Calypso parser (by @DocSystem)
   - Picopass: Added Save SR as legacy from saved menu, fix write key 'retry' when presented with new card (by @bettse)
   - Pinball0: Prevent tilt before ball is in play, fixed Endless table by making bottom portal extend full width (by @rdefeo)
+- BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
+  - Additionally, can now customize MAC address when BLE Remember is enabled
 - NFC:
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)
@@ -39,12 +49,14 @@
 ### Fixed:
 - Asset Packs: Fix level-up animations not being themed (by @Willy-JL)
 - About: Fix missing Prev. button when invoked from Device Info keybind (by @Willy-JL)
-- OFW: uFBT: Bumped action version in example github workflow for project template (by @hedger)
 - OFW: NFC: ST25TB poller mode check (by @RebornedBrain)
 - Furi:
   - OFW: EventLoop unsubscribe fix (by @gsurkov & @portasynthinca3)
   - OFW: Various bug fixes and improvements (by @skotopes)
   - OFW: Ensure that `furi_record_create()` is passed a non-NULL data pointer (by @dcoles)
+- OFW: CLI: Fixed repeat in subghz tx_from_file command (by @Jnesselr)
+- OFW: VSCode: Disabled auto-update for clangd since correct version is in the toolchain (by @hedger)
+- OFW: uFBT: Bumped action version in example github workflow for project template (by @hedger)
 
 ### Removed:
 - JS: Removed old `widget` module, replaced by new `gui/widget` view
