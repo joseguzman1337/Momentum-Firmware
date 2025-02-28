@@ -3,6 +3,7 @@
 #include <gui/modules/variable_item_list.h>
 #include <gui/view_dispatcher.h>
 #include <lib/toolbox/value_index.h>
+#include <applications/settings/notification_settings/rgb_backlight.h>
 
 #define MAX_NOTIFICATION_SETTINGS 4
 
@@ -12,6 +13,8 @@ typedef struct {
     ViewDispatcher* view_dispatcher;
     VariableItemList* variable_item_list;
 } NotificationAppSettings;
+
+static VariableItem* temp_item;
 
 static const NotificationSequence sequence_note_c = {
     &message_note_c5,
@@ -168,6 +171,59 @@ static void vibro_changed(VariableItem* item) {
     notification_message(app->notification, &sequence_single_vibro);
 }
 
+// Set RGB backlight color
+static void color_changed(VariableItem* item) {
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+    rgb_backlight_set_color(index);
+    variable_item_set_current_value_text(item, rgb_backlight_get_color_text(index));
+    notification_message(app->notification, &sequence_display_backlight_on);
+}
+
+// TODO: refactor and fix this
+static void color_set_custom_red(VariableItem* item) {
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+    rgb_backlight_set_custom_color(index, 0);
+    char valtext[4] = {};
+    snprintf(valtext, sizeof(valtext), "%d", index);
+    variable_item_set_current_value_text(item, valtext);
+    rgb_backlight_set_color(13);
+    rgb_backlight_update(app->notification->settings.display_brightness * 0xFF, true);
+    // Set to custom color explicitly
+    variable_item_set_current_value_index(temp_item, 13);
+    variable_item_set_current_value_text(temp_item, rgb_backlight_get_color_text(13));
+    notification_message(app->notification, &sequence_display_backlight_on);
+}
+static void color_set_custom_green(VariableItem* item) {
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+    rgb_backlight_set_custom_color(index, 1);
+    char valtext[4] = {};
+    snprintf(valtext, sizeof(valtext), "%d", index);
+    variable_item_set_current_value_text(item, valtext);
+    rgb_backlight_set_color(13);
+    rgb_backlight_update(app->notification->settings.display_brightness * 0xFF, true);
+    // Set to custom color explicitly
+    variable_item_set_current_value_index(temp_item, 13);
+    variable_item_set_current_value_text(temp_item, rgb_backlight_get_color_text(13));
+    notification_message(app->notification, &sequence_display_backlight_on);
+}
+static void color_set_custom_blue(VariableItem* item) {
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+    rgb_backlight_set_custom_color(index, 2);
+    char valtext[4] = {};
+    snprintf(valtext, sizeof(valtext), "%d", index);
+    variable_item_set_current_value_text(item, valtext);
+    rgb_backlight_set_color(13);
+    rgb_backlight_update(app->notification->settings.display_brightness * 0xFF, true);
+    // Set to custom color explicitly
+    variable_item_set_current_value_index(temp_item, 13);
+    variable_item_set_current_value_text(temp_item, rgb_backlight_get_color_text(13));
+    notification_message(app->notification, &sequence_display_backlight_on);
+}
+
 static uint32_t notification_app_settings_exit(void* context) {
     UNUSED(context);
     return VIEW_NONE;
@@ -192,8 +248,40 @@ static NotificationAppSettings* alloc_settings(void) {
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, contrast_text[value_index]);
 
+    // RGB Colors
     item = variable_item_list_add(
-        app->variable_item_list, "LCD Backlight", BACKLIGHT_COUNT, backlight_changed, app);
+        app->variable_item_list, "LCD Color", rgb_backlight_get_color_count(), color_changed, app);
+    value_index = rgb_backlight_get_settings()->display_color_index;
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, rgb_backlight_get_color_text(value_index));
+    temp_item = item;
+
+    // Custom Color - REFACTOR THIS
+    item = variable_item_list_add(
+        app->variable_item_list, "Custom Red", 255, color_set_custom_red, app);
+    value_index = rgb_backlight_get_settings()->custom_r;
+    variable_item_set_current_value_index(item, value_index);
+    char valtext[4] = {};
+    snprintf(valtext, sizeof(valtext), "%d", value_index);
+    variable_item_set_current_value_text(item, valtext);
+
+    item = variable_item_list_add(
+        app->variable_item_list, "Custom Green", 255, color_set_custom_green, app);
+    value_index = rgb_backlight_get_settings()->custom_g;
+    variable_item_set_current_value_index(item, value_index);
+    snprintf(valtext, sizeof(valtext), "%d", value_index);
+    variable_item_set_current_value_text(item, valtext);
+
+    item = variable_item_list_add(
+        app->variable_item_list, "Custom Blue", 255, color_set_custom_blue, app);
+    value_index = rgb_backlight_get_settings()->custom_b;
+    variable_item_set_current_value_index(item, value_index);
+    snprintf(valtext, sizeof(valtext), "%d", value_index);
+    variable_item_set_current_value_text(item, valtext);
+    // End of RGB
+
+    item = variable_item_list_add(
+        app->variable_item_list, "LCD Brightness", BACKLIGHT_COUNT, backlight_changed, app);
     value_index = value_index_float(
         app->notification->settings.display_brightness, backlight_value, BACKLIGHT_COUNT);
     variable_item_set_current_value_index(item, value_index);
