@@ -33,7 +33,7 @@ typedef struct {
     Light light;
 } NotificationLedLayer;
 
-#define NOTIFICATION_SETTINGS_VERSION 0x02
+#define NOTIFICATION_SETTINGS_VERSION 0x03
 #define NOTIFICATION_SETTINGS_PATH    INT_PATH(NOTIFICATION_SETTINGS_FILE_NAME)
 
 typedef struct {
@@ -44,6 +44,7 @@ typedef struct {
     uint32_t display_off_delay_ms;
     int8_t contrast;
     bool vibro_on;
+    bool rgb_mod_installed;
 } NotificationSettings;
 
 struct NotificationApp {

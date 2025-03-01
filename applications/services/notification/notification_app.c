@@ -523,6 +523,7 @@ static NotificationApp* notification_app_alloc(void) {
     app->settings.led_brightness = 1.0f;
     app->settings.display_off_delay_ms = 30000;
     app->settings.vibro_on = true;
+    app->settings.rgb_mod_installed = false;
 
     app->display.value[LayerInternal] = 0x00;
     app->display.value[LayerNotification] = 0x00;

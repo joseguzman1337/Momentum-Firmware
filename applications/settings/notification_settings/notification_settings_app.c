@@ -1,4 +1,5 @@
 #include <furi.h>
+#include <furi_hal_rtc.h>
 #include <notification/notification_app.h>
 #include <gui/modules/variable_item_list.h>
 #include <gui/view_dispatcher.h>
@@ -107,6 +108,13 @@ const char* const vibro_text[VIBRO_COUNT] = {
 };
 const bool vibro_value[VIBRO_COUNT] = {false, true};
 
+#define RGB_MOD_COUNT 2
+const char* const rgb_mod_text[RGB_MOD_COUNT] = {
+    "OFF",
+    "ON",
+};
+const bool rgb_mod_value[RGB_MOD_COUNT] = {false, true};
+
 static void contrast_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
@@ -169,6 +177,13 @@ static void vibro_changed(VariableItem* item) {
     variable_item_set_current_value_text(item, vibro_text[index]);
     app->notification->settings.vibro_on = vibro_value[index];
     notification_message(app->notification, &sequence_single_vibro);
+}
+
+static void rgb_mod_installed_changed(VariableItem* item) {
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+    variable_item_set_current_value_text(item, rgb_mod_text[index]);
+    app->notification->settings.rgb_mod_installed = rgb_mod_value[index];
 }
 
 // Set RGB backlight color
@@ -248,38 +263,59 @@ static NotificationAppSettings* alloc_settings(void) {
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, contrast_text[value_index]);
 
-    // RGB Colors
-    item = variable_item_list_add(
-        app->variable_item_list, "LCD Color", rgb_backlight_get_color_count(), color_changed, app);
-    value_index = rgb_backlight_get_settings()->display_color_index;
-    variable_item_set_current_value_index(item, value_index);
-    variable_item_set_current_value_text(item, rgb_backlight_get_color_text(value_index));
-    temp_item = item;
+    // Show RGB_MOD_Installed_Swith only in Debug mode
+    if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
+        item = variable_item_list_add(
+            app->variable_item_list,
+            "RGB MOD Installed",
+            RGB_MOD_COUNT,
+            rgb_mod_installed_changed,
+            app);
+        value_index = value_index_bool(
+            app->notification->settings.rgb_mod_installed, rgb_mod_value, RGB_MOD_COUNT);
+        variable_item_set_current_value_index(item, value_index);
+        variable_item_set_current_value_text(item, rgb_mod_text[value_index]);
+    }
 
-    // Custom Color - REFACTOR THIS
-    item = variable_item_list_add(
-        app->variable_item_list, "Custom Red", 255, color_set_custom_red, app);
-    value_index = rgb_backlight_get_settings()->custom_r;
-    variable_item_set_current_value_index(item, value_index);
-    char valtext[4] = {};
-    snprintf(valtext, sizeof(valtext), "%d", value_index);
-    variable_item_set_current_value_text(item, valtext);
+    //Show RGB settings only when debug mode enabled or rgb_mod_installed is true
+    if((furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) ||
+       (app->notification->settings.rgb_mod_installed)) {
+        // RGB Colors
+        item = variable_item_list_add(
+            app->variable_item_list,
+            "LCD Color",
+            rgb_backlight_get_color_count(),
+            color_changed,
+            app);
+        value_index = rgb_backlight_get_settings()->display_color_index;
+        variable_item_set_current_value_index(item, value_index);
+        variable_item_set_current_value_text(item, rgb_backlight_get_color_text(value_index));
+        temp_item = item;
 
-    item = variable_item_list_add(
-        app->variable_item_list, "Custom Green", 255, color_set_custom_green, app);
-    value_index = rgb_backlight_get_settings()->custom_g;
-    variable_item_set_current_value_index(item, value_index);
-    snprintf(valtext, sizeof(valtext), "%d", value_index);
-    variable_item_set_current_value_text(item, valtext);
+        // Custom Color - REFACTOR THIS
+        item = variable_item_list_add(
+            app->variable_item_list, "Custom Red", 255, color_set_custom_red, app);
+        value_index = rgb_backlight_get_settings()->custom_r;
+        variable_item_set_current_value_index(item, value_index);
+        char valtext[4] = {};
+        snprintf(valtext, sizeof(valtext), "%d", value_index);
+        variable_item_set_current_value_text(item, valtext);
 
-    item = variable_item_list_add(
-        app->variable_item_list, "Custom Blue", 255, color_set_custom_blue, app);
-    value_index = rgb_backlight_get_settings()->custom_b;
-    variable_item_set_current_value_index(item, value_index);
-    snprintf(valtext, sizeof(valtext), "%d", value_index);
-    variable_item_set_current_value_text(item, valtext);
-    // End of RGB
+        item = variable_item_list_add(
+            app->variable_item_list, "Custom Green", 255, color_set_custom_green, app);
+        value_index = rgb_backlight_get_settings()->custom_g;
+        variable_item_set_current_value_index(item, value_index);
+        snprintf(valtext, sizeof(valtext), "%d", value_index);
+        variable_item_set_current_value_text(item, valtext);
 
+        item = variable_item_list_add(
+            app->variable_item_list, "Custom Blue", 255, color_set_custom_blue, app);
+        value_index = rgb_backlight_get_settings()->custom_b;
+        variable_item_set_current_value_index(item, value_index);
+        snprintf(valtext, sizeof(valtext), "%d", value_index);
+        variable_item_set_current_value_text(item, valtext);
+        // End of RGB
+    }
     item = variable_item_list_add(
         app->variable_item_list, "LCD Brightness", BACKLIGHT_COUNT, backlight_changed, app);
     value_index = value_index_float(
