@@ -277,9 +277,8 @@ static NotificationAppSettings* alloc_settings(void) {
         variable_item_set_current_value_text(item, rgb_mod_text[value_index]);
     }
 
-    //Show RGB settings only when debug mode enabled or rgb_mod_installed is true
-    if((furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) ||
-       (app->notification->settings.rgb_mod_installed)) {
+    //Show RGB settings only when rgb_mod_installed is true
+    if(app->notification->settings.rgb_mod_installed) {
         // RGB Colors
         item = variable_item_list_add(
             app->variable_item_list,
