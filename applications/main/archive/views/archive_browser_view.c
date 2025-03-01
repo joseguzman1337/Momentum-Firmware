@@ -36,6 +36,7 @@ static const Icon* ArchiveItemIcons[] = {
     [ArchiveFileTypeBadUsb] = &I_badusb_10px,
     [ArchiveFileTypeWAV] = &I_music_10px,
     [ArchiveFileTypeMag] = &I_mag_card_10px,
+    [ArchiveFileTypeCrossRemote] = &I_xremote_10px,
     [ArchiveFileTypeU2f] = &I_u2f_10px,
     [ArchiveFileTypeApplication] = &I_Apps_10px,
     [ArchiveFileTypeJS] = &I_js_script_10px,

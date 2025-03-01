@@ -21,6 +21,7 @@ typedef enum {
     ArchiveFileTypeBadUsb,
     ArchiveFileTypeWAV,
     ArchiveFileTypeMag,
+    ArchiveFileTypeCrossRemote,
     ArchiveFileTypeU2f,
     ArchiveFileTypeApplication,
     ArchiveFileTypeJS,
