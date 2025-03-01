@@ -357,6 +357,7 @@ def _validate_app_imports(target, source, env):
                 "calypso_plugin",
                 "charliecard_plugin",
                 "clipper_plugin",
+                "gocard_plugin",
                 "itso_plugin",
                 "metromoney_plugin",
                 "myki_plugin",

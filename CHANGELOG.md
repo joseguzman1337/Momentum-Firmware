@@ -40,14 +40,21 @@
 
 ### Updated:
 - Apps:
+  - Authenticator: Extended valid UTC offset range to be from -12 to +14 (by @akopachov)
   - BH1750 Lightmeter: Update EV compute logic (by @bogdumi)
-  - Cross Remote: Use firmware's IR settings (by @Willy-JL)
+  - Cross Remote: Support external IR modules, fix loop transmit with RAW files, support pinning to favorites in firmware (by @leedave)
+  - DTMF Dolphin: GPIO sound output (by @Dmitry422)
   - FlipWorld: NPCs, in-game menu, new controls, weapon option, many bugfixes (by @jblanked)
   - IR Intervalometer: Add Pentax camera support (by @petrikjp)
   - KeyCopier: Separate Brand and Key Format selection for ease of use (by @zinongli)
-  - Metroflip: Big refactor with plugins and assets to save RAM, RavKav moved to Calypso parser (by @luu176), unified Calypso parser (by @DocSystem)
-  - Picopass: Added Save SR as legacy from saved menu, fix write key 'retry' when presented with new card (by @bettse)
+  - Metroflip: Big refactor with plugins and assets to save RAM, RavKav moved to Calypso parser, ability to save and load files, added gocard plugin (by @luu176), unified Calypso parser (by @DocSystem)
+  - Picopass: Added Save SR as legacy from saved menu, fix write key 'retry' when presented with new card, make iClass SIO sniffing more dynamic (by @bettse)
   - Pinball0: Prevent tilt before ball is in play, fixed Endless table by making bottom portal extend full width (by @rdefeo)
+  - Pomodoro Timer: Add time constraint to talking feature (by @Th3Un1q3)
+  - Quac: Refactor Sub-GHz code to support rolling codes and auto-detect external CC1101, add option to import files as links without copying, scroll long action names (by @rdefeo)
+  - Solitaire: Fixed cards from waste can be placed on the first tableau (by @Erbonator3000)
+  - W5500 Ethernet: Add traceroute command (by @arag0re)
+  - Many app fixes for new firmware changes (by @xMasterX & @Willy-JL)
 - BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
   - Additionally, can now customize MAC address when BLE Remember is enabled
   - Also added `BLE_ID` command, same as `BT_ID`
