@@ -35,6 +35,7 @@ MomentumSettings momentum_settings = {
     .dark_mode = false, // OFF
     .rgb_backlight = false, // OFF
     .butthurt_timer = 21600, // 6 H
+    .midnight_format_00 = true, // 00:XX
     .spi_cc1101_handle = SpiDefault, // &furi_hal_spi_bus_handle_external
     .spi_nrf24_handle = SpiDefault, // &furi_hal_spi_bus_handle_external
     .uart_esp_channel = FuriHalSerialIdUsart, // pin 13,14
@@ -105,6 +106,7 @@ static const struct {
     {setting_bool(dark_mode)},
     {setting_bool(rgb_backlight)},
     {setting_uint(butthurt_timer, 0, 172800)},
+    {setting_bool(midnight_format_00)},
     {setting_enum(spi_cc1101_handle, SpiCount)},
     {setting_enum(spi_nrf24_handle, SpiCount)},
     {setting_enum(uart_esp_channel, FuriHalSerialIdMax)},
