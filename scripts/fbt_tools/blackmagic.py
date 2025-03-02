@@ -1,6 +1,4 @@
 from SCons.Errors import StopError
-from flipper.storage import FlipperStorage
-import serial.tools.list_ports as list_ports
 
 
 class BlackmagicResolver:
@@ -32,18 +30,6 @@ class BlackmagicResolver:
             # print("\n".join([f"{p.device} {vars(p)}" for p in ports]))
             return sorted(ports, key=lambda p: f"{p.location}_{p.name}")[0]
 
-    def _enable_flipper_debug(self):
-        flippers = list(list_ports.grep("flip_"))
-        if len(flippers) != 1:
-            return
-        with FlipperStorage(flippers[0].device) as storage:
-            storage.send_and_wait_eol("sysctl debug 1\r")
-            storage.read.until(storage.CLI_EOL)
-            storage.send_and_wait_eol("sysctl sleep_mode legacy\r")
-            storage.read.until(storage.CLI_EOL)
-            storage.send_and_wait_eol("sysctl log_level debug\r")
-            storage.read.until(storage.CLI_EOL)
-
     # Look up blackmagic probe hostname with dns
     def _resolve_hostname(self):
         import socket
@@ -57,7 +43,6 @@ class BlackmagicResolver:
     def get_serial(self):
         if not (probe := self._find_probe()):
             return None
-        self._enable_flipper_debug()
         # print(f"Found Blackmagic probe on {probe.device}")
         if self.env.subst("$PLATFORM") == "win32":
             return f"\\\\.\\{probe.device}"
