@@ -1,12 +1,21 @@
 #include "../momentum_app.h"
 
 enum VarItemListIndex {
+    VarItemListIndexScrollType,
     VarItemListIndexMidnightFormat,
 };
 
 void momentum_app_scene_interface_general_var_item_list_callback(void* context, uint32_t index) {
     MomentumApp* app = context;
     view_dispatcher_send_custom_event(app->view_dispatcher, index);
+}
+
+static void momentum_app_scene_interface_general_scroll_marquee_changed(VariableItem* item) {
+    MomentumApp* app = variable_item_get_context(item);
+    bool value = variable_item_get_current_value_index(item);
+    variable_item_set_current_value_text(item, value ? "Marquee" : "Standard");
+    momentum_settings.scroll_marquee = value;
+    app->save_settings = true;
 }
 
 static void momentum_app_scene_interface_general_midnight_format_changed(VariableItem* item) {
@@ -21,6 +30,16 @@ void momentum_app_scene_interface_general_on_enter(void* context) {
     MomentumApp* app = context;
     VariableItemList* var_item_list = app->var_item_list;
     VariableItem* item;
+
+    item = variable_item_list_add(
+        var_item_list,
+        "Text Scroll",
+        2,
+        momentum_app_scene_interface_general_scroll_marquee_changed,
+        app);
+    variable_item_set_current_value_index(item, momentum_settings.scroll_marquee);
+    variable_item_set_current_value_text(
+        item, momentum_settings.scroll_marquee ? "Marquee" : "Standard");
 
     item = variable_item_list_add(
         var_item_list,

@@ -32,6 +32,7 @@ MomentumSettings momentum_settings = {
     .show_internal_tab = false, // OFF
     .browser_path_mode = BrowserPathOff, // OFF
     .favorite_timeout = 0, // OFF
+    .scroll_marquee = false, // OFF
     .dark_mode = false, // OFF
     .rgb_backlight = false, // OFF
     .butthurt_timer = 21600, // 6 H
@@ -103,6 +104,7 @@ static const struct {
     {setting_bool(show_internal_tab)},
     {setting_enum(browser_path_mode, BrowserPathModeCount)},
     {setting_uint(favorite_timeout, 0, 60)},
+    {setting_bool(scroll_marquee)},
     {setting_bool(dark_mode)},
     {setting_bool(rgb_backlight)},
     {setting_uint(butthurt_timer, 0, 172800)},

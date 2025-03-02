@@ -210,7 +210,7 @@ static void menu_draw_callback(Canvas* canvas, void* _model) {
                         canvas,
                         pos_x,
                         pos_y - height / 2 - 8,
-                        126,
+                        124,
                         name,
                         scroll_counter,
                         false,

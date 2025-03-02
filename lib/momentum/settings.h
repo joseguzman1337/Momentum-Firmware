@@ -89,6 +89,7 @@ typedef struct {
     bool show_internal_tab;
     BrowserPathMode browser_path_mode;
     uint32_t favorite_timeout;
+    bool scroll_marquee;
     bool dark_mode;
     bool rgb_backlight;
     uint32_t butthurt_timer;
