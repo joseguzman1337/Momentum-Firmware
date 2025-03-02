@@ -15,6 +15,7 @@
 ### Added:
 - Apps:
   - Games: Quadrastic (by @ivanbarsukov)
+  - USB: Portal Of Flipper (by @Bettse)
 - UL: Sub-GHz: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
 - RFID:
   - OFW: EM4305 support (by @Astrrra)
