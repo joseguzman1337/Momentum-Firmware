@@ -147,12 +147,18 @@ InfraredErrorCode infrared_brute_force_calculate_messages(
 
             InfraredBruteForceRecord* record =
                 InfraredBruteForceRecordDict_get(brute_force->records, signal_name);
-            if(!record && auto_detect_buttons) {
-                infrared_brute_force_add_record(
-                    brute_force, auto_detect_button_index++, furi_string_get_cstr(signal_name));
-                record = InfraredBruteForceRecordDict_get(brute_force->records, signal_name);
+            if(!record) {
+                if(auto_detect_buttons) {
+                    infrared_brute_force_add_record(
+                        brute_force,
+                        auto_detect_button_index++,
+                        furi_string_get_cstr(signal_name));
+                    record = InfraredBruteForceRecordDict_get(brute_force->records, signal_name);
+                } else {
+                    FURI_LOG_E(TAG, "Unknown signal name: %s", furi_string_get_cstr(signal_name));
+                    furi_crash("Unknown signal name");
+                }
             }
-            furi_assert(record);
             SignalPositionArray_push_back(record->signals, signal_start);
         }
         if(!signal_valid) break;
