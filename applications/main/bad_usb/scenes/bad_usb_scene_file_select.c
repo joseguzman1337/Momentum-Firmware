@@ -27,6 +27,7 @@ void bad_usb_scene_file_select_on_enter(void* context) {
     }
 
     if(bad_usb_file_select(bad_usb)) {
+        scene_manager_set_scene_state(bad_usb->scene_manager, BadUsbSceneWork, true);
         scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneWork);
     } else {
         view_dispatcher_stop(bad_usb->view_dispatcher);

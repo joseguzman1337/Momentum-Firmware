@@ -34,7 +34,11 @@ typedef struct {
 
 typedef struct BadUsbScript BadUsbScript;
 
-BadUsbScript* bad_usb_script_open(FuriString* file_path, BadUsbHidInterface interface);
+BadUsbScript* bad_usb_script_open(
+    FuriString* file_path,
+    BadUsbHidInterface* interface,
+    BadUsbHidConfig* hid_cfg,
+    bool load_id_cfg);
 
 void bad_usb_script_close(BadUsbScript* bad_usb);
 
