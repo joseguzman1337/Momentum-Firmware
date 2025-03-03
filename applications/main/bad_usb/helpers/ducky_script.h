@@ -30,6 +30,7 @@ typedef struct {
     uint32_t delay_remain;
     size_t error_line;
     char error[64];
+    uint32_t elapsed;
 } BadUsbState;
 
 typedef struct BadUsbScript BadUsbScript;

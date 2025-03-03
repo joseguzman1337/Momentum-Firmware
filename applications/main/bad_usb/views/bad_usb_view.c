@@ -35,6 +35,8 @@ static void bad_usb_draw_callback(Canvas* canvas, void* _model) {
     } else {
         furi_string_printf(disp_str, "(%s)", model->layout);
     }
+    uint32_t e = model->state.elapsed;
+    furi_string_cat_printf(disp_str, "  %02lu:%02lu.%ld", e / 60 / 1000, e / 1000, e % 1000);
     elements_string_fit_width(canvas, disp_str, 128 - 2);
     canvas_draw_str(
         canvas, 2, 8 + canvas_current_font_height(canvas), furi_string_get_cstr(disp_str));
