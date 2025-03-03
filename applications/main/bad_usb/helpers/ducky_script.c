@@ -532,7 +532,7 @@ static int32_t bad_usb_worker(void* context) {
             bad_usb->st.state = worker_state;
 
         } else if(worker_state == BadUsbStateRunning) { // State: running
-            uint16_t delay_cur = (delay_val > 1000) ? (1000) : (delay_val);
+            uint16_t delay_cur = (delay_val > 100) ? (100) : (delay_val);
             uint32_t flags = furi_thread_flags_wait(
                 WorkerEvtEnd | WorkerEvtStartStop | WorkerEvtPauseResume | WorkerEvtDisconnect,
                 FuriFlagWaitAny,
@@ -581,9 +581,9 @@ static int32_t bad_usb_worker(void* context) {
                 } else if(delay_val == SCRIPT_STATE_WAIT_FOR_BTN) { // set state to wait for user input
                     worker_state = BadUsbStateWaitForBtn;
                     bad_usb->st.state = BadUsbStateWaitForBtn; // Show long delays
-                } else if(delay_val > 1000) {
+                } else if(delay_val > 100) {
                     bad_usb->st.state = BadUsbStateDelay; // Show long delays
-                    bad_usb->st.delay_remain = delay_val / 1000;
+                    bad_usb->st.delay_remain = delay_val / 100;
                 }
             } else {
                 furi_check((flags & FuriFlagError) == 0);
@@ -624,7 +624,7 @@ static int32_t bad_usb_worker(void* context) {
                     if(pause_state == BadUsbStateRunning) {
                         if(delay_val > 0) {
                             bad_usb->st.state = BadUsbStateDelay;
-                            bad_usb->st.delay_remain = delay_val / 1000;
+                            bad_usb->st.delay_remain = delay_val / 100;
                         } else {
                             bad_usb->st.state = BadUsbStateRunning;
                             delay_val = 0;
