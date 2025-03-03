@@ -24,8 +24,7 @@ typedef struct {
 static void bad_usb_draw_callback(Canvas* canvas, void* _model) {
     BadUsbModel* model = _model;
 
-    FuriString* disp_str;
-    disp_str = furi_string_alloc_set(model->file_name);
+    FuriString* disp_str = furi_string_alloc_set(model->file_name);
     elements_string_fit_width(canvas, disp_str, 128 - 2);
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 2, 8, furi_string_get_cstr(disp_str));

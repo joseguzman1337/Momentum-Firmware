@@ -1,5 +1,4 @@
 #include "../bad_usb_app_i.h"
-#include <furi_hal_power.h>
 #include <storage/storage.h>
 
 static bool bad_usb_file_select(BadUsbApp* bad_usb) {
@@ -37,11 +36,9 @@ void bad_usb_scene_file_select_on_enter(void* context) {
 bool bad_usb_scene_file_select_on_event(void* context, SceneManagerEvent event) {
     UNUSED(context);
     UNUSED(event);
-    // BadUsbApp* bad_usb = context;
     return false;
 }
 
 void bad_usb_scene_file_select_on_exit(void* context) {
     UNUSED(context);
-    // BadUsbApp* bad_usb = context;
 }

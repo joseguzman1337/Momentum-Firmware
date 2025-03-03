@@ -37,11 +37,9 @@ void bad_usb_scene_config_layout_on_enter(void* context) {
 bool bad_usb_scene_config_layout_on_event(void* context, SceneManagerEvent event) {
     UNUSED(context);
     UNUSED(event);
-    // BadUsbApp* bad_usb = context;
     return false;
 }
 
 void bad_usb_scene_config_layout_on_exit(void* context) {
     UNUSED(context);
-    // BadUsbApp* bad_usb = context;
 }
