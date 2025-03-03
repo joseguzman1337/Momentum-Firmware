@@ -210,8 +210,13 @@ static int32_t ducky_parse_line(BadUsbScript* bad_usb, FuriString* line) {
     }
     if((key & 0xFF00) != 0) {
         // It's a modifier key
-        line_tmp = &line_tmp[ducky_get_command_len(line_tmp) + 1];
-        key |= ducky_get_keycode(bad_usb, line_tmp, true);
+        uint32_t offset = ducky_get_command_len(line_tmp) + 1;
+        // ducky_get_command_len() returns 0 without space, so check for != 1
+        if(offset != 1 && line_len > offset) {
+            // It's also a key combination
+            line_tmp = &line_tmp[offset];
+            key |= ducky_get_keycode(bad_usb, line_tmp, true);
+        }
     }
     bad_usb->hid->kb_press(bad_usb->hid_inst, key);
     bad_usb->hid->kb_release(bad_usb->hid_inst, key);
