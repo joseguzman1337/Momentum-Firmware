@@ -512,18 +512,49 @@ static void input_event_callback(const void* value, void* context) {
     notification_message(app, &sequence_display_backlight_on);
 }
 
+// RGB MOD RAINBOW SECTION
+
+//start furi timer for rgb_mod_rainbow
+static void rgb_mod_rainbow_timer_start(NotificationApp* app) {
+    furi_timer_start(
+        app->rgb_mod_rainbow_timer, furi_ms_to_ticks(app->settings.rgb_mod_rainbow_speed_ms));
+}
+
+//stop furi timer for rgb_mod_rainbow
+static void rgb_mod_rainbow_timer_stop(NotificationApp* app) {
+    furi_timer_stop(app->rgb_mod_rainbow_timer);
+}
+
+// start/stop rgb_mod_rainbow_timer only if rgb_mod_installed
+static void rgb_mod_rainbow_timer_control(NotificationApp* app) {
+    if(app->settings.rgb_mod_installed) {
+        if(app->settings.rgb_mod_rainbow) {
+            rgb_mod_rainbow_timer_start(app);
+        } else {
+            rgb_mod_rainbow_timer_stop(app);
+        }
+    }
+}
+
+// callback for rgb_mod_rainbow_timer (what we do when timer end)
+static void rgb_mod_rainbow_timer_callback(void* context) {
+    furi_assert(context);
+    FURI_LOG_I("RAINBOW", "Rainbow timer callback - change color");
+}
+
+// END OF RGB MOD RAINBOW SECTION
+
 // App alloc
 static NotificationApp* notification_app_alloc(void) {
     NotificationApp* app = malloc(sizeof(NotificationApp));
     app->queue = furi_message_queue_alloc(8, sizeof(NotificationAppMessage));
-    app->display_timer = furi_timer_alloc(notification_display_timer, FuriTimerTypeOnce, app);
+    app->display_timer = furi_timer_alloc(notification_display_timer, FuriTimerTypePeriodic, app);
 
     app->settings.speaker_volume = 1.0f;
     app->settings.display_brightness = 1.0f;
     app->settings.led_brightness = 1.0f;
     app->settings.display_off_delay_ms = 30000;
     app->settings.vibro_on = true;
-    app->settings.rgb_mod_installed = false;
 
     app->display.value[LayerInternal] = 0x00;
     app->display.value[LayerNotification] = 0x00;
@@ -552,7 +583,25 @@ static NotificationApp* notification_app_alloc(void) {
     furi_pubsub_subscribe(app->event_record, input_event_callback, app);
     notification_message(app, &sequence_display_backlight_on);
 
+    //RGB MOD SECTION
+
+    //rgb mod
+    app->settings.rgb_mod_installed = false;
+
+    //rgb mod rainbow init settings
+    app->settings.rgb_mod_rainbow = false;
+    app->settings.rgb_mod_rainbow_speed_ms = 1000;
+    app->settings.rgb_mod_rainbow_step = 1;
+    app->rgb_mod_rainbow_color1 = 1;
+    app->rgb_mod_rainbow_color2 = 1;
+    app->rgb_mod_rainbow_color3 = 1;
+
+    //define rgb_mod_rainbow_timer and they callback
+    app->rgb_mod_rainbow_timer =
+        furi_timer_alloc(rgb_mod_rainbow_timer_callback, FuriTimerTypePeriodic, app);
     return app;
+
+    // END OF RGB SECTION
 }
 
 static void notification_storage_callback(const void* message, void* context) {
@@ -575,6 +624,8 @@ static void notification_apply_settings(NotificationApp* app) {
     }
 
     notification_apply_lcd_contrast(app);
+    // on system init start rgb_mod_rainbow_timer if they ON in config
+    rgb_mod_rainbow_timer_control(app);
 }
 
 static void notification_init_settings(NotificationApp* app) {
@@ -619,6 +670,8 @@ int32_t notification_srv(void* p) {
         case SaveSettingsMessage:
             notification_save_settings(app);
             rgb_backlight_save_settings();
+            //call rgb_mod_timer_control when we save settings
+            rgb_mod_rainbow_timer_control(app);
             break;
         case LoadSettingsMessage:
             notification_load_settings(app);

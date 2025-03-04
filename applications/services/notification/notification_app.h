@@ -44,7 +44,12 @@ typedef struct {
     uint32_t display_off_delay_ms;
     int8_t contrast;
     bool vibro_on;
+    
     bool rgb_mod_installed;
+    bool rgb_mod_rainbow;
+    uint32_t rgb_mod_rainbow_speed_ms;
+    uint32_t rgb_mod_rainbow_step;
+
 } NotificationSettings;
 
 struct NotificationApp {
@@ -55,6 +60,13 @@ struct NotificationApp {
     NotificationLedLayer display;
     NotificationLedLayer led[NOTIFICATION_LED_COUNT];
     uint8_t display_led_lock;
+
+    // rainbow mode section
+    FuriTimer* rgb_mod_rainbow_timer;
+    int8_t rgb_mod_rainbow_color1;
+    int8_t rgb_mod_rainbow_color2;
+    int8_t rgb_mod_rainbow_color3;
+  
 
     NotificationSettings settings;
 };
