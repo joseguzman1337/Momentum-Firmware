@@ -63,9 +63,9 @@ struct NotificationApp {
 
     // rainbow mode section
     FuriTimer* rgb_mod_rainbow_timer;
-    int8_t rgb_mod_rainbow_color1;
-    int8_t rgb_mod_rainbow_color2;
-    int8_t rgb_mod_rainbow_color3;
+    uint8_t rgb_mod_rainbow_color1;
+    uint8_t rgb_mod_rainbow_color2;
+    uint8_t rgb_mod_rainbow_color3;
   
 
     NotificationSettings settings;

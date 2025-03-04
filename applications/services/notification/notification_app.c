@@ -189,6 +189,61 @@ static void notification_display_timer(void* ctx) {
     notification_message(app, &sequence_display_backlight_off);
 }
 
+// RGB MOD RAINBOW SECTION
+
+//start furi timer for rgb_mod_rainbow
+static void rgb_mod_rainbow_timer_start(NotificationApp* app) {
+    furi_timer_start(
+        app->rgb_mod_rainbow_timer, furi_ms_to_ticks(app->settings.rgb_mod_rainbow_speed_ms));
+}
+
+//stop furi timer for rgb_mod_rainbow
+static void rgb_mod_rainbow_timer_stop(NotificationApp* app) {
+    furi_timer_stop(app->rgb_mod_rainbow_timer);
+}
+
+// start/stop rgb_mod_rainbow_timer only if rgb_mod_installed
+static void rgb_mod_rainbow_timer_control(NotificationApp* app) {
+    if(app->settings.rgb_mod_installed) {
+        if(app->settings.rgb_mod_rainbow) {
+            rgb_mod_rainbow_timer_start(app);
+        } else {
+            if(furi_timer_is_running(app->rgb_mod_rainbow_timer)) {
+                rgb_mod_rainbow_timer_stop(app);
+            }
+        }
+    }
+}
+
+// callback for rgb_mod_rainbow_timer (what we do when timer end)
+static void rgb_mod_rainbow_timer_callback(void* context) {
+    furi_assert(context);
+    NotificationApp* app = context;
+
+// УЧЕСТЬ СТЕП и его вероятность превысить 255
+// При выключении радуги активировать настроенный в меню цвет
+
+    app->rgb_mod_rainbow_color3++;
+
+    if(app->rgb_mod_rainbow_color3 == 255) {
+        app->rgb_mod_rainbow_color2++;
+        app->rgb_mod_rainbow_color3 = 1;
+    }
+
+    if(app->rgb_mod_rainbow_color2 == 255) {
+        app->rgb_mod_rainbow_color1++;
+        app->rgb_mod_rainbow_color2 = 1;
+    }
+    if(app->rgb_mod_rainbow_color1 == 255) {
+        app->rgb_mod_rainbow_color1 = 1;
+    }
+    FURI_LOG_I("RAINBOW", "Color3 %u", app->rgb_mod_rainbow_color3);
+    FURI_LOG_I("RAINBOW", "Color2 %u", app->rgb_mod_rainbow_color2);
+    FURI_LOG_I("RAINBOW", "Color1 %u", app->rgb_mod_rainbow_color1);
+}
+
+// END OF RGB MOD RAINBOW SECTION
+
 // message processing
 static void notification_process_notification_message(
     NotificationApp* app,
@@ -219,11 +274,17 @@ static void notification_process_notification_message(
                     &app->display,
                     notification_message->data.led.value * display_brightness_setting);
                 reset_mask |= reset_display_mask;
+                //start rgb_mod_rainbow_timer when display backlight is ON
+                rgb_mod_rainbow_timer_control(app);
             } else {
                 reset_mask &= ~reset_display_mask;
                 notification_reset_notification_led_layer(&app->display);
                 if(furi_timer_is_running(app->display_timer)) {
                     furi_timer_stop(app->display_timer);
+                }
+                //stop rgb_mod_rainbow_timer when display backlight is OFF
+                if(furi_timer_is_running(app->rgb_mod_rainbow_timer)) {
+                    rgb_mod_rainbow_timer_stop(app);
                 }
             }
             break;
@@ -511,38 +572,6 @@ static void input_event_callback(const void* value, void* context) {
     NotificationApp* app = context;
     notification_message(app, &sequence_display_backlight_on);
 }
-
-// RGB MOD RAINBOW SECTION
-
-//start furi timer for rgb_mod_rainbow
-static void rgb_mod_rainbow_timer_start(NotificationApp* app) {
-    furi_timer_start(
-        app->rgb_mod_rainbow_timer, furi_ms_to_ticks(app->settings.rgb_mod_rainbow_speed_ms));
-}
-
-//stop furi timer for rgb_mod_rainbow
-static void rgb_mod_rainbow_timer_stop(NotificationApp* app) {
-    furi_timer_stop(app->rgb_mod_rainbow_timer);
-}
-
-// start/stop rgb_mod_rainbow_timer only if rgb_mod_installed
-static void rgb_mod_rainbow_timer_control(NotificationApp* app) {
-    if(app->settings.rgb_mod_installed) {
-        if(app->settings.rgb_mod_rainbow) {
-            rgb_mod_rainbow_timer_start(app);
-        } else {
-            rgb_mod_rainbow_timer_stop(app);
-        }
-    }
-}
-
-// callback for rgb_mod_rainbow_timer (what we do when timer end)
-static void rgb_mod_rainbow_timer_callback(void* context) {
-    furi_assert(context);
-    FURI_LOG_I("RAINBOW", "Rainbow timer callback - change color");
-}
-
-// END OF RGB MOD RAINBOW SECTION
 
 // App alloc
 static NotificationApp* notification_app_alloc(void) {
