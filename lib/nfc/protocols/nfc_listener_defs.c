@@ -14,10 +14,11 @@ const NfcListenerBase* nfc_listeners_api[NfcProtocolNum] = {
     [NfcProtocolIso14443_4a] = &nfc_listener_iso14443_4a,
     [NfcProtocolIso14443_4b] = NULL,
     [NfcProtocolIso15693_3] = &nfc_listener_iso15693_3,
+    [NfcProtocolFelica] = &nfc_listener_felica,
     [NfcProtocolMfUltralight] = &mf_ultralight_listener,
     [NfcProtocolMfClassic] = &mf_classic_listener,
     [NfcProtocolMfDesfire] = NULL,
     [NfcProtocolSlix] = &nfc_listener_slix,
     [NfcProtocolSt25tb] = NULL,
-    [NfcProtocolFelica] = &nfc_listener_felica,
+    [NfcProtocolType4Tag] = NULL,
 };

@@ -169,6 +169,8 @@ Header,+,lib/nfc/protocols/slix/slix_poller.h,,
 Header,+,lib/nfc/protocols/st25tb/st25tb.h,,
 Header,+,lib/nfc/protocols/st25tb/st25tb_poller.h,,
 Header,+,lib/nfc/protocols/st25tb/st25tb_poller_sync.h,,
+Header,+,lib/nfc/protocols/type_4_tag/type_4_tag.h,,
+Header,+,lib/nfc/protocols/type_4_tag/type_4_tag_poller.h,,
 Header,+,lib/one_wire/maxim_crc.h,,
 Header,+,lib/one_wire/one_wire_host.h,,
 Header,+,lib/one_wire/one_wire_slave.h,,
@@ -3625,6 +3627,18 @@ Function,-,toupper_l,int,"int, locale_t"
 Function,-,trunc,double,double
 Function,-,truncf,float,float
 Function,-,truncl,long double,long double
+Function,+,type_4_tag_alloc,Type4TagData*,
+Function,+,type_4_tag_copy,void,"Type4TagData*, const Type4TagData*"
+Function,+,type_4_tag_free,void,Type4TagData*
+Function,+,type_4_tag_get_base_data,Iso14443_4aData*,const Type4TagData*
+Function,+,type_4_tag_get_device_name,const char*,"const Type4TagData*, NfcDeviceNameType"
+Function,+,type_4_tag_get_uid,const uint8_t*,"const Type4TagData*, size_t*"
+Function,+,type_4_tag_is_equal,_Bool,"const Type4TagData*, const Type4TagData*"
+Function,+,type_4_tag_load,_Bool,"Type4TagData*, FlipperFormat*, uint32_t"
+Function,+,type_4_tag_reset,void,Type4TagData*
+Function,+,type_4_tag_save,_Bool,"const Type4TagData*, FlipperFormat*"
+Function,+,type_4_tag_set_uid,_Bool,"Type4TagData*, const uint8_t*, size_t"
+Function,+,type_4_tag_verify,_Bool,"Type4TagData*, const FuriString*"
 Function,+,uint8_to_hex_chars,void,"const uint8_t*, uint8_t*, int"
 Function,-,ungetc,int,"int, FILE*"
 Function,-,unsetenv,int,const char*
@@ -4012,6 +4026,7 @@ Variable,-,nfc_device_mf_desfire,const NfcDeviceBase,
 Variable,-,nfc_device_mf_plus,const NfcDeviceBase,
 Variable,-,nfc_device_mf_ultralight,const NfcDeviceBase,
 Variable,-,nfc_device_st25tb,const NfcDeviceBase,
+Variable,-,nfc_device_type_4_tag,const NfcDeviceBase,
 Variable,+,sequence_audiovisual_alert,const NotificationSequence,
 Variable,+,sequence_blink_blue_10,const NotificationSequence,
 Variable,+,sequence_blink_blue_100,const NotificationSequence,

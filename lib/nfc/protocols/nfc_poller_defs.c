@@ -12,6 +12,7 @@
 #include <nfc/protocols/mf_desfire/mf_desfire_poller_defs.h>
 #include <nfc/protocols/slix/slix_poller_defs.h>
 #include <nfc/protocols/st25tb/st25tb_poller_defs.h>
+#include <nfc/protocols/type_4_tag/type_4_tag_poller_defs.h>
 
 const NfcPollerBase* nfc_pollers_api[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = &nfc_poller_iso14443_3a,
@@ -25,6 +26,7 @@ const NfcPollerBase* nfc_pollers_api[NfcProtocolNum] = {
     [NfcProtocolMfPlus] = &mf_plus_poller,
     [NfcProtocolMfDesfire] = &mf_desfire_poller,
     [NfcProtocolSlix] = &nfc_poller_slix,
-    /* Add new pollers here */
     [NfcProtocolSt25tb] = &nfc_poller_st25tb,
+    [NfcProtocolType4Tag] = &type_4_tag_poller,
+    /* Add new pollers here */
 };
