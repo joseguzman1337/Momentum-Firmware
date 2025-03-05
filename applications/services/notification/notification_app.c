@@ -220,26 +220,31 @@ static void rgb_mod_rainbow_timer_callback(void* context) {
     furi_assert(context);
     NotificationApp* app = context;
 
-// УЧЕСТЬ СТЕП и его вероятность превысить 255
 // При выключении радуги активировать настроенный в меню цвет
 
-    app->rgb_mod_rainbow_color3++;
-
-    if(app->rgb_mod_rainbow_color3 == 255) {
-        app->rgb_mod_rainbow_color2++;
-        app->rgb_mod_rainbow_color3 = 1;
+    if(app->rgb_mod_rainbow_red >= 255) {
+        app->rgb_mod_rainbow_red = 1;
+        app->rgb_mod_rainbow_green += app->settings.rgb_mod_rainbow_step;
     }
 
-    if(app->rgb_mod_rainbow_color2 == 255) {
-        app->rgb_mod_rainbow_color1++;
-        app->rgb_mod_rainbow_color2 = 1;
+    if(app->rgb_mod_rainbow_green >= 255) {
+        app->rgb_mod_rainbow_green = 1;
+        app->rgb_mod_rainbow_blue += app->settings.rgb_mod_rainbow_step;
     }
-    if(app->rgb_mod_rainbow_color1 == 255) {
-        app->rgb_mod_rainbow_color1 = 1;
+
+    if(app->rgb_mod_rainbow_blue >= 255) {
+        app->rgb_mod_rainbow_blue = 1;
     }
-    FURI_LOG_I("RAINBOW", "Color3 %u", app->rgb_mod_rainbow_color3);
-    FURI_LOG_I("RAINBOW", "Color2 %u", app->rgb_mod_rainbow_color2);
-    FURI_LOG_I("RAINBOW", "Color1 %u", app->rgb_mod_rainbow_color1);
+
+    rgb_backlight_set_custom_color(app->rgb_mod_rainbow_red, 0);
+    rgb_backlight_set_custom_color(app->rgb_mod_rainbow_green, 1);
+    rgb_backlight_set_custom_color(app->rgb_mod_rainbow_blue, 2);
+
+    FURI_LOG_I("RAINBOW", "RED %u", app->rgb_mod_rainbow_red);
+    FURI_LOG_I("RAINBOW", "GREEN %u", app->rgb_mod_rainbow_green);
+    FURI_LOG_I("RAINBOW", "BLUE %u", app->rgb_mod_rainbow_blue);
+
+    app->rgb_mod_rainbow_red += app->settings.rgb_mod_rainbow_step;
 }
 
 // END OF RGB MOD RAINBOW SECTION
@@ -274,7 +279,7 @@ static void notification_process_notification_message(
                     &app->display,
                     notification_message->data.led.value * display_brightness_setting);
                 reset_mask |= reset_display_mask;
-                //start rgb_mod_rainbow_timer when display backlight is ON
+                //start rgb_mod_rainbow_timer when display backlight is ON and all corresponding settings is ON too
                 rgb_mod_rainbow_timer_control(app);
             } else {
                 reset_mask &= ~reset_display_mask;
@@ -621,9 +626,9 @@ static NotificationApp* notification_app_alloc(void) {
     app->settings.rgb_mod_rainbow = false;
     app->settings.rgb_mod_rainbow_speed_ms = 1000;
     app->settings.rgb_mod_rainbow_step = 1;
-    app->rgb_mod_rainbow_color1 = 1;
-    app->rgb_mod_rainbow_color2 = 1;
-    app->rgb_mod_rainbow_color3 = 1;
+    app->rgb_mod_rainbow_red = 1;
+    app->rgb_mod_rainbow_green = 1;
+    app->rgb_mod_rainbow_blue = 1;
 
     //define rgb_mod_rainbow_timer and they callback
     app->rgb_mod_rainbow_timer =
@@ -699,7 +704,7 @@ int32_t notification_srv(void* p) {
         case SaveSettingsMessage:
             notification_save_settings(app);
             rgb_backlight_save_settings();
-            //call rgb_mod_timer_control when we save settings
+            //call rgb_mod_timer_control (start or stop) when we save settings
             rgb_mod_rainbow_timer_control(app);
             break;
         case LoadSettingsMessage:
