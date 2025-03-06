@@ -2,8 +2,6 @@
 
 #include "../iso14443_4a/iso14443_4a_render.h"
 
-#define TYPE_4_TAG_RENDER_MAX_RECORD_SIZE (256U)
-
 void nfc_render_type_4_tag_info(
     const Type4TagData* data,
     NfcProtocolFormatType format_type,
@@ -11,26 +9,27 @@ void nfc_render_type_4_tag_info(
     nfc_render_iso14443_4a_brief(type_4_tag_get_base_data(data), str);
 
     furi_string_cat(str, "\n:::::::::::::::[Stored NDEF]:::::::::::::::\n");
-    furi_string_cat_printf(
-        str, "Current NDEF Size: %lu\n", simple_array_get_count(data->ndef_data));
+    furi_string_cat_printf(str, "Current NDEF Size: %lu", simple_array_get_count(data->ndef_data));
 
-    furi_string_cat(str, "::::::::::::::::::[Tag Specs]::::::::::::::::::\n");
-    furi_string_cat_printf(
-        str, "T4T Mapping Version: %u.%u\n", data->t4t_version.major, data->t4t_version.minor);
-    furi_string_cat_printf(str, "NDEF File ID: 0x%04X\n", data->ndef_file_id);
-    furi_string_cat_printf(str, "Max NDEF Size: %u\n", data->ndef_max_len);
-    furi_string_cat_printf(
-        str, "APDU Sizes: R:%u W:%u\n", data->chunk_max_read, data->chunk_max_write);
-    furi_string_cat_printf(
-        str,
-        "Read Lock: 0x%02X%s\n",
-        data->ndef_read_lock,
-        data->ndef_read_lock == 0 ? " (unlocked)" : "");
-    furi_string_cat_printf(
-        str,
-        "Write Lock: 0x%02X%s",
-        data->ndef_write_lock,
-        data->ndef_write_lock == 0 ? " (unlocked)" : "");
+    if(data->is_tag_specific) {
+        furi_string_cat(str, "\n::::::::::::::::::[Tag Specs]::::::::::::::::::\n");
+        furi_string_cat_printf(
+            str, "T4T Mapping Version: %u.%u\n", data->t4t_version.major, data->t4t_version.minor);
+        furi_string_cat_printf(str, "NDEF File ID: 0x%04X\n", data->ndef_file_id);
+        furi_string_cat_printf(str, "Max NDEF Size: %u\n", data->ndef_max_len);
+        furi_string_cat_printf(
+            str, "APDU Sizes: R:%u W:%u\n", data->chunk_max_read, data->chunk_max_write);
+        furi_string_cat_printf(
+            str,
+            "Read Lock: 0x%02X%s\n",
+            data->ndef_read_lock,
+            data->ndef_read_lock == 0 ? " (unlocked)" : "");
+        furi_string_cat_printf(
+            str,
+            "Write Lock: 0x%02X%s",
+            data->ndef_write_lock,
+            data->ndef_write_lock == 0 ? " (unlocked)" : "");
+    }
 
     if(format_type != NfcProtocolFormatTypeFull) return;
 

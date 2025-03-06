@@ -41,6 +41,7 @@ void type_4_tag_reset(Type4TagData* data) {
 
     iso14443_4a_reset(data->iso14443_4a_data);
 
+    data->is_tag_specific = false;
     data->t4t_version.value = 0;
     data->chunk_max_read = 0;
     data->chunk_max_write = 0;
@@ -60,6 +61,7 @@ void type_4_tag_copy(Type4TagData* data, const Type4TagData* other) {
 
     iso14443_4a_copy(data->iso14443_4a_data, other->iso14443_4a_data);
 
+    data->is_tag_specific = other->is_tag_specific;
     data->t4t_version.value = other->t4t_version.value;
     data->chunk_max_read = other->chunk_max_read;
     data->chunk_max_write = other->chunk_max_write;
@@ -89,6 +91,8 @@ bool type_4_tag_load(Type4TagData* data, FlipperFormat* ff, uint32_t version) {
     do {
         if(!iso14443_4a_load(data->iso14443_4a_data, ff, version)) break;
 
+        if(!type_4_tag_ndef_data_load(data, ff)) break;
+
         success = true;
     } while(false);
 
@@ -109,6 +113,7 @@ bool type_4_tag_save(const Type4TagData* data, FlipperFormat* ff) {
 
         if(!flipper_format_write_comment_cstr(ff, TYPE_4_TAG_PROTOCOL_NAME " specific data"))
             break;
+        if(!type_4_tag_ndef_data_save(data, ff)) break;
 
         success = true;
     } while(false);
@@ -122,6 +127,7 @@ bool type_4_tag_is_equal(const Type4TagData* data, const Type4TagData* other) {
     furi_check(other);
 
     return iso14443_4a_is_equal(data->iso14443_4a_data, other->iso14443_4a_data) &&
+           data->is_tag_specific == other->is_tag_specific &&
            data->t4t_version.value == other->t4t_version.value &&
            data->chunk_max_read == other->chunk_max_read &&
            data->chunk_max_write == other->chunk_max_write &&

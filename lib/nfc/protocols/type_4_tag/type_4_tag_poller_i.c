@@ -137,6 +137,7 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
             break;
         }
 
+        instance->data->is_tag_specific = true;
         instance->data->t4t_version.value = cc->t4t_vno;
         instance->data->chunk_max_read = bit_lib_bytes_to_num_be((void*)&cc->mle, sizeof(cc->mle));
         instance->data->chunk_max_write =

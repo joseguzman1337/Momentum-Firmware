@@ -2,26 +2,30 @@
 
 #include "type_4_tag.h"
 
+// ISO SELECT FILE command and parameters
 #define TYPE_4_TAG_ISO_SELECT_CMD        0x00, 0xA4
 #define TYPE_4_TAG_ISO_SELECT_P1_BY_NAME (0x04)
 #define TYPE_4_TAG_ISO_SELECT_P1_BY_ID   (0x00)
 #define TYPE_4_TAG_ISO_SELECT_P2_EMPTY   (0x0C)
 #define TYPE_4_TAG_ISO_SELECT_LE_EMPTY   (0x00)
 
+// ISO READ BINARY command and parameters
 #define TYPE_4_TAG_ISO_READ_CMD          0x00, 0xB0
 #define TYPE_4_TAG_ISO_READ_P1_EMPTY     (0x00)
 #define TYPE_4_TAG_ISO_READ_P2_BEGINNING (0x00)
 #define TYPE_4_TAG_ISO_READ_LE_FULL      (0x00)
 
-#define TYPE_4_TAG_ISO_STATUS_LEN     (2)
+// Common APDU parameters and values
+#define TYPE_4_TAG_ISO_STATUS_LEN     (2U)
 #define TYPE_4_TAG_ISO_STATUS_SUCCESS 0x90, 0x00
-#define TYPE_4_TAG_ISO_RW_CHUNK_LEN   (255)
-#define TYPE_4_TAG_ISO_APP_NAME_LEN   (7)
+#define TYPE_4_TAG_ISO_RW_CHUNK_LEN   (255U)
+#define TYPE_4_TAG_ISO_APP_NAME_LEN   (7U)
 #define TYPE_4_TAG_ISO_APP_NAME       0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01
-#define TYPE_4_TAG_T4T_CC_FILE_ID_LEN (2)
+#define TYPE_4_TAG_T4T_CC_FILE_ID_LEN (2U)
 #define TYPE_4_TAG_T4T_CC_FILE_ID     0xE1, 0x03
+#define TYPE_4_TAG_T4T_CC_VNO         (0x20)
 
-#define TYPE_4_TAG_T4T_CC_VNO 0x20
+// Capability Container parsing structures
 
 typedef enum FURI_PACKED {
     Type4TagCcTlvTypeNdefFileCtrl = 0x04,
@@ -52,3 +56,11 @@ typedef struct FURI_PACKED {
     uint16_t mlc;
     Type4TagCcTlv tlv[];
 } Type4TagCc;
+
+// Load internal Type4Tag structures
+
+bool type_4_tag_ndef_data_load(Type4TagData* data, FlipperFormat* ff);
+
+// Save internal Type4Tag structures
+
+bool type_4_tag_ndef_data_save(const Type4TagData* data, FlipperFormat* ff);

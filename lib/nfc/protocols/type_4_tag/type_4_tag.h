@@ -17,7 +17,8 @@ typedef enum {
 
 typedef struct {
     Iso14443_4aData* iso14443_4a_data;
-    // Tag specific
+    // Tag specific data
+    bool is_tag_specific;
     union {
         struct {
             uint8_t minor : 4;
