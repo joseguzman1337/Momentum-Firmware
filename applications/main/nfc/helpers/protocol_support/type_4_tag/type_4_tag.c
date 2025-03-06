@@ -44,12 +44,16 @@ static void nfc_scene_more_info_on_enter_type_4_tag(NfcApp* instance) {
         scene_manager_get_scene_state(instance->scene_manager, NfcSceneMoreInfo);
 
     if(scene_state == NfcSceneMoreInfoStateASCII) {
-        pretty_format_bytes_hex_canonical(
-            instance->text_box_store,
-            TYPE_4_TAG_RENDER_BYTES_PER_LINE,
-            PRETTY_FORMAT_FONT_MONOSPACE,
-            simple_array_cget_data(data->ndef_data),
-            simple_array_get_count(data->ndef_data));
+        if(simple_array_get_count(data->ndef_data) == 0) {
+            furi_string_cat_str(instance->text_box_store, "No NDEF data to show");
+        } else {
+            pretty_format_bytes_hex_canonical(
+                instance->text_box_store,
+                TYPE_4_TAG_RENDER_BYTES_PER_LINE,
+                PRETTY_FORMAT_FONT_MONOSPACE,
+                simple_array_cget_data(data->ndef_data),
+                simple_array_get_count(data->ndef_data));
+        }
 
         widget_add_text_scroll_element(
             instance->widget, 0, 0, 128, 48, furi_string_get_cstr(instance->text_box_store));

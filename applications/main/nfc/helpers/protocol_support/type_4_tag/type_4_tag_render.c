@@ -10,7 +10,11 @@ void nfc_render_type_4_tag_info(
     FuriString* str) {
     nfc_render_iso14443_4a_brief(type_4_tag_get_base_data(data), str);
 
-    furi_string_cat(str, "\n::::::::::::::::::[Tag Specs]::::::::::::::::::\n");
+    furi_string_cat(str, "\n:::::::::::::::[Stored NDEF]:::::::::::::::\n");
+    furi_string_cat_printf(
+        str, "Current NDEF Size: %lu\n", simple_array_get_count(data->ndef_data));
+
+    furi_string_cat(str, "::::::::::::::::::[Tag Specs]::::::::::::::::::\n");
     furi_string_cat_printf(
         str, "T4T Mapping Version: %u.%u\n", data->t4t_version.major, data->t4t_version.minor);
     furi_string_cat_printf(str, "NDEF File ID: 0x%04X\n", data->ndef_file_id);
@@ -24,12 +28,9 @@ void nfc_render_type_4_tag_info(
         data->ndef_read_lock == 0 ? " (unlocked)" : "");
     furi_string_cat_printf(
         str,
-        "Write Lock: 0x%02X%s\n",
+        "Write Lock: 0x%02X%s",
         data->ndef_write_lock,
         data->ndef_write_lock == 0 ? " (unlocked)" : "");
-
-    furi_string_cat(str, ":::::::::::::::[Stored NDEF]:::::::::::::::\n");
-    furi_string_cat_printf(str, "Current NDEF Size: %lu", simple_array_get_count(data->ndef_data));
 
     if(format_type != NfcProtocolFormatTypeFull) return;
 
@@ -38,9 +39,13 @@ void nfc_render_type_4_tag_info(
 }
 
 void nfc_render_type_4_tag_dump(const Type4TagData* data, FuriString* str) {
-    furi_string_cat_printf(str, "\e*");
-    const uint8_t* ndef_data = simple_array_cget_data(data->ndef_data);
     size_t ndef_len = simple_array_get_count(data->ndef_data);
+    if(ndef_len == 0) {
+        furi_string_cat_str(str, "No NDEF data to show");
+        return;
+    }
+    const uint8_t* ndef_data = simple_array_cget_data(data->ndef_data);
+    furi_string_cat_printf(str, "\e*");
     for(size_t i = 0; i < ndef_len; i += TYPE_4_TAG_RENDER_BYTES_PER_LINE) {
         const uint8_t* line_data = &ndef_data[i];
         for(size_t j = 0; j < TYPE_4_TAG_RENDER_BYTES_PER_LINE; j += 2) {

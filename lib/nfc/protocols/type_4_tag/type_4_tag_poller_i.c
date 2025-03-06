@@ -208,14 +208,20 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
 
         ndef_len =
             bit_lib_bytes_to_num_be(bit_buffer_get_data(instance->rx_buffer), sizeof(ndef_len));
-        simple_array_init(instance->data->ndef_data, ndef_len);
+        if(ndef_len == 0) {
+            FURI_LOG_D(TAG, "NDEF file is empty");
+            break;
+        }
         if(ndef_len > 510) {
             // Both size and offset for READ BINARY are 1 byte uint
             // So the furthest we can read is 255 bytes at offset 255
             // AKA 2 * 255 byte chunks = 510 bytes
             // TODO: Surely there has to be another way?
             FURI_LOG_E(TAG, "NDEF file too long: %zu bytes", ndef_len);
+            error = Type4TagErrorProtocol;
+            break;
         }
+        simple_array_init(instance->data->ndef_data, ndef_len);
 
         FURI_LOG_D(TAG, "Read NDEF");
         const uint8_t type_4_tag_read_ndef_apdu_1[] = {
