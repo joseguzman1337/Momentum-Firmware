@@ -213,10 +213,10 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
             FURI_LOG_D(TAG, "NDEF file is empty");
             break;
         }
-        if(ndef_len > 510) {
+        if(ndef_len > 510 - sizeof(ndef_len)) {
             // Both size and offset for READ BINARY are 1 byte uint
             // So the furthest we can read is 255 bytes at offset 255
-            // AKA 2 * 255 byte chunks = 510 bytes
+            // AKA 2 * 255 byte chunks = 510 bytes -2 byte NDEF len header
             // TODO: Surely there has to be another way?
             FURI_LOG_E(TAG, "NDEF file too long: %zu bytes", ndef_len);
             error = Type4TagErrorProtocol;
@@ -240,7 +240,7 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
                 instance->tx_buffer,
                 type_4_tag_read_ndef_apdu_1,
                 sizeof(type_4_tag_read_ndef_apdu_1));
-            bit_buffer_append_byte(instance->tx_buffer, (uint8_t)ndef_pos);
+            bit_buffer_append_byte(instance->tx_buffer, (uint8_t)(sizeof(ndef_len) + ndef_pos));
             bit_buffer_append_byte(instance->tx_buffer, chunk_len);
 
             error = type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
