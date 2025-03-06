@@ -20,6 +20,7 @@
 #include <nfc/protocols/mf_ultralight/mf_ultralight.h>
 #include <nfc/protocols/mf_classic/mf_classic.h>
 #include <nfc/protocols/slix/slix.h>
+#include <nfc/protocols/type_4_tag/type_4_tag.h>
 
 #include <bit_lib.h>
 
@@ -30,7 +31,8 @@
 #define NDEF_PROTO_UL      (1)
 #define NDEF_PROTO_MFC     (2)
 #define NDEF_PROTO_SLIX    (3)
-#define NDEF_PROTO_TOTAL   (4)
+#define NDEF_PROTO_T4T     (4)
+#define NDEF_PROTO_TOTAL   (5)
 
 #ifndef NDEF_PROTO
 #error Must specify what protocol to use with NDEF_PROTO define!
@@ -150,6 +152,11 @@ typedef struct {
         const uint8_t* start;
         size_t size;
     } slix;
+#elif NDEF_PROTO == NDEF_PROTO_T4T
+    struct {
+        const uint8_t* data;
+        size_t size;
+    } t4t;
 #endif
 } Ndef;
 
@@ -223,6 +230,13 @@ static bool ndef_get(Ndef* ndef, size_t pos, size_t len, void* buf) {
     // Memory space is contiguous, simply need to remap to data pointer
     if(pos + len > ndef->slix.size) return false;
     memcpy(buf, ndef->slix.start + pos, len);
+    return true;
+
+#elif NDEF_PROTO == NDEF_PROTO_T4T
+
+    // Memory space is contiguous, simply need to remap to data pointer
+    if(pos + len > ndef->t4t.size) return false;
+    memcpy(buf, ndef->t4t.data + pos, len);
     return true;
 
 #else
@@ -1030,6 +1044,38 @@ static bool ndef_slix_parse(const NfcDevice* device, FuriString* parsed_data) {
     return parsed > 0;
 }
 
+#elif NDEF_PROTO == NDEF_PROTO_T4T
+
+static bool ndef_t4t_parse(const NfcDevice* device, FuriString* parsed_data) {
+    furi_assert(device);
+    furi_assert(parsed_data);
+
+    const Type4TagData* data = nfc_device_get_data(device, NfcProtocolType4Tag);
+    size_t data_start = 0;
+    size_t data_size = simple_array_get_count(data->ndef_data);
+
+    NDEF_TITLE(device, parsed_data);
+
+    Ndef ndef = {
+        .output = parsed_data,
+        .t4t =
+            {
+                .data = data_size == 0 ? NULL : simple_array_cget_data(data->ndef_data),
+                .size = data_size,
+            },
+    };
+    size_t parsed = ndef_parse_message(&ndef, data_start, data_size - data_start, 1, false);
+
+    if(parsed) {
+        furi_string_trim(parsed_data, "\n");
+        furi_string_cat(parsed_data, "\n");
+    } else {
+        furi_string_reset(parsed_data);
+    }
+
+    return parsed > 0;
+}
+
 #endif
 
 // ---=== boilerplate ===---
@@ -1047,6 +1093,9 @@ static const NfcSupportedCardsPlugin ndef_plugin = {
 #elif NDEF_PROTO == NDEF_PROTO_SLIX
     .parse = ndef_slix_parse,
     .protocol = NfcProtocolSlix,
+#elif NDEF_PROTO == NDEF_PROTO_T4T
+    .parse = ndef_t4t_parse,
+    .protocol = NfcProtocolType4Tag,
 #endif
 };
 

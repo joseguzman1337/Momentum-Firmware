@@ -248,6 +248,16 @@ App(
 )
 
 App(
+    appid="ndef_t4t_parser",
+    apptype=FlipperAppType.PLUGIN,
+    cdefines=[("NDEF_PROTO", "NDEF_PROTO_T4T")],
+    entry_point="ndef_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=["plugins/supported_cards/ndef.c"],
+)
+
+App(
     appid="disney_infinity_parser",
     apptype=FlipperAppType.PLUGIN,
     entry_point="disney_infinity_plugin_ep",
