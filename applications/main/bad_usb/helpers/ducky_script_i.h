@@ -6,8 +6,12 @@ extern "C" {
 
 #include <furi.h>
 #include <furi_hal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "uthash.h"
 #include "ducky_script.h"
 #include "bad_usb_hid.h"
+
 
 #define SCRIPT_STATE_ERROR        (-1)
 #define SCRIPT_STATE_END          (-2)
@@ -20,6 +24,13 @@ extern "C" {
 
 #define HID_MOUSE_INVALID 0
 #define HID_MOUSE_NONE    0
+
+
+typedef struct {
+    const char* key;   // Key
+    const char* value; // Value
+    UT_hash_handle hh; // Makes this structure hashable
+} Map;
 
 struct BadUsbScript {
     FuriHalUsbHidConfig hid_cfg;
@@ -46,6 +57,10 @@ struct BadUsbScript {
 
     FuriString* string_print;
     size_t string_print_pos;
+
+    Map* variables;
+    Map* constants;
+    Map* constants_sharp;
 };
 
 uint16_t ducky_get_keycode(BadUsbScript* bad_usb, const char* param, bool accept_chars);
@@ -72,9 +87,17 @@ bool ducky_altstring(BadUsbScript* bad_usb, const char* param);
 
 bool ducky_string(BadUsbScript* bad_usb, const char* param);
 
+int32_t ducky_define(BadUsbScript* bad_usb, const char* param, bool is_constant);
+
 int32_t ducky_execute_cmd(BadUsbScript* bad_usb, const char* line);
 
 int32_t ducky_error(BadUsbScript* bad_usb, const char* text, ...);
+
+void ducky_map_insert(Map** map, const char* key, const char* value);
+
+const char* ducky_map_get(Map* map, const char* key);
+
+void ducky_map_free(Map** map);
 
 #ifdef __cplusplus
 }
