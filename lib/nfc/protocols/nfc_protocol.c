@@ -62,8 +62,8 @@ static const NfcProtocol nfc_protocol_iso14443_3b_children_protocol[] = {
 
 /** List of ISO14443-4A child protocols. */
 static const NfcProtocol nfc_protocol_iso14443_4a_children_protocol[] = {
-    NfcProtocolMfDesfire,
     NfcProtocolMfPlus,
+    NfcProtocolMfDesfire,
     NfcProtocolType4Tag,
 };
 
