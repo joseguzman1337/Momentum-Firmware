@@ -33,8 +33,6 @@ struct Type4TagPoller {
     void* context;
 };
 
-Type4TagError type_4_tag_process_error(Iso14443_4aError error);
-
 const Type4TagData* type_4_tag_poller_get_data(Type4TagPoller* instance);
 
 Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance);

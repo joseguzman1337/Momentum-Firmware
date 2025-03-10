@@ -7,6 +7,19 @@
 
 #define TYPE_4_TAG_FFF_NDEF_DATA_PER_LINE (16U)
 
+Type4TagError type_4_tag_process_error(Iso14443_4aError error) {
+    switch(error) {
+    case Iso14443_4aErrorNone:
+        return Type4TagErrorNone;
+    case Iso14443_4aErrorNotPresent:
+        return Type4TagErrorNotPresent;
+    case Iso14443_4aErrorTimeout:
+        return Type4TagErrorTimeout;
+    default:
+        return Type4TagErrorProtocol;
+    }
+}
+
 bool type_4_tag_ndef_data_load(Type4TagData* data, FlipperFormat* ff) {
     uint32_t ndef_data_size;
     if(!flipper_format_read_uint32(ff, TYPE_4_TAG_FFF_NDEF_DATA_SIZE_KEY, &ndef_data_size, 1)) {

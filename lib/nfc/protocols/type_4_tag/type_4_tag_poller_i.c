@@ -5,19 +5,6 @@
 
 #define TAG "Type4TagPoller"
 
-Type4TagError type_4_tag_process_error(Iso14443_4aError error) {
-    switch(error) {
-    case Iso14443_4aErrorNone:
-        return Type4TagErrorNone;
-    case Iso14443_4aErrorNotPresent:
-        return Type4TagErrorNotPresent;
-    case Iso14443_4aErrorTimeout:
-        return Type4TagErrorTimeout;
-    default:
-        return Type4TagErrorProtocol;
-    }
-}
-
 Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, BitBuffer* rx_buf) {
     furi_check(instance);
 
@@ -58,7 +45,7 @@ Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance) {
     FURI_LOG_D(TAG, "Select application");
     const uint8_t type_4_tag_select_app_apdu[] = {
         TYPE_4_TAG_ISO_SELECT_CMD,
-        TYPE_4_TAG_ISO_SELECT_P1_BY_NAME,
+        TYPE_4_TAG_ISO_SELECT_P1_BY_DF_NAME,
         TYPE_4_TAG_ISO_SELECT_P2_EMPTY,
         TYPE_4_TAG_ISO_APP_NAME_LEN,
         TYPE_4_TAG_ISO_APP_NAME,

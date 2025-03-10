@@ -2,13 +2,13 @@
 #include "type_4_tag_render.h"
 
 #include <nfc/protocols/type_4_tag/type_4_tag_poller.h>
+#include <nfc/protocols/type_4_tag/type_4_tag_listener.h>
 #include <toolbox/pretty_format.h>
 
 #include "nfc/nfc_app_i.h"
 
 #include "../nfc_protocol_support_common.h"
 #include "../nfc_protocol_support_gui_common.h"
-#include "../iso14443_4a/iso14443_4a_i.h"
 
 enum {
     SubmenuIndexWrite = SubmenuIndexCommonMax,
@@ -167,19 +167,42 @@ static void nfc_scene_read_success_on_enter_type_4_tag(NfcApp* instance) {
     furi_string_free(temp_str);
 }
 
-static void nfc_scene_emulate_on_enter_type_4_tag(NfcApp* instance) {
-    // TODO: Implement full emulation
-    const Iso14443_4aData* iso14443_4a_data =
-        nfc_device_get_data(instance->nfc_device, NfcProtocolIso14443_4a);
+static NfcCommand
+    nfc_scene_emulate_listener_callback_type_4_tag(NfcGenericEvent event, void* context) {
+    furi_assert(context);
+    furi_assert(event.protocol == NfcProtocolType4Tag);
+    furi_assert(event.event_data);
 
-    instance->listener =
-        nfc_listener_alloc(instance->nfc, NfcProtocolIso14443_4a, iso14443_4a_data);
+    NfcApp* nfc = context;
+    Type4TagListenerEvent* type_4_tag_event = event.event_data;
+
+    if(type_4_tag_event->type == Type4TagListenerEventTypeCustomCommand) {
+        if(furi_string_size(nfc->text_box_store) < NFC_LOG_SIZE_MAX) {
+            furi_string_cat_printf(nfc->text_box_store, "R:");
+            for(size_t i = 0; i < bit_buffer_get_size_bytes(type_4_tag_event->data->buffer); i++) {
+                furi_string_cat_printf(
+                    nfc->text_box_store,
+                    " %02X",
+                    bit_buffer_get_byte(type_4_tag_event->data->buffer, i));
+            }
+            furi_string_push_back(nfc->text_box_store, '\n');
+            view_dispatcher_send_custom_event(nfc->view_dispatcher, NfcCustomEventListenerUpdate);
+        }
+    }
+
+    return NfcCommandContinue;
+}
+
+static void nfc_scene_emulate_on_enter_type_4_tag(NfcApp* instance) {
+    const Type4TagData* data = nfc_device_get_data(instance->nfc_device, NfcProtocolType4Tag);
+
+    instance->listener = nfc_listener_alloc(instance->nfc, NfcProtocolType4Tag, data);
     nfc_listener_start(
-        instance->listener, nfc_scene_emulate_listener_callback_iso14443_4a, instance);
+        instance->listener, nfc_scene_emulate_listener_callback_type_4_tag, instance);
 }
 
 const NfcProtocolSupportBase nfc_protocol_support_type_4_tag = {
-    .features = NfcProtocolFeatureEmulateUid | NfcProtocolFeatureMoreInfo,
+    .features = NfcProtocolFeatureEmulateFull | NfcProtocolFeatureMoreInfo,
 
     .scene_info =
         {

@@ -4,9 +4,6 @@
 
 #define TAG "Type4TagPoller"
 
-// Read returns 2 byte status trailer, write sends 5 byte command header
-#define TYPE_4_TAG_BUF_SIZE (TYPE_4_TAG_ISO_RW_CHUNK_LEN + 5)
-
 typedef NfcCommand (*Type4TagPollerReadHandler)(Type4TagPoller* instance);
 
 const Type4TagData* type_4_tag_poller_get_data(Type4TagPoller* instance) {
