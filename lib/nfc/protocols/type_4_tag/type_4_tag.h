@@ -13,6 +13,9 @@ typedef enum {
     Type4TagErrorNotPresent,
     Type4TagErrorProtocol,
     Type4TagErrorTimeout,
+    Type4TagErrorWrongFormat,
+    Type4TagErrorNotSupported,
+    Type4TagErrorUnknown,
 } Type4TagError;
 
 typedef struct {

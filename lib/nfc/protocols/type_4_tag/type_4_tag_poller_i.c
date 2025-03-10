@@ -36,7 +36,7 @@ Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, B
 
     size_t response_len = bit_buffer_get_size_bytes(rx_buf);
     if(response_len < TYPE_4_TAG_ISO_STATUS_LEN) {
-        return Type4TagErrorProtocol;
+        return Type4TagErrorWrongFormat;
     }
 
     const uint8_t success[TYPE_4_TAG_ISO_STATUS_LEN] = {TYPE_4_TAG_ISO_STATUS_SUCCESS};
@@ -50,7 +50,7 @@ Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, B
         return Type4TagErrorNone;
     } else {
         FURI_LOG_E(TAG, "APDU failed: 0x%02X%02X", status[0], status[1]);
-        return Type4TagErrorProtocol;
+        return Type4TagErrorUnknown;
     }
 }
 
@@ -112,7 +112,7 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
         const Type4TagCc* cc = (const Type4TagCc*)bit_buffer_get_data(instance->rx_buffer);
         if(cc->t4t_vno != TYPE_4_TAG_T4T_CC_VNO) {
             FURI_LOG_E(TAG, "Unsupported T4T version");
-            error = Type4TagErrorProtocol;
+            error = Type4TagErrorNotSupported;
             break;
         }
 
@@ -133,7 +133,7 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
         }
         if(!ndef_file_ctrl) {
             FURI_LOG_E(TAG, "No NDEF file ctrl TLV");
-            error = Type4TagErrorProtocol;
+            error = Type4TagErrorWrongFormat;
             break;
         }
 
@@ -219,7 +219,7 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
             // AKA 2 * 255 byte chunks = 510 bytes -2 byte NDEF len header
             // TODO: Surely there has to be another way?
             FURI_LOG_E(TAG, "NDEF file too long: %zu bytes", ndef_len);
-            error = Type4TagErrorProtocol;
+            error = Type4TagErrorNotSupported;
             break;
         }
         simple_array_init(instance->data->ndef_data, ndef_len);
@@ -251,7 +251,7 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
                     "Wrong NDEF chunk len: %zu != %zu",
                     bit_buffer_get_size_bytes(instance->rx_buffer),
                     ndef_len);
-                error = Type4TagErrorProtocol;
+                error = Type4TagErrorWrongFormat;
                 break;
             }
             memcpy(&ndef_data[ndef_pos], bit_buffer_get_data(instance->rx_buffer), chunk_len);
