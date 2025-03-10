@@ -84,7 +84,7 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
         const uint8_t type_4_tag_read_cc_apdu[] = {
             TYPE_4_TAG_ISO_READ_CMD,
             TYPE_4_TAG_ISO_READ_P1_EMPTY,
-            TYPE_4_TAG_ISO_READ_P2_BEGINNING,
+            TYPE_4_TAG_ISO_READ_P_BEGINNING,
             TYPE_4_TAG_ISO_READ_LE_FULL,
         };
 
@@ -180,7 +180,7 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
         const uint8_t type_4_tag_read_ndef_len_apdu[] = {
             TYPE_4_TAG_ISO_READ_CMD,
             TYPE_4_TAG_ISO_READ_P1_EMPTY,
-            TYPE_4_TAG_ISO_READ_P2_BEGINNING,
+            TYPE_4_TAG_ISO_READ_P_BEGINNING,
             sizeof(ndef_len),
         };
 
@@ -198,11 +198,8 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
             FURI_LOG_D(TAG, "NDEF file is empty");
             break;
         }
-        if(ndef_len > 510 - sizeof(ndef_len)) {
-            // Both size and offset for READ BINARY are 1 byte uint
-            // So the furthest we can read is 255 bytes at offset 255
-            // AKA 2 * 255 byte chunks = 510 bytes -2 byte NDEF len header
-            // TODO: Surely there has to be another way?
+        uint8_t chunk_max = MIN(instance->data->chunk_max_read, TYPE_4_TAG_ISO_RW_CHUNK_LEN);
+        if(ndef_len > TYPE_4_TAG_ISO_READ_P_OFFSET_MAX + chunk_max - sizeof(ndef_len)) {
             FURI_LOG_E(TAG, "NDEF file too long: %zu bytes", ndef_len);
             error = Type4TagErrorNotSupported;
             break;
@@ -212,20 +209,20 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
         FURI_LOG_D(TAG, "Read NDEF");
         const uint8_t type_4_tag_read_ndef_apdu_1[] = {
             TYPE_4_TAG_ISO_READ_CMD,
-            TYPE_4_TAG_ISO_READ_P1_EMPTY,
         };
 
         uint16_t ndef_pos = 0;
         uint8_t* ndef_data = simple_array_get_data(instance->data->ndef_data);
-        uint8_t chunk_max = MIN(instance->data->chunk_max_read, TYPE_4_TAG_ISO_RW_CHUNK_LEN);
         while(ndef_len > 0) {
             uint8_t chunk_len = MIN(ndef_len, chunk_max);
+            uint8_t ndef_pos_be[sizeof(ndef_pos)];
+            bit_lib_num_to_bytes_be(sizeof(ndef_len) + ndef_pos, sizeof(ndef_pos_be), ndef_pos_be);
 
             bit_buffer_append_bytes(
                 instance->tx_buffer,
                 type_4_tag_read_ndef_apdu_1,
                 sizeof(type_4_tag_read_ndef_apdu_1));
-            bit_buffer_append_byte(instance->tx_buffer, (uint8_t)(sizeof(ndef_len) + ndef_pos));
+            bit_buffer_append_bytes(instance->tx_buffer, ndef_pos_be, sizeof(ndef_pos_be));
             bit_buffer_append_byte(instance->tx_buffer, chunk_len);
 
             error = type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
