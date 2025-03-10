@@ -89,3 +89,6 @@ uint8_t rgb_backlight_get_color_count(void);
  * @return Указатель на строку с названием цвета
  */
 const char* rgb_backlight_get_color_text(uint8_t index);
+
+// set custom color to display;
+void rgb_mod_rainbow_update(uint8_t red, uint8_t green, uint8_t blue, float brightness);

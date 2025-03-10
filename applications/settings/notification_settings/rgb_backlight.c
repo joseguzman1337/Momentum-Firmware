@@ -215,3 +215,15 @@ void rgb_backlight_update(uint8_t brightness, bool bypass) {
 
     SK6805_update();
 }
+
+// --- RGB MOD RAINBOW ---
+void rgb_mod_rainbow_update(uint8_t red, uint8_t green, uint8_t blue, float brightness) {
+    for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
+        uint8_t r = red * (brightness);
+        uint8_t g = green * (brightness);
+        uint8_t b = blue * (brightness);
+        SK6805_set_led_color(i, r, g, b);
+    }
+    SK6805_update();
+}
+// --- END OF RGB MOD RAINBOW ---
