@@ -60,7 +60,7 @@ void bit_buffer_copy_right(BitBuffer* buf, const BitBuffer* other, size_t start_
     furi_check(bit_buffer_get_size_bytes(other) > start_index);
     furi_check(buf->capacity_bytes >= bit_buffer_get_size_bytes(other) - start_index);
 
-    memcpy(buf->data, other->data + start_index, bit_buffer_get_size_bytes(other) - start_index);
+    memmove(buf->data, other->data + start_index, bit_buffer_get_size_bytes(other) - start_index);
     buf->size_bits = other->size_bits - start_index * BITS_IN_BYTE;
 }
 
@@ -70,7 +70,9 @@ void bit_buffer_copy_left(BitBuffer* buf, const BitBuffer* other, size_t end_ind
     furi_check(bit_buffer_get_capacity_bytes(buf) >= end_index);
     furi_check(bit_buffer_get_size_bytes(other) >= end_index);
 
-    memcpy(buf->data, other->data, end_index);
+    if(buf != other) {
+        memcpy(buf->data, other->data, end_index);
+    }
     buf->size_bits = end_index * BITS_IN_BYTE;
 }
 
