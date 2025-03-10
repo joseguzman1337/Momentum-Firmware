@@ -100,6 +100,7 @@ static NfcCommand type_4_tag_poller_handler_read_ndef(Type4TagPoller* instance) 
 static NfcCommand type_4_tag_poller_handler_read_fail(Type4TagPoller* instance) {
     FURI_LOG_D(TAG, "Read Failed");
     iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+    instance->type_4_tag_event.type = Type4TagPollerEventTypeReadFailed;
     instance->type_4_tag_event.data->error = instance->error;
     NfcCommand command = instance->callback(instance->general_event, instance->context);
     instance->state = Type4TagPollerStateIdle;
@@ -150,6 +151,8 @@ static NfcCommand type_4_tag_poller_run(NfcGenericEvent event, void* context) {
         command = type_4_tag_poller_read_handler[instance->state](instance);
     } else if(iso14443_4a_event->type == Iso14443_4aPollerEventTypeError) {
         instance->type_4_tag_event.type = Type4TagPollerEventTypeReadFailed;
+        instance->type_4_tag_event.data->error =
+            type_4_tag_process_error(iso14443_4a_event->data->error);
         command = instance->callback(instance->general_event, instance->context);
     }
 
