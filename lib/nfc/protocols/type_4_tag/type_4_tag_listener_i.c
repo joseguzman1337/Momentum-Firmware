@@ -200,6 +200,8 @@ Type4TagError
     type_4_tag_listener_handle_apdu(Type4TagListener* instance, const BitBuffer* rx_buffer) {
     Type4TagError error = Type4TagErrorNone;
 
+    bit_buffer_reset(instance->tx_buffer);
+
     do {
         typedef struct {
             uint8_t cla_ins[2];
@@ -297,18 +299,18 @@ Type4TagError
             }
         }
 
-        bit_buffer_reset(instance->tx_buffer);
-
         error = handler(instance, apdu->p1, apdu->p2, lc, data, le);
+    } while(false);
 
+    if(bit_buffer_get_size_bytes(instance->tx_buffer) > 0) {
         const Iso14443_4aError iso14443_4a_error =
             iso14443_4a_listener_send_block(instance->iso14443_4a_listener, instance->tx_buffer);
 
-        // Show unknown command on screen
-        if(error == Type4TagErrorCustomCommand) break;
-
-        error = type_4_tag_process_error(iso14443_4a_error);
-    } while(false);
+        // Keep error flag to show unknown command on screen
+        if(error != Type4TagErrorCustomCommand) {
+            error = type_4_tag_process_error(iso14443_4a_error);
+        }
+    }
 
     return error;
 }
