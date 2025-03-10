@@ -1,7 +1,5 @@
 #include "type_4_tag_i.h"
 
-#include <furi.h>
-
 #define TYPE_4_TAG_PROTOCOL_NAME "Type 4 Tag"
 
 const NfcDeviceBase nfc_device_type_4_tag = {

@@ -1,9 +1,6 @@
 #include "type_4_tag_poller_i.h"
+#include "type_4_tag_poller_defs.h"
 #include "type_4_tag_i.h"
-
-#include <nfc/protocols/nfc_poller_base.h>
-
-#include <furi.h>
 
 #define TAG "Type4TagPoller"
 

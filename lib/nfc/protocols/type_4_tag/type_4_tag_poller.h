@@ -2,8 +2,6 @@
 
 #include "type_4_tag.h"
 
-#include <lib/nfc/protocols/iso14443_4a/iso14443_4a_poller.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

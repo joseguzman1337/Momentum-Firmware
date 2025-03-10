@@ -1,9 +1,7 @@
 #include "type_4_tag_poller_i.h"
+#include "type_4_tag_i.h"
 
 #include <bit_lib/bit_lib.h>
-#include <furi.h>
-
-#include "type_4_tag_i.h"
 
 #define TAG "Type4TagPoller"
 
