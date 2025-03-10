@@ -109,6 +109,7 @@ const char* const vibro_text[VIBRO_COUNT] = {
 };
 const bool vibro_value[VIBRO_COUNT] = {false, true};
 
+// --- RGB MOD RAINBOW ---
 #define RGB_MOD_COUNT 2
 const char* const rgb_mod_text[RGB_MOD_COUNT] = {
     "OFF",
@@ -151,6 +152,8 @@ typedef enum {
     MainViewId,
     RGBViewId,
 } ViewId;
+
+// --- END OF RGB MOD RAINBOW ---
 
 static void contrast_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
@@ -215,6 +218,8 @@ static void vibro_changed(VariableItem* item) {
     app->notification->settings.vibro_on = vibro_value[index];
     notification_message(app->notification, &sequence_single_vibro);
 }
+
+// --- RGB MOD AND RAINBOW ---
 
 static void rgb_mod_installed_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
@@ -316,11 +321,6 @@ static void color_set_custom_blue(VariableItem* item) {
     notification_message(app->notification, &sequence_display_backlight_on);
 }
 
-static uint32_t notification_app_settings_exit(void* context) {
-    UNUSED(context);
-    return VIEW_NONE;
-}
-
 // open rgb_settings_view if user press OK on first (index=0) menu string and (debug mode or rgb_mod_install is true)
 void variable_item_list_enter_callback(void* context, uint32_t index) {
     UNUSED(context);
@@ -338,6 +338,12 @@ static uint32_t notification_app_rgb_settings_exit(void* context) {
     UNUSED(context);
     return MainViewId;
 }
+// --- END OF RGB MOD AND RAINBOW ---
+
+static uint32_t notification_app_settings_exit(void* context) {
+    UNUSED(context);
+    return VIEW_NONE;
+}
 
 static NotificationAppSettings* alloc_settings(void) {
     NotificationAppSettings* app = malloc(sizeof(NotificationAppSettings));
@@ -346,8 +352,10 @@ static NotificationAppSettings* alloc_settings(void) {
 
     app->variable_item_list = variable_item_list_alloc();
     View* view = variable_item_list_get_view(app->variable_item_list);
+
     //set callback for exit from view
     view_set_previous_callback(view, notification_app_settings_exit);
+
     // set callback for OK pressed in menu
     variable_item_list_set_enter_callback(
         app->variable_item_list, variable_item_list_enter_callback, app);
