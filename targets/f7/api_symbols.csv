@@ -2114,6 +2114,9 @@ Function,+,iso14443_3a_get_device_name,const char*,"const Iso14443_3aData*, NfcD
 Function,+,iso14443_3a_get_sak,uint8_t,const Iso14443_3aData*
 Function,+,iso14443_3a_get_uid,const uint8_t*,"const Iso14443_3aData*, size_t*"
 Function,+,iso14443_3a_is_equal,_Bool,"const Iso14443_3aData*, const Iso14443_3aData*"
+Function,+,iso14443_3a_listener_send_standard_frame,Iso14443_3aError,"Iso14443_3aListener*, const BitBuffer*"
+Function,+,iso14443_3a_listener_tx,Iso14443_3aError,"Iso14443_3aListener*, const BitBuffer*"
+Function,+,iso14443_3a_listener_tx_with_custom_parity,Iso14443_3aError,"Iso14443_3aListener*, const BitBuffer*"
 Function,+,iso14443_3a_load,_Bool,"Iso14443_3aData*, FlipperFormat*, uint32_t"
 Function,+,iso14443_3a_poller_activate,Iso14443_3aError,"Iso14443_3aPoller*, Iso14443_3aData*"
 Function,+,iso14443_3a_poller_check_presence,Iso14443_3aError,Iso14443_3aPoller*
