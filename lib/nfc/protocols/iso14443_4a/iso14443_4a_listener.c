@@ -70,7 +70,15 @@ static NfcCommand iso14443_4a_listener_run(NfcGenericEvent event, void* context)
                     instance->state = Iso14443_4aListenerStateActive;
                 }
             }
-        } else {
+        } else if(bit_buffer_get_size_bytes(rx_buffer) > 1) {
+            // TODO: This is a rudimentary PCB implementation!
+            // Just ignores its meaning and saves it for sending blocks to reader,
+            // there is no handling of S, R, I blocks and their different flags.
+            // We have iso14443_4_layer helper but it is entirely designed for poller,
+            // will need large rework for listener, for now this works.
+            instance->pcb_prev = bit_buffer_get_byte(rx_buffer, 0);
+            bit_buffer_copy_right(rx_buffer, rx_buffer, 1);
+
             instance->iso14443_4a_event.type = Iso14443_4aListenerEventTypeReceivedData;
             instance->iso14443_4a_event.data->buffer = rx_buffer;
 
