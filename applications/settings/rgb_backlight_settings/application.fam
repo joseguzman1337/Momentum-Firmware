@@ -1,9 +1,0 @@
-App(
-    appid="rgb_backlight_settings",
-    name="RGB backlight",
-    apptype=FlipperAppType.SETTINGS,
-    entry_point="rgb_backlight_settings",
-    requires=["rgb_backlight"],
-    stack_size=1 * 1024,
-    order=110,
-)

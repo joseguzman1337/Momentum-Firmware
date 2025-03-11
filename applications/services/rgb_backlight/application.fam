@@ -7,5 +7,4 @@ App(
     stack_size=1 * 1024,
     order=99,
     sdk_headers=["rgb_backlight.h"],
-    provides=["rgb_backlight_settings"],
 )

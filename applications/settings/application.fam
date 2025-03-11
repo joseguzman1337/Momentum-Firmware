@@ -7,7 +7,6 @@ App(
         "system_settings",
         "clock_settings",
         "input_settings",
-        "rgb_backlight_settings",
         "about",
     ],
 )
