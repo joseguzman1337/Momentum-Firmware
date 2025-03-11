@@ -234,8 +234,10 @@ static void rgb_mod_rainbow_changed(VariableItem* item) {
     variable_item_set_current_value_text(item, rgb_mod_rainbow_mode_text[index]);
     app->notification->settings.rgb_mod_rainbow_mode = rgb_mod_rainbow_mode_value[index];
 
-    // Lock/Unlock color settings if rainbow mode Enabled/Disabled
-    for(int i = 0; i < 4; i++) {
+    // Lock/Unlock color settings if rainbow mode Enabled/Disabled (0-3 index if debug off and 1-4 index if debug on)
+    int slide = 0;
+    if (furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {slide = 1;}
+    for(int i = slide; i < (slide+4); i++) {
         VariableItem* t_item = variable_item_list_get(app->variable_item_list_rgb, i);
         if(app->notification->settings.rgb_mod_rainbow_mode > 0) {
             variable_item_set_locked(t_item, true, "Rainbow mode\nenabled!");
