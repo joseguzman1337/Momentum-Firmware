@@ -71,8 +71,8 @@ void rgb_backlight_set_static_color(uint8_t index, float brightness) {
         SK6805_set_led_color(i, r, g, b);
     }
     
-    furi_record_close(RECORD_RGB_BACKLIGHT);
     SK6805_update();
+    furi_record_close(RECORD_RGB_BACKLIGHT);
 }
 
 // void rgb_backlight_set_custom_color(uint8_t red, uint8_t green, uint8_t blue, float brightness) {
@@ -208,6 +208,7 @@ int32_t rgb_backlight_srv (void* p) {
     // Define object app (full app with settings and running variables), 
     // allocate memory and create record for access to app structure from outside
     RGBBacklightApp* app = malloc(sizeof(RGBBacklightApp));
+
     furi_record_create(RECORD_RGB_BACKLIGHT, app);
 
     //define rainbow_timer and they callback
@@ -215,12 +216,13 @@ int32_t rgb_backlight_srv (void* p) {
         furi_timer_alloc(rainbow_timer_callback, FuriTimerTypePeriodic, app);
 
     // settings load or create default
+    app->settings = malloc(sizeof(RGBBacklightSettings));
     rgb_backlight_settings_load (app->settings);
 
     // Init app variables
     app->current_red = 255;
     app->current_green = 60;
-    app->current_green = 0;
+    app->current_blue = 0;
     app->rainbow_stage = 1;
 
     // а нужно ли это все при старте сервиса, если мы получим сигнал на подсветку от Нотификейшена. Может вынести в ИНИТ и при старте нотиф дернуть его 1 раз
