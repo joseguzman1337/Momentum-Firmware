@@ -7,10 +7,10 @@ typedef struct {
     uint8_t version;
     bool rgb_mod_installed;
 
-    uint8_t display_static_color_index;
-    uint8_t custom_r;
-    uint8_t custom_g;
-    uint8_t custom_b;
+    uint8_t static_color_index;
+    uint8_t custom_red;
+    uint8_t custom_green;
+    uint8_t custom_blue;
     float brightness;
 
     uint32_t rainbow_mode;

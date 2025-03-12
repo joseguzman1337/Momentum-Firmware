@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef SK6805_H_
 #define SK6805_H_
@@ -49,3 +52,7 @@ void SK6805_set_led_color(uint8_t led_index, uint8_t r, uint8_t g, uint8_t b);
 void SK6805_update(void);
 
 #endif /* SK6805_H_ */
+
+#ifdef __cplusplus
+}
+#endif

@@ -3,6 +3,7 @@
 #include "notification.h"
 #include "notification_messages.h"
 #include "notification_settings_filename.h"
+#include "applications/services/rgb_backlight/rgb_backlight.h"
 
 #define NOTIFICATION_LED_COUNT      3
 #define NOTIFICATION_EVENT_COMPLETE 0x00000001U
@@ -45,10 +46,10 @@ typedef struct {
     int8_t contrast;
     bool vibro_on;
     /// --- RGB MOD SETTINGS SECTION ---
-    bool rgb_mod_installed;
-    uint32_t rgb_mod_rainbow_mode;
-    uint32_t rgb_mod_rainbow_speed_ms;
-    uint16_t rgb_mod_rainbow_step;
+    // bool rgb_mod_installed;
+    // uint32_t rgb_mod_rainbow_mode;
+    // uint32_t rgb_mod_rainbow_speed_ms;
+    // uint16_t rgb_mod_rainbow_step;
     /// --- END OF RGB MOD SETTINGS SECTION ---
 
 } NotificationSettings;
@@ -63,14 +64,15 @@ struct NotificationApp {
     uint8_t display_led_lock;
 
     // --- RGB RAINBOW MODE VARIABLES SECTION ---
-    FuriTimer* rgb_mod_rainbow_timer;
-    int16_t rgb_mod_rainbow_red;
-    int16_t rgb_mod_rainbow_green;
-    int16_t rgb_mod_rainbow_blue;
-    uint8_t rgb_mod_rainbow_stage;
+    // FuriTimer* rgb_mod_rainbow_timer;
+    // int16_t rgb_mod_rainbow_red;
+    // int16_t rgb_mod_rainbow_green;
+    // int16_t rgb_mod_rainbow_blue;
+    // uint8_t rgb_mod_rainbow_stage;
     // --- ENd OF RGB RAINBOW MODE VARIABLES SECTION ---
 
     NotificationSettings settings;
+    RGBBacklightApp* rgb_srv;
 };
 
 void notification_message_save_settings(NotificationApp* app);

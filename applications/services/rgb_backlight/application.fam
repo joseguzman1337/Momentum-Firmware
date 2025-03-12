@@ -5,6 +5,6 @@ App(
     entry_point="rgb_backlight_srv",
     cdefines=["SRV_RGB_BACKLIGHT"],
     stack_size=1 * 1024,
-    order=99,
+    order=95,
     sdk_headers=["rgb_backlight.h"],
 )

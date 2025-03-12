@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,83.1,,
+Version,+,84.1,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
@@ -3125,6 +3125,9 @@ Function,-,putw,int,"int, FILE*"
 Function,-,qsort,void,"void*, size_t, size_t, __compar_fn_t"
 Function,-,qsort_r,void,"void*, size_t, size_t, int (*)(const void*, const void*, void*), void*"
 Function,-,quick_exit,void,int
+Function,+,rainbow_timer_start,void,RGBBacklightApp*
+Function,+,rainbow_timer_starter,void,RGBBacklightApp*
+Function,+,rainbow_timer_stop,void,RGBBacklightApp*
 Function,+,rand,int,
 Function,-,rand_r,int,unsigned*
 Function,+,random,long,
@@ -3143,8 +3146,12 @@ Function,-,remquol,long double,"long double, long double, int*"
 Function,-,rename,int,"const char*, const char*"
 Function,-,renameat,int,"int, const char*, int, const char*"
 Function,-,rewind,void,FILE*
+Function,+,rgb_backlight_get_color_count,uint8_t,
+Function,+,rgb_backlight_get_color_text,const char*,uint8_t
+Function,+,rgb_backlight_set_static_color,void,"uint8_t, float"
 Function,+,rgb_backlight_settings_load,void,RGBBacklightSettings*
 Function,+,rgb_backlight_settings_save,void,const RGBBacklightSettings*
+Function,+,rgb_backlight_update,void,float
 Function,-,rindex,char*,"const char*, int"
 Function,-,rint,double,double
 Function,-,rintf,float,float
