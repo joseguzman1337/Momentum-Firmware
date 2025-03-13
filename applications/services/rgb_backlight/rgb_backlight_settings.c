@@ -91,5 +91,7 @@ void rgb_backlight_settings_save(const RGBBacklightSettings* settings) {
 
     if(!success) {
         FURI_LOG_E(TAG, "Failed to save rgb_backlight_settings file");
+    } else {
+        FURI_LOG_I(TAG, "Settings saved");
     }
 }
