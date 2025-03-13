@@ -47,7 +47,8 @@ typedef struct {
 
 #define RECORD_RGB_BACKLIGHT "rgb_backlight"
 
-void rgb_backlight_update (float brightness);
+void rgb_backlight_update(float brightness);
+void rgb_backlight_set_custom_color(uint8_t red, uint8_t green, uint8_t blue);
 void rgb_backlight_set_static_color(uint8_t index);
 void rainbow_timer_stop(RGBBacklightApp* app);
 void rainbow_timer_start(RGBBacklightApp* app);

@@ -748,9 +748,6 @@ int32_t notification_srv(void* p) {
             notification_process_internal_message(app, &message);
             break;
         case SaveSettingsMessage:
-            // //call rgb_mod_timer_control (start or stop) when we save settings
-            // rainbow_timer_starter(app->rgb_srv);
-            // rgb_backlight_settings_save(app->rgb_srv->settings);
             notification_save_settings(app);
             break;
         case LoadSettingsMessage:

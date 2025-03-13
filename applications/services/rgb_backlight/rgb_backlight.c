@@ -24,7 +24,6 @@
 #include <storage/storage.h>
 #include "rgb_backlight.h"
 
-
 #define COLOR_COUNT (sizeof(colors) / sizeof(RGBBacklightColor))
 
 #define TAG "RGB_BACKLIGHT_SRV"
@@ -47,21 +46,27 @@ static const RGBBacklightColor colors[] = {
 };
 
 uint8_t rgb_backlight_get_color_count(void) {
-        return COLOR_COUNT;
-    }
+    return COLOR_COUNT;
+}
 
 const char* rgb_backlight_get_color_text(uint8_t index) {
-        return colors[index].name;
-    }
+    return colors[index].name;
+}
 
 // use RECORD for acces to rgb service instance and update current colors by static
 void rgb_backlight_set_static_color(uint8_t index) {
     RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
 
-    app->current_red = colors[index].red;
-    app->current_green = colors[index].green;
-    app->current_blue = colors[index].blue;
-
+    //if user select "custom" value then set current colors by custom values
+    if(index == 13) {
+        app->current_red = app->settings->custom_red;
+        app->current_green = app->settings->custom_green;
+        app->current_blue = app->settings->custom_blue;
+    } else {
+        app->current_red = colors[index].red;
+        app->current_green = colors[index].green;
+        app->current_blue = colors[index].blue;
+    }
     furi_record_close(RECORD_RGB_BACKLIGHT);
 }
 
@@ -74,15 +79,14 @@ void rgb_backlight_set_custom_color(uint8_t red, uint8_t green, uint8_t blue) {
     furi_record_close(RECORD_RGB_BACKLIGHT);
 }
 
-// apply new brightness to current display color set
-void rgb_backlight_update (float brightness) {
-    // use RECORD for acces to rgb service instance and use current_* colors
+// use RECORD for acces to rgb service instance, use current_* colors and update backlight
+void rgb_backlight_update(float brightness) {
     RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
-    
+
     for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
-        uint8_t r = app->current_red * brightness;
-        uint8_t g = app->current_green * brightness;
-        uint8_t b = app->current_blue * brightness;
+        uint8_t r = app->current_red * (brightness / 1.0f);
+        uint8_t g = app->current_green * (brightness / 1.0f);
+        uint8_t b = app->current_blue * (brightness / 1.0f);
         SK6805_set_led_color(i, r, g, b);
     }
     SK6805_update();
@@ -91,8 +95,7 @@ void rgb_backlight_update (float brightness) {
 
 //start furi timer for rainbow
 void rainbow_timer_start(RGBBacklightApp* app) {
-    furi_timer_start(
-        app->rainbow_timer, furi_ms_to_ticks(app->settings->rainbow_speed_ms));
+    furi_timer_start(app->rainbow_timer, furi_ms_to_ticks(app->settings->rainbow_speed_ms));
 }
 
 //stop furi timer for rainbow
@@ -102,17 +105,15 @@ void rainbow_timer_stop(RGBBacklightApp* app) {
 
 // if rgb_mod_installed then apply rainbow colors to backlight and start/restart/stop rainbow_timer
 void rainbow_timer_starter(RGBBacklightApp* app) {
-    if(app->settings->rgb_mod_installed) {
-        if(app->settings->rainbow_mode > 0) {
-            rainbow_timer_start(app);
-        } else {
-            if(furi_timer_is_running(app->rainbow_timer)) {
-                rainbow_timer_stop(app);
-            }
+
+    if((app->settings->rainbow_mode > 0) && (app->settings->rgb_mod_installed)) {
+        rainbow_timer_start(app);
+    } else {
+        if(furi_timer_is_running(app->rainbow_timer)) {
+            rainbow_timer_stop(app);
         }
     }
 }
-
 static void rainbow_timer_callback(void* context) {
     furi_assert(context);
     RGBBacklightApp* app = context;
@@ -171,60 +172,50 @@ static void rainbow_timer_callback(void* context) {
         default:
             break;
         }
-     }
-    //rgb_backlight_set_custom_color(app->current_red,app->current_green,app->current_blue);
-    rgb_backlight_update (app->settings->brightness);
+    }
+    rgb_backlight_update(app->settings->brightness);
 
     // if rainbow_mode is ..... do another effect
     // if(app->settings.rainbow_mode == ...) {
     // }
 }
 
-int32_t rgb_backlight_srv (void* p) {
+int32_t rgb_backlight_srv(void* p) {
     UNUSED(p);
 
-    // Define object app (full app with settings and running variables), 
+    // Define object app (full app with settings and running variables),
     // allocate memory and create RECORD for access to app structure from outside
     RGBBacklightApp* app = malloc(sizeof(RGBBacklightApp));
-
     furi_record_create(RECORD_RGB_BACKLIGHT, app);
 
     //define rainbow_timer and they callback
-    app->rainbow_timer =
-        furi_timer_alloc(rainbow_timer_callback, FuriTimerTypePeriodic, app);
+    app->rainbow_timer = furi_timer_alloc(rainbow_timer_callback, FuriTimerTypePeriodic, app);
 
     // settings load or create default
     app->settings = malloc(sizeof(RGBBacklightSettings));
-    rgb_backlight_settings_load (app->settings);
+    rgb_backlight_settings_load(app->settings);
 
     // Init app variables
     app->rainbow_stage = 1;
 
-    // app->current_red = 255;
-    // app->current_green = 60;
-    // app->current_blue = 0;
-    
-    // а нужно ли это все при старте сервиса, если мы получим сигнал на подсветку от Нотификейшена. Может вынести в ИНИТ и при старте нотиф дернуть его 1 раз
-    // if rgb_mod_installed start rainbow or set static color from settings (default index = 0)
+    // if rgb mod installed - start rainbow or set static color from settings (default index = 0)
     if(app->settings->rgb_mod_installed) {
-        if(app->settings->rainbow_mode > 0 ) {
-            // app->current_red = 255;
-            // app->current_green = 0;
-            // app->current_blue = 0;
+        if(app->settings->rainbow_mode > 0) {
             rainbow_timer_starter(app);
         } else {
             rgb_backlight_set_static_color(app->settings->static_color_index);
-            rgb_backlight_update (app->settings->brightness);
+            rgb_backlight_update(app->settings->brightness);
         }
-    // if not rgb_mod_installed set default static orange color (index=0)
+        // if rgb mod not installed - set default static orange color (index=0)
     } else {
         rgb_backlight_set_static_color(0);
-        rgb_backlight_update (app->settings->brightness);
-    }        
+        rgb_backlight_update(app->settings->brightness);
+    }
 
     while(1) {
-        FURI_LOG_I(TAG, "working");
-        furi_delay_ms(2000);
+        // place for message queue and other future options
+        furi_delay_ms(5000);
+        FURI_LOG_I(TAG, "Service is running");
     }
     return 0;
 }

@@ -48,7 +48,8 @@ void rgb_backlight_settings_load(RGBBacklightSettings* settings) {
                 RGB_BACKLIGHT_SETTINGS_VER);
             // if config previous version - load it and inicialize new settings
         } else if(version == RGB_BACKLIGHT_SETTINGS_VER_PREV) {
-            RGBBacklightSettingsPrevious* settings_previous = malloc(sizeof(RGBBacklightSettingsPrevious));
+            RGBBacklightSettingsPrevious* settings_previous =
+                malloc(sizeof(RGBBacklightSettingsPrevious));
 
             success = saved_struct_load(
                 RGB_BACKLIGHT_SETTINGS_PATH,
@@ -73,8 +74,11 @@ void rgb_backlight_settings_load(RGBBacklightSettings* settings) {
     // fill settings with 0 and save to settings file;
     // Orange color (index=0) will be default
     if(!success) {
-        FURI_LOG_W(TAG, "Failed to load file, using defaults 0");
+        FURI_LOG_W(TAG, "Failed to load file, using defaults");
         memset(settings, 0, sizeof(RGBBacklightSettings));
+        settings->brightness = 1.0f;
+        settings->rainbow_speed_ms = 100;
+        settings->rainbow_step = 1;
         rgb_backlight_settings_save(settings);
     }
 }
