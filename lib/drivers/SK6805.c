@@ -98,6 +98,5 @@ void SK6805_update(void) {
             }
         }
     }
-    furi_delay_us(100);
     FURI_CRITICAL_EXIT();
 }

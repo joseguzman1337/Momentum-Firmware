@@ -157,8 +157,10 @@ int32_t input_srv(void* p) {
                 // Send Press/Release event
                 event.type = pin_states[i].state ? InputTypePress : InputTypeRelease;
                 furi_pubsub_publish(event_pubsub, &event);
-                // do vibro if user setup vibro touch level in Settings-Input.
+                // vibro signal if user setup vibro touch level in Settings-Input.
                 if(settings->vibro_touch_level) {
+                    //delay 1 ticks for compatibility with rgb_backlight_mod
+                    furi_delay_tick(1);
                     furi_hal_vibro_on(true);
                     furi_delay_tick(settings->vibro_touch_level);
                     furi_hal_vibro_on(false);
