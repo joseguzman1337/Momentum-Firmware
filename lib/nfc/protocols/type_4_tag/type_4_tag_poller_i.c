@@ -198,7 +198,7 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
             FURI_LOG_D(TAG, "NDEF file is empty");
             break;
         }
-        uint8_t chunk_max = MIN(instance->data->chunk_max_read, TYPE_4_TAG_ISO_RW_CHUNK_LEN);
+        uint8_t chunk_max = MIN(instance->data->chunk_max_read, TYPE_4_TAG_CHUNK_LEN);
         if(ndef_len > TYPE_4_TAG_ISO_READ_P_OFFSET_MAX + chunk_max - sizeof(ndef_len)) {
             FURI_LOG_E(TAG, "NDEF file too long: %zu bytes", ndef_len);
             error = Type4TagErrorNotSupported;

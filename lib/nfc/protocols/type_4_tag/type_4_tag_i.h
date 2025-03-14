@@ -33,8 +33,11 @@
 #define TYPE_4_TAG_T4T_CC_FILE_ID        0xE1, 0x03
 #define TYPE_4_TAG_T4T_CC_VNO            (0x20)
 
+// 4a layer adds 1..3 byte prefix, 3a layer adds 2 byte suffix and has 256 byte buffer
+#define TYPE_4_TAG_BUF_SIZE     (256U - 3U - 2U)
 // Read returns 2 byte status trailer, write sends 5 byte command header
-#define TYPE_4_TAG_BUF_SIZE (TYPE_4_TAG_ISO_RW_CHUNK_LEN + 5)
+#define TYPE_4_TAG_CHUNK_LEN    MIN(TYPE_4_TAG_BUF_SIZE - 5U, TYPE_4_TAG_ISO_RW_CHUNK_LEN)
+#define TYPE_4_TAG_DEFAULT_SIZE (2048U)
 
 // Capability Container parsing structures
 

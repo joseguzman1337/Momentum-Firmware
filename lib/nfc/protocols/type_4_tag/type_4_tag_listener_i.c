@@ -112,13 +112,15 @@ static Type4TagError type_4_tag_listener_iso_read(
         bit_lib_num_to_bytes_be(sizeof(cc_buf), sizeof(cc->len), (void*)&cc->len);
         cc->t4t_vno = TYPE_4_TAG_T4T_CC_VNO;
         bit_lib_num_to_bytes_be(
-            instance->data->is_tag_specific ? instance->data->chunk_max_read :
-                                              TYPE_4_TAG_ISO_RW_CHUNK_LEN,
+            instance->data->is_tag_specific ?
+                MIN(instance->data->chunk_max_read, TYPE_4_TAG_CHUNK_LEN) :
+                TYPE_4_TAG_CHUNK_LEN,
             sizeof(cc->mle),
             (void*)&cc->mle);
         bit_lib_num_to_bytes_be(
-            instance->data->is_tag_specific ? instance->data->chunk_max_write :
-                                              TYPE_4_TAG_ISO_RW_CHUNK_LEN,
+            instance->data->is_tag_specific ?
+                MIN(instance->data->chunk_max_write, TYPE_4_TAG_CHUNK_LEN) :
+                TYPE_4_TAG_CHUNK_LEN,
             sizeof(cc->mlc),
             (void*)&cc->mlc);
         cc->tlv[0].type = Type4TagCcTlvTypeNdefFileCtrl;
@@ -129,7 +131,7 @@ static Type4TagError type_4_tag_listener_iso_read(
             (void*)&cc->tlv[0].value.ndef_file_ctrl.file_id);
         bit_lib_num_to_bytes_be(
             instance->data->is_tag_specific ? instance->data->ndef_max_len :
-                                              TYPE_4_TAG_ISO_RW_CHUNK_LEN,
+                                              TYPE_4_TAG_DEFAULT_SIZE,
             sizeof(cc->tlv[0].value.ndef_file_ctrl.max_len),
             (void*)&cc->tlv[0].value.ndef_file_ctrl.max_len);
         cc->tlv[0].value.ndef_file_ctrl.read_perm =
