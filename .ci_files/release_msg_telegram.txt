@@ -11,7 +11,7 @@ How to [install firmware](https://github.com/DarkFlippers/unleashed-firmware/blo
 [Extra apps](https://lab.flipper.net/?url=https://unleashedflip.com/fw_extra_apps/flipper-z-f7-update-(releasever)e.tgz&channel=release-cfw&version=(releasever)e) > `e`
 [No apps](https://lab.flipper.net/?url=https://unleashedflip.com/fw_extra_apps/flipper-z-f7-update-(releasever)c.tgz&channel=release-cfw&version=(releasever)c) > `c`
 
-What ` `, `e`, `c` means? -> [versions info](https://github.com/DarkFlippers/unleashed-firmware/blob/dev/CHANGELOG.md#what-n-r-e---c-means-what-i-need-to-download-if-i-dont-want-to-use-web-updater)
+What ` `, `e`, `c` means? -> [versions info](https://github.com/DarkFlippers/unleashed-firmware/blob/dev/CHANGELOG.md#what-e---c-means-what-i-need-to-download-if-i-dont-want-to-use-web-updater)
 
 **Direct tgz download links:**
 [Default](https://unleashedflip.com/fw/(releasever)/flipper-z-f7-update-(releasever).tgz) > ` ` 
