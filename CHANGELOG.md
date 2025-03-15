@@ -19,6 +19,7 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW PR 4132: Infrared: Fix universals sending (by @Willy-JL)
 * OFW PR 4149: HID Ble: increased stack and improvements (by @doomwastaken)
 * OFW PR 4126: Stricter constness for const data (by @hedger)
 * OFW PR 4017: Alarm improvements: Snooze, timeouts, and dismissing from the locked state (by @Astrrra)
