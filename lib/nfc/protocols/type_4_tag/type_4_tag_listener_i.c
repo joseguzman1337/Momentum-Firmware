@@ -161,6 +161,81 @@ static Type4TagError type_4_tag_listener_iso_read(
     return Type4TagErrorCustomCommand;
 }
 
+static Type4TagError type_4_tag_listener_iso_write(
+    Type4TagListener* instance,
+    uint8_t p1,
+    uint8_t p2,
+    size_t lc,
+    const uint8_t* data,
+    size_t le) {
+    UNUSED(le);
+
+    size_t offset;
+    if(p1 & TYPE_4_TAG_ISO_WRITE_P1_ID_MASK) {
+        bit_buffer_append_bytes(
+            instance->tx_buffer, type_4_tag_no_support_apdu, sizeof(type_4_tag_no_support_apdu));
+        return Type4TagErrorCustomCommand;
+    } else {
+        offset = (p1 << 8) + p2;
+    }
+
+    if(instance->state == Type4TagListenerStateSelectedCapabilityContainer) {
+        bit_buffer_append_bytes(
+            instance->tx_buffer, type_4_tag_no_support_apdu, sizeof(type_4_tag_no_support_apdu));
+        return Type4TagErrorNotSupported;
+    }
+
+    if(instance->state == Type4TagListenerStateSelectedNdefMessage) {
+        if(offset + lc > (instance->data->is_tag_specific ? instance->data->ndef_max_len :
+                                                            TYPE_4_TAG_DEFAULT_SIZE)) {
+            bit_buffer_append_bytes(
+                instance->tx_buffer,
+                type_4_tag_offset_error_apdu,
+                sizeof(type_4_tag_offset_error_apdu));
+            return Type4TagErrorWrongFormat;
+        }
+
+        const size_t ndef_file_len = simple_array_get_count(instance->data->ndef_data);
+        size_t ndef_file_len_new = ndef_file_len;
+        if(offset < sizeof(uint16_t)) {
+            const uint8_t write_len = sizeof(uint16_t) - offset;
+            ndef_file_len_new = bit_lib_bytes_to_num_be(data, write_len);
+            offset = sizeof(uint16_t);
+            data += offset;
+            lc -= write_len;
+        }
+        offset -= sizeof(uint16_t);
+
+        ndef_file_len_new = MAX(ndef_file_len_new, offset + lc);
+        if(ndef_file_len_new != ndef_file_len) {
+            SimpleArray* ndef_data_temp = simple_array_alloc(&simple_array_config_uint8_t);
+            if(ndef_file_len_new > 0) {
+                simple_array_init(ndef_data_temp, ndef_file_len_new);
+                if(ndef_file_len > 0) {
+                    memcpy(
+                        simple_array_get_data(ndef_data_temp),
+                        simple_array_get_data(instance->data->ndef_data),
+                        MIN(ndef_file_len_new, ndef_file_len));
+                }
+            }
+            simple_array_copy(instance->data->ndef_data, ndef_data_temp);
+            simple_array_free(ndef_data_temp);
+        }
+
+        if(ndef_file_len_new > 0 && lc > 0) {
+            uint8_t* ndef_data = simple_array_get_data(instance->data->ndef_data);
+            memcpy(&ndef_data[offset], data, lc);
+        }
+        bit_buffer_append_bytes(
+            instance->tx_buffer, type_4_tag_success_apdu, sizeof(type_4_tag_success_apdu));
+        return Type4TagErrorNone;
+    }
+
+    bit_buffer_append_bytes(
+        instance->tx_buffer, type_4_tag_not_found_apdu, sizeof(type_4_tag_not_found_apdu));
+    return Type4TagErrorCustomCommand;
+}
+
 static const Type4TagListenerApduCommand type_4_tag_listener_commands[] = {
     {
         .cla_ins = {TYPE_4_TAG_ISO_SELECT_CMD},
@@ -169,6 +244,10 @@ static const Type4TagListenerApduCommand type_4_tag_listener_commands[] = {
     {
         .cla_ins = {TYPE_4_TAG_ISO_READ_CMD},
         .handler = type_4_tag_listener_iso_read,
+    },
+    {
+        .cla_ins = {TYPE_4_TAG_ISO_WRITE_CMD},
+        .handler = type_4_tag_listener_iso_write,
     },
 };
 

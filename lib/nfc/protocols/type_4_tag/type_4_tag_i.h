@@ -17,6 +17,12 @@
 #define TYPE_4_TAG_ISO_READ_P_OFFSET_MAX (32767U)
 #define TYPE_4_TAG_ISO_READ_LE_FULL      (0x00)
 
+// ISO UPDATE BINARY command and parameters
+#define TYPE_4_TAG_ISO_WRITE_CMD         0x00, 0xD6
+#define TYPE_4_TAG_ISO_WRITE_P1_ID_MASK  (1 << 7)
+#define TYPE_4_TAG_ISO_WRITE_P_BEGINNING 0x00, 0x00
+#define TYPE_4_TAG_ISO_WRITE_LE_EMPTY    (0x00)
+
 // Common APDU parameters and values
 #define TYPE_4_TAG_ISO_STATUS_LEN        (2U)
 #define TYPE_4_TAG_ISO_STATUS_SUCCESS    0x90, 0x00
