@@ -83,7 +83,6 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
         FURI_LOG_D(TAG, "Read CC");
         const uint8_t type_4_tag_read_cc_apdu[] = {
             TYPE_4_TAG_ISO_READ_CMD,
-            TYPE_4_TAG_ISO_READ_P1_EMPTY,
             TYPE_4_TAG_ISO_READ_P_BEGINNING,
             TYPE_4_TAG_ISO_READ_LE_FULL,
         };
@@ -179,7 +178,6 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
         uint16_t ndef_len;
         const uint8_t type_4_tag_read_ndef_len_apdu[] = {
             TYPE_4_TAG_ISO_READ_CMD,
-            TYPE_4_TAG_ISO_READ_P1_EMPTY,
             TYPE_4_TAG_ISO_READ_P_BEGINNING,
             sizeof(ndef_len),
         };

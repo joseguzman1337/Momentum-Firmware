@@ -12,9 +12,8 @@
 
 // ISO READ BINARY command and parameters
 #define TYPE_4_TAG_ISO_READ_CMD          0x00, 0xB0
-#define TYPE_4_TAG_ISO_READ_P1_EMPTY     (0x00)
 #define TYPE_4_TAG_ISO_READ_P1_ID_MASK   (1 << 7)
-#define TYPE_4_TAG_ISO_READ_P_BEGINNING  (0x00)
+#define TYPE_4_TAG_ISO_READ_P_BEGINNING  0x00, 0x00
 #define TYPE_4_TAG_ISO_READ_P_OFFSET_MAX (32767U)
 #define TYPE_4_TAG_ISO_READ_LE_FULL      (0x00)
 
