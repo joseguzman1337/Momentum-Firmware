@@ -11,5 +11,6 @@ App(
         "loader",
         "power",
         "namechanger_srv",
+        "rgb_backlight",
     ],
 )

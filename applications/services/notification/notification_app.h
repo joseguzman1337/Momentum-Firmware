@@ -3,6 +3,7 @@
 #include "notification.h"
 #include "notification_messages.h"
 #include "notification_settings_filename.h"
+#include "applications/services/rgb_backlight/rgb_backlight.h"
 
 #define NOTIFICATION_LED_COUNT      3
 #define NOTIFICATION_EVENT_COMPLETE 0x00000001U
@@ -33,7 +34,7 @@ typedef struct {
     Light light;
 } NotificationLedLayer;
 
-#define NOTIFICATION_SETTINGS_VERSION 0x02
+#define NOTIFICATION_SETTINGS_VERSION 0x03
 #define NOTIFICATION_SETTINGS_PATH    INT_PATH(NOTIFICATION_SETTINGS_FILE_NAME)
 
 typedef struct {
@@ -56,6 +57,7 @@ struct NotificationApp {
     uint8_t display_led_lock;
 
     NotificationSettings settings;
+    RGBBacklightApp* rgb_srv;
 };
 
 void notification_message_save_settings(NotificationApp* app);

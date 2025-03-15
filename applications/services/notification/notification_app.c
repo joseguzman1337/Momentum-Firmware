@@ -9,6 +9,7 @@
 #include "notification.h"
 #include "notification_messages.h"
 #include "notification_app.h"
+#include "applications/services/rgb_backlight/rgb_backlight.h"
 
 #define TAG "NotificationSrv"
 
@@ -218,11 +219,19 @@ static void notification_process_notification_message(
                     &app->display,
                     notification_message->data.led.value * display_brightness_setting);
                 reset_mask |= reset_display_mask;
+
+                //start rgb_mod_rainbow_timer when display backlight is ON and all corresponding settings is ON too
+                rainbow_timer_starter(app->rgb_srv);
+
             } else {
                 reset_mask &= ~reset_display_mask;
                 notification_reset_notification_led_layer(&app->display);
                 if(furi_timer_is_running(app->display_timer)) {
                     furi_timer_stop(app->display_timer);
+                }
+                //stop rgb_mod_rainbow_timer when display backlight is OFF
+                if(furi_timer_is_running(app->rgb_srv->rainbow_timer)) {
+                    rainbow_timer_stop(app->rgb_srv);
                 }
             }
             break;
@@ -591,7 +600,7 @@ static void notification_init_settings(NotificationApp* app) {
 int32_t notification_srv(void* p) {
     UNUSED(p);
     NotificationApp* app = notification_app_alloc();
-
+    app->rgb_srv = furi_record_open(RECORD_RGB_BACKLIGHT);
     notification_init_settings(app);
 
     notification_vibro_off();

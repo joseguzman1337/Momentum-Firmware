@@ -30,7 +30,6 @@ void input_settings_load(InputSettings* settings) {
                 sizeof(InputSettings),
                 INPUT_SETTINGS_MAGIC,
                 INPUT_SETTINGS_VER);
-            // if config previous version - load it and inicialize new settings
         }
         // in case of another config version we exit from useless cycle to next step
     } while(false);
