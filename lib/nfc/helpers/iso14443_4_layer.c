@@ -217,7 +217,14 @@ Iso14443_4LayerResult iso14443_4_layer_decode_command(
             return Iso14443_4LayerResultSkip;
         }
 
+    } else if(ISO14443_4_BLOCK_PCB_IS_R_BLOCK(instance->pcb)) {
         // FIXME: R blocks
+        iso14443_4_layer_update_pcb(instance, true);
+        instance->pcb |= ISO14443_4_BLOCK_PCB_R_NACK_MASK;
+        bit_buffer_reset(block_data);
+        bit_buffer_append_byte(block_data, instance->pcb);
+        iso14443_4_layer_update_pcb(instance, false);
+        return Iso14443_4LayerResultSend;
     }
     return Iso14443_4LayerResultSkip;
 }
