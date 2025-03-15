@@ -93,47 +93,9 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
         error = type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
         if(error != Type4TagErrorNone) break;
 
-        const Type4TagCc* cc = (const Type4TagCc*)bit_buffer_get_data(instance->rx_buffer);
-        if(cc->t4t_vno != TYPE_4_TAG_T4T_CC_VNO) {
-            FURI_LOG_E(TAG, "Unsupported T4T version");
-            error = Type4TagErrorNotSupported;
-            break;
-        }
-
-        const Type4TagCcTlv* tlv = cc->tlv;
-        const Type4TagCcTlvNdefFileCtrl* ndef_file_ctrl = NULL;
-        while((void*)tlv < (void*)cc + cc->len) {
-            if(tlv->type == Type4TagCcTlvTypeNdefFileCtrl) {
-                ndef_file_ctrl = &tlv->value.ndef_file_ctrl;
-                break;
-            }
-
-            if(tlv->len < 0xFF) {
-                tlv = (void*)&tlv->value + tlv->len;
-            } else {
-                uint16_t len = bit_lib_bytes_to_num_be((void*)&tlv->len + 1, sizeof(uint16_t));
-                tlv = (void*)&tlv->value + sizeof(len) + len;
-            }
-        }
-        if(!ndef_file_ctrl) {
-            FURI_LOG_E(TAG, "No NDEF file ctrl TLV");
-            error = Type4TagErrorWrongFormat;
-            break;
-        }
-
+        error = type_4_tag_cc_parse(instance->data, instance->rx_buffer);
+        if(error != Type4TagErrorNone) break;
         instance->data->is_tag_specific = true;
-        instance->data->t4t_version.value = cc->t4t_vno;
-        instance->data->chunk_max_read = bit_lib_bytes_to_num_be((void*)&cc->mle, sizeof(cc->mle));
-        instance->data->chunk_max_write =
-            bit_lib_bytes_to_num_be((void*)&cc->mlc, sizeof(cc->mlc));
-        instance->data->ndef_file_id = bit_lib_bytes_to_num_be(
-            (void*)&ndef_file_ctrl->file_id, sizeof(ndef_file_ctrl->file_id));
-        instance->data->ndef_max_len =
-            bit_lib_bytes_to_num_be(
-                (void*)&ndef_file_ctrl->max_len, sizeof(ndef_file_ctrl->max_len)) -
-            sizeof(uint16_t);
-        instance->data->ndef_read_lock = ndef_file_ctrl->read_perm;
-        instance->data->ndef_write_lock = ndef_file_ctrl->write_perm;
 
         FURI_LOG_D(TAG, "Detected NDEF file ID 0x%04X", instance->data->ndef_file_id);
     } while(false);

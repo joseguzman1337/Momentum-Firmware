@@ -34,6 +34,7 @@
 #define TYPE_4_TAG_T4T_CC_VNO            (0x20)
 #define TYPE_4_TAG_T4T_DEFAULT_FILE_ID   0xE104
 #define TYPE_4_TAG_T4T_CC_RW_LOCK_NONE   0x00
+#define TYPE_4_TAG_T4T_CC_MIN_SIZE       (sizeof(Type4TagCc) + sizeof(Type4TagCcTlv))
 
 // 4a layer adds 1..3 byte prefix, 3a layer adds 2 byte suffix and has 256 byte buffer
 #define TYPE_4_TAG_BUF_SIZE     (256U - 3U - 2U)
@@ -76,6 +77,10 @@ typedef struct FURI_PACKED {
 // Internal helpers
 
 Type4TagError type_4_tag_process_error(Iso14443_4aError error);
+
+void type_4_tag_cc_dump(const Type4TagData* data, uint8_t* buf, size_t len);
+
+Type4TagError type_4_tag_cc_parse(Type4TagData* data, const BitBuffer* buf);
 
 // Load internal Type4Tag structures
 
