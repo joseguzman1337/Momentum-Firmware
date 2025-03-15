@@ -33,12 +33,13 @@ bool iso14443_4_layer_decode_response(
 // Listener mode
 
 typedef enum {
-    Iso14443_4LayerStatusOk,
-    Iso14443_4LayerStatusIgnore,
-    Iso14443_4LayerStatusSendAndHalt,
-} Iso14443_4LayerStatus;
+    Iso14443_4LayerResultSkip = (0),
+    Iso14443_4LayerResultData = (1 << 1),
+    Iso14443_4LayerResultSend = (1 << 2),
+    Iso14443_4LayerResultHalt = (1 << 3),
+} Iso14443_4LayerResult;
 
-Iso14443_4LayerStatus iso14443_4_layer_decode_command(
+Iso14443_4LayerResult iso14443_4_layer_decode_command(
     Iso14443_4Layer* instance,
     const BitBuffer* input_data,
     BitBuffer* block_data);

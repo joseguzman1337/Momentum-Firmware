@@ -88,19 +88,21 @@ static NfcCommand iso14443_4a_listener_run(NfcGenericEvent event, void* context)
                 }
             }
         } else {
-            Iso14443_4LayerStatus status =
+            Iso14443_4LayerResult status =
                 iso14443_4_layer_decode_command(instance->iso14443_4_layer, rx_buffer, rx_buffer);
-            if(status == Iso14443_4LayerStatusSendAndHalt) {
-                if(iso14443_3a_listener_send_standard_frame(
-                       instance->iso14443_3a_listener, rx_buffer) == Iso14443_3aErrorNone) {
-                    iso14443_4a_listener_reset(instance);
-                    if(instance->callback) {
-                        instance->iso14443_4a_event.type = Iso14443_4aListenerEventTypeHalted;
-                        instance->callback(instance->generic_event, instance->context);
-                    }
-                    command = NfcCommandSleep;
+            if(status & Iso14443_4LayerResultSend) {
+                iso14443_3a_listener_send_standard_frame(
+                    instance->iso14443_3a_listener, rx_buffer);
+            }
+            if(status & Iso14443_4LayerResultHalt) {
+                iso14443_4a_listener_reset(instance);
+                if(instance->callback) {
+                    instance->iso14443_4a_event.type = Iso14443_4aListenerEventTypeHalted;
+                    instance->callback(instance->generic_event, instance->context);
                 }
-            } else if(status == Iso14443_4LayerStatusOk) {
+                command = NfcCommandSleep;
+            }
+            if(status & Iso14443_4LayerResultData) {
                 instance->iso14443_4a_event.type = Iso14443_4aListenerEventTypeReceivedData;
                 instance->iso14443_4a_event.data->buffer = rx_buffer;
 

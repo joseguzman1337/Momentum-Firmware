@@ -59,9 +59,11 @@ struct Iso14443_4Layer {
     uint8_t nad;
 };
 
-static inline void iso14443_4_layer_update_pcb(Iso14443_4Layer* instance) {
+static inline void iso14443_4_layer_update_pcb(Iso14443_4Layer* instance, bool toggle_num) {
     instance->pcb_prev = instance->pcb;
-    instance->pcb ^= (uint8_t)0x01;
+    if(toggle_num) {
+        instance->pcb ^= (uint8_t)0x01;
+    }
 }
 
 Iso14443_4Layer* iso14443_4_layer_alloc(void) {
@@ -115,7 +117,7 @@ void iso14443_4_layer_encode_command(
     bit_buffer_append_byte(block_data, instance->pcb);
     bit_buffer_append(block_data, input_data);
 
-    iso14443_4_layer_update_pcb(instance);
+    iso14443_4_layer_update_pcb(instance, true);
 }
 
 static inline uint8_t iso14443_4_layer_get_response_pcb(const BitBuffer* block_data) {
@@ -137,7 +139,7 @@ bool iso14443_4_layer_decode_response(
             ret = (ISO14443_4_BLOCK_PCB_IS_R_BLOCK(response_pcb)) &&
                   (!ISO14443_4_BLOCK_PCB_R_NACK_ACTIVE(response_pcb));
             instance->pcb &= ISO14443_4_BLOCK_PCB_MASK;
-            iso14443_4_layer_update_pcb(instance);
+            iso14443_4_layer_update_pcb(instance, true);
         } else if(ISO14443_4_BLOCK_PCB_IS_CHAIN_ACTIVE(instance->pcb_prev)) {
             const uint8_t response_pcb = iso14443_4_layer_get_response_pcb(block_data);
             ret = (ISO14443_4_BLOCK_PCB_IS_R_BLOCK(response_pcb)) &&
@@ -165,65 +167,69 @@ void iso14443_4_layer_set_nad_supported(Iso14443_4Layer* instance, bool nad) {
     instance->nad = nad ? 0 : ISO14443_4_LAYER_NAD_NOT_SUPPORTED;
 }
 
-Iso14443_4LayerStatus iso14443_4_layer_decode_command(
+Iso14443_4LayerResult iso14443_4_layer_decode_command(
     Iso14443_4Layer* instance,
     const BitBuffer* input_data,
     BitBuffer* block_data) {
-    uint8_t prologue_len = 0;
-    instance->pcb_prev = bit_buffer_get_byte(input_data, prologue_len++);
+    furi_assert(instance);
 
-    if(ISO14443_4_BLOCK_PCB_IS_I_BLOCK(instance->pcb_prev)) {
-        if(instance->pcb_prev & ISO14443_4_BLOCK_PCB_I_CID_MASK) {
+    uint8_t prologue_len = 0;
+    instance->pcb = bit_buffer_get_byte(input_data, prologue_len++);
+
+    if(ISO14443_4_BLOCK_PCB_IS_I_BLOCK(instance->pcb)) {
+        if(instance->pcb & ISO14443_4_BLOCK_PCB_I_CID_MASK) {
             const uint8_t cid = bit_buffer_get_byte(input_data, prologue_len++) &
                                 ISO14443_4_BLOCK_CID_MASK;
             if(instance->cid == ISO14443_4_LAYER_CID_NOT_SUPPORTED || cid != instance->cid) {
-                return Iso14443_4LayerStatusIgnore;
+                return Iso14443_4LayerResultSkip;
             }
         } else if(instance->cid != ISO14443_4_LAYER_CID_NOT_SUPPORTED && instance->cid != 0) {
-            return Iso14443_4LayerStatusIgnore;
+            return Iso14443_4LayerResultSkip;
         }
-        if(instance->pcb_prev & ISO14443_4_BLOCK_PCB_I_NAD_MASK) {
+        if(instance->pcb & ISO14443_4_BLOCK_PCB_I_NAD_MASK) {
             if(instance->nad == ISO14443_4_LAYER_NAD_NOT_SUPPORTED) {
-                return Iso14443_4LayerStatusIgnore;
+                return Iso14443_4LayerResultSkip;
             }
             instance->nad = bit_buffer_get_byte(input_data, prologue_len++);
             // FIXME: unset NAD when chaining after first block
         }
         // FIXME: chaining
         bit_buffer_copy_right(block_data, input_data, prologue_len);
-        return Iso14443_4LayerStatusOk;
+        iso14443_4_layer_update_pcb(instance, false);
+        return Iso14443_4LayerResultData;
 
-    } else if(ISO14443_4_BLOCK_PCB_IS_S_BLOCK(instance->pcb_prev)) {
-        if(instance->pcb_prev & ISO14443_4_BLOCK_PCB_S_CID_MASK) {
+    } else if(ISO14443_4_BLOCK_PCB_IS_S_BLOCK(instance->pcb)) {
+        if(instance->pcb & ISO14443_4_BLOCK_PCB_S_CID_MASK) {
             const uint8_t cid = bit_buffer_get_byte(input_data, prologue_len++) &
                                 ISO14443_4_BLOCK_CID_MASK;
             if(instance->cid == ISO14443_4_LAYER_CID_NOT_SUPPORTED || cid != instance->cid) {
-                return Iso14443_4LayerStatusIgnore;
+                return Iso14443_4LayerResultSkip;
             }
         } else if(instance->cid != ISO14443_4_LAYER_CID_NOT_SUPPORTED && instance->cid != 0) {
-            return Iso14443_4LayerStatusIgnore;
+            return Iso14443_4LayerResultSkip;
         }
-        if((instance->pcb_prev & ISO14443_4_BLOCK_PCB_S_WTX_DESELECT_MASK) == 0) {
+        if((instance->pcb & ISO14443_4_BLOCK_PCB_S_WTX_DESELECT_MASK) == 0) {
             // DESELECT
             bit_buffer_copy(block_data, input_data);
-            return Iso14443_4LayerStatusSendAndHalt;
+            return Iso14443_4LayerResultSend | Iso14443_4LayerResultHalt;
         } else {
             // WTX ACK or wrong value
-            return Iso14443_4LayerStatusIgnore;
+            return Iso14443_4LayerResultSkip;
         }
 
         // FIXME: R blocks
     }
-    return Iso14443_4LayerStatusIgnore;
+    return Iso14443_4LayerResultSkip;
 }
 
 bool iso14443_4_layer_encode_response(
     Iso14443_4Layer* instance,
     const BitBuffer* input_data,
     BitBuffer* block_data) {
+    furi_assert(instance);
+
     if(ISO14443_4_BLOCK_PCB_IS_I_BLOCK(instance->pcb_prev)) {
-        instance->pcb = instance->pcb_prev;
-        bit_buffer_append_byte(block_data, instance->pcb);
+        bit_buffer_append_byte(block_data, 0x00);
         if(instance->pcb_prev & ISO14443_4_BLOCK_PCB_I_CID_MASK) {
             bit_buffer_append_byte(block_data, instance->cid);
         }
@@ -239,6 +245,7 @@ bool iso14443_4_layer_encode_response(
         instance->pcb &= ~ISO14443_4_BLOCK_PCB_I_CHAIN_MASK;
         bit_buffer_set_byte(block_data, 0, instance->pcb);
         bit_buffer_append(block_data, input_data);
+        iso14443_4_layer_update_pcb(instance, false);
         return true;
 
         // FIXME: R blocks
