@@ -47,7 +47,7 @@ Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance) {
         TYPE_4_TAG_ISO_SELECT_CMD,
         TYPE_4_TAG_ISO_SELECT_P1_BY_DF_NAME,
         TYPE_4_TAG_ISO_SELECT_P2_EMPTY,
-        TYPE_4_TAG_ISO_APP_NAME_LEN,
+        TYPE_4_TAG_ISO_NAME_LEN,
         TYPE_4_TAG_ISO_APP_NAME,
         TYPE_4_TAG_ISO_SELECT_LE_EMPTY,
     };

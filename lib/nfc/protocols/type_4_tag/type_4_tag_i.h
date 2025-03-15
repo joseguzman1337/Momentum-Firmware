@@ -26,8 +26,9 @@
 #define TYPE_4_TAG_ISO_STATUS_BAD_PARAMS 0x6A, 0x86
 #define TYPE_4_TAG_ISO_STATUS_NO_CMD     0x68, 0x00
 #define TYPE_4_TAG_ISO_RW_CHUNK_LEN      (255U)
-#define TYPE_4_TAG_ISO_APP_NAME_LEN      (7U)
+#define TYPE_4_TAG_ISO_NAME_LEN          (7U)
 #define TYPE_4_TAG_ISO_APP_NAME          0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01
+#define TYPE_4_TAG_ISO_PICC_NAME         0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x00
 #define TYPE_4_TAG_T4T_CC_FILE_ID_LEN    (2U)
 #define TYPE_4_TAG_T4T_CC_FILE_ID        0xE1, 0x03
 #define TYPE_4_TAG_T4T_CC_VNO            (0x20)

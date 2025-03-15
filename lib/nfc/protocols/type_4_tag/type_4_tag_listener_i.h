@@ -10,6 +10,7 @@ extern "C" {
 
 typedef enum {
     Type4TagListenerStateIdle,
+    Type4TagListenerStateSelectedPicc,
     Type4TagListenerStateSelectedApplication,
     Type4TagListenerStateSelectedCapabilityContainer,
     Type4TagListenerStateSelectedNdefMessage,
