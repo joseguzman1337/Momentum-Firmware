@@ -189,111 +189,6 @@ static void notification_display_timer(void* ctx) {
     notification_message(app, &sequence_display_backlight_off);
 }
 
-// // --- RGB MOD RAINBOW SECTION ---
-
-// //start furi timer for rgb_mod_rainbow
-// static void rgb_mod_rainbow_timer_start(NotificationApp* app) {
-//     furi_timer_start(
-//         app->rgb_mod_rainbow_timer, furi_ms_to_ticks(app->settings.rgb_mod_rainbow_speed_ms));
-// }
-
-// //stop furi timer for rgb_mod_rainbow
-// static void rgb_mod_rainbow_timer_stop(NotificationApp* app) {
-//     furi_timer_stop(app->rgb_mod_rainbow_timer);
-// }
-
-// // start/restart/stop rgb_mod_rainbow_timer only if rgb_mod_installed and apply rainbow colors to backlight
-// static void rgb_mod_rainbow_timer_starter(NotificationApp* app) {
-//     if(app->settings.rgb_mod_installed) {
-//         if(app->settings.rgb_mod_rainbow_mode > 0) {
-//             rgb_mod_rainbow_update(
-//                 app->rgb_mod_rainbow_red,
-//                 app->rgb_mod_rainbow_green,
-//                 app->rgb_mod_rainbow_blue,
-//                 app->settings.display_brightness);
-//             rgb_mod_rainbow_timer_start(app);
-//         } else {
-//             if(furi_timer_is_running(app->rgb_mod_rainbow_timer)) {
-//                 rgb_mod_rainbow_timer_stop(app);
-//             }
-//         }
-//     }
-// }
-
-// // callback for rgb_mod_rainbow_timer (what we do when timer end)
-// static void rgb_mod_rainbow_timer_callback(void* context) {
-//     furi_assert(context);
-//     NotificationApp* app = context;
-
-//     // if rgb_mode_rainbow_mode is rainbow do rainbow effect
-//     if(app->settings.rgb_mod_rainbow_mode == 1) {
-//         switch(app->rgb_mod_rainbow_stage) {
-//         // from red to yellow
-//         case 1:
-//             app->rgb_mod_rainbow_green += app->settings.rgb_mod_rainbow_step;
-//             if(app->rgb_mod_rainbow_green >= 255) {
-//                 app->rgb_mod_rainbow_green = 255;
-//                 app->rgb_mod_rainbow_stage++;
-//             }
-//             break;
-//         // yellow red to green
-//         case 2:
-//             app->rgb_mod_rainbow_red -= app->settings.rgb_mod_rainbow_step;
-//             if(app->rgb_mod_rainbow_red <= 0) {
-//                 app->rgb_mod_rainbow_red = 0;
-//                 app->rgb_mod_rainbow_stage++;
-//             }
-//             break;
-//         // from green to light blue
-//         case 3:
-//             app->rgb_mod_rainbow_blue += app->settings.rgb_mod_rainbow_step;
-//             if(app->rgb_mod_rainbow_blue >= 255) {
-//                 app->rgb_mod_rainbow_blue = 255;
-//                 app->rgb_mod_rainbow_stage++;
-//             }
-//             break;
-//         //from light blue to blue
-//         case 4:
-//             app->rgb_mod_rainbow_green -= app->settings.rgb_mod_rainbow_step;
-//             if(app->rgb_mod_rainbow_green <= 0) {
-//                 app->rgb_mod_rainbow_green = 0;
-//                 app->rgb_mod_rainbow_stage++;
-//             }
-//             break;
-//         //from blue to violet
-//         case 5:
-//             app->rgb_mod_rainbow_red += app->settings.rgb_mod_rainbow_step;
-//             if(app->rgb_mod_rainbow_red >= 255) {
-//                 app->rgb_mod_rainbow_red = 255;
-//                 app->rgb_mod_rainbow_stage++;
-//             }
-//             break;
-//         //from violet to red
-//         case 6:
-//             app->rgb_mod_rainbow_blue -= app->settings.rgb_mod_rainbow_step;
-//             if(app->rgb_mod_rainbow_blue <= 0) {
-//                 app->rgb_mod_rainbow_blue = 0;
-//                 app->rgb_mod_rainbow_stage = 1;
-//             }
-//             break;
-//         default:
-//             break;
-//         }
-
-//         rgb_mod_rainbow_update(
-//             app->rgb_mod_rainbow_red,
-//             app->rgb_mod_rainbow_green,
-//             app->rgb_mod_rainbow_blue,
-//             app->settings.display_brightness);
-//     }
-
-//     // if rgb_mode_rainbow_mode is ..... do another effect
-//     // if(app->settings.rgb_mod_rainbow_mode == 2) {
-//     // }
-// }
-
-// // --- END OF RGB MOD RAINBOW SECTION ---
-
 // message processing
 static void notification_process_notification_message(
     NotificationApp* app,
@@ -629,7 +524,7 @@ static void input_event_callback(const void* value, void* context) {
 static NotificationApp* notification_app_alloc(void) {
     NotificationApp* app = malloc(sizeof(NotificationApp));
     app->queue = furi_message_queue_alloc(8, sizeof(NotificationAppMessage));
-    app->display_timer = furi_timer_alloc(notification_display_timer, FuriTimerTypePeriodic, app);
+    app->display_timer = furi_timer_alloc(notification_display_timer, FuriTimerTypeOnce, app);
 
     app->settings.speaker_volume = 1.0f;
     app->settings.display_brightness = 1.0f;
@@ -664,25 +559,8 @@ static NotificationApp* notification_app_alloc(void) {
     furi_pubsub_subscribe(app->event_record, input_event_callback, app);
     notification_message(app, &sequence_display_backlight_on);
 
-    // // --- RGB MOD INIT SETTINGS SECTION ---
-
-    // app->settings.rgb_mod_installed = false;
-    // app->settings.rgb_mod_rainbow_mode = 0;
-    // app->settings.rgb_mod_rainbow_speed_ms = 100;
-    // app->settings.rgb_mod_rainbow_step = 5;
-    // app->rgb_mod_rainbow_red = 255;
-    // app->rgb_mod_rainbow_green = 0;
-    // app->rgb_mod_rainbow_blue = 0;
-    // app->rgb_mod_rainbow_stage = 1;
-
-    // //define rgb_mod_rainbow_timer and they callback
-    // app->rgb_mod_rainbow_timer =
-    //     furi_timer_alloc(rgb_mod_rainbow_timer_callback, FuriTimerTypePeriodic, app);
-    // // --- END OF RGB MOD INIT SETTINGS SECTION ---
-
     return app;
 }
-
 
 static void notification_storage_callback(const void* message, void* context) {
     furi_assert(context);
@@ -704,8 +582,6 @@ static void notification_apply_settings(NotificationApp* app) {
     }
 
     notification_apply_lcd_contrast(app);
-    // //start rgb_mod_rainbow_timer on system init if they ON in config
-    // rgb_mod_rainbow_timer_starter(app);
 }
 
 static void notification_init_settings(NotificationApp* app) {
@@ -724,7 +600,7 @@ static void notification_init_settings(NotificationApp* app) {
 int32_t notification_srv(void* p) {
     UNUSED(p);
     NotificationApp* app = notification_app_alloc();
-    app->rgb_srv = furi_record_open (RECORD_RGB_BACKLIGHT);
+    app->rgb_srv = furi_record_open(RECORD_RGB_BACKLIGHT);
     notification_init_settings(app);
 
     notification_vibro_off();

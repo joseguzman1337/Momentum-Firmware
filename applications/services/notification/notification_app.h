@@ -45,13 +45,6 @@ typedef struct {
     uint32_t display_off_delay_ms;
     int8_t contrast;
     bool vibro_on;
-    /// --- RGB MOD SETTINGS SECTION ---
-    // bool rgb_mod_installed;
-    // uint32_t rgb_mod_rainbow_mode;
-    // uint32_t rgb_mod_rainbow_speed_ms;
-    // uint16_t rgb_mod_rainbow_step;
-    /// --- END OF RGB MOD SETTINGS SECTION ---
-
 } NotificationSettings;
 
 struct NotificationApp {
@@ -62,14 +55,6 @@ struct NotificationApp {
     NotificationLedLayer display;
     NotificationLedLayer led[NOTIFICATION_LED_COUNT];
     uint8_t display_led_lock;
-
-    // --- RGB RAINBOW MODE VARIABLES SECTION ---
-    // FuriTimer* rgb_mod_rainbow_timer;
-    // int16_t rgb_mod_rainbow_red;
-    // int16_t rgb_mod_rainbow_green;
-    // int16_t rgb_mod_rainbow_blue;
-    // uint8_t rgb_mod_rainbow_stage;
-    // --- ENd OF RGB RAINBOW MODE VARIABLES SECTION ---
 
     NotificationSettings settings;
     RGBBacklightApp* rgb_srv;
