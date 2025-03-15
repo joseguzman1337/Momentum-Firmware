@@ -63,7 +63,10 @@ static Type4TagError type_4_tag_listener_iso_select(
 
             uint8_t ndef_file_id_be[sizeof(instance->data->ndef_file_id)];
             bit_lib_num_to_bytes_be(
-                instance->data->ndef_file_id, sizeof(ndef_file_id_be), ndef_file_id_be);
+                instance->data->is_tag_specific ? instance->data->ndef_file_id :
+                                                  TYPE_4_TAG_T4T_DEFAULT_FILE_ID,
+                sizeof(ndef_file_id_be),
+                ndef_file_id_be);
             if(lc == sizeof(ndef_file_id_be) &&
                memcmp(ndef_file_id_be, data, sizeof(ndef_file_id_be)) == 0) {
                 instance->state = Type4TagListenerStateSelectedNdefMessage;
@@ -126,7 +129,8 @@ static Type4TagError type_4_tag_listener_iso_read(
         cc->tlv[0].type = Type4TagCcTlvTypeNdefFileCtrl;
         cc->tlv[0].len = sizeof(cc->tlv[0].value.ndef_file_ctrl);
         bit_lib_num_to_bytes_be(
-            instance->data->ndef_file_id,
+            instance->data->is_tag_specific ? instance->data->ndef_file_id :
+                                              TYPE_4_TAG_T4T_DEFAULT_FILE_ID,
             sizeof(cc->tlv[0].value.ndef_file_ctrl.file_id),
             (void*)&cc->tlv[0].value.ndef_file_ctrl.file_id);
         bit_lib_num_to_bytes_be(
@@ -134,10 +138,12 @@ static Type4TagError type_4_tag_listener_iso_read(
                                               TYPE_4_TAG_DEFAULT_SIZE,
             sizeof(cc->tlv[0].value.ndef_file_ctrl.max_len),
             (void*)&cc->tlv[0].value.ndef_file_ctrl.max_len);
-        cc->tlv[0].value.ndef_file_ctrl.read_perm =
-            instance->data->is_tag_specific ? instance->data->ndef_read_lock : 0x00;
-        cc->tlv[0].value.ndef_file_ctrl.write_perm =
-            instance->data->is_tag_specific ? instance->data->ndef_write_lock : 0x00;
+        cc->tlv[0].value.ndef_file_ctrl.read_perm = instance->data->is_tag_specific ?
+                                                        instance->data->ndef_read_lock :
+                                                        TYPE_4_TAG_T4T_CC_RW_LOCK_NONE;
+        cc->tlv[0].value.ndef_file_ctrl.write_perm = instance->data->is_tag_specific ?
+                                                         instance->data->ndef_write_lock :
+                                                         TYPE_4_TAG_T4T_CC_RW_LOCK_NONE;
 
         bit_buffer_append_bytes(
             instance->tx_buffer, cc_buf + offset, MIN(sizeof(cc_buf) - offset, le));
@@ -147,8 +153,7 @@ static Type4TagError type_4_tag_listener_iso_read(
     }
 
     if(instance->state == Type4TagListenerStateSelectedNdefMessage) {
-        size_t ndef_file_len =
-            instance->data->ndef_data ? simple_array_get_count(instance->data->ndef_data) : 0;
+        size_t ndef_file_len = simple_array_get_count(instance->data->ndef_data);
         bool included_len = false;
         if(offset < sizeof(uint16_t)) {
             uint8_t ndef_file_len_be[sizeof(uint16_t)];

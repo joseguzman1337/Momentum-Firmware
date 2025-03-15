@@ -31,6 +31,8 @@
 #define TYPE_4_TAG_T4T_CC_FILE_ID_LEN    (2U)
 #define TYPE_4_TAG_T4T_CC_FILE_ID        0xE1, 0x03
 #define TYPE_4_TAG_T4T_CC_VNO            (0x20)
+#define TYPE_4_TAG_T4T_DEFAULT_FILE_ID   0xE104
+#define TYPE_4_TAG_T4T_CC_RW_LOCK_NONE   0x00
 
 // 4a layer adds 1..3 byte prefix, 3a layer adds 2 byte suffix and has 256 byte buffer
 #define TYPE_4_TAG_BUF_SIZE     (256U - 3U - 2U)
