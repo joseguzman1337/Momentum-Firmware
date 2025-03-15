@@ -34,7 +34,7 @@ typedef struct {
     Light light;
 } NotificationLedLayer;
 
-#define NOTIFICATION_SETTINGS_VERSION 0x03
+#define NOTIFICATION_SETTINGS_VERSION 0x02
 #define NOTIFICATION_SETTINGS_PATH    INT_PATH(NOTIFICATION_SETTINGS_FILE_NAME)
 
 typedef struct {

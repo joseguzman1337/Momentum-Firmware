@@ -105,7 +105,6 @@ void rainbow_timer_stop(RGBBacklightApp* app) {
 
 // if rgb_mod_installed then apply rainbow colors to backlight and start/restart/stop rainbow_timer
 void rainbow_timer_starter(RGBBacklightApp* app) {
-
     if((app->settings->rainbow_mode > 0) && (app->settings->rgb_mod_installed)) {
         rainbow_timer_start(app);
     } else {
