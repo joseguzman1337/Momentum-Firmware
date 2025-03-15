@@ -28,7 +28,7 @@ Before getting started:
 - **Review the Official Documentation:** [docs.flipper.net](https://docs.flipper.net)
 
 - **Installation Guide & Version Info:**  
-  How to install the firmware by following the [Installation Guide](/documentation/HowToInstall.md) and check the [version information](/CHANGELOG.md#recommended-update-option---web-updater) (`r`, `e`, ` `, `c`)
+  How to install the firmware by following the [Installation Guide](/documentation/HowToInstall.md) and check the [version information](/CHANGELOG.md#recommended-update-option---web-updater) (`e`, ` `, `c`)
 
 - **FAQ:**  
   Find answers to common questions in the [FAQ](/documentation/FAQ.md)

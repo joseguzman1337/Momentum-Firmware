@@ -9,15 +9,20 @@
 
 See [this](https://github.com/DarkFlippers/unleashed-firmware/blob/dev/documentation/HowToInstall.md)
 
-## What version should I install? What do the letters `e`, `r`, `c`... mean?
+## What version should I install? What do the letters `e`, `c`... mean?
 
 Follow this link for [details](https://github.com/DarkFlippers/unleashed-firmware/blob/dev/CHANGELOG.md#recommended-update-option---web-updater).
 
 ## I installed Unleashed and now the backlight doesn't work
 
-You’ve installed a version made for custom RGB modded flippers. The version ending in `r` is specifically for `RGB` modded flippers. <br />
+You’ve enabled RGB backlight mod in settings made for custom RGB modded flippers. <br />
 
 Please, do not use that version if your flipper isn’t modded!
+Disable in Settings -> Notifications -> RGB mod settings
+
+Make sure to have System -> Debug = ON before, otherwise first option (is mod installed) will not appear
+
+If you have RGB backlight mod do the same but enable the mod instead
   
 ## What apps (plugins) are included with Unleashed Firmware?
 
