@@ -1,24 +1,28 @@
 ## Main changes
 - Current API: 83.0
-* SubGHz: Add ReversRB2 / RB2M Protocol (static 64 bit) full support with add manually (by @xMasterX)
-* SubGHz: Fix Hollarm protocol with more verification
-* SubGHz: Fix GangQi protocol (by @DoberBit and @mishamyte (who spent 2 weeks on this))
-* SubGHz: Came Atomo button hold simulation with full cycle simulation (to allow proper pairing with receiver)
+* SubGHz: Add **ReversRB2 / RB2M Protocol** (static 64 bit) **full support** with add manually (by @xMasterX)
+* SubGHz: **Fix Hollarm protocol with more verification**
+* SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte ( who spent 2 weeks on this :O ))
+* SubGHz: **Came Atomo button hold simulation with full cycle** simulation (to allow proper pairing with receiver)
+* System: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow effect (based on @Willy-JL idea)) (PR #877 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode = ON**)
 * OFW: LFRFID - **EM4305 support**
-* OFW: Universal IR signal selection
-* OFW: BadUSB: Mouse control 
+* OFW: **Universal IR signal selection**
+* OFW: **BadUSB: Mouse control**
 * OFW: NFC - Added naming for DESFire cards + fix MF3ICD40 cards unable to be read
-* Apps: Add FindMyFlipper to system apps and allow autostart on system boot [app by @MatthewKuKanich](https://github.com/MatthewKuKanich/FindMyFlipper) and autoloader by @Willy-JL - to use app please check how to add keys in [app repo](https://github.com/MatthewKuKanich/FindMyFlipper)
+* Apps: Add **FindMyFlipper to system apps and allow autostart** on system boot [app by @MatthewKuKanich](https://github.com/MatthewKuKanich/FindMyFlipper) and autoloader by @Willy-JL - to use app please check how to add keys in [app repo](https://github.com/MatthewKuKanich/FindMyFlipper)
 * README Update: Enhanced Visuals & Navigation (PR #871 #872 | by @m-xim)
 * Docs: Update FAQ.md (PR #865 | by @mi-lrn)
 * Input: Vibro on Button press option (PR #867 | by @Dmitry422)
-* Power: Option to limit battery charging (suppress charging on selected charge level) (PR #867 | by @Dmitry422)
+* Power: Option to limit battery charging (suppress charging on selected charge level) (PR #867 | by @Dmitry422) (idea and example by @oltenxyz)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW PR 4149: HID Ble: increased stack and improvements (by @doomwastaken)
 * OFW PR 4126: Stricter constness for const data (by @hedger)
 * OFW PR 4017: Alarm improvements: Snooze, timeouts, and dismissing from the locked state (by @Astrrra)
+* OFW: fix: flipper detected before it was rebooted
 * OFW: NFC: FeliCa Protocol Expose Read Block API and Allow Specifying Service
 * OFW: LFRFID: Fix Detection Conflict Between Securakey and Noralsy Format (by @zinongli)
 * OFW: Stdio API improvements
@@ -78,20 +82,22 @@ and all other great people who supported our project and me (xMasterX), thanks t
 
 ## **Recommended update option - Web Updater**
 
-### What `r`, `e`, ` `, `c` means? What I need to download if I don't want to use Web updater?
-What build I should download and what this name means - `flipper-z-f7-update-(version)(r / e / c).tgz` ? <br>
+### What `e`, ` `, `c` means? What I need to download if I don't want to use Web updater?
+What build I should download and what this name means - `flipper-z-f7-update-(version)(e / c).tgz` ? <br>
 `flipper-z` = for Flipper Zero device<br>
 `f7` = Hardware version - same for all flipper zero devices<br>
 `update` = Update package, contains updater, all assets (plugins, IR libs, etc.), and firmware itself<br>
 `(version)` = Firmware version<br>
-| Designation | [Base Apps](https://github.com/xMasterX/all-the-plugins#default-pack) | [Extra Apps](https://github.com/xMasterX/all-the-plugins#extra-pack) | ⚠️RGB mode* |
-|-----|:---:|:---:|:---:|
-| ` ` | ✅ |  |  |
-| `c` |  |  |  |
-| `e` | ✅ | ✅ |  |
-| `r` | ✅ | ✅ | ⚠️ |
+| Designation | [Base Apps](https://github.com/xMasterX/all-the-plugins#default-pack) | [Extra Apps](https://github.com/xMasterX/all-the-plugins#extra-pack) |
+|-----|:---:|:---:|
+| ` ` | ✅ |  |
+| `c` |  |  |
+| `e` | ✅ | ✅ |
 
-⚠️This is [hardware mod](https://github.com/quen0n/flipperzero-firmware-rgb#readme), works only on modded flippers! do not install on non modded device!
+**To enable RGB Backlight support go into Notifications settings with Debug mode = ON**
+
+⚠️RGB backlight [hardware mod](https://github.com/quen0n/flipperzero-firmware-rgb#readme), works only on modded flippers! do not enable on non modded device!
+
 
 Firmware Self-update package (update from microSD) - `flipper-z-f7-update-(version).tgz` for mobile app / qFlipper / web<br>
 Archive of `scripts` folder (contains scripts for FW/plugins development) - `flipper-z-any-scripts-(version).tgz`<br>
