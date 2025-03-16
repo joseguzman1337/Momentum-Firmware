@@ -208,10 +208,18 @@ int32_t rgb_backlight_srv(void* p) {
             rgb_backlight_update(app->settings->brightness);
         }
         // if rgb mod not installed - set default static orange color (index=0)
-    } //else {
-    //   rgb_backlight_set_static_color(0);
-    //   rgb_backlight_update(app->settings->brightness);
-    //}
+    } else {
+        //rgb_backlight_set_static_color(0);
+        //rgb_backlight_update(app->settings->brightness);
+        rgb_backlight_set_static_color(0);
+        for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
+            uint8_t r = app->current_red * (1.0f / 1.0f);
+            uint8_t g = app->current_green * (1.0f / 1.0f);
+            uint8_t b = app->current_blue * (1.0f / 1.0f);
+            SK6805_set_led_color(i, r, g, b);
+        }
+        SK6805_update();
+    }
 
     while(1) {
         // place for message queue and other future options

@@ -8,13 +8,3 @@ App(
     order=95,
     sdk_headers=["rgb_backlight.h"],
 )
-
-App(
-    appid="rgb_backlight_startup",
-    name="RgbBackLightBootSrv",
-    apptype=FlipperAppType.STARTUP,
-    targets=["f7"],
-    entry_point="rgb_backlight_on_system_start",
-    cdefines=["SRV_RGB_BACKLIGHT"],
-    order=270,
-)
