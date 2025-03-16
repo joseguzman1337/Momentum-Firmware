@@ -42,7 +42,7 @@ static const RGBBacklightColor colors[] = {
     {"Pink", 255, 0, 127},
     {"Red", 255, 0, 0},
     {"White", 254, 210, 200},
-    {"Custom", 0, 0, 0},
+    {"Custom", 255, 255, 255},
 };
 
 uint8_t rgb_backlight_get_color_count(void) {
@@ -82,7 +82,7 @@ void rgb_backlight_set_custom_color(uint8_t red, uint8_t green, uint8_t blue) {
 // use RECORD for acces to rgb service instance, use current_* colors and update backlight
 void rgb_backlight_update(float brightness) {
     RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
-    if(app->settings->rgb_mod_installed) {
+    if(app->settings->rgb_backlight_mode > 0) {
         for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
             uint8_t r = app->current_red * (brightness / 1.0f);
             uint8_t g = app->current_green * (brightness / 1.0f);
@@ -104,9 +104,9 @@ void rainbow_timer_stop(RGBBacklightApp* app) {
     furi_timer_stop(app->rainbow_timer);
 }
 
-// if rgb_mod_installed then apply rainbow colors to backlight and start/restart/stop rainbow_timer
+// if rgb_backlight_installed then apply rainbow colors to backlight and start/restart/stop rainbow_timer
 void rainbow_timer_starter(RGBBacklightApp* app) {
-    if((app->settings->rainbow_mode > 0) && (app->settings->rgb_mod_installed)) {
+    if((app->settings->rainbow_mode > 0) && (app->settings->rgb_backlight_installed)) {
         rainbow_timer_start(app);
     } else {
         if(furi_timer_is_running(app->rainbow_timer)) {
@@ -200,22 +200,22 @@ int32_t rgb_backlight_srv(void* p) {
     furi_record_create(RECORD_RGB_BACKLIGHT, app);
 
     // if rgb mod installed - start rainbow or set static color from settings (default index = 0)
-    if(app->settings->rgb_mod_installed) {
-        if(app->settings->rainbow_mode > 0) {
-            rainbow_timer_starter(app);
-        } else {
-            rgb_backlight_set_static_color(app->settings->static_color_index);
-            rgb_backlight_update(app->settings->brightness);
-        }
-        // if rgb mod not installed - set default static orange color (index=0)
+    //
+    // TODO запуск сохраненного режима 
+    if(app->settings->rgb_backlight_mode > 0) {
+        // if(app->settings->rainbow_mode > 0) {
+        //     rainbow_timer_starter(app);
+        // } else {
+        //     rgb_backlight_set_static_color(app->settings->static_color_index);
+        //     rgb_backlight_update(app->settings->brightness);
+        // }
+    // if rgb mode = 0 (rgb_backlight not installed) then set default static orange color (index=0) and light on default color
     } else {
-        //rgb_backlight_set_static_color(0);
-        //rgb_backlight_update(app->settings->brightness);
         rgb_backlight_set_static_color(0);
         for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
-            uint8_t r = app->current_red * (1.0f / 1.0f);
-            uint8_t g = app->current_green * (1.0f / 1.0f);
-            uint8_t b = app->current_blue * (1.0f / 1.0f);
+            uint8_t r = app->current_red * 1.0f;
+            uint8_t g = app->current_green * 1.0f;
+            uint8_t b = app->current_blue * 1.0f;
             SK6805_set_led_color(i, r, g, b);
         }
         SK6805_update();
@@ -224,7 +224,7 @@ int32_t rgb_backlight_srv(void* p) {
     while(1) {
         // place for message queue and other future options
         furi_delay_ms(5000);
-        if(app->settings->rgb_mod_installed) {
+        if(app->settings->rgb_backlight_mode > 0) {
             FURI_LOG_D(TAG, "Mod is enabled - serivce is running");
         } else {
             FURI_LOG_D(TAG, "Mod is DISABLED - serivce is running");

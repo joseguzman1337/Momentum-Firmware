@@ -10,18 +10,27 @@
 
 #define RGB_BACKLIGHT_SETTINGS_MAGIC    (0x30)
 #define RGB_BACKLIGHT_SETTINGS_VER_PREV (0) // Previous version number
-#define RGB_BACKLIGHT_SETTINGS_VER      (1) // New version number
+#define RGB_BACKLIGHT_SETTINGS_VER      (1) // Current version number
 
 //pervious settings must be copyed from previous rgb_backlight_settings.h file
 typedef struct {
+    //Common settings
     uint8_t version;
-    bool rgb_mod_installed;
+    uint8_t rgb_backlight_mode;
+    float brightness;
 
+    //static and custom colors mode settings
     uint8_t static_color_index;
-    uint8_t custom_r;
-    uint8_t custom_g;
-    uint8_t custom_b;
+    uint8_t custom_red;
+    uint8_t custom_green;
+    uint8_t custom_blue;
 
+    // static gradient mode settings
+    uint8_t static_vd1_index;
+    uint8_t static_vd2_index;
+    uint8_t static_vd3_index;
+
+    // rainbow mode setings
     uint32_t rainbow_mode;
     uint32_t rainbow_speed_ms;
     uint16_t rainbow_step;
@@ -79,6 +88,9 @@ void rgb_backlight_settings_load(RGBBacklightSettings* settings) {
         settings->brightness = 1.0f;
         settings->rainbow_speed_ms = 100;
         settings->rainbow_step = 1;
+        settings->custom_red=255;
+        settings->custom_green = 255;
+        settings->custom_blue=255;
         rgb_backlight_settings_save(settings);
     }
 }
