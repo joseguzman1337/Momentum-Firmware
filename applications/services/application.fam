@@ -12,5 +12,6 @@ App(
         "power",
         "namechanger_srv",
         "rgb_backlight",
+        "rgb_backlight_startup",
     ],
 )
