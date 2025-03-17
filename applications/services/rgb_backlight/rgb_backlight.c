@@ -42,7 +42,7 @@ static const RGBBacklightColor colors[] = {
     {"Pink", 255, 0, 127},
     {"Red", 255, 0, 0},
     {"White", 254, 210, 200},
-    {"Custom", 255, 255, 255},
+    {"White1", 255, 255, 255},
 };
 
 uint8_t rgb_backlight_get_color_count(void) {
@@ -54,19 +54,27 @@ const char* rgb_backlight_get_color_text(uint8_t index) {
 }
 
 // use RECORD for acces to rgb service instance and update current colors by static
-void rgb_backlight_set_static_color(uint8_t index) {
+void rgb_backlight_set_static_color(uint8_t index, uint8_t vd) {
     RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
 
-    //if user select "custom" value then set current colors by custom values
-    if(index == 13) {
-        app->current_red = app->settings->custom_red;
-        app->current_green = app->settings->custom_green;
-        app->current_blue = app->settings->custom_blue;
-    } else {
-        app->current_red = colors[index].red;
-        app->current_green = colors[index].green;
-        app->current_blue = colors[index].blue;
+    if(vd < SK6805_get_led_count()) {
+        uint8_t r = colors[index].red;
+        uint8_t g = colors[index].green;
+        uint8_t b = colors[index].blue;
+        SK6805_set_led_color(vd, r, g, b);
+        SK6805_update();
     }
+
+        //if user select "custom" value then set current colors by custom values
+        if(index == 13) {
+            app->current_red = app->settings->custom_red;
+            app->current_green = app->settings->custom_green;
+            app->current_blue = app->settings->custom_blue;
+        } else {
+            app->current_red = colors[index].red;
+            app->current_green = colors[index].green;
+            app->current_blue = colors[index].blue;
+        }
     furi_record_close(RECORD_RGB_BACKLIGHT);
 }
 

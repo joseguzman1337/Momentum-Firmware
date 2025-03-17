@@ -16,7 +16,7 @@
 typedef struct {
     //Common settings
     uint8_t version;
-    uint8_t rgb_backlight_mode;
+    bool rgb_backlight_installed;
     float brightness;
 
     //static and custom colors mode settings
