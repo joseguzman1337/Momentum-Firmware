@@ -13,7 +13,7 @@ typedef enum {
     Type4TagErrorTimeout,
     Type4TagErrorWrongFormat,
     Type4TagErrorNotSupported,
-    Type4TagErrorUnknown,
+    Type4TagErrorApduFailed,
     Type4TagErrorCustomCommand,
 } Type4TagError;
 

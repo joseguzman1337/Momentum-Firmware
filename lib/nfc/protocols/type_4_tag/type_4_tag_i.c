@@ -9,6 +9,9 @@
 
 #define TYPE_4_TAG_FFF_NDEF_DATA_PER_LINE (16U)
 
+const uint8_t type_4_tag_iso_picc_name[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_PICC_NAME};
+const uint8_t type_4_tag_iso_app_name[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_APP_NAME};
+
 Type4TagError type_4_tag_process_error(Iso14443_4aError error) {
     switch(error) {
     case Iso14443_4aErrorNone:
@@ -56,14 +59,13 @@ void type_4_tag_cc_dump(const Type4TagData* data, uint8_t* buf, size_t len) {
         data->is_tag_specific ? data->ndef_write_lock : TYPE_4_TAG_T4T_CC_RW_LOCK_NONE;
 }
 
-Type4TagError type_4_tag_cc_parse(Type4TagData* data, const BitBuffer* buf) {
-    const size_t cc_len = bit_buffer_get_size_bytes(buf);
-    if(cc_len < TYPE_4_TAG_T4T_CC_MIN_SIZE) {
+Type4TagError type_4_tag_cc_parse(Type4TagData* data, const uint8_t* buf, size_t len) {
+    if(len < TYPE_4_TAG_T4T_CC_MIN_SIZE) {
         FURI_LOG_E(TAG, "Unsupported T4T version");
         return Type4TagErrorWrongFormat;
     }
 
-    const Type4TagCc* cc = (const Type4TagCc*)bit_buffer_get_data(buf);
+    const Type4TagCc* cc = (const Type4TagCc*)buf;
     if(cc->t4t_vno != TYPE_4_TAG_T4T_CC_VNO) {
         FURI_LOG_E(TAG, "Unsupported T4T version");
         return Type4TagErrorNotSupported;
@@ -71,7 +73,7 @@ Type4TagError type_4_tag_cc_parse(Type4TagData* data, const BitBuffer* buf) {
 
     const Type4TagCcTlv* tlv = cc->tlv;
     const Type4TagCcTlvNdefFileCtrl* ndef_file_ctrl = NULL;
-    const void* end = MIN((void*)cc + cc->len, (void*)cc + cc_len);
+    const void* end = MIN((void*)cc + cc->len, (void*)cc + len);
     while((void*)tlv < end) {
         if(tlv->type == Type4TagCcTlvTypeNdefFileCtrl) {
             ndef_file_ctrl = &tlv->value.ndef_file_ctrl;

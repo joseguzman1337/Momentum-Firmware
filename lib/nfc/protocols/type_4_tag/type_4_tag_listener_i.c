@@ -36,16 +36,16 @@ static Type4TagError type_4_tag_listener_iso_select(
     UNUSED(le);
 
     if(p1 == TYPE_4_TAG_ISO_SELECT_P1_BY_DF_NAME) {
-        static const uint8_t t4t_picc[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_PICC_NAME};
-        if(lc == sizeof(t4t_picc) && memcmp(t4t_picc, data, sizeof(t4t_picc)) == 0) {
+        if(lc == sizeof(type_4_tag_iso_picc_name) &&
+           memcmp(type_4_tag_iso_picc_name, data, sizeof(type_4_tag_iso_picc_name)) == 0) {
             instance->state = Type4TagListenerStateSelectedPicc;
             bit_buffer_append_bytes(
                 instance->tx_buffer, type_4_tag_success_apdu, sizeof(type_4_tag_success_apdu));
             return Type4TagErrorNone;
         }
 
-        static const uint8_t t4t_app[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_APP_NAME};
-        if(lc == sizeof(t4t_app) && memcmp(t4t_app, data, sizeof(t4t_app)) == 0) {
+        if(lc == sizeof(type_4_tag_iso_app_name) &&
+           memcmp(type_4_tag_iso_app_name, data, sizeof(type_4_tag_iso_app_name)) == 0) {
             instance->state = Type4TagListenerStateSelectedApplication;
             bit_buffer_append_bytes(
                 instance->tx_buffer, type_4_tag_success_apdu, sizeof(type_4_tag_success_apdu));
@@ -54,23 +54,18 @@ static Type4TagError type_4_tag_listener_iso_select(
 
     } else if(
         instance->state >= Type4TagListenerStateSelectedApplication &&
-        (p1 == TYPE_4_TAG_ISO_SELECT_P1_BY_ID || p1 == TYPE_4_TAG_ISO_SELECT_P1_BY_EF_ID)) {
-        static const uint8_t cc_id[TYPE_4_TAG_T4T_CC_FILE_ID_LEN] = {TYPE_4_TAG_T4T_CC_FILE_ID};
-        if(lc == sizeof(cc_id) && memcmp(cc_id, data, sizeof(cc_id)) == 0) {
+        (p1 == TYPE_4_TAG_ISO_SELECT_P1_BY_ID || p1 == TYPE_4_TAG_ISO_SELECT_P1_BY_EF_ID) &&
+        lc == sizeof(uint16_t)) {
+        uint16_t file_id = bit_lib_bytes_to_num_be(data, sizeof(uint16_t));
+        if(file_id == TYPE_4_TAG_T4T_CC_FILE_ID) {
             instance->state = Type4TagListenerStateSelectedCapabilityContainer;
             bit_buffer_append_bytes(
                 instance->tx_buffer, type_4_tag_success_apdu, sizeof(type_4_tag_success_apdu));
             return Type4TagErrorNone;
         }
 
-        uint8_t ndef_file_id_be[sizeof(instance->data->ndef_file_id)];
-        bit_lib_num_to_bytes_be(
-            instance->data->is_tag_specific ? instance->data->ndef_file_id :
-                                              TYPE_4_TAG_T4T_DEFAULT_FILE_ID,
-            sizeof(ndef_file_id_be),
-            ndef_file_id_be);
-        if(lc == sizeof(ndef_file_id_be) &&
-           memcmp(ndef_file_id_be, data, sizeof(ndef_file_id_be)) == 0) {
+        if(file_id == (instance->data->is_tag_specific ? instance->data->ndef_file_id :
+                                                         TYPE_4_TAG_T4T_DEFAULT_FILE_ID)) {
             instance->state = Type4TagListenerStateSelectedNdefMessage;
             bit_buffer_append_bytes(
                 instance->tx_buffer, type_4_tag_success_apdu, sizeof(type_4_tag_success_apdu));

@@ -33,10 +33,9 @@
 #define TYPE_4_TAG_ISO_STATUS_NO_CMD     0x68, 0x00
 #define TYPE_4_TAG_ISO_RW_CHUNK_LEN      (255U)
 #define TYPE_4_TAG_ISO_NAME_LEN          (7U)
-#define TYPE_4_TAG_ISO_APP_NAME          0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01
 #define TYPE_4_TAG_ISO_PICC_NAME         0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x00
-#define TYPE_4_TAG_T4T_CC_FILE_ID_LEN    (2U)
-#define TYPE_4_TAG_T4T_CC_FILE_ID        0xE1, 0x03
+#define TYPE_4_TAG_ISO_APP_NAME          0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01
+#define TYPE_4_TAG_T4T_CC_FILE_ID        0xE103
 #define TYPE_4_TAG_T4T_CC_VNO            (0x20)
 #define TYPE_4_TAG_T4T_DEFAULT_FILE_ID   0xE104
 #define TYPE_4_TAG_T4T_CC_RW_LOCK_NONE   0x00
@@ -47,6 +46,9 @@
 // Read returns 2 byte status trailer, write sends 5 byte command header
 #define TYPE_4_TAG_CHUNK_LEN    MIN(TYPE_4_TAG_BUF_SIZE - 5U, TYPE_4_TAG_ISO_RW_CHUNK_LEN)
 #define TYPE_4_TAG_DEFAULT_SIZE (2048U)
+
+extern const uint8_t type_4_tag_iso_picc_name[TYPE_4_TAG_ISO_NAME_LEN];
+extern const uint8_t type_4_tag_iso_app_name[TYPE_4_TAG_ISO_NAME_LEN];
 
 // Capability Container parsing structures
 
@@ -86,7 +88,7 @@ Type4TagError type_4_tag_process_error(Iso14443_4aError error);
 
 void type_4_tag_cc_dump(const Type4TagData* data, uint8_t* buf, size_t len);
 
-Type4TagError type_4_tag_cc_parse(Type4TagData* data, const BitBuffer* buf);
+Type4TagError type_4_tag_cc_parse(Type4TagData* data, const uint8_t* buf, size_t len);
 
 // Load internal Type4Tag structures
 
