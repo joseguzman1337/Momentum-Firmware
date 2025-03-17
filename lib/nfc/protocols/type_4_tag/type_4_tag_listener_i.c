@@ -73,7 +73,6 @@ static Type4TagError type_4_tag_listener_iso_select(
         }
     }
 
-    instance->state = Type4TagListenerStateIdle;
     bit_buffer_append_bytes(
         instance->tx_buffer, type_4_tag_not_found_apdu, sizeof(type_4_tag_not_found_apdu));
     return Type4TagErrorCustomCommand;
