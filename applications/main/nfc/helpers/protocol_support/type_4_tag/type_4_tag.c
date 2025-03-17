@@ -129,9 +129,10 @@ static void nfc_scene_read_on_enter_type_4_tag(NfcApp* instance) {
 static void nfc_scene_read_and_saved_menu_on_enter_type_4_tag(NfcApp* instance) {
     Submenu* submenu = instance->submenu;
 
+    // FIXME: standardize this and the write scenes into protocol support helper
     submenu_add_item(
         submenu,
-        "Write (Not Implemented)",
+        "Write",
         SubmenuIndexWrite,
         nfc_protocol_support_common_submenu_callback,
         instance);
@@ -144,8 +145,7 @@ static bool
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubmenuIndexWrite) {
-            // TODO: Implement write
-            // scene_manager_next_scene(instance->scene_manager, NfcSceneType4TagWrite);
+            scene_manager_next_scene(instance->scene_manager, NfcSceneType4TagWrite);
             consumed = true;
         }
     }

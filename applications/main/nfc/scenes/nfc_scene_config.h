@@ -67,4 +67,8 @@ ADD_SCENE(nfc, slix_key_input, SlixKeyInput)
 ADD_SCENE(nfc, slix_unlock, SlixUnlock)
 ADD_SCENE(nfc, slix_unlock_success, SlixUnlockSuccess)
 
+ADD_SCENE(nfc, type_4_tag_write, Type4TagWrite)
+ADD_SCENE(nfc, type_4_tag_write_success, Type4TagWriteSuccess)
+ADD_SCENE(nfc, type_4_tag_write_fail, Type4TagWriteFail)
+
 ADD_SCENE(nfc, generate_info, GenerateInfo)

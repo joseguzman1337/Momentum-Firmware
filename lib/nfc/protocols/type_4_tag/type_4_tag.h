@@ -14,6 +14,7 @@ typedef enum {
     Type4TagErrorWrongFormat,
     Type4TagErrorNotSupported,
     Type4TagErrorApduFailed,
+    Type4TagErrorCardLocked,
     Type4TagErrorCustomCommand,
 } Type4TagError;
 

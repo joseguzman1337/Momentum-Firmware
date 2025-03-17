@@ -198,11 +198,28 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(
-            TAG,
-            "Read NDEF file 0x%04X of %lu bytes",
-            instance->data->ndef_file_id,
-            simple_array_get_count(instance->data->ndef_data));
+            TAG, "Read %hu bytes from NDEF file 0x%04X", ndef_len, instance->data->ndef_file_id);
     } while(false);
 
     return error;
+}
+
+Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
+    UNUSED(instance);
+    return Type4TagErrorNotSupported;
+}
+
+Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance) {
+    UNUSED(instance);
+    return Type4TagErrorNotSupported;
+}
+
+Type4TagError type_4_tag_poller_create_ndef(Type4TagPoller* instance) {
+    UNUSED(instance);
+    return Type4TagErrorNotSupported;
+}
+
+Type4TagError type_4_tag_poller_write_ndef(Type4TagPoller* instance) {
+    UNUSED(instance);
+    return Type4TagErrorNotSupported;
 }

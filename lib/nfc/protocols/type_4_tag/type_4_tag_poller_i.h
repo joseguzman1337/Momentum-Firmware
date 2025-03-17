@@ -10,11 +10,16 @@ extern "C" {
 
 typedef enum {
     Type4TagPollerStateIdle,
+    Type4TagPollerStateRequestMode,
     Type4TagPollerStateSelectApplication,
     Type4TagPollerStateReadCapabilityContainer,
     Type4TagPollerStateReadNdefMessage,
-    Type4TagPollerStateReadFailed,
-    Type4TagPollerStateReadSuccess,
+    Type4TagPollerStateCreateApplication,
+    Type4TagPollerStateCreateCapabilityContainer,
+    Type4TagPollerStateCreateNdefMessage,
+    Type4TagPollerStateWriteNdefMessage,
+    Type4TagPollerStateFailed,
+    Type4TagPollerStateSuccess,
 
     Type4TagPollerStateNum,
 } Type4TagPollerState;
@@ -22,6 +27,7 @@ typedef enum {
 struct Type4TagPoller {
     Iso14443_4aPoller* iso14443_4a_poller;
     Type4TagPollerState state;
+    Type4TagPollerMode mode;
     Type4TagError error;
     Type4TagData* data;
     BitBuffer* tx_buffer;
@@ -40,6 +46,14 @@ Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance);
 Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance);
 
 Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance);
+
+Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance);
+
+Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance);
+
+Type4TagError type_4_tag_poller_create_ndef(Type4TagPoller* instance);
+
+Type4TagError type_4_tag_poller_write_ndef(Type4TagPoller* instance);
 
 #ifdef __cplusplus
 }
