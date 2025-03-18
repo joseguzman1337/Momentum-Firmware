@@ -11,6 +11,7 @@ extern "C" {
 typedef enum {
     Type4TagPollerStateIdle,
     Type4TagPollerStateRequestMode,
+    Type4TagPollerStateDetectPlatform,
     Type4TagPollerStateSelectApplication,
     Type4TagPollerStateReadCapabilityContainer,
     Type4TagPollerStateReadNdefMessage,
@@ -40,6 +41,8 @@ struct Type4TagPoller {
 };
 
 const Type4TagData* type_4_tag_poller_get_data(Type4TagPoller* instance);
+
+Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance);
 
 Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance);
 

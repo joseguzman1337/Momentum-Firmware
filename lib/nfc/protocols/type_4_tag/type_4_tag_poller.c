@@ -62,8 +62,21 @@ static NfcCommand type_4_tag_poller_handler_request_mode(Type4TagPoller* instanc
         type_4_tag_copy(instance->data, instance->type_4_tag_event.data->poller_mode.data);
     }
 
-    instance->state = Type4TagPollerStateSelectApplication;
+    instance->state = Type4TagPollerStateDetectPlatform;
     return command;
+}
+
+static NfcCommand type_4_tag_poller_handler_detect_platform(Type4TagPoller* instance) {
+    instance->error = type_4_tag_poller_detect_platform(instance);
+    iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+    if(instance->error == Type4TagErrorNone) {
+        FURI_LOG_D(TAG, "Detect platform success");
+    } else {
+        FURI_LOG_W(TAG, "Failed to detect platform");
+    }
+    instance->state = Type4TagPollerStateSelectApplication;
+
+    return NfcCommandContinue;
 }
 
 static NfcCommand type_4_tag_poller_handler_select_app(Type4TagPoller* instance) {
@@ -199,6 +212,7 @@ static NfcCommand type_4_tag_poller_handler_success(Type4TagPoller* instance) {
 static const Type4TagPollerReadHandler type_4_tag_poller_read_handler[Type4TagPollerStateNum] = {
     [Type4TagPollerStateIdle] = type_4_tag_poller_handler_idle,
     [Type4TagPollerStateRequestMode] = type_4_tag_poller_handler_request_mode,
+    [Type4TagPollerStateDetectPlatform] = type_4_tag_poller_handler_detect_platform,
     [Type4TagPollerStateSelectApplication] = type_4_tag_poller_handler_select_app,
     [Type4TagPollerStateReadCapabilityContainer] = type_4_tag_poller_handler_read_cc,
     [Type4TagPollerStateReadNdefMessage] = type_4_tag_poller_handler_read_ndef,

@@ -3,6 +3,9 @@
 
 #include <bit_lib/bit_lib.h>
 
+#include <nfc/nfc_device.h>
+#include <nfc/protocols/mf_desfire/mf_desfire_poller_defs.h>
+
 #define TAG "Type4TagPoller"
 
 Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, BitBuffer* rx_buf) {
@@ -176,6 +179,52 @@ static Type4TagError type_5_tag_poller_iso_write(
     }
 
     return Type4TagErrorNone;
+}
+
+Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
+    furi_check(instance);
+
+    Iso14443_4aPollerEvent iso14443_4a_event = {
+        .type = Iso14443_4aPollerEventTypeReady,
+        .data = NULL,
+    };
+    NfcGenericEvent event = {
+        .protocol = NfcProtocolIso14443_4a,
+        .instance = instance->iso14443_4a_poller,
+        .event_data = &iso14443_4a_event,
+    };
+
+    Type4TagPlatform platform = Type4TagPlatformUnknown;
+    NfcDevice* device = nfc_device_alloc();
+
+    do {
+        FURI_LOG_D(TAG, "Detect DESFire");
+        NfcGenericInstance* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        if(mf_desfire_poller.detect(event, mf_des)) {
+            platform = Type4TagPlatformMfDesfire;
+            nfc_device_set_data(device, NfcProtocolMfDesfire, mf_desfire_poller.get_data(mf_des));
+        }
+        mf_desfire_poller.free(mf_des);
+        if(platform != Type4TagPlatformUnknown) break;
+
+        // FIXME: detect NTAG4xx
+    } while(false);
+
+    if(platform != Type4TagPlatformUnknown) {
+        furi_string_set(
+            instance->data->platform_name_full,
+            nfc_device_get_name(device, NfcDeviceNameTypeFull));
+        furi_string_set(
+            instance->data->platform_name_short,
+            nfc_device_get_name(device, NfcDeviceNameTypeShort));
+    } else {
+        furi_string_reset(instance->data->platform_name_full);
+        furi_string_reset(instance->data->platform_name_short);
+    }
+    instance->data->platform = platform;
+    nfc_device_free(device);
+
+    return platform != Type4TagPlatformUnknown ? Type4TagErrorNone : Type4TagErrorNotSupported;
 }
 
 Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance) {

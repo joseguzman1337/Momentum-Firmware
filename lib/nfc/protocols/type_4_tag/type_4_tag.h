@@ -19,10 +19,20 @@ typedef enum {
     Type4TagErrorCustomCommand,
 } Type4TagError;
 
+typedef enum {
+    Type4TagPlatformUnknown,
+    Type4TagPlatformNtag4xx,
+    Type4TagPlatformMfDesfire,
+} Type4TagPlatform;
+
 typedef struct {
     Iso14443_4aData* iso14443_4a_data;
+    FuriString* device_name;
     // Tag specific data
     bool is_tag_specific;
+    Type4TagPlatform platform;
+    FuriString* platform_name_full;
+    FuriString* platform_name_short;
     union {
         struct {
             uint8_t minor : 4;
