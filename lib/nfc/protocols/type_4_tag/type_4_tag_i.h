@@ -3,12 +3,12 @@
 #include "type_4_tag.h"
 
 // ISO SELECT FILE command and parameters
-#define TYPE_4_TAG_ISO_SELECT_CMD           0x00, 0xA4
-#define TYPE_4_TAG_ISO_SELECT_P1_BY_DF_NAME (0x04)
-#define TYPE_4_TAG_ISO_SELECT_P1_BY_EF_ID   (0x02)
-#define TYPE_4_TAG_ISO_SELECT_P1_BY_ID      (0x00)
-#define TYPE_4_TAG_ISO_SELECT_P2_EMPTY      (0x0C)
-#define TYPE_4_TAG_ISO_SELECT_LE_EMPTY      (0x00)
+#define TYPE_4_TAG_ISO_SELECT_CMD         0x00, 0xA4
+#define TYPE_4_TAG_ISO_SELECT_P1_BY_NAME  (0x04)
+#define TYPE_4_TAG_ISO_SELECT_P1_BY_EF_ID (0x02)
+#define TYPE_4_TAG_ISO_SELECT_P1_BY_ID    (0x00)
+#define TYPE_4_TAG_ISO_SELECT_P2_EMPTY    (0x0C)
+#define TYPE_4_TAG_ISO_SELECT_LE_EMPTY    (0x00)
 
 // ISO READ BINARY command and parameters
 #define TYPE_4_TAG_ISO_READ_CMD          0x00, 0xB0
@@ -32,23 +32,34 @@
 #define TYPE_4_TAG_ISO_STATUS_BAD_PARAMS 0x6A, 0x86
 #define TYPE_4_TAG_ISO_STATUS_NO_CMD     0x68, 0x00
 #define TYPE_4_TAG_ISO_RW_CHUNK_LEN      (255U)
-#define TYPE_4_TAG_ISO_NAME_LEN          (7U)
-#define TYPE_4_TAG_ISO_PICC_NAME         0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x00
-#define TYPE_4_TAG_ISO_APP_NAME          0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01
-#define TYPE_4_TAG_T4T_CC_FILE_ID        0xE103
-#define TYPE_4_TAG_T4T_CC_VNO            (0x20)
-#define TYPE_4_TAG_T4T_DEFAULT_FILE_ID   0xE104
-#define TYPE_4_TAG_T4T_CC_RW_LOCK_NONE   0x00
-#define TYPE_4_TAG_T4T_CC_MIN_SIZE       (sizeof(Type4TagCc) + sizeof(Type4TagCcTlv))
 
+// Common IDs and Names, note:
+// MF = Master File (PICC/Card Level)
+// DF = Dedicated File (Application)
+// EF = Elementary File (File)
+#define TYPE_4_TAG_ISO_NAME_LEN   (7U)
+#define TYPE_4_TAG_ISO_MF_NAME    0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x00
+#define TYPE_4_TAG_ISO_DF_NAME    0xD2, 0x76, 0x00, 0x00, 0x85, 0x01, 0x01
+#define TYPE_4_TAG_ISO_ID_LEN     (2U)
+#define TYPE_4_TAG_ISO_MF_ID      (0x3F00)
+#define TYPE_4_TAG_ISO_DF_ID      (0xE110)
+#define TYPE_4_TAG_T4T_CC_EF_ID   (0xE103)
+#define TYPE_4_TAG_T4T_NDEF_EF_ID (0xE104)
+
+// Capability Container parsing parameters
+#define TYPE_4_TAG_T4T_CC_VNO          (0x20)
+#define TYPE_4_TAG_T4T_CC_RW_LOCK_NONE (0x00)
+#define TYPE_4_TAG_T4T_CC_MIN_SIZE     (sizeof(Type4TagCc) + sizeof(Type4TagCcTlv))
+
+// Implementation-specific sizes and defaults
 // 4a layer adds 1..3 byte prefix, 3a layer adds 2 byte suffix and has 256 byte buffer
-#define TYPE_4_TAG_BUF_SIZE     (256U - 3U - 2U)
+#define TYPE_4_TAG_BUF_SIZE          (256U - 3U - 2U)
 // Read returns 2 byte status trailer, write sends 5 byte command header
-#define TYPE_4_TAG_CHUNK_LEN    MIN(TYPE_4_TAG_BUF_SIZE - 5U, TYPE_4_TAG_ISO_RW_CHUNK_LEN)
-#define TYPE_4_TAG_DEFAULT_SIZE (2048U)
+#define TYPE_4_TAG_CHUNK_LEN         MIN(TYPE_4_TAG_BUF_SIZE - 5U, TYPE_4_TAG_ISO_RW_CHUNK_LEN)
+#define TYPE_4_TAG_DEFAULT_NDEF_SIZE (2048U)
 
-extern const uint8_t type_4_tag_iso_picc_name[TYPE_4_TAG_ISO_NAME_LEN];
-extern const uint8_t type_4_tag_iso_app_name[TYPE_4_TAG_ISO_NAME_LEN];
+extern const uint8_t type_4_tag_iso_mf_name[TYPE_4_TAG_ISO_NAME_LEN];
+extern const uint8_t type_4_tag_iso_df_name[TYPE_4_TAG_ISO_NAME_LEN];
 
 // Capability Container parsing structures
 

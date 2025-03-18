@@ -41,11 +41,11 @@ Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, B
 
 static Type4TagError type_5_tag_poller_iso_select_name(
     Type4TagPoller* instance,
-    const uint8_t* df_name,
-    uint8_t df_name_len) {
+    const uint8_t* name,
+    uint8_t name_len) {
     const uint8_t type_4_tag_iso_select_name_apdu[] = {
         TYPE_4_TAG_ISO_SELECT_CMD,
-        TYPE_4_TAG_ISO_SELECT_P1_BY_DF_NAME,
+        TYPE_4_TAG_ISO_SELECT_P1_BY_NAME,
         TYPE_4_TAG_ISO_SELECT_P2_EMPTY,
     };
 
@@ -53,8 +53,8 @@ static Type4TagError type_5_tag_poller_iso_select_name(
         instance->tx_buffer,
         type_4_tag_iso_select_name_apdu,
         sizeof(type_4_tag_iso_select_name_apdu));
-    bit_buffer_append_byte(instance->tx_buffer, df_name_len);
-    bit_buffer_append_bytes(instance->tx_buffer, df_name, df_name_len);
+    bit_buffer_append_byte(instance->tx_buffer, name_len);
+    bit_buffer_append_bytes(instance->tx_buffer, name, name_len);
 
     return type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
 }
@@ -63,7 +63,7 @@ static Type4TagError
     type_5_tag_poller_iso_select_file(Type4TagPoller* instance, uint16_t file_id) {
     const uint8_t type_4_tag_iso_select_file_apdu[] = {
         TYPE_4_TAG_ISO_SELECT_CMD,
-        TYPE_4_TAG_ISO_SELECT_P1_BY_ID,
+        TYPE_4_TAG_ISO_SELECT_P1_BY_EF_ID,
         TYPE_4_TAG_ISO_SELECT_P2_EMPTY,
         sizeof(file_id),
     };
@@ -134,7 +134,7 @@ Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance) {
 
     FURI_LOG_D(TAG, "Select application");
     return type_5_tag_poller_iso_select_name(
-        instance, type_4_tag_iso_app_name, sizeof(type_4_tag_iso_app_name));
+        instance, type_4_tag_iso_df_name, sizeof(type_4_tag_iso_df_name));
 }
 
 Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
@@ -144,7 +144,7 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
 
     do {
         FURI_LOG_D(TAG, "Select CC");
-        error = type_5_tag_poller_iso_select_file(instance, TYPE_4_TAG_T4T_CC_FILE_ID);
+        error = type_5_tag_poller_iso_select_file(instance, TYPE_4_TAG_T4T_CC_EF_ID);
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(TAG, "Read CC len");

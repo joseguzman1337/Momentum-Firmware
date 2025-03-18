@@ -9,8 +9,8 @@
 
 #define TYPE_4_TAG_FFF_NDEF_DATA_PER_LINE (16U)
 
-const uint8_t type_4_tag_iso_picc_name[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_PICC_NAME};
-const uint8_t type_4_tag_iso_app_name[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_APP_NAME};
+const uint8_t type_4_tag_iso_mf_name[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_MF_NAME};
+const uint8_t type_4_tag_iso_df_name[TYPE_4_TAG_ISO_NAME_LEN] = {TYPE_4_TAG_ISO_DF_NAME};
 
 Type4TagError type_4_tag_process_error(Iso14443_4aError error) {
     switch(error) {
@@ -46,11 +46,11 @@ void type_4_tag_cc_dump(const Type4TagData* data, uint8_t* buf, size_t len) {
     cc->tlv[0].len = sizeof(cc->tlv[0].value.ndef_file_ctrl);
 
     bit_lib_num_to_bytes_be(
-        data->is_tag_specific ? data->ndef_file_id : TYPE_4_TAG_T4T_DEFAULT_FILE_ID,
+        data->is_tag_specific ? data->ndef_file_id : TYPE_4_TAG_T4T_NDEF_EF_ID,
         sizeof(cc->tlv[0].value.ndef_file_ctrl.file_id),
         (void*)&cc->tlv[0].value.ndef_file_ctrl.file_id);
     bit_lib_num_to_bytes_be(
-        data->is_tag_specific ? data->ndef_max_len : TYPE_4_TAG_DEFAULT_SIZE,
+        data->is_tag_specific ? data->ndef_max_len : TYPE_4_TAG_DEFAULT_NDEF_SIZE,
         sizeof(cc->tlv[0].value.ndef_file_ctrl.max_len),
         (void*)&cc->tlv[0].value.ndef_file_ctrl.max_len);
     cc->tlv[0].value.ndef_file_ctrl.read_perm =
