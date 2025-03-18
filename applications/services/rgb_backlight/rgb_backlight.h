@@ -28,10 +28,10 @@ extern "C" {
 
 typedef struct {
     FuriTimer* rainbow_timer;
-
-    // int16_t current_red;
-    // int16_t current_green;
-    // int16_t current_blue;
+    uint8_t rainbow_hue;
+    uint8_t rainbow_red;
+    uint8_t rainbow_green;
+    uint8_t rainbow_blue;
 
     RGBBacklightSettings* settings;
 

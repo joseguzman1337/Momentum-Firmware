@@ -18,6 +18,7 @@ typedef struct {
     uint32_t rainbow_mode;
     uint32_t rainbow_speed_ms;
     uint16_t rainbow_step;
+    uint8_t  rainbow_saturation;
 
 } RGBBacklightSettings;
 

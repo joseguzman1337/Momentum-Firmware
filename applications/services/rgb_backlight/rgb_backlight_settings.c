@@ -18,16 +18,17 @@ typedef struct {
     uint8_t version;
     uint8_t rgb_backlight_installed;
     float brightness;
-    
+
     // static gradient mode settings
     uint8_t led_2_color_index;
     uint8_t led_1_color_index;
     uint8_t led_0_color_index;
-    
+
     // rainbow mode setings
     uint32_t rainbow_mode;
     uint32_t rainbow_speed_ms;
     uint16_t rainbow_step;
+    uint8_t rainbow_saturation;
 } RGBBacklightSettingsPrevious;
 
 void rgb_backlight_settings_load(RGBBacklightSettings* settings) {
@@ -82,6 +83,7 @@ void rgb_backlight_settings_load(RGBBacklightSettings* settings) {
         settings->brightness = 1.0f;
         settings->rainbow_speed_ms = 100;
         settings->rainbow_step = 1;
+        settings->rainbow_saturation = 255;
         rgb_backlight_settings_save(settings);
     }
 }
