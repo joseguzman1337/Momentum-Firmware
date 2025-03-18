@@ -56,7 +56,10 @@ static Type4TagError type_5_tag_poller_iso_select_name(
     bit_buffer_append_byte(instance->tx_buffer, name_len);
     bit_buffer_append_bytes(instance->tx_buffer, name, name_len);
 
-    return type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
+    Type4TagError error = type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
+    if(error == Type4TagErrorApduFailed) error = Type4TagErrorCardUnformatted;
+
+    return error;
 }
 
 static Type4TagError
@@ -76,7 +79,10 @@ static Type4TagError
         sizeof(type_4_tag_iso_select_file_apdu));
     bit_buffer_append_bytes(instance->tx_buffer, file_id_be, sizeof(file_id_be));
 
-    return type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
+    Type4TagError error = type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
+    if(error == Type4TagErrorApduFailed) error = Type4TagErrorCardUnformatted;
+
+    return error;
 }
 
 static Type4TagError type_5_tag_poller_iso_read(
