@@ -24,7 +24,7 @@ Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, B
         return Type4TagErrorWrongFormat;
     }
 
-    const uint8_t success[TYPE_4_TAG_ISO_STATUS_LEN] = {TYPE_4_TAG_ISO_STATUS_SUCCESS};
+    static const uint8_t success[TYPE_4_TAG_ISO_STATUS_LEN] = {TYPE_4_TAG_ISO_STATUS_SUCCESS};
     uint8_t status[TYPE_4_TAG_ISO_STATUS_LEN] = {
         bit_buffer_get_byte(rx_buf, response_len - 2),
         bit_buffer_get_byte(rx_buf, response_len - 1),
@@ -43,7 +43,7 @@ static Type4TagError type_5_tag_poller_iso_select_name(
     Type4TagPoller* instance,
     const uint8_t* name,
     uint8_t name_len) {
-    const uint8_t type_4_tag_iso_select_name_apdu[] = {
+    static const uint8_t type_4_tag_iso_select_name_apdu[] = {
         TYPE_4_TAG_ISO_SELECT_CMD,
         TYPE_4_TAG_ISO_SELECT_P1_BY_NAME,
         TYPE_4_TAG_ISO_SELECT_P2_EMPTY,
@@ -61,7 +61,7 @@ static Type4TagError type_5_tag_poller_iso_select_name(
 
 static Type4TagError
     type_5_tag_poller_iso_select_file(Type4TagPoller* instance, uint16_t file_id) {
-    const uint8_t type_4_tag_iso_select_file_apdu[] = {
+    static const uint8_t type_4_tag_iso_select_file_apdu[] = {
         TYPE_4_TAG_ISO_SELECT_CMD,
         TYPE_4_TAG_ISO_SELECT_P1_BY_EF_ID,
         TYPE_4_TAG_ISO_SELECT_P2_EMPTY,
@@ -92,7 +92,7 @@ static Type4TagError type_5_tag_poller_iso_read(
         return Type4TagErrorNotSupported;
     }
 
-    const uint8_t type_4_tag_iso_read_apdu[] = {
+    static const uint8_t type_4_tag_iso_read_apdu[] = {
         TYPE_4_TAG_ISO_READ_CMD,
     };
 
