@@ -135,6 +135,49 @@ static Type4TagError type_5_tag_poller_iso_read(
     return Type4TagErrorNone;
 }
 
+static Type4TagError type_5_tag_poller_iso_write(
+    Type4TagPoller* instance,
+    uint16_t offset,
+    uint16_t length,
+    uint8_t* buffer) {
+    const uint8_t chunk_max = instance->data->is_tag_specific ?
+                                  MIN(instance->data->chunk_max_write, TYPE_4_TAG_CHUNK_LEN) :
+                                  TYPE_4_TAG_CHUNK_LEN;
+    if(offset + length > TYPE_4_TAG_ISO_READ_P_OFFSET_MAX + chunk_max - sizeof(length)) {
+        FURI_LOG_E(TAG, "File too large: %zu bytes", length);
+        return Type4TagErrorNotSupported;
+    }
+
+    static const uint8_t type_4_tag_iso_write_apdu[] = {
+        TYPE_4_TAG_ISO_WRITE_CMD,
+    };
+
+    while(length > 0) {
+        uint8_t chunk_len = MIN(length, chunk_max);
+        uint8_t offset_be[sizeof(offset)];
+        bit_lib_num_to_bytes_be(offset, sizeof(offset_be), offset_be);
+
+        bit_buffer_append_bytes(
+            instance->tx_buffer, type_4_tag_iso_write_apdu, sizeof(type_4_tag_iso_write_apdu));
+        bit_buffer_append_bytes(instance->tx_buffer, offset_be, sizeof(offset_be));
+        bit_buffer_append_byte(instance->tx_buffer, chunk_len);
+        bit_buffer_append_bytes(instance->tx_buffer, buffer, chunk_len);
+
+        Type4TagError error =
+            type_4_tag_apdu_trx(instance, instance->tx_buffer, instance->rx_buffer);
+        if(error == Type4TagErrorApduFailed) error = Type4TagErrorCardLocked;
+        if(error != Type4TagErrorNone) {
+            return error;
+        }
+
+        buffer += chunk_len;
+        offset += chunk_len;
+        length -= chunk_len;
+    }
+
+    return Type4TagErrorNone;
+}
+
 Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance) {
     furi_check(instance);
 
@@ -226,6 +269,35 @@ Type4TagError type_4_tag_poller_create_ndef(Type4TagPoller* instance) {
 }
 
 Type4TagError type_4_tag_poller_write_ndef(Type4TagPoller* instance) {
-    UNUSED(instance);
-    return Type4TagErrorNotSupported;
+    furi_check(instance);
+
+    Type4TagError error;
+
+    do {
+        FURI_LOG_D(TAG, "Select NDEF");
+        error = type_5_tag_poller_iso_select_file(instance, instance->data->ndef_file_id);
+        if(error != Type4TagErrorNone) break;
+
+        FURI_LOG_D(TAG, "Write NDEF len");
+        uint16_t ndef_len = simple_array_get_count(instance->data->ndef_data);
+        uint8_t ndef_len_be[sizeof(ndef_len)];
+        bit_lib_num_to_bytes_be(ndef_len, sizeof(ndef_len_be), ndef_len_be);
+        error = type_5_tag_poller_iso_write(instance, 0, sizeof(ndef_len_be), ndef_len_be);
+        if(error != Type4TagErrorNone) break;
+
+        if(ndef_len == 0) {
+            FURI_LOG_D(TAG, "NDEF file is empty");
+            break;
+        }
+
+        FURI_LOG_D(TAG, "Write NDEF");
+        uint8_t* ndef_buf = simple_array_get_data(instance->data->ndef_data);
+        error = type_5_tag_poller_iso_write(instance, sizeof(ndef_len), ndef_len, ndef_buf);
+        if(error != Type4TagErrorNone) break;
+
+        FURI_LOG_D(
+            TAG, "Wrote %hu bytes from NDEF file 0x%04X", ndef_len, instance->data->ndef_file_id);
+    } while(false);
+
+    return error;
 }
