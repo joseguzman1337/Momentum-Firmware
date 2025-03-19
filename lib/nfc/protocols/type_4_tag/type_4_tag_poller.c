@@ -68,7 +68,6 @@ static NfcCommand type_4_tag_poller_handler_request_mode(Type4TagPoller* instanc
 
 static NfcCommand type_4_tag_poller_handler_detect_platform(Type4TagPoller* instance) {
     instance->error = type_4_tag_poller_detect_platform(instance);
-    iso14443_4a_poller_halt(instance->iso14443_4a_poller);
     if(instance->error == Type4TagErrorNone) {
         FURI_LOG_D(TAG, "Detect platform success");
     } else {
@@ -76,6 +75,8 @@ static NfcCommand type_4_tag_poller_handler_detect_platform(Type4TagPoller* inst
     }
     instance->state = Type4TagPollerStateSelectApplication;
 
+    // Reset card state so platform-specific commands do not interfere
+    iso14443_4a_poller_halt(instance->iso14443_4a_poller);
     return NfcCommandReset;
 }
 
@@ -89,6 +90,9 @@ static NfcCommand type_4_tag_poller_handler_select_app(Type4TagPoller* instance)
         if(instance->mode == Type4TagPollerModeWrite &&
            instance->error == Type4TagErrorCardUnformatted) {
             instance->state = Type4TagPollerStateCreateApplication;
+            // Reset card state so platform-specific commands do not interfere
+            iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+            return NfcCommandReset;
         } else {
             instance->state = Type4TagPollerStateFailed;
         }
@@ -109,6 +113,9 @@ static NfcCommand type_4_tag_poller_handler_read_cc(Type4TagPoller* instance) {
         if(instance->mode == Type4TagPollerModeWrite &&
            instance->error == Type4TagErrorCardUnformatted) {
             instance->state = Type4TagPollerStateCreateCapabilityContainer;
+            // Reset card state so platform-specific commands do not interfere
+            iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+            return NfcCommandReset;
         } else {
             instance->state = Type4TagPollerStateFailed;
         }
@@ -134,7 +141,10 @@ static NfcCommand type_4_tag_poller_handler_create_app(Type4TagPoller* instance)
     instance->error = type_4_tag_poller_create_app(instance);
     if(instance->error == Type4TagErrorNone) {
         FURI_LOG_D(TAG, "Create application success");
+        // Reset card state so platform-specific commands do not interfere
         instance->state = Type4TagPollerStateSelectApplication;
+        iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+        return NfcCommandReset;
     } else {
         FURI_LOG_E(TAG, "Failed to create application");
         instance->state = Type4TagPollerStateFailed;
@@ -147,7 +157,10 @@ static NfcCommand type_4_tag_poller_handler_create_cc(Type4TagPoller* instance) 
     instance->error = type_4_tag_poller_create_cc(instance);
     if(instance->error == Type4TagErrorNone) {
         FURI_LOG_D(TAG, "Create CC success");
-        instance->state = Type4TagPollerStateReadCapabilityContainer;
+        // Reset card state so platform-specific commands do not interfere
+        instance->state = Type4TagPollerStateSelectApplication;
+        iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+        return NfcCommandReset;
     } else {
         FURI_LOG_E(TAG, "Failed to create CC");
         instance->state = Type4TagPollerStateFailed;
@@ -160,7 +173,10 @@ static NfcCommand type_4_tag_poller_handler_create_ndef(Type4TagPoller* instance
     instance->error = type_4_tag_poller_create_ndef(instance);
     if(instance->error == Type4TagErrorNone) {
         FURI_LOG_D(TAG, "Create NDEF success");
-        instance->state = Type4TagPollerStateWriteNdefMessage;
+        // Reset card state so platform-specific commands do not interfere
+        instance->state = Type4TagPollerStateSelectApplication;
+        iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+        return NfcCommandReset;
     } else {
         FURI_LOG_E(TAG, "Failed to create NDEF");
         instance->state = Type4TagPollerStateFailed;
@@ -179,6 +195,9 @@ static NfcCommand type_4_tag_poller_handler_write_ndef(Type4TagPoller* instance)
         if(instance->mode == Type4TagPollerModeWrite &&
            instance->error == Type4TagErrorCardUnformatted) {
             instance->state = Type4TagPollerStateCreateNdefMessage;
+            // Reset card state so platform-specific commands do not interfere
+            iso14443_4a_poller_halt(instance->iso14443_4a_poller);
+            return NfcCommandReset;
         } else {
             instance->state = Type4TagPollerStateFailed;
         }

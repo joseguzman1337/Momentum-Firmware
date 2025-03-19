@@ -4,6 +4,7 @@
 #include <bit_lib/bit_lib.h>
 
 #include <nfc/nfc_device.h>
+#include <nfc/protocols/mf_desfire/mf_desfire_poller.h>
 #include <nfc/protocols/mf_desfire/mf_desfire_poller_defs.h>
 
 #define TAG "Type4TagPoller"
@@ -199,7 +200,7 @@ Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
 
     do {
         FURI_LOG_D(TAG, "Detect DESFire");
-        NfcGenericInstance* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
         if(mf_desfire_poller.detect(event, mf_des)) {
             platform = Type4TagPlatformMfDesfire;
             nfc_device_set_data(device, NfcProtocolMfDesfire, mf_desfire_poller.get_data(mf_des));
@@ -303,8 +304,56 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
 }
 
 Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
-    UNUSED(instance);
-    return Type4TagErrorNotSupported;
+    Type4TagError error = Type4TagErrorNotSupported;
+
+    if(instance->data->platform == Type4TagPlatformMfDesfire) {
+        MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        MfDesfireError mf_des_error;
+
+        do {
+            // Select PICC (Card) level
+            MfDesfireApplicationId picc_aid = {{0x00, 0x00, 0x00}};
+            mf_des_error = mf_desfire_poller_select_application(mf_des, &picc_aid);
+            if(mf_des_error != MfDesfireErrorNone) {
+                error = Type4TagErrorProtocol;
+                break;
+            }
+
+            // Create NDEF application
+            MfDesfireApplicationId ndef_aid = {{0x10, 0xEE, 0xEE}};
+            MfDesfireKeySettings key_settings = {
+                .is_master_key_changeable = true,
+                .is_free_directory_list = true,
+                .is_free_create_delete = true,
+                .is_config_changeable = true,
+                .change_key_id = 0,
+                .max_keys = 1,
+                .flags = 0,
+            };
+            mf_des_error = mf_desfire_poller_create_application(
+                mf_des,
+                &ndef_aid,
+                &key_settings,
+                TYPE_4_TAG_ISO_DF_ID,
+                type_4_tag_iso_df_name,
+                sizeof(type_4_tag_iso_df_name));
+            if(mf_des_error != MfDesfireErrorNone) {
+                if(mf_des_error != MfDesfireErrorNotPresent &&
+                   mf_des_error != MfDesfireErrorTimeout) {
+                    error = Type4TagErrorCardLocked;
+                } else {
+                    error = Type4TagErrorProtocol;
+                }
+                break;
+            }
+
+            error = Type4TagErrorNone;
+        } while(false);
+
+        mf_desfire_poller.free(mf_des);
+    }
+
+    return error;
 }
 
 Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance) {

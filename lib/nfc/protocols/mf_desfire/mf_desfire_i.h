@@ -68,6 +68,8 @@ bool mf_desfire_free_memory_parse(MfDesfireFreeMemory* data, const BitBuffer* bu
 
 bool mf_desfire_key_settings_parse(MfDesfireKeySettings* data, const BitBuffer* buf);
 
+void mf_desfire_key_settings_dump(const MfDesfireKeySettings* data, BitBuffer* buf);
+
 bool mf_desfire_key_version_parse(MfDesfireKeyVersion* data, const BitBuffer* buf);
 
 bool mf_desfire_application_id_parse(

@@ -1,6 +1,7 @@
 #include "mf_desfire_poller_i.h"
 
 #include <furi.h>
+#include <bit_lib/bit_lib.h>
 
 #include "mf_desfire_i.h"
 
@@ -325,6 +326,40 @@ MfDesfireError mf_desfire_poller_read_file_settings_multi(
         error = mf_desfire_poller_read_file_settings(instance, file_id, simple_array_get(data, i));
         if(error != MfDesfireErrorNone) break;
     }
+
+    return error;
+}
+
+MfDesfireError mf_desfire_poller_create_application(
+    MfDesfirePoller* instance,
+    const MfDesfireApplicationId* id,
+    const MfDesfireKeySettings* key_settings,
+    uint16_t iso_df_id,
+    const uint8_t* iso_df_name,
+    uint8_t iso_df_name_len) {
+    furi_check(instance);
+
+    bit_buffer_reset(instance->input_buffer);
+    bit_buffer_append_byte(instance->input_buffer, MF_DESFIRE_CMD_CREATE_APPLICATION);
+    bit_buffer_append_bytes(
+        instance->input_buffer, (const uint8_t*)id, sizeof(MfDesfireApplicationId));
+    mf_desfire_key_settings_dump(key_settings, instance->input_buffer);
+
+    if(iso_df_name && iso_df_name_len) {
+        uint8_t ks2_pos = bit_buffer_get_size_bytes(instance->input_buffer) - 1;
+        uint8_t ks2 = bit_buffer_get_byte(instance->input_buffer, ks2_pos);
+        ks2 |= (1 << 5); // Mark file id present
+        bit_buffer_set_byte(instance->input_buffer, ks2_pos, ks2);
+
+        uint8_t iso_file_id_le[sizeof(iso_df_id)];
+        bit_lib_num_to_bytes_le(iso_df_id, sizeof(iso_file_id_le), iso_file_id_le);
+        bit_buffer_append_bytes(instance->input_buffer, iso_file_id_le, sizeof(iso_file_id_le));
+
+        bit_buffer_append_bytes(instance->input_buffer, iso_df_name, iso_df_name_len);
+    }
+
+    MfDesfireError error =
+        mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
 
     return error;
 }
