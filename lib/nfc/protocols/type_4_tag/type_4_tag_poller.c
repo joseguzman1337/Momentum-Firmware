@@ -76,7 +76,7 @@ static NfcCommand type_4_tag_poller_handler_detect_platform(Type4TagPoller* inst
     }
     instance->state = Type4TagPollerStateSelectApplication;
 
-    return NfcCommandContinue;
+    return NfcCommandReset;
 }
 
 static NfcCommand type_4_tag_poller_handler_select_app(Type4TagPoller* instance) {
