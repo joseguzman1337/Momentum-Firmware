@@ -8,17 +8,18 @@ typedef struct {
     uint8_t version;
     uint8_t rgb_backlight_installed;
     float brightness;
-    
+
     // static gradient mode settings
     uint8_t led_2_color_index;
     uint8_t led_1_color_index;
     uint8_t led_0_color_index;
-    
+
     // rainbow mode setings
     uint32_t rainbow_mode;
     uint32_t rainbow_speed_ms;
     uint16_t rainbow_step;
-    uint8_t  rainbow_saturation;
+    uint8_t rainbow_saturation;
+    uint8_t rainbow_wide;
 
 } RGBBacklightSettings;
 

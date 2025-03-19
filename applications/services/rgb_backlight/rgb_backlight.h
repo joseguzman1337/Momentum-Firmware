@@ -28,7 +28,7 @@ extern "C" {
 
 typedef struct {
     FuriTimer* rainbow_timer;
-    uint8_t rainbow_hue;
+    uint16_t rainbow_hue;
     uint8_t rainbow_red;
     uint8_t rainbow_green;
     uint8_t rainbow_blue;
@@ -40,6 +40,7 @@ typedef struct {
 #define RECORD_RGB_BACKLIGHT "rgb_backlight"
 
 void rgb_backlight_update(float brightness);
+//not used now, for future use
 // void rgb_backlight_set_custom_color(uint8_t red, uint8_t green, uint8_t blue);
 void rgb_backlight_set_led_static_color(uint8_t led, uint8_t index);
 void rainbow_timer_stop(RGBBacklightApp* app);
