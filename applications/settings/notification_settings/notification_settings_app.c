@@ -253,7 +253,7 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
         rgb_backlight_set_led_static_color(1, 0);
         rgb_backlight_set_led_static_color(0, 0);
         SK6805_update();
-        // start rainbow (if its Enabled) or set saved static colors if user swith_on rgb_backlight_installed switch
+    // start rainbow (if its Enabled) or set saved static colors if user swith_on rgb_backlight_installed switch
     } else {
         if(app->notification->rgb_srv->settings->rainbow_mode > 0) {
             rainbow_timer_starter(app->notification->rgb_srv);

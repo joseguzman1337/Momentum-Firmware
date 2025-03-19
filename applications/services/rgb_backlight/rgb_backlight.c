@@ -38,9 +38,9 @@ typedef struct {
 
 //use one type RGBBacklightColor for current_leds_settings and for static colors definition
 static RGBBacklightColor current_led[] = {
-    {"LED0", 255, 60, 0},
-    {"LED1", 255, 60, 0},
-    {"LED2", 255, 60, 0},
+    {"LED0", 0, 0, 0},
+    {"LED1", 0, 0, 0},
+    {"LED2", 0, 0, 0},
 };
 
 static const RGBBacklightColor colors[] = {
