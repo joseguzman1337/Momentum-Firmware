@@ -201,6 +201,7 @@ Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
     do {
         FURI_LOG_D(TAG, "Detect DESFire");
         MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
         if(mf_desfire_poller.detect(event, mf_des)) {
             platform = Type4TagPlatformMfDesfire;
             nfc_device_set_data(device, NfcProtocolMfDesfire, mf_desfire_poller.get_data(mf_des));
@@ -308,6 +309,7 @@ Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
 
     if(instance->data->platform == Type4TagPlatformMfDesfire) {
         MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
         MfDesfireError mf_des_error;
 
         do {
