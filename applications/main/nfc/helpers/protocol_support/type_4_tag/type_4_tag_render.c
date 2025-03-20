@@ -15,18 +15,18 @@ void nfc_render_type_4_tag_info(
         furi_string_cat(str, "\n::::::::::::::::::[Tag Specs]::::::::::::::::::\n");
         furi_string_cat_printf(
             str, "T4T Mapping Version: %u.%u\n", data->t4t_version.major, data->t4t_version.minor);
-        furi_string_cat_printf(str, "NDEF File ID: 0x%04X\n", data->ndef_file_id);
+        furi_string_cat_printf(str, "NDEF File ID: %04X\n", data->ndef_file_id);
         furi_string_cat_printf(str, "Max NDEF Size: %u\n", data->ndef_max_len);
         furi_string_cat_printf(
             str, "APDU Sizes: R:%u W:%u\n", data->chunk_max_read, data->chunk_max_write);
         furi_string_cat_printf(
             str,
-            "Read Lock: 0x%02X%s\n",
+            "Read Lock: %02X%s\n",
             data->ndef_read_lock,
             data->ndef_read_lock == 0 ? " (unlocked)" : "");
         furi_string_cat_printf(
             str,
-            "Write Lock: 0x%02X%s",
+            "Write Lock: %02X%s",
             data->ndef_write_lock,
             data->ndef_write_lock == 0 ? " (unlocked)" : "");
     }

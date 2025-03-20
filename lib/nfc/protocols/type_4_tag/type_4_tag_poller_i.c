@@ -38,7 +38,7 @@ Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, B
     if(memcmp(status, success, sizeof(status)) == 0) {
         return Type4TagErrorNone;
     } else {
-        FURI_LOG_E(TAG, "APDU failed: 0x%02X%02X", status[0], status[1]);
+        FURI_LOG_E(TAG, "APDU failed: %02X%02X", status[0], status[1]);
         return Type4TagErrorApduFailed;
     }
 }
@@ -263,7 +263,7 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
         if(error != Type4TagErrorNone) break;
         instance->data->is_tag_specific = true;
 
-        FURI_LOG_D(TAG, "Detected NDEF file ID 0x%04X", instance->data->ndef_file_id);
+        FURI_LOG_D(TAG, "Detected NDEF file ID %04X", instance->data->ndef_file_id);
     } while(false);
 
     return error;
@@ -298,7 +298,7 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(
-            TAG, "Read %hu bytes from NDEF file 0x%04X", ndef_len, instance->data->ndef_file_id);
+            TAG, "Read %hu bytes from NDEF file %04X", ndef_len, instance->data->ndef_file_id);
     } while(false);
 
     return error;
@@ -396,7 +396,7 @@ Type4TagError type_4_tag_poller_write_ndef(Type4TagPoller* instance) {
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(
-            TAG, "Wrote %hu bytes from NDEF file 0x%04X", ndef_len, instance->data->ndef_file_id);
+            TAG, "Wrote %hu bytes to NDEF file %04X", ndef_len, instance->data->ndef_file_id);
     } while(false);
 
     return error;
