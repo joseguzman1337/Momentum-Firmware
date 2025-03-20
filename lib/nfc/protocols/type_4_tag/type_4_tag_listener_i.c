@@ -196,8 +196,9 @@ static Type4TagError type_4_tag_listener_iso_write(
     }
 
     if(instance->state == Type4TagListenerStateSelectedNdefMessage) {
-        if(offset + lc > (instance->data->is_tag_specific ? instance->data->ndef_max_len :
-                                                            TYPE_4_TAG_DEFAULT_NDEF_SIZE)) {
+        if(offset + lc > sizeof(uint16_t) + (instance->data->is_tag_specific ?
+                                                 instance->data->ndef_max_len :
+                                                 TYPE_4_TAG_DEFAULT_NDEF_SIZE)) {
             bit_buffer_append_bytes(
                 instance->tx_buffer,
                 type_4_tag_offset_error_apdu,

@@ -50,7 +50,8 @@ void type_4_tag_cc_dump(const Type4TagData* data, uint8_t* buf, size_t len) {
         sizeof(cc->tlv[0].value.ndef_file_ctrl.file_id),
         (void*)&cc->tlv[0].value.ndef_file_ctrl.file_id);
     bit_lib_num_to_bytes_be(
-        data->is_tag_specific ? data->ndef_max_len : TYPE_4_TAG_DEFAULT_NDEF_SIZE,
+        sizeof(uint16_t) +
+            (data->is_tag_specific ? data->ndef_max_len : TYPE_4_TAG_DEFAULT_NDEF_SIZE),
         sizeof(cc->tlv[0].value.ndef_file_ctrl.max_len),
         (void*)&cc->tlv[0].value.ndef_file_ctrl.max_len);
     cc->tlv[0].value.ndef_file_ctrl.read_perm =
