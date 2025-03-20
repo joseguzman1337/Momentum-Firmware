@@ -51,10 +51,15 @@ typedef struct {
  * @param[out] rx_buffer pointer to the buffer to be filled with received data.
  * @return MfDesfireErrorNone on success, an error code on failure.
  */
-MfDesfireError mf_desfire_send_chunks(
+MfDesfireError mf_desfire_poller_send_chunks(
     MfDesfirePoller* instance,
     const BitBuffer* tx_buffer,
     BitBuffer* rx_buffer);
+
+/**
+  * @warning deprecated, use mf_desfire_poller_send_chunks instead
+  */
+#define mf_desfire_send_chunks mf_desfire_poller_send_chunks
 
 /**
  * @brief Read MfDesfire card version.
