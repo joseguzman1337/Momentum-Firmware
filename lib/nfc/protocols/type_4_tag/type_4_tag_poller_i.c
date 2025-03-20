@@ -215,6 +215,7 @@ Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
         // FIXME: detect NTAG4xx
     } while(false);
 
+    Type4TagError error;
     if(platform != Type4TagPlatformUnknown) {
         furi_string_set(
             instance->data->platform_name_full,
@@ -222,14 +223,16 @@ Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
         furi_string_set(
             instance->data->platform_name_short,
             nfc_device_get_name(device, NfcDeviceNameTypeShort));
+        error = Type4TagErrorNone;
     } else {
         furi_string_reset(instance->data->platform_name_full);
         furi_string_reset(instance->data->platform_name_short);
+        error = Type4TagErrorNotSupported;
     }
     instance->data->platform = platform;
     nfc_device_free(device);
 
-    return platform != Type4TagPlatformUnknown ? Type4TagErrorNone : Type4TagErrorNotSupported;
+    return error;
 }
 
 Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance) {
