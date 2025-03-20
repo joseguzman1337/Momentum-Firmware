@@ -39,6 +39,26 @@ typedef struct {
 } MfDesfirePollerEvent;
 
 /**
+ * @brief Enumeration of possible MfDesfire poller command modes.
+ */
+typedef enum {
+    MfDesfirePollerCommandModeNative, /**< Native MfDesfire commands. */
+    MfDesfirePollerCommandModeIsoWrapped, /**< ISO 7816-wrapped commands. */
+
+    MfDesfirePollerCommandModeMAX,
+} MfDesfirePollerCommandMode;
+
+/**
+ * @brief Change MfDesfire command mode used in poller mode.
+ *
+ * @param[in, out] instance pointer to the instance to affect.
+ * @param[in] command_mode command mode to use in further communication with the card.
+ */
+void mf_desfire_poller_set_command_mode(
+    MfDesfirePoller* instance,
+    MfDesfirePollerCommandMode command_mode);
+
+/**
  * @brief Transmit and receive MfDesfire chunks in poller mode.
  *
  * Must ONLY be used inside the callback function.

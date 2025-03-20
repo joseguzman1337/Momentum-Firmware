@@ -5,6 +5,14 @@
 #define MF_DESFIRE_FFF_PICC_PREFIX "PICC"
 #define MF_DESFIRE_FFF_APP_PREFIX  "Application"
 
+// ISO 7816 command wrapping
+#define MF_DESFIRE_CMD_ISO_CLA    (0x90)
+#define MF_DESFIRE_CMD_ISO_P1     (0x00)
+#define MF_DESFIRE_CMD_ISO_P2     (0x00)
+#define MF_DESFIRE_CMD_ISO_LE     (0x00)
+// ISO 7816 status wrapping
+#define MF_DESFIRE_STATUS_ISO_SW1 (0x91)
+
 // Successful operation
 #define MF_DESFIRE_STATUS_OPERATION_OK          (0x00)
 // No changes done to backup files, CommitTransaction / AbortTransaction not necessary
