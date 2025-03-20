@@ -405,6 +405,7 @@ MfDesfireError mf_desfire_poller_create_application(
     const uint8_t* iso_df_name,
     uint8_t iso_df_name_len) {
     furi_check(instance);
+    furi_check(key_settings);
 
     bit_buffer_reset(instance->input_buffer);
     bit_buffer_append_byte(instance->input_buffer, MF_DESFIRE_CMD_CREATE_APPLICATION);
@@ -418,11 +419,78 @@ MfDesfireError mf_desfire_poller_create_application(
         ks2 |= (1 << 5); // Mark file id present
         bit_buffer_set_byte(instance->input_buffer, ks2_pos, ks2);
 
-        uint8_t iso_file_id_le[sizeof(iso_df_id)];
-        bit_lib_num_to_bytes_le(iso_df_id, sizeof(iso_file_id_le), iso_file_id_le);
-        bit_buffer_append_bytes(instance->input_buffer, iso_file_id_le, sizeof(iso_file_id_le));
+        uint8_t iso_df_id_le[sizeof(iso_df_id)];
+        bit_lib_num_to_bytes_le(iso_df_id, sizeof(iso_df_id_le), iso_df_id_le);
+        bit_buffer_append_bytes(instance->input_buffer, iso_df_id_le, sizeof(iso_df_id_le));
 
         bit_buffer_append_bytes(instance->input_buffer, iso_df_name, iso_df_name_len);
+    }
+
+    MfDesfireError error =
+        mf_desfire_poller_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+
+    return error;
+}
+
+MfDesfireError mf_desfire_poller_create_file(
+    MfDesfirePoller* instance,
+    MfDesfireFileId id,
+    const MfDesfireFileSettings* data,
+    uint16_t iso_ef_id) {
+    furi_check(instance);
+    furi_check(data);
+
+    bit_buffer_reset(instance->input_buffer);
+    bit_buffer_append_byte(
+        instance->input_buffer,
+        data->type == MfDesfireFileTypeStandard     ? MF_DESFIRE_CMD_CREATE_STD_DATA_FILE :
+        data->type == MfDesfireFileTypeBackup       ? MF_DESFIRE_CMD_CREATE_BACKUP_DATA_FILE :
+        data->type == MfDesfireFileTypeValue        ? MF_DESFIRE_CMD_CREATE_VALUE_FILE :
+        data->type == MfDesfireFileTypeLinearRecord ? MF_DESFIRE_CMD_CREATE_LINEAR_RECORD_FILE :
+        data->type == MfDesfireFileTypeCyclicRecord ? MF_DESFIRE_CMD_CREATE_CYCLIC_RECORD_FILE :
+                                                      0x00);
+    bit_buffer_append_byte(instance->input_buffer, id);
+    if(iso_ef_id) {
+        uint8_t iso_ef_id_le[sizeof(iso_ef_id)];
+        bit_lib_num_to_bytes_le(iso_ef_id, sizeof(iso_ef_id_le), iso_ef_id_le);
+        bit_buffer_append_bytes(instance->input_buffer, iso_ef_id_le, sizeof(iso_ef_id_le));
+    }
+    bit_buffer_append_byte(instance->input_buffer, data->comm);
+    bit_buffer_append_bytes(
+        instance->input_buffer,
+        (const uint8_t*)data->access_rights,
+        sizeof(MfDesfireFileAccessRights) * data->access_rights_len);
+
+    if(data->type == MfDesfireFileTypeStandard || data->type == MfDesfireFileTypeBackup) {
+        uint8_t data_size_le[3 * sizeof(uint8_t)];
+        bit_lib_num_to_bytes_le(data->data.size, sizeof(data_size_le), data_size_le);
+        bit_buffer_append_bytes(instance->input_buffer, data_size_le, sizeof(data_size_le));
+
+    } else if(data->type == MfDesfireFileTypeValue) {
+        uint8_t lo_limit_le[sizeof(data->value.lo_limit)];
+        bit_lib_num_to_bytes_le(data->value.lo_limit, sizeof(lo_limit_le), lo_limit_le);
+        bit_buffer_append_bytes(instance->input_buffer, lo_limit_le, sizeof(lo_limit_le));
+
+        uint8_t hi_limit_le[sizeof(data->value.hi_limit)];
+        bit_lib_num_to_bytes_le(data->value.hi_limit, sizeof(hi_limit_le), hi_limit_le);
+        bit_buffer_append_bytes(instance->input_buffer, hi_limit_le, sizeof(hi_limit_le));
+
+        uint8_t value_le[sizeof(data->value.limited_credit_value)];
+        bit_lib_num_to_bytes_le(data->value.limited_credit_value, sizeof(value_le), value_le);
+        bit_buffer_append_bytes(instance->input_buffer, value_le, sizeof(value_le));
+
+        bit_buffer_append_byte(instance->input_buffer, data->value.limited_credit_enabled);
+
+    } else if(
+        data->type == MfDesfireFileTypeLinearRecord ||
+        data->type == MfDesfireFileTypeCyclicRecord) {
+        uint8_t record_size_le[3 * sizeof(uint8_t)];
+        bit_lib_num_to_bytes_le(data->record.size, sizeof(record_size_le), record_size_le);
+        bit_buffer_append_bytes(instance->input_buffer, record_size_le, sizeof(record_size_le));
+
+        uint8_t record_max_le[3 * sizeof(uint8_t)];
+        bit_lib_num_to_bytes_le(data->record.max, sizeof(record_max_le), record_max_le);
+        bit_buffer_append_bytes(instance->input_buffer, record_max_le, sizeof(record_max_le));
     }
 
     MfDesfireError error =

@@ -10,7 +10,31 @@
 #define TAG "Type4TagPoller"
 
 static const MfDesfireApplicationId mf_des_picc_app_id = {.data = {0x00, 0x00, 0x00}};
-static const MfDesfireApplicationId mf_des_ndef_app_id = {.data = {0x10, 0xEE, 0xEE}};
+static const MfDesfireApplicationId mf_des_t4t_app_id = {.data = {0x10, 0xEE, 0xEE}};
+static const MfDesfireKeySettings mf_des_t4t_app_key_settings = {
+    .is_master_key_changeable = true,
+    .is_free_directory_list = true,
+    .is_free_create_delete = true,
+    .is_config_changeable = true,
+    .change_key_id = 0,
+    .max_keys = 1,
+    .flags = 0,
+};
+#define MF_DES_T4T_CC_FILE_ID (0x01)
+static const MfDesfireFileSettings mf_des_t4t_cc_file = {
+    .type = MfDesfireFileTypeStandard,
+    .comm = MfDesfireFileCommunicationSettingsPlaintext,
+    .access_rights[0] = 0xEEEE,
+    .access_rights_len = 1,
+    .data.size = TYPE_4_TAG_T4T_CC_MIN_SIZE,
+};
+#define MF_DES_T4T_NDEF_FILE_ID (0x02)
+static const MfDesfireFileSettings mf_des_t4t_ndef_file_default = {
+    .type = MfDesfireFileTypeStandard,
+    .comm = MfDesfireFileCommunicationSettingsPlaintext,
+    .access_rights[0] = 0xEEE0,
+    .access_rights_len = 1,
+};
 
 Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, BitBuffer* rx_buf) {
     furi_check(instance);
@@ -319,27 +343,18 @@ Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
         MfDesfireError mf_des_error;
 
         do {
-            // Select PICC (Card) level
+            FURI_LOG_D(TAG, "Select DESFire PICC");
             mf_des_error = mf_desfire_poller_select_application(mf_des, &mf_des_picc_app_id);
             if(mf_des_error != MfDesfireErrorNone) {
                 error = Type4TagErrorProtocol;
                 break;
             }
 
-            // Create NDEF application
-            MfDesfireKeySettings key_settings = {
-                .is_master_key_changeable = true,
-                .is_free_directory_list = true,
-                .is_free_create_delete = true,
-                .is_config_changeable = true,
-                .change_key_id = 0,
-                .max_keys = 1,
-                .flags = 0,
-            };
+            FURI_LOG_D(TAG, "Create DESFire T4T app");
             mf_des_error = mf_desfire_poller_create_application(
                 mf_des,
-                &mf_des_ndef_app_id,
-                &key_settings,
+                &mf_des_t4t_app_id,
+                &mf_des_t4t_app_key_settings,
                 TYPE_4_TAG_ISO_DF_ID,
                 type_4_tag_iso_df_name,
                 sizeof(type_4_tag_iso_df_name));
@@ -363,13 +378,87 @@ Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
 }
 
 Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance) {
-    UNUSED(instance);
-    return Type4TagErrorNotSupported;
+    Type4TagError error = Type4TagErrorNotSupported;
+
+    if(instance->data->platform == Type4TagPlatformMfDesfire) {
+        MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
+        MfDesfireError mf_des_error;
+
+        do {
+            FURI_LOG_D(TAG, "Create DESFire CC");
+            mf_des_error = mf_desfire_poller_create_file(
+                mf_des, MF_DES_T4T_CC_FILE_ID, &mf_des_t4t_cc_file, TYPE_4_TAG_T4T_CC_EF_ID);
+            if(mf_des_error != MfDesfireErrorNone) {
+                if(mf_des_error != MfDesfireErrorNotPresent &&
+                   mf_des_error != MfDesfireErrorTimeout) {
+                    error = Type4TagErrorCardLocked;
+                } else {
+                    error = Type4TagErrorProtocol;
+                }
+                break;
+            }
+
+            FURI_LOG_D(TAG, "Select CC");
+            error = type_5_tag_poller_iso_select_file(instance, TYPE_4_TAG_T4T_CC_EF_ID);
+            if(error != Type4TagErrorNone) break;
+
+            FURI_LOG_D(TAG, "Write DESFire CC");
+            instance->data->t4t_version.value = TYPE_4_TAG_T4T_CC_VNO;
+            instance->data->chunk_max_read = 0x3A;
+            instance->data->chunk_max_write = 0x34;
+            instance->data->ndef_file_id = TYPE_4_TAG_T4T_NDEF_EF_ID;
+            instance->data->ndef_max_len = TYPE_4_TAG_DEFAULT_NDEF_SIZE;
+            instance->data->ndef_read_lock = TYPE_4_TAG_T4T_CC_RW_LOCK_NONE;
+            instance->data->ndef_write_lock = TYPE_4_TAG_T4T_CC_RW_LOCK_NONE;
+            instance->data->is_tag_specific = true;
+            uint8_t cc_buf[TYPE_4_TAG_T4T_CC_MIN_SIZE];
+            type_4_tag_cc_dump(instance->data, cc_buf, sizeof(cc_buf));
+            error = type_5_tag_poller_iso_write(instance, 0, sizeof(cc_buf), cc_buf);
+            if(error != Type4TagErrorNone) break;
+
+            error = Type4TagErrorNone;
+        } while(false);
+
+        mf_desfire_poller.free(mf_des);
+    }
+
+    return error;
 }
 
 Type4TagError type_4_tag_poller_create_ndef(Type4TagPoller* instance) {
-    UNUSED(instance);
-    return Type4TagErrorNotSupported;
+    Type4TagError error = Type4TagErrorNotSupported;
+
+    if(instance->data->platform == Type4TagPlatformMfDesfire) {
+        MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
+        MfDesfireError mf_des_error;
+
+        do {
+            FURI_LOG_D(TAG, "Create DESFire NDEF");
+            MfDesfireFileSettings mf_des_t4t_ndef_file = mf_des_t4t_ndef_file_default;
+            mf_des_t4t_ndef_file.data.size = sizeof(uint16_t) + (instance->data->is_tag_specific ?
+                                                                     instance->data->ndef_max_len :
+                                                                     TYPE_4_TAG_DEFAULT_NDEF_SIZE);
+            mf_des_error = mf_desfire_poller_create_file(
+                mf_des, MF_DES_T4T_NDEF_FILE_ID, &mf_des_t4t_ndef_file, TYPE_4_TAG_T4T_NDEF_EF_ID);
+            if(mf_des_error != MfDesfireErrorNone) {
+                if(mf_des_error != MfDesfireErrorNotPresent &&
+                   mf_des_error != MfDesfireErrorTimeout) {
+                    error = Type4TagErrorCardLocked;
+                } else {
+                    error = Type4TagErrorProtocol;
+                }
+                break;
+            }
+
+            error = Type4TagErrorNone;
+        } while(false);
+
+        mf_desfire_poller.free(mf_des);
+    }
+
+    return error;
 }
 
 Type4TagError type_4_tag_poller_write_ndef(Type4TagPoller* instance) {

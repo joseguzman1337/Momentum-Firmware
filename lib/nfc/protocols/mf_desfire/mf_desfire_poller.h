@@ -220,9 +220,9 @@ MfDesfireError mf_desfire_poller_read_file_settings_multi(
  * @param[in, out] instance pointer to the instance to be used in the transaction.
  * @param[in] id pointer to the application id for the new application.
  * @param[in] key_settings pointer to the key settings for the new application.
- * @param[in] iso_df_id optional identifier for the new application.
- * @param[in] iso_df_name optional name for the new application.
- * @param[in] iso_df_name_len length of the optional application name.
+ * @param[in] iso_df_id optional iso identifier for the new application.
+ * @param[in] iso_df_name optional iso name for the new application.
+ * @param[in] iso_df_name_len length of the optional iso application name.
  * @return MfDesfireErrorNone on success, an error code on failure.
  */
 MfDesfireError mf_desfire_poller_create_application(
@@ -232,6 +232,23 @@ MfDesfireError mf_desfire_poller_create_application(
     uint16_t iso_df_id,
     const uint8_t* iso_df_name,
     uint8_t iso_df_name_len);
+
+/**
+ * @brief Create File on MfDesfire card.
+ *
+ * Must ONLY be used inside the callback function.
+ *
+ * @param[in, out] instance pointer to the instance to be used in the transaction.
+ * @param[in] id file id for the new file.
+ * @param[in] data pointer to the file settings for the new file.
+ * @param[in] iso_ef_id optional iso identifier for the new file.
+ * @return MfDesfireErrorNone on success, an error code on failure.
+ */
+MfDesfireError mf_desfire_poller_create_file(
+    MfDesfirePoller* instance,
+    MfDesfireFileId id,
+    const MfDesfireFileSettings* data,
+    uint16_t iso_ef_id);
 
 /**
  * @brief Read file data on MfDesfire card.
