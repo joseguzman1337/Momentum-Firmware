@@ -9,6 +9,9 @@
 
 #define TAG "Type4TagPoller"
 
+static const MfDesfireApplicationId mf_des_picc_app_id = {.data = {0x00, 0x00, 0x00}};
+static const MfDesfireApplicationId mf_des_ndef_app_id = {.data = {0x10, 0xEE, 0xEE}};
+
 Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, BitBuffer* rx_buf) {
     furi_check(instance);
 
@@ -314,15 +317,13 @@ Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
 
         do {
             // Select PICC (Card) level
-            MfDesfireApplicationId picc_aid = {{0x00, 0x00, 0x00}};
-            mf_des_error = mf_desfire_poller_select_application(mf_des, &picc_aid);
+            mf_des_error = mf_desfire_poller_select_application(mf_des, &mf_des_picc_app_id);
             if(mf_des_error != MfDesfireErrorNone) {
                 error = Type4TagErrorProtocol;
                 break;
             }
 
             // Create NDEF application
-            MfDesfireApplicationId ndef_aid = {{0x10, 0xEE, 0xEE}};
             MfDesfireKeySettings key_settings = {
                 .is_master_key_changeable = true,
                 .is_free_directory_list = true,
@@ -334,7 +335,7 @@ Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
             };
             mf_des_error = mf_desfire_poller_create_application(
                 mf_des,
-                &ndef_aid,
+                &mf_des_ndef_app_id,
                 &key_settings,
                 TYPE_4_TAG_ISO_DF_ID,
                 type_4_tag_iso_df_name,
