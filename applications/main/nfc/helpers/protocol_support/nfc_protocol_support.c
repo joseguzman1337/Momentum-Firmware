@@ -747,7 +747,7 @@ void nfc_protocol_support_scene_write_widget_callback(
     void* context) {
     NfcApp* instance = context;
     if(type == InputTypeShort && result == GuiButtonTypeLeft) {
-        view_dispatcher_send_custom_event(instance->view_dispatcher, NfcCustomEventViewExit);
+        view_dispatcher_send_custom_event(instance->view_dispatcher, NfcCustomEventRetry);
     }
 }
 
@@ -861,7 +861,9 @@ static bool nfc_protocol_support_scene_write_on_event(NfcApp* instance, SceneMan
             new_state = NfcSceneWriteStateWrongCard;
             consumed = true;
         } else if(event.event == NfcCustomEventViewExit) {
-            // Retry
+            scene_manager_previous_scene(instance->scene_manager);
+            consumed = true;
+        } else if(event.event == NfcCustomEventRetry) {
             nfc_protocol_support_scenes[NfcProtocolSupportSceneWrite].on_exit(instance);
             nfc_protocol_support_scenes[NfcProtocolSupportSceneWrite].on_enter(instance);
             consumed = true;
