@@ -144,4 +144,9 @@ const NfcProtocolSupportBase nfc_protocol_support_iso14443_3a = {
             .on_enter = nfc_scene_emulate_on_enter_iso14443_3a,
             .on_event = nfc_protocol_support_common_on_event_empty,
         },
+    .scene_write =
+        {
+            .on_enter = nfc_protocol_support_common_on_enter_empty,
+            .on_event = nfc_protocol_support_common_on_event_empty,
+        },
 };

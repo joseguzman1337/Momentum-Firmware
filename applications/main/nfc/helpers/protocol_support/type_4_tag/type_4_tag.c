@@ -11,10 +11,6 @@
 #include "../nfc_protocol_support_gui_common.h"
 
 enum {
-    SubmenuIndexWrite = SubmenuIndexCommonMax,
-};
-
-enum {
     NfcSceneMoreInfoStateASCII,
     NfcSceneMoreInfoStateRawData,
 };
@@ -126,32 +122,6 @@ static void nfc_scene_read_on_enter_type_4_tag(NfcApp* instance) {
     nfc_poller_start(instance->poller, nfc_scene_read_poller_callback_type_4_tag, instance);
 }
 
-static void nfc_scene_read_and_saved_menu_on_enter_type_4_tag(NfcApp* instance) {
-    Submenu* submenu = instance->submenu;
-
-    // FIXME: standardize this and the write scenes into protocol support helper
-    submenu_add_item(
-        submenu,
-        "Write",
-        SubmenuIndexWrite,
-        nfc_protocol_support_common_submenu_callback,
-        instance);
-}
-
-static bool
-    nfc_scene_read_and_saved_menu_on_event_type_4_tag(NfcApp* instance, SceneManagerEvent event) {
-    bool consumed = false;
-    UNUSED(instance);
-
-    if(event.type == SceneManagerEventTypeCustom) {
-        if(event.event == SubmenuIndexWrite) {
-            scene_manager_next_scene(instance->scene_manager, NfcSceneType4TagWrite);
-            consumed = true;
-        }
-    }
-    return consumed;
-}
-
 static void nfc_scene_read_success_on_enter_type_4_tag(NfcApp* instance) {
     const NfcDevice* device = instance->nfc_device;
     const Type4TagData* data = nfc_device_get_data(device, NfcProtocolType4Tag);
@@ -201,8 +171,45 @@ static void nfc_scene_emulate_on_enter_type_4_tag(NfcApp* instance) {
         instance->listener, nfc_scene_emulate_listener_callback_type_4_tag, instance);
 }
 
+static NfcCommand
+    nfc_scene_write_poller_callback_type_4_tag(NfcGenericEvent event, void* context) {
+    furi_assert(event.protocol == NfcProtocolType4Tag);
+
+    NfcApp* instance = context;
+    Type4TagPollerEvent* type_4_tag_event = event.event_data;
+    NfcCommand command = NfcCommandContinue;
+
+    if(type_4_tag_event->type == Type4TagPollerEventTypeRequestMode) {
+        type_4_tag_event->data->poller_mode.mode = Type4TagPollerModeWrite;
+        type_4_tag_event->data->poller_mode.data =
+            nfc_device_get_data(instance->nfc_device, NfcProtocolType4Tag);
+        furi_string_reset(instance->text_box_store);
+        view_dispatcher_send_custom_event(instance->view_dispatcher, NfcCustomEventCardDetected);
+    } else if(type_4_tag_event->type == Type4TagPollerEventTypeWriteFail) {
+        const char* error_str = type_4_tag_event->data->error == Type4TagErrorCardLocked ?
+                                    "Card does not\nallow writing\nnew data" :
+                                    "Failed to\nwrite new data";
+        furi_string_set(instance->text_box_store, error_str);
+        view_dispatcher_send_custom_event(instance->view_dispatcher, NfcCustomEventPollerFailure);
+        command = NfcCommandStop;
+    } else if(type_4_tag_event->type == Type4TagPollerEventTypeWriteSuccess) {
+        furi_string_reset(instance->text_box_store);
+        view_dispatcher_send_custom_event(instance->view_dispatcher, NfcCustomEventPollerSuccess);
+        command = NfcCommandStop;
+    }
+
+    return command;
+}
+
+static void nfc_scene_write_on_enter_type_4_tag(NfcApp* instance) {
+    instance->poller = nfc_poller_alloc(instance->nfc, NfcProtocolType4Tag);
+    nfc_poller_start(instance->poller, nfc_scene_write_poller_callback_type_4_tag, instance);
+    furi_string_set(instance->text_box_store, "Apply card\nto the back");
+}
+
 const NfcProtocolSupportBase nfc_protocol_support_type_4_tag = {
-    .features = NfcProtocolFeatureEmulateFull | NfcProtocolFeatureMoreInfo,
+    .features = NfcProtocolFeatureEmulateFull | NfcProtocolFeatureMoreInfo |
+                NfcProtocolFeatureWrite,
 
     .scene_info =
         {
@@ -221,8 +228,8 @@ const NfcProtocolSupportBase nfc_protocol_support_type_4_tag = {
         },
     .scene_read_menu =
         {
-            .on_enter = nfc_scene_read_and_saved_menu_on_enter_type_4_tag,
-            .on_event = nfc_scene_read_and_saved_menu_on_event_type_4_tag,
+            .on_enter = nfc_protocol_support_common_on_enter_empty,
+            .on_event = nfc_protocol_support_common_on_event_empty,
         },
     .scene_read_success =
         {
@@ -231,8 +238,8 @@ const NfcProtocolSupportBase nfc_protocol_support_type_4_tag = {
         },
     .scene_saved_menu =
         {
-            .on_enter = nfc_scene_read_and_saved_menu_on_enter_type_4_tag,
-            .on_event = nfc_scene_read_and_saved_menu_on_event_type_4_tag,
+            .on_enter = nfc_protocol_support_common_on_enter_empty,
+            .on_event = nfc_protocol_support_common_on_event_empty,
         },
     .scene_save_name =
         {
@@ -242,6 +249,11 @@ const NfcProtocolSupportBase nfc_protocol_support_type_4_tag = {
     .scene_emulate =
         {
             .on_enter = nfc_scene_emulate_on_enter_type_4_tag,
+            .on_event = nfc_protocol_support_common_on_event_empty,
+        },
+    .scene_write =
+        {
+            .on_enter = nfc_scene_write_on_enter_type_4_tag,
             .on_event = nfc_protocol_support_common_on_event_empty,
         },
 };
