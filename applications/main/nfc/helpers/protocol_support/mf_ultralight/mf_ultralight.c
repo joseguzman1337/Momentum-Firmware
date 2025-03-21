@@ -249,9 +249,6 @@ static bool nfc_scene_read_and_saved_menu_on_event_mf_ultralight(
                                       NfcSceneMfUltralightUnlockMenu;
             scene_manager_next_scene(instance->scene_manager, next_scene);
             consumed = true;
-        } else if(event.event == SubmenuIndexCommonEdit) {
-            scene_manager_next_scene(instance->scene_manager, NfcSceneSetUid);
-            consumed = true;
         }
     }
     return consumed;

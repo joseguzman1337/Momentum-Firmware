@@ -139,24 +139,23 @@ static void nfc_scene_read_success_on_enter_type_4_tag(NfcApp* instance) {
 
 static NfcCommand
     nfc_scene_emulate_listener_callback_type_4_tag(NfcGenericEvent event, void* context) {
-    furi_assert(context);
     furi_assert(event.protocol == NfcProtocolType4Tag);
-    furi_assert(event.event_data);
 
-    NfcApp* nfc = context;
+    NfcApp* instance = context;
     Type4TagListenerEvent* type_4_tag_event = event.event_data;
 
     if(type_4_tag_event->type == Type4TagListenerEventTypeCustomCommand) {
-        if(furi_string_size(nfc->text_box_store) < NFC_LOG_SIZE_MAX) {
-            furi_string_cat_printf(nfc->text_box_store, "R:");
+        if(furi_string_size(instance->text_box_store) < NFC_LOG_SIZE_MAX) {
+            furi_string_cat_printf(instance->text_box_store, "R:");
             for(size_t i = 0; i < bit_buffer_get_size_bytes(type_4_tag_event->data->buffer); i++) {
                 furi_string_cat_printf(
-                    nfc->text_box_store,
+                    instance->text_box_store,
                     " %02X",
                     bit_buffer_get_byte(type_4_tag_event->data->buffer, i));
             }
-            furi_string_push_back(nfc->text_box_store, '\n');
-            view_dispatcher_send_custom_event(nfc->view_dispatcher, NfcCustomEventListenerUpdate);
+            furi_string_push_back(instance->text_box_store, '\n');
+            view_dispatcher_send_custom_event(
+                instance->view_dispatcher, NfcCustomEventListenerUpdate);
         }
     }
 

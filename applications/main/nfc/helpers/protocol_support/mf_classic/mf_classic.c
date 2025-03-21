@@ -200,9 +200,6 @@ static bool nfc_scene_read_menu_on_event_mf_classic(NfcApp* instance, SceneManag
                 scene_manager_next_scene(instance->scene_manager, NfcSceneMfClassicDictAttack);
             }
             consumed = true;
-        } else if(event.event == SubmenuIndexCommonEdit) {
-            scene_manager_next_scene(instance->scene_manager, NfcSceneSetUid);
-            consumed = true;
         }
     }
 
