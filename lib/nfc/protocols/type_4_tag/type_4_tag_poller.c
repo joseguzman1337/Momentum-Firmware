@@ -6,7 +6,7 @@
 
 typedef NfcCommand (*Type4TagPollerReadHandler)(Type4TagPoller* instance);
 
-const Type4TagData* type_4_tag_poller_get_data(Type4TagPoller* instance) {
+static const Type4TagData* type_4_tag_poller_get_data(Type4TagPoller* instance) {
     furi_assert(instance);
 
     return instance->data;
@@ -186,7 +186,7 @@ static NfcCommand type_4_tag_poller_handler_write_ndef(Type4TagPoller* instance)
     return NfcCommandContinue;
 }
 
-static NfcCommand type_4_tag_poller_handler_fail(Type4TagPoller* instance) {
+static NfcCommand type_4_tag_poller_handler_failed(Type4TagPoller* instance) {
     FURI_LOG_D(TAG, "Operation Failed");
     iso14443_4a_poller_halt(instance->iso14443_4a_poller);
     instance->type_4_tag_event.type = instance->mode == Type4TagPollerModeRead ?
@@ -219,7 +219,7 @@ static const Type4TagPollerReadHandler type_4_tag_poller_read_handler[Type4TagPo
     [Type4TagPollerStateCreateCapabilityContainer] = type_4_tag_poller_handler_create_cc,
     [Type4TagPollerStateCreateNdefMessage] = type_4_tag_poller_handler_create_ndef,
     [Type4TagPollerStateWriteNdefMessage] = type_4_tag_poller_handler_write_ndef,
-    [Type4TagPollerStateFailed] = type_4_tag_poller_handler_fail,
+    [Type4TagPollerStateFailed] = type_4_tag_poller_handler_failed,
     [Type4TagPollerStateSuccess] = type_4_tag_poller_handler_success,
 };
 
