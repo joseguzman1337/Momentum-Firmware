@@ -27,7 +27,7 @@ MfPlusError mf_plus_get_type_from_version(
 
     MfPlusError error = MfPlusErrorProtocol;
 
-    if(mf_plus_data->version.hw_type == 0x02 || mf_plus_data->version.hw_type == 0x82) {
+    if((mf_plus_data->version.hw_type & 0x0F) == 0x02) {
         error = MfPlusErrorNone;
         // Mifare Plus EV1/EV2
 

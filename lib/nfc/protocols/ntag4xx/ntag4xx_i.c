@@ -44,7 +44,7 @@ bool ntag4xx_version_parse(Ntag4xxVersion* data, const BitBuffer* buf) {
         }
     }
 
-    return can_parse && data->hw_type == 0x04;
+    return can_parse && (data->hw_type & 0x0F) == 0x04;
 }
 
 bool ntag4xx_version_load(Ntag4xxVersion* data, FlipperFormat* ff) {
