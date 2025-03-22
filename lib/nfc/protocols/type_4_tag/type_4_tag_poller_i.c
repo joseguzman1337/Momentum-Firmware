@@ -4,6 +4,8 @@
 #include <bit_lib/bit_lib.h>
 
 #include <nfc/nfc_device.h>
+#include <nfc/protocols/ntag4xx/ntag4xx_poller.h>
+#include <nfc/protocols/ntag4xx/ntag4xx_poller_defs.h>
 #include <nfc/protocols/mf_desfire/mf_desfire_poller.h>
 #include <nfc/protocols/mf_desfire/mf_desfire_poller_defs.h>
 
@@ -226,17 +228,25 @@ Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
     NfcDevice* device = nfc_device_alloc();
 
     do {
-        FURI_LOG_D(TAG, "Detect DESFire");
-        MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
-        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
-        if(mf_desfire_poller.detect(event, mf_des)) {
-            platform = Type4TagPlatformMfDesfire;
-            nfc_device_set_data(device, NfcProtocolMfDesfire, mf_desfire_poller.get_data(mf_des));
+        FURI_LOG_D(TAG, "Detect NTAG4xx");
+        Ntag4xxPoller* ntag4xx = ntag4xx_poller.alloc(instance->iso14443_4a_poller);
+        if(ntag4xx_poller.detect(event, ntag4xx)) {
+            platform = Type4TagPlatformNtag4xx;
+            nfc_device_set_data(device, NfcProtocolNtag4xx, ntag4xx_poller.get_data(ntag4xx));
         }
-        mf_desfire_poller.free(mf_des);
+        ntag4xx_poller.free(ntag4xx);
         if(platform != Type4TagPlatformUnknown) break;
 
-        // FIXME: detect NTAG4xx
+        FURI_LOG_D(TAG, "Detect DESFire");
+        MfDesfirePoller* mf_desfire = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
+        mf_desfire_poller_set_command_mode(mf_desfire, MfDesfirePollerCommandModeIsoWrapped);
+        if(mf_desfire_poller.detect(event, mf_desfire)) {
+            platform = Type4TagPlatformMfDesfire;
+            nfc_device_set_data(
+                device, NfcProtocolMfDesfire, mf_desfire_poller.get_data(mf_desfire));
+        }
+        mf_desfire_poller.free(mf_desfire);
+        if(platform != Type4TagPlatformUnknown) break;
     } while(false);
 
     Type4TagError error;
