@@ -20,8 +20,6 @@ typedef enum {
     Ntag4xxErrorNotPresent,
     Ntag4xxErrorProtocol,
     Ntag4xxErrorTimeout,
-    Ntag4xxErrorAuthentication,
-    Ntag4xxErrorCommandNotSupported,
 } Ntag4xxError;
 
 typedef enum {

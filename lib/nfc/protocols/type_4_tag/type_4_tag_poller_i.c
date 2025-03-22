@@ -239,7 +239,7 @@ Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
 
         FURI_LOG_D(TAG, "Detect DESFire");
         MfDesfirePoller* mf_desfire = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
-        mf_desfire_poller_set_command_mode(mf_desfire, MfDesfirePollerCommandModeIsoWrapped);
+        mf_desfire_poller_set_command_mode(mf_desfire, NxpNativeCommandModeIsoWrapped);
         if(mf_desfire_poller.detect(event, mf_desfire)) {
             platform = Type4TagPlatformMfDesfire;
             nfc_device_set_data(
@@ -349,7 +349,7 @@ Type4TagError type_4_tag_poller_create_app(Type4TagPoller* instance) {
 
     if(instance->data->platform == Type4TagPlatformMfDesfire) {
         MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
-        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
+        mf_desfire_poller_set_command_mode(mf_des, NxpNativeCommandModeIsoWrapped);
         MfDesfireError mf_des_error;
 
         do {
@@ -392,7 +392,7 @@ Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance) {
 
     if(instance->data->platform == Type4TagPlatformMfDesfire) {
         MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
-        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
+        mf_desfire_poller_set_command_mode(mf_des, NxpNativeCommandModeIsoWrapped);
         MfDesfireError mf_des_error;
 
         do {
@@ -441,7 +441,7 @@ Type4TagError type_4_tag_poller_create_ndef(Type4TagPoller* instance) {
 
     if(instance->data->platform == Type4TagPlatformMfDesfire) {
         MfDesfirePoller* mf_des = mf_desfire_poller.alloc(instance->iso14443_4a_poller);
-        mf_desfire_poller_set_command_mode(mf_des, MfDesfirePollerCommandModeIsoWrapped);
+        mf_desfire_poller_set_command_mode(mf_des, NxpNativeCommandModeIsoWrapped);
         MfDesfireError mf_des_error;
 
         do {

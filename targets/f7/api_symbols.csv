@@ -2657,7 +2657,7 @@ Function,+,mf_desfire_poller_read_key_versions,MfDesfireError,"MfDesfirePoller*,
 Function,+,mf_desfire_poller_read_version,MfDesfireError,"MfDesfirePoller*, MfDesfireVersion*"
 Function,+,mf_desfire_poller_select_application,MfDesfireError,"MfDesfirePoller*, const MfDesfireApplicationId*"
 Function,+,mf_desfire_poller_send_chunks,MfDesfireError,"MfDesfirePoller*, const BitBuffer*, BitBuffer*"
-Function,+,mf_desfire_poller_set_command_mode,void,"MfDesfirePoller*, MfDesfirePollerCommandMode"
+Function,+,mf_desfire_poller_set_command_mode,void,"MfDesfirePoller*, NxpNativeCommandMode"
 Function,+,mf_desfire_reset,void,MfDesfireData*
 Function,+,mf_desfire_save,_Bool,"const MfDesfireData*, FlipperFormat*"
 Function,+,mf_desfire_set_uid,_Bool,"MfDesfireData*, const uint8_t*, size_t"

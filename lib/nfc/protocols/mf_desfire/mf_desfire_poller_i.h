@@ -30,7 +30,7 @@ typedef enum {
 
 struct MfDesfirePoller {
     Iso14443_4aPoller* iso14443_4a_poller;
-    MfDesfirePollerCommandMode command_mode;
+    NxpNativeCommandMode command_mode;
     MfDesfirePollerSessionState session_state;
     MfDesfirePollerState state;
     MfDesfireError error;

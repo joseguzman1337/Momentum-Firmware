@@ -21,12 +21,8 @@ Ntag4xxError ntag4xx_process_error(Iso14443_4aError error) {
 
 Ntag4xxError ntag4xx_process_status_code(uint8_t status_code) {
     switch(status_code) {
-    case NTAG4XX_STATUS_OPERATION_OK:
+    case NXP_NATIVE_COMMAND_STATUS_OPERATION_OK:
         return Ntag4xxErrorNone;
-    case NTAG4XX_STATUS_AUTHENTICATION_ERROR:
-        return Ntag4xxErrorAuthentication;
-    case NTAG4XX_STATUS_ILLEGAL_COMMAND_CODE:
-        return Ntag4xxErrorCommandNotSupported;
     default:
         return Ntag4xxErrorProtocol;
     }
