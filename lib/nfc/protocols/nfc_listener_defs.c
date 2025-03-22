@@ -22,5 +22,6 @@ const NfcListenerBase* nfc_listeners_api[NfcProtocolNum] = {
     [NfcProtocolMfDesfire] = NULL,
     [NfcProtocolSlix] = &nfc_listener_slix,
     [NfcProtocolSt25tb] = NULL,
+    [NfcProtocolNtag4xx] = NULL,
     [NfcProtocolType4Tag] = &nfc_listener_type_4_tag,
 };
