@@ -36,7 +36,7 @@ typedef struct {
     uint8_t blue;
 } RGBBacklightColor;
 
-//use one type RGBBacklightColor for current_leds_settings and for static colors definition
+// use one type RGBBacklightColor for current_leds_settings and for static colors definition
 static RGBBacklightColor current_led[] = {
     {"LED0", 0, 0, 0},
     {"LED1", 0, 0, 0},
@@ -83,30 +83,18 @@ void rgb_backlight_set_led_static_color(uint8_t led, uint8_t index) {
     }
 }
 
-// --- NOT USED IN CURRENT RELEASE, FOR FUTURE USAGE---
-// Update current colors by custom rgb value
-// void rgb_backlight_set_led_custom_color(uint8_t led, uint8_t red, uint8_t green, uint8_t blue) {
-//     if(led < SK6805_get_led_count()) {
-//         current_led[led].red = red;
-//         current_led[led].green = green;
-//         current_led[led].blue = blue;
-//         SK6805_set_led_color(led, red, green, blue);
-//     }
-// }
-// --- NOT USED IN CURRENT RELEASE, FOR FUTURE USAGE---
-
 // HSV to RGB based on
 // https://www.radiokot.ru/forum/viewtopic.php?p=3000181&ysclid=m88wvoz34w244644702
 // https://radiolaba.ru/microcotrollers/tsvetnaya-lampa.html#comment-1790
 // https://alexgyver.ru/lessons/arduino-rgb/?ysclid=m88voflppa24464916
 // led number (0-2), hue (0..255), sat (0..255), val (0...1)
 void rgb_backlight_set_led_custom_hsv_color(uint8_t led, uint16_t hue, uint8_t sat, float V) {
-    //init value
+    // init value
     float r = 1.0f;
     float g = 1.0f;
     float b = 1.0f;
 
-    //from (0..255) to (0..1)
+    // from (0..255) to (0..1)
     float H = hue / 255.0f;
     float S = sat / 255.0f;
 
@@ -137,7 +125,7 @@ void rgb_backlight_set_led_custom_hsv_color(uint8_t led, uint16_t hue, uint8_t s
         break;
     }
 
-    //from (0..1) to (0..255)
+    // from (0..1) to (0..255)
     current_led[led].red = r * 255;
     current_led[led].green = g * 255;
     current_led[led].blue = b * 255;
@@ -159,12 +147,12 @@ void rgb_backlight_update(float brightness) {
     furi_record_close(RECORD_RGB_BACKLIGHT);
 }
 
-//start furi timer for rainbow
+// start furi timer for rainbow
 void rainbow_timer_start(RGBBacklightApp* app) {
     furi_timer_start(app->rainbow_timer, furi_ms_to_ticks(app->settings->rainbow_speed_ms));
 }
 
-//stop furi timer for rainbow
+// stop furi timer for rainbow
 void rainbow_timer_stop(RGBBacklightApp* app) {
     furi_timer_stop(app->rainbow_timer);
 }
@@ -173,10 +161,6 @@ void rainbow_timer_stop(RGBBacklightApp* app) {
 void rainbow_timer_starter(RGBBacklightApp* app) {
     if((app->settings->rainbow_mode > 0) && (app->settings->rgb_backlight_installed)) {
         rainbow_timer_start(app);
-    } else {
-        if(furi_timer_is_running(app->rainbow_timer)) {
-            rainbow_timer_stop(app);
-        }
     }
 }
 
@@ -239,7 +223,7 @@ int32_t rgb_backlight_srv(void* p) {
     // allocate memory and create RECORD for access to app structure from outside
     RGBBacklightApp* app = malloc(sizeof(RGBBacklightApp));
 
-    //define rainbow_timer and they callback
+    // define rainbow_timer and they callback
     app->rainbow_timer = furi_timer_alloc(rainbow_timer_callback, FuriTimerTypePeriodic, app);
 
     // settings load or create default
@@ -250,10 +234,10 @@ int32_t rgb_backlight_srv(void* p) {
 
     furi_record_create(RECORD_RGB_BACKLIGHT, app);
 
-    //if rgb_backlight_installed then start rainbow or set leds colors from saved settings (default index = 0)
+    // if rgb_backlight_installed then start rainbow or set leds colors from saved settings (default index = 0)
     if(app->settings->rgb_backlight_installed) {
         if(app->settings->rainbow_mode > 0) {
-            rainbow_timer_starter(app);
+            rainbow_timer_start(app);
         } else {
             rgb_backlight_set_led_static_color(2, app->settings->led_2_color_index);
             rgb_backlight_set_led_static_color(1, app->settings->led_1_color_index);
@@ -269,7 +253,6 @@ int32_t rgb_backlight_srv(void* p) {
     }
 
     while(1) {
-        // place for message queue and other future options
         furi_delay_ms(5000);
         if(app->settings->rgb_backlight_installed) {
             FURI_LOG_D(TAG, "RGB backlight enabled - serivce is running");
