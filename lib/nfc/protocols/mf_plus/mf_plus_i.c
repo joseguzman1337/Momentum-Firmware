@@ -242,6 +242,8 @@ MfPlusError mf_plus_version_parse(MfPlusVersion* data, const BitBuffer* buf) {
 
     if(can_parse) {
         bit_buffer_write_bytes(buf, data, sizeof(MfPlusVersion));
+    } else {
+        memset(data, 0, sizeof(MfPlusVersion));
     }
 
     return can_parse ? MfPlusErrorNone : MfPlusErrorProtocol;
