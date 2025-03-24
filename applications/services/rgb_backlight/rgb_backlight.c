@@ -23,10 +23,25 @@
 #include <furi_hal.h>
 #include <storage/storage.h>
 #include "rgb_backlight.h"
+#include <math.h>
 
 #define COLOR_COUNT (sizeof(colors) / sizeof(RGBBacklightColor))
 
 #define TAG "RGB_BACKLIGHT_SRV"
+
+typedef struct {
+    char* name;
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+} RGBBacklightColor;
+
+// use one type RGBBacklightColor for current_leds_settings and for static colors definition
+static RGBBacklightColor current_led[] = {
+    {"LED0", 0, 0, 0},
+    {"LED1", 0, 0, 0},
+    {"LED2", 0, 0, 0},
+};
 
 static const RGBBacklightColor colors[] = {
     {"Orange", 255, 60, 0},
@@ -42,7 +57,7 @@ static const RGBBacklightColor colors[] = {
     {"Pink", 255, 0, 127},
     {"Red", 255, 0, 0},
     {"White", 254, 210, 200},
-    {"Custom", 0, 0, 0},
+    {"OFF", 0, 0, 0},
 };
 
 uint8_t rgb_backlight_get_color_count(void) {
@@ -54,39 +69,77 @@ const char* rgb_backlight_get_color_text(uint8_t index) {
 }
 
 // use RECORD for acces to rgb service instance and update current colors by static
-void rgb_backlight_set_static_color(uint8_t index) {
-    RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
+void rgb_backlight_set_led_static_color(uint8_t led, uint8_t index) {
+    if(led < SK6805_get_led_count()) {
+        uint8_t r = colors[index].red;
+        uint8_t g = colors[index].green;
+        uint8_t b = colors[index].blue;
 
-    //if user select "custom" value then set current colors by custom values
-    if(index == 13) {
-        app->current_red = app->settings->custom_red;
-        app->current_green = app->settings->custom_green;
-        app->current_blue = app->settings->custom_blue;
-    } else {
-        app->current_red = colors[index].red;
-        app->current_green = colors[index].green;
-        app->current_blue = colors[index].blue;
+        current_led[led].red = r;
+        current_led[led].green = g;
+        current_led[led].blue = b;
+
+        SK6805_set_led_color(led, r, g, b);
     }
-    furi_record_close(RECORD_RGB_BACKLIGHT);
 }
 
-// use RECORD for acces to rgb service instance and update current colors by custom
-void rgb_backlight_set_custom_color(uint8_t red, uint8_t green, uint8_t blue) {
-    RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
-    app->current_red = red;
-    app->current_green = green;
-    app->current_blue = blue;
-    furi_record_close(RECORD_RGB_BACKLIGHT);
+// HSV to RGB based on
+// https://www.radiokot.ru/forum/viewtopic.php?p=3000181&ysclid=m88wvoz34w244644702
+// https://radiolaba.ru/microcotrollers/tsvetnaya-lampa.html#comment-1790
+// https://alexgyver.ru/lessons/arduino-rgb/?ysclid=m88voflppa24464916
+// led number (0-2), hue (0..255), sat (0..255), val (0...1)
+void rgb_backlight_set_led_custom_hsv_color(uint8_t led, uint16_t hue, uint8_t sat, float V) {
+    // init value
+    float r = 1.0f;
+    float g = 1.0f;
+    float b = 1.0f;
+
+    // from (0..255) to (0..1)
+    float H = hue / 255.0f;
+    float S = sat / 255.0f;
+
+    uint8_t i = trunc(H * 6);
+    float f = H * 6 - i;
+    float p = V * (1 - S);
+    float q = V * (1 - f * S);
+    float t = V * (1 - (1 - f) * S);
+
+    switch(i) {
+    case 0:
+        r = V, g = t, b = p;
+        break;
+    case 1:
+        r = q, g = V, b = p;
+        break;
+    case 2:
+        r = p, g = V, b = t;
+        break;
+    case 3:
+        r = p, g = q, b = V;
+        break;
+    case 4:
+        r = t, g = p, b = V;
+        break;
+    case 5:
+        r = V, g = p, b = q;
+        break;
+    }
+
+    // from (0..1) to (0..255)
+    current_led[led].red = r * 255;
+    current_led[led].green = g * 255;
+    current_led[led].blue = b * 255;
 }
 
-// use RECORD for acces to rgb service instance, use current_* colors and update backlight
+// use RECORD for acces to rgb service instance, set current_* colors to led and update backlight
 void rgb_backlight_update(float brightness) {
     RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
-    if(app->settings->rgb_mod_installed) {
+
+    if(app->settings->rgb_backlight_installed) {
         for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
-            uint8_t r = app->current_red * (brightness / 1.0f);
-            uint8_t g = app->current_green * (brightness / 1.0f);
-            uint8_t b = app->current_blue * (brightness / 1.0f);
+            uint8_t r = current_led[i].red * (brightness * 1.0f);
+            uint8_t g = current_led[i].green * (brightness * 1.0f);
+            uint8_t b = current_led[i].blue * (brightness * 1.0f);
             SK6805_set_led_color(i, r, g, b);
         }
         SK6805_update();
@@ -94,90 +147,73 @@ void rgb_backlight_update(float brightness) {
     furi_record_close(RECORD_RGB_BACKLIGHT);
 }
 
-//start furi timer for rainbow
+// start furi timer for rainbow
 void rainbow_timer_start(RGBBacklightApp* app) {
     furi_timer_start(app->rainbow_timer, furi_ms_to_ticks(app->settings->rainbow_speed_ms));
 }
 
-//stop furi timer for rainbow
+// stop furi timer for rainbow
 void rainbow_timer_stop(RGBBacklightApp* app) {
     furi_timer_stop(app->rainbow_timer);
 }
 
-// if rgb_mod_installed then apply rainbow colors to backlight and start/restart/stop rainbow_timer
+// if rgb_backlight_installed then apply rainbow colors to backlight and start/restart/stop rainbow_timer
 void rainbow_timer_starter(RGBBacklightApp* app) {
-    if((app->settings->rainbow_mode > 0) && (app->settings->rgb_mod_installed)) {
+    if((app->settings->rainbow_mode > 0) && (app->settings->rgb_backlight_installed)) {
         rainbow_timer_start(app);
-    } else {
-        if(furi_timer_is_running(app->rainbow_timer)) {
-            rainbow_timer_stop(app);
-        }
     }
 }
+
 static void rainbow_timer_callback(void* context) {
     furi_assert(context);
     RGBBacklightApp* app = context;
 
-    // if rainbow_mode is rainbow do rainbow effect
-    if(app->settings->rainbow_mode == 1) {
-        switch(app->rainbow_stage) {
-        // from red to yellow (255,0,0) - (255,255,0)
+    if(app->settings->rgb_backlight_installed) {
+        app->rainbow_hue += app->settings->rainbow_step;
+        if(app->rainbow_hue > 254) {
+            app->rainbow_hue = 0;
+        }
+
+        uint8_t wide = app->settings->rainbow_wide;
+
+        switch(app->settings->rainbow_mode) {
+        //rainbow mode
         case 1:
-            app->current_green += app->settings->rainbow_step;
-            if(app->current_green >= 255) {
-                app->current_green = 255;
-                app->rainbow_stage++;
+            for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
+                rgb_backlight_set_led_custom_hsv_color(
+                    i,
+                    app->rainbow_hue,
+                    app->settings->rainbow_saturation,
+                    app->settings->brightness);
             }
             break;
-        // yellow to green (255,255,0) - (0,255,0)
+
+        //wave mode
         case 2:
-            app->current_red -= app->settings->rainbow_step;
-            if(app->current_red <= 0) {
-                app->current_red = 0;
-                app->rainbow_stage++;
+            uint16_t j = app->rainbow_hue + wide;
+            uint16_t k = app->rainbow_hue + wide * 2;
+
+            if(app->rainbow_hue > (254 - wide)) {
+                j = j - 255;
             }
-            break;
-        // from green to light blue (0,255,0) - (0,255,255)
-        case 3:
-            app->current_blue += app->settings->rainbow_step;
-            if(app->current_blue >= 255) {
-                app->current_blue = 255;
-                app->rainbow_stage++;
+            if(app->rainbow_hue > (254 - wide * 2)) {
+                k = k - 255;
             }
+
+            rgb_backlight_set_led_custom_hsv_color(
+                0, app->rainbow_hue, app->settings->rainbow_saturation, app->settings->brightness);
+            rgb_backlight_set_led_custom_hsv_color(
+                1, j, app->settings->rainbow_saturation, app->settings->brightness);
+            rgb_backlight_set_led_custom_hsv_color(
+                2, k, app->settings->rainbow_saturation, app->settings->brightness);
             break;
-        //from light blue to blue (0,255,255) - (0,0,255)
-        case 4:
-            app->current_green -= app->settings->rainbow_step;
-            if(app->current_green <= 0) {
-                app->current_green = 0;
-                app->rainbow_stage++;
-            }
-            break;
-        //from blue to violet (0,0,255) - (255,0,255)
-        case 5:
-            app->current_red += app->settings->rainbow_step;
-            if(app->current_red >= 255) {
-                app->current_red = 255;
-                app->rainbow_stage++;
-            }
-            break;
-        //from violet to red (255,0,255) - (255,0,0)
-        case 6:
-            app->current_blue -= app->settings->rainbow_step;
-            if(app->current_blue <= 0) {
-                app->current_blue = 0;
-                app->rainbow_stage = 1;
-            }
-            break;
+
         default:
             break;
         }
+
         rgb_backlight_update(app->settings->brightness);
     }
-
-    // if rainbow_mode is ..... do another effect
-    // if(app->settings.rainbow_mode == ...) {
-    // }
 }
 
 int32_t rgb_backlight_srv(void* p) {
@@ -187,47 +223,41 @@ int32_t rgb_backlight_srv(void* p) {
     // allocate memory and create RECORD for access to app structure from outside
     RGBBacklightApp* app = malloc(sizeof(RGBBacklightApp));
 
-    //define rainbow_timer and they callback
+    // define rainbow_timer and they callback
     app->rainbow_timer = furi_timer_alloc(rainbow_timer_callback, FuriTimerTypePeriodic, app);
 
     // settings load or create default
     app->settings = malloc(sizeof(RGBBacklightSettings));
     rgb_backlight_settings_load(app->settings);
 
-    // Init app variables
-    app->rainbow_stage = 1;
+    app->rainbow_hue = 1;
 
     furi_record_create(RECORD_RGB_BACKLIGHT, app);
 
-    // if rgb mod installed - start rainbow or set static color from settings (default index = 0)
-    if(app->settings->rgb_mod_installed) {
+    // if rgb_backlight_installed then start rainbow or set leds colors from saved settings (default index = 0)
+    if(app->settings->rgb_backlight_installed) {
         if(app->settings->rainbow_mode > 0) {
-            rainbow_timer_starter(app);
+            rainbow_timer_start(app);
         } else {
-            rgb_backlight_set_static_color(app->settings->static_color_index);
+            rgb_backlight_set_led_static_color(2, app->settings->led_2_color_index);
+            rgb_backlight_set_led_static_color(1, app->settings->led_1_color_index);
+            rgb_backlight_set_led_static_color(0, app->settings->led_0_color_index);
             rgb_backlight_update(app->settings->brightness);
         }
-        // if rgb mod not installed - set default static orange color (index=0)
+        // if rgb_backlight not installed then set default static orange color(index=0) to all leds (0-2) and force light on
     } else {
-        //rgb_backlight_set_static_color(0);
-        //rgb_backlight_update(app->settings->brightness);
-        rgb_backlight_set_static_color(0);
-        for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
-            uint8_t r = app->current_red * (1.0f / 1.0f);
-            uint8_t g = app->current_green * (1.0f / 1.0f);
-            uint8_t b = app->current_blue * (1.0f / 1.0f);
-            SK6805_set_led_color(i, r, g, b);
-        }
+        rgb_backlight_set_led_static_color(2, 0);
+        rgb_backlight_set_led_static_color(1, 0);
+        rgb_backlight_set_led_static_color(0, 0);
         SK6805_update();
     }
 
     while(1) {
-        // place for message queue and other future options
         furi_delay_ms(5000);
-        if(app->settings->rgb_mod_installed) {
-            FURI_LOG_D(TAG, "Mod is enabled - serivce is running");
+        if(app->settings->rgb_backlight_installed) {
+            FURI_LOG_D(TAG, "RGB backlight enabled - serivce is running");
         } else {
-            FURI_LOG_D(TAG, "Mod is DISABLED - serivce is running");
+            FURI_LOG_D(TAG, "RGB backlight DISABLED - serivce is running");
         }
     }
     return 0;

@@ -4,18 +4,22 @@
 #include <stdbool.h>
 
 typedef struct {
+    //Common settings
     uint8_t version;
-    bool rgb_mod_installed;
-
-    uint8_t static_color_index;
-    uint8_t custom_red;
-    uint8_t custom_green;
-    uint8_t custom_blue;
+    uint8_t rgb_backlight_installed;
     float brightness;
 
+    // static gradient mode settings
+    uint8_t led_2_color_index;
+    uint8_t led_1_color_index;
+    uint8_t led_0_color_index;
+
+    // rainbow mode setings
     uint32_t rainbow_mode;
     uint32_t rainbow_speed_ms;
     uint16_t rainbow_step;
+    uint8_t rainbow_saturation;
+    uint8_t rainbow_wide;
 
 } RGBBacklightSettings;
 

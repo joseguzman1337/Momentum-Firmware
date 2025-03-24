@@ -27,33 +27,70 @@ extern "C" {
 #endif
 
 typedef struct {
-    char* name;
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-} RGBBacklightColor;
-
-typedef struct {
     FuriTimer* rainbow_timer;
-
-    int16_t current_red;
-    int16_t current_green;
-    int16_t current_blue;
-    uint8_t rainbow_stage;
-
+    uint16_t rainbow_hue;
+    uint8_t rainbow_red;
+    uint8_t rainbow_green;
+    uint8_t rainbow_blue;
     RGBBacklightSettings* settings;
-
 } RGBBacklightApp;
 
 #define RECORD_RGB_BACKLIGHT "rgb_backlight"
 
+/** Update leds colors from current_led[i].color and selected bright
+ * 
+ * @param brightness  - Brightness 0..1
+ * @return 
+ */
 void rgb_backlight_update(float brightness);
-void rgb_backlight_set_custom_color(uint8_t red, uint8_t green, uint8_t blue);
-void rgb_backlight_set_static_color(uint8_t index);
+
+/** Set current_led[i].color for one led by static color index
+ * 
+ * @param led  - Led number (0..2)
+ * @param index  - Static color index number
+ * @return 
+ */
+void rgb_backlight_set_led_static_color(uint8_t led, uint8_t index);
+
+/** Stop rainbow timer
+ * 
+ * @param app  - Instance of RGBBacklightApp from FURI RECORD
+ * @return 
+ */
 void rainbow_timer_stop(RGBBacklightApp* app);
+
+/** Start rainbow timer 
+ * 
+ * @param app  - Instance of RGBBacklightApp from FURI RECORD
+ * @return 
+ */
+
+/** Start rainbow timer
+ * 
+ * @param app  - Instance of RGBBacklightApp from FURI RECORD
+ * @return 
+ */
 void rainbow_timer_start(RGBBacklightApp* app);
+
+/** Start rainbow timer only if all conditions meet (rgb_backlight_installed && rainbow ON)
+ * 
+ * @param app  - Instance of RGBBacklightApp from FURI RECORD
+ * @return 
+ */
 void rainbow_timer_starter(RGBBacklightApp* app);
+
+/** Get name of static color by index
+ * 
+ * @param index  - Static colors index number
+ * @return - color name
+ */
 const char* rgb_backlight_get_color_text(uint8_t index);
+
+/** Get static colors count
+ * 
+ * @param 
+ * @return - colors count
+ */
 uint8_t rgb_backlight_get_color_count(void);
 
 #ifdef __cplusplus
