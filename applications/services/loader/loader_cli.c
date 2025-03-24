@@ -4,8 +4,8 @@
 #include <toolbox/cli/cli_command.h>
 #include <cli/cli_main_commands.h>
 #include <applications.h>
-#include <lib/toolbox/args.h>
-#include <lib/toolbox/strint.h>
+#include <lib/cli_util/args.h>
+#include <pure/strint.h>
 #include <notification/notification_messages.h>
 #include <toolbox/pipe.h>
 

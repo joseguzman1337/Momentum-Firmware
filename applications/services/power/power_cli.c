@@ -1,9 +1,8 @@
 #include "power_cli.h"
 
 #include <furi_hal.h>
-#include <toolbox/cli/cli_command.h>
-#include <cli/cli_main_commands.h>
-#include <lib/toolbox/args.h>
+#include <cli/cli.h>
+#include <lib/cli_util/args.h>
 #include <power/power_service/power.h>
 #include <toolbox/pipe.h>
 

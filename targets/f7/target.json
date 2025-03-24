@@ -26,7 +26,15 @@
         "hwdrivers",
         "fatfs",
         "subghz",
-        "toolbox",
+        "cli_util",
+        "compress",
+        "containers",
+        "debug",
+        "flipper_metadata",
+        "pure",
+        "signal_common",
+        "srv_util",
+        "storage_util",
         "nfc",
         "digital_signal",
         "pulse_reader",
@@ -48,9 +56,6 @@
         "heatshrink",
         "flipperformat",
         "flipper7",
-        "bit_lib",
-        "toolbox",
-        "datetime",
-        "ieee754_parse_wrap"
+        "datetime"
     ]
 }

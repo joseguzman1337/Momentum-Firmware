@@ -10,9 +10,8 @@
 #include <notification/notification_messages.h>
 #include <notification/notification_app.h>
 #include <loader/loader.h>
-#include <lib/toolbox/args.h>
-#include <lib/toolbox/strint.h>
-#include <toolbox/pipe.h>
+#include <lib/cli_util/args.h>
+#include <pure/strint.h>
 
 // Close to ISO, `date +'%Y-%m-%d %H:%M:%S %u'`
 #define CLI_DATE_FORMAT "%.4d-%.2d-%.2d %.2d:%.2d:%.2d %d"

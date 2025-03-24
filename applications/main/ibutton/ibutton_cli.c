@@ -1,9 +1,8 @@
 #include <furi.h>
 #include <furi_hal.h>
 
-#include <cli/cli_main_commands.h>
-#include <toolbox/args.h>
-#include <toolbox/pipe.h>
+#include <cli/cli.h>
+#include <cli_util/args.h>
 
 #include <ibutton/ibutton_key.h>
 #include <ibutton/ibutton_worker.h>
