@@ -4,7 +4,7 @@
 * SubGHz: **Fix Hollarm protocol with more verification**
 * SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte (who spent 2 weeks on this))
 * SubGHz: **Came Atomo button hold simulation with full cycle** simulation (to allow proper pairing with receiver)
-* System: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow effect (based on @Willy-JL idea)) (PR #877 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
+* System: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
 * OFW: LFRFID - **EM4305 support**
 * OFW: **Universal IR signal selection**
 * OFW: **BadUSB: Mouse control**
