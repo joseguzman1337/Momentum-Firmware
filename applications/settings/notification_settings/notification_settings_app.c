@@ -175,6 +175,16 @@ const uint32_t rgb_backlight_rainbow_wide_value[RGB_BACKLIGHT_RAINBOW_WIDE_COUNT
     50,
 };
 
+#define RGB_BACKLIGHT_INDIVIDUAL_LED_COUNT 2
+const char* const rgb_backlight_individual_led_text[RGB_BACKLIGHT_INDIVIDUAL_LED_COUNT] = {
+    "OFF",
+    "ON",
+};
+const bool rgb_backlight_individual_value[RGB_BACKLIGHT_INDIVIDUAL_LED_COUNT] = {
+    false,
+    true,
+};
+
 typedef enum {
     MainViewId,
     RGBViewId,
@@ -291,7 +301,7 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
     if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
         slide = 1;
     }
-    for(int i = slide; i < (slide + 8); i++) {
+    for(int i = slide; i < (slide + 9); i++) {
         VariableItem* t_item = variable_item_list_get(app->variable_item_list_rgb, i);
         if(index == 0) {
             variable_item_set_locked(t_item, true, "RGB\nOFF!");
@@ -299,6 +309,32 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
             variable_item_set_locked(t_item, false, "RGB\nOFF!");
         }
     }
+}
+
+static void individual_led_changed (VariableItem* item){
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+
+    variable_item_set_current_value_text (item,rgb_backlight_individual_led_text[index]);
+    app->notification->rgb_srv->settings->individual_led = index;
+    
+    // if individual led OFF - set led0 and led1 colors indexes as led2 index
+    if (index == 0) {
+        app->notification->rgb_srv->settings->led_1_color_index = app->notification->rgb_srv->settings->led_2_color_index;
+        app->notification->rgb_srv->settings->led_0_color_index = app->notification->rgb_srv->settings->led_2_color_index;
+    } 
+
+    // enable/disable led0 and led1 color settings
+    for(int i = 2; i < 4; i++) {
+        VariableItem* t_item = variable_item_list_get(app->variable_item_list_rgb, i);
+        if(index == 0) {
+                variable_item_set_locked(t_item, true, "Individual\nleds OFF!");
+        } else {
+                variable_item_set_locked(t_item, false, "Individual\nleds OFF!");
+        }
+    }
+    rgb_backlight_update(app->notification->rgb_srv->settings->brightness);
+    //rgb_backlight_settings_save(app->notification->rgb_srv->settings);
 }
 
 static void led_2_color_changed(VariableItem* item) {
@@ -550,6 +586,22 @@ static NotificationAppSettings* alloc_settings(void) {
     }
 
     // We (humans) are numbering LEDs from left to right as 1..3, but hardware have another order from right to left 2..0
+
+    // Individual led color switch
+    item = variable_item_list_add(
+        app->variable_item_list_rgb,
+        "Individual leds colors",
+        RGB_BACKLIGHT_INDIVIDUAL_LED_COUNT,
+        individual_led_changed,
+        app);
+    value_index = app->notification->rgb_srv->settings->individual_led;
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, rgb_backlight_individual_led_text[value_index]);
+    variable_item_set_locked(
+        item,
+        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
+        "RGB MOD \nOFF!");
+
     // led_1 color
     item = variable_item_list_add(
         app->variable_item_list_rgb,
@@ -579,6 +631,10 @@ static NotificationAppSettings* alloc_settings(void) {
         item,
         (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
         "RGB MOD \nOFF!");
+    variable_item_set_locked(
+            item,
+            (!app->notification->rgb_srv->settings->individual_led),
+            "Individual\nleds OFF!");
 
     // led 3 color
     item = variable_item_list_add(
@@ -594,11 +650,15 @@ static NotificationAppSettings* alloc_settings(void) {
         item,
         (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
         "RGB MOD \nOFF!");
+    variable_item_set_locked(
+        item,
+        (!app->notification->rgb_srv->settings->individual_led),
+        "Individual\nleds OFF!");
 
     // Rainbow mode
     item = variable_item_list_add(
         app->variable_item_list_rgb,
-        "Rainbow mode",
+        "Dynamic colors mode",
         RGB_BACKLIGHT_RAINBOW_MODE_COUNT,
         rgb_backlight_rainbow_changed,
         app);
@@ -615,7 +675,7 @@ static NotificationAppSettings* alloc_settings(void) {
 
     item = variable_item_list_add(
         app->variable_item_list_rgb,
-        "Rainbow speed",
+        "Mode speed",
         RGB_BACKLIGHT_RAINBOW_SPEED_COUNT,
         rgb_backlight_rainbow_speed_changed,
         app);
@@ -632,7 +692,7 @@ static NotificationAppSettings* alloc_settings(void) {
 
     item = variable_item_list_add(
         app->variable_item_list_rgb,
-        "Rainbow step",
+        "Colors step",
         RGB_BACKLIGHT_RAINBOW_STEP_COUNT,
         rgb_backlight_rainbow_step_changed,
         app);

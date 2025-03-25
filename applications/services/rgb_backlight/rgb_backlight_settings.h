@@ -10,6 +10,7 @@ typedef struct {
     float brightness;
 
     // static gradient mode settings
+    bool individual_led;
     uint8_t led_2_color_index;
     uint8_t led_1_color_index;
     uint8_t led_0_color_index;
