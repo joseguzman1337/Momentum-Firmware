@@ -15,8 +15,8 @@
 const uint8_t mf_plus_ats_t1_tk_values[][MF_PLUS_T1_TK_VALUE_LEN] = {
     {0xC1, 0x05, 0x2F, 0x2F, 0x00, 0x35, 0xC7}, // Mifare Plus S
     {0xC1, 0x05, 0x2F, 0x2F, 0x01, 0xBC, 0xD6}, // Mifare Plus X
-    {0xC1, 0x05, 0x2F, 0x2F, 0x00, 0xF6, 0xD1}, // Mifare Plus SE
-    {0xC1, 0x05, 0x2F, 0x2F, 0x01, 0xF6, 0xD1}, // Mifare Plus SE
+    {0xC1, 0x05, 0x21, 0x30, 0x00, 0xF6, 0xD1}, // Mifare Plus SE
+    {0xC1, 0x05, 0x21, 0x30, 0x10, 0xF6, 0xD1}, // Mifare Plus SE
 };
 
 MfPlusError mf_plus_get_type_from_version(
@@ -85,16 +85,15 @@ MfPlusError
 
     MfPlusError error = MfPlusErrorProtocol;
 
-    if(simple_array_get_count(iso4_data->ats_data.t1_tk) != MF_PLUS_T1_TK_VALUE_LEN) {
+    const size_t historical_bytes_len = simple_array_get_count(iso4_data->ats_data.t1_tk);
+    if(historical_bytes_len != MF_PLUS_T1_TK_VALUE_LEN) {
         return MfPlusErrorProtocol;
     }
+    const uint8_t* historical_bytes = simple_array_cget_data(iso4_data->ats_data.t1_tk);
 
     switch(iso4_data->iso14443_3a_data->sak) {
     case 0x08:
-        if(memcmp(
-               simple_array_get_data(iso4_data->ats_data.t1_tk),
-               mf_plus_ats_t1_tk_values[0],
-               simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0) {
+        if(memcmp(historical_bytes, mf_plus_ats_t1_tk_values[0], historical_bytes_len) == 0) {
             // Mifare Plus S 2K SL1
             mf_plus_data->type = MfPlusTypeS;
             mf_plus_data->size = MfPlusSize2K;
@@ -102,11 +101,7 @@ MfPlusError
 
             FURI_LOG_D(TAG, "Mifare Plus S 2K SL1");
             error = MfPlusErrorNone;
-        } else if(
-            memcmp(
-                simple_array_get_data(iso4_data->ats_data.t1_tk),
-                mf_plus_ats_t1_tk_values[1],
-                simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0) {
+        } else if(memcmp(historical_bytes, mf_plus_ats_t1_tk_values[1], historical_bytes_len) == 0) {
             // Mifare Plus X 2K SL1
             mf_plus_data->type = MfPlusTypeX;
             mf_plus_data->size = MfPlusSize2K;
@@ -115,14 +110,8 @@ MfPlusError
             FURI_LOG_D(TAG, "Mifare Plus X 2K SL1");
             error = MfPlusErrorNone;
         } else if(
-            memcmp(
-                simple_array_get_data(iso4_data->ats_data.t1_tk),
-                mf_plus_ats_t1_tk_values[2],
-                simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0 ||
-            memcmp(
-                simple_array_get_data(iso4_data->ats_data.t1_tk),
-                mf_plus_ats_t1_tk_values[3],
-                simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0) {
+            memcmp(historical_bytes, mf_plus_ats_t1_tk_values[2], historical_bytes_len) == 0 ||
+            memcmp(historical_bytes, mf_plus_ats_t1_tk_values[3], historical_bytes_len) == 0) {
             // Mifare Plus SE 1K SL1
             mf_plus_data->type = MfPlusTypeSE;
             mf_plus_data->size = MfPlusSize1K;
@@ -154,10 +143,7 @@ MfPlusError
 
         break;
     case 0x18:
-        if(memcmp(
-               simple_array_get_data(iso4_data->ats_data.t1_tk),
-               mf_plus_ats_t1_tk_values[0],
-               simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0) {
+        if(memcmp(historical_bytes, mf_plus_ats_t1_tk_values[0], historical_bytes_len) == 0) {
             // Mifare Plus S 4K SL1
             mf_plus_data->type = MfPlusTypeS;
             mf_plus_data->size = MfPlusSize4K;
@@ -165,11 +151,7 @@ MfPlusError
 
             FURI_LOG_D(TAG, "Mifare Plus S 4K SL1");
             error = MfPlusErrorNone;
-        } else if(
-            memcmp(
-                simple_array_get_data(iso4_data->ats_data.t1_tk),
-                mf_plus_ats_t1_tk_values[1],
-                simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0) {
+        } else if(memcmp(historical_bytes, mf_plus_ats_t1_tk_values[1], historical_bytes_len) == 0) {
             // Mifare Plus X 4K SL1
             mf_plus_data->type = MfPlusTypeX;
             mf_plus_data->size = MfPlusSize4K;
@@ -183,10 +165,7 @@ MfPlusError
 
         break;
     case 0x20:
-        if(memcmp(
-               simple_array_get_data(iso4_data->ats_data.t1_tk),
-               mf_plus_ats_t1_tk_values[0],
-               simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0) {
+        if(memcmp(historical_bytes, mf_plus_ats_t1_tk_values[0], historical_bytes_len) == 0) {
             // Mifare Plus S 2/4K SL3
             FURI_LOG_D(TAG, "Mifare Plus S SL3");
             mf_plus_data->type = MfPlusTypeS;
@@ -207,21 +186,20 @@ MfPlusError
             } else {
                 FURI_LOG_D(TAG, "Sak 20 but no known Mifare Plus type (S)");
             }
-        } else if(
-            memcmp(
-                simple_array_get_data(iso4_data->ats_data.t1_tk),
-                mf_plus_ats_t1_tk_values[1],
-                simple_array_get_count(iso4_data->ats_data.t1_tk)) == 0) {
+        } else if(memcmp(historical_bytes, mf_plus_ats_t1_tk_values[1], historical_bytes_len) == 0) {
+            // Mifare Plus X 2/4K SL3
             mf_plus_data->type = MfPlusTypeX;
             mf_plus_data->security_level = MfPlusSecurityLevel3;
             FURI_LOG_D(TAG, "Mifare Plus X SL3");
 
             if((iso4_data->iso14443_3a_data->atqa[0] & 0x0F) == 0x04) {
+                // Mifare Plus X 2K SL3
                 mf_plus_data->size = MfPlusSize2K;
 
                 FURI_LOG_D(TAG, "Mifare Plus X 2K SL3");
                 error = MfPlusErrorNone;
             } else if((iso4_data->iso14443_3a_data->atqa[0] & 0x0F) == 0x02) {
+                // Mifare Plus X 4K SL3
                 mf_plus_data->size = MfPlusSize4K;
 
                 FURI_LOG_D(TAG, "Mifare Plus X 4K SL3");
@@ -229,6 +207,16 @@ MfPlusError
             } else {
                 FURI_LOG_D(TAG, "Sak 20 but no known Mifare Plus type (X)");
             }
+        } else if(
+            memcmp(historical_bytes, mf_plus_ats_t1_tk_values[2], historical_bytes_len) == 0 ||
+            memcmp(historical_bytes, mf_plus_ats_t1_tk_values[3], historical_bytes_len) == 0) {
+            // Mifare Plus SE 1K SL3
+            mf_plus_data->type = MfPlusTypeSE;
+            mf_plus_data->size = MfPlusSize1K;
+            mf_plus_data->security_level = MfPlusSecurityLevel3;
+
+            FURI_LOG_D(TAG, "Mifare Plus SE 1K SL3");
+            error = MfPlusErrorNone;
         } else {
             FURI_LOG_D(TAG, "Sak 20 but no known Mifare Plus type");
         }
