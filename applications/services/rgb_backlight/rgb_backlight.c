@@ -154,7 +154,9 @@ void rainbow_timer_start(RGBBacklightApp* app) {
 
 // stop furi timer for rainbow
 void rainbow_timer_stop(RGBBacklightApp* app) {
-    furi_timer_stop(app->rainbow_timer);
+    if (furi_timer_is_running (app->rainbow_timer)){
+        furi_timer_stop(app->rainbow_timer);
+    }
 }
 
 // if rgb_backlight_installed then apply rainbow colors to backlight and start/restart/stop rainbow_timer

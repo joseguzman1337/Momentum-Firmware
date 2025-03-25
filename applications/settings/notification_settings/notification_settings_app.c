@@ -355,7 +355,6 @@ static void rgb_backlight_rainbow_changed(VariableItem* item) {
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_mode_text[index]);
     app->notification->rgb_srv->settings->rainbow_mode = rgb_backlight_rainbow_mode_value[index];
 
-    rainbow_timer_starter(app->notification->rgb_srv);
     rgb_backlight_settings_save(app->notification->rgb_srv->settings);
 
     // restore saved rgb backlight settings if we switch_off rainbow mode
@@ -367,6 +366,9 @@ static void rgb_backlight_rainbow_changed(VariableItem* item) {
         rgb_backlight_set_led_static_color(
             0, app->notification->rgb_srv->settings->led_0_color_index);
         rgb_backlight_update(app->notification->rgb_srv->settings->brightness);
+        rainbow_timer_stop (app->notification->rgb_srv);
+    } else {
+        rainbow_timer_starter(app->notification->rgb_srv);
     }
 }
 
