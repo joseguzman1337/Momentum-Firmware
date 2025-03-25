@@ -96,7 +96,7 @@ static void desktop_clock_draw_callback(Canvas* canvas, void* context) {
             hour -= 12;
         }
         if(hour == 0) {
-            hour = 12;
+            hour = momentum_settings.midnight_format_00 ? 0 : 12;
         }
     }
 
