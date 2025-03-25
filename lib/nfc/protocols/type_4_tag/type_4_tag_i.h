@@ -56,7 +56,7 @@
 #define TYPE_4_TAG_BUF_SIZE          (256U - 3U - 2U)
 // Read returns 2 byte status trailer, write sends 5 byte command header
 #define TYPE_4_TAG_CHUNK_LEN         MIN(TYPE_4_TAG_BUF_SIZE - 5U, TYPE_4_TAG_ISO_RW_CHUNK_LEN)
-#define TYPE_4_TAG_DEFAULT_NDEF_SIZE (2048U - sizeof(uint16_t))
+#define TYPE_4_TAG_DEFAULT_NDEF_SIZE TYPE_4_TAG_MF_DESFIRE_NDEF_SIZE
 
 extern const uint8_t type_4_tag_iso_mf_name[TYPE_4_TAG_ISO_NAME_LEN];
 extern const uint8_t type_4_tag_iso_df_name[TYPE_4_TAG_ISO_NAME_LEN];

@@ -418,7 +418,7 @@ Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance) {
             instance->data->chunk_max_read = 0x3A;
             instance->data->chunk_max_write = 0x34;
             instance->data->ndef_file_id = TYPE_4_TAG_T4T_NDEF_EF_ID;
-            instance->data->ndef_max_len = TYPE_4_TAG_DEFAULT_NDEF_SIZE;
+            instance->data->ndef_max_len = TYPE_4_TAG_MF_DESFIRE_NDEF_SIZE;
             instance->data->ndef_read_lock = TYPE_4_TAG_T4T_CC_RW_LOCK_NONE;
             instance->data->ndef_write_lock = TYPE_4_TAG_T4T_CC_RW_LOCK_NONE;
             instance->data->is_tag_specific = true;

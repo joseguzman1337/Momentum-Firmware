@@ -6,6 +6,8 @@
 extern "C" {
 #endif
 
+#define TYPE_4_TAG_MF_DESFIRE_NDEF_SIZE (2048U - sizeof(uint16_t))
+
 typedef enum {
     Type4TagErrorNone,
     Type4TagErrorNotPresent,
