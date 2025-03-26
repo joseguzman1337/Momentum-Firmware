@@ -65,9 +65,10 @@
   - Also added `BLE_ID` command, same as `BT_ID`
 - Main Menu: Refined CoverFlow menu style (#379 by @956MB)
 - NFC:
+  - Support MIFARE DESFire Transaction MAC file type, fixes reading some EV2+ cards (by @Willy-JL)
+  - Improvements and fixes for NDEF parsing on MIFARE Classic (by @Willy-JL)
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
-  - OFW: Support DESFire Transaction MAC file type, fixes reading some EV2+ cards (by @Willy-JL)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)
 - UL: Power: Moved Charge Cap to Power Settings as Charge Limit option (by @Dmitry422)
 - Infrared:
@@ -84,13 +85,13 @@
 ### Fixed:
 - Asset Packs: Fix level-up animations not being themed (by @Willy-JL)
 - About: Fix missing Prev. button when invoked from Device Info keybind (by @Willy-JL)
+- GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
 - Sub-GHz:
   - UL: Fix Hollarm protocol with more verification (by @xMasterX)
   - UL: Fix GangQi protocol (by @DoberBit and @mishamyte)
   - UL: Came Atomo button hold simulation with full cycle to allow proper pairing with receiver (by @xMasterX)
 - OFW: NFC: ST25TB poller mode check (by @RebornedBrain)
 - OFW: RFID: Fix Detection Conflict Between Securakey and Noralsy Format (by @zinongli)
-- OFW: GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
 - Furi:
   - OFW: EventLoop unsubscribe fix (by @gsurkov & @portasynthinca3)
   - OFW: Various bug fixes and improvements (by @skotopes)

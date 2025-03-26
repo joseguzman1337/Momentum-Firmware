@@ -181,30 +181,34 @@ static bool ndef_get(Ndef* ndef, size_t pos, size_t len, void* buf) {
     // So the first 93 (31*3) data blocks correspond to 128 real blocks.
     // Last 128 blocks are 8 sectors: 15 data blocks, 1 sector trailer.
     // So the last 120 (8*15) data blocks correspond to 128 real blocks.
-    div_t small_sector_data_blocks = div(pos, MF_CLASSIC_BLOCK_SIZE);
+    const size_t real_block_data_offset = pos % MF_CLASSIC_BLOCK_SIZE;
+    size_t small_sector_data_blocks = pos / MF_CLASSIC_BLOCK_SIZE;
     size_t large_sector_data_blocks = 0;
-    if(small_sector_data_blocks.quot > 93) {
-        large_sector_data_blocks = small_sector_data_blocks.quot - 93;
-        small_sector_data_blocks.quot = 93;
+    if(small_sector_data_blocks > 93) {
+        large_sector_data_blocks = small_sector_data_blocks - 93;
+        small_sector_data_blocks = 93;
     }
 
-    div_t small_sectors = div(small_sector_data_blocks.quot, 3);
-    size_t real_block = small_sectors.quot * 4 + small_sectors.rem;
-    if(small_sectors.quot >= 16) {
+    const size_t small_sector_block_offset = small_sector_data_blocks % 3;
+    const size_t small_sectors = small_sector_data_blocks / 3;
+    size_t real_block = small_sectors * 4 + small_sector_block_offset;
+    if(small_sectors >= 16) {
         real_block += 4; // Skip MAD2
     }
     if(large_sector_data_blocks) {
-        div_t large_sectors = div(large_sector_data_blocks, 15);
-        real_block += large_sectors.quot * 16 + large_sectors.rem;
+        const size_t large_sector_block_offset = large_sector_data_blocks % 15;
+        const size_t large_sectors = large_sector_data_blocks / 15;
+        real_block += large_sectors * 16 + large_sector_block_offset;
     }
 
-    const uint8_t* cur = &ndef->mfc.blocks[real_block].data[small_sector_data_blocks.rem];
+    const uint8_t* cur = &ndef->mfc.blocks[real_block].data[real_block_data_offset];
     while(len) {
         size_t sector_trailer = mf_classic_get_sector_trailer_num_by_block(real_block);
         const uint8_t* end = &ndef->mfc.blocks[sector_trailer].data[0];
 
-        size_t chunk_len = MIN((size_t)(end - cur), len);
+        const size_t chunk_len = MIN((size_t)(end - cur), len);
         memcpy(buf, cur, chunk_len);
+        buf += chunk_len;
         len -= chunk_len;
 
         if(len) {
@@ -582,7 +586,7 @@ bool ndef_parse_record(
     NdefTnf tnf,
     const char* type,
     uint8_t type_len) {
-    FURI_LOG_D(TAG, "payload type: %.*s len: %hu", type_len, type, len);
+    FURI_LOG_D(TAG, "payload type: %.*s len: %hu pos: %zu", type_len, type, len, pos);
     if(!len) {
         furi_string_cat(ndef->output, "Empty\n");
         return true;
@@ -887,13 +891,13 @@ static bool ndef_mfc_parse(const NfcDevice* device, FuriString* parsed_data) {
     for(uint8_t mad = 0; mad < COUNT_OF(mads); mad++) {
         const size_t block = mads[mad].block;
         const size_t sector = mf_classic_get_sector_by_block(block);
-        if(sector_count <= sector) break; // Skip this MAD if not present
+        if(sector_count <= sector) continue; // Skip this MAD if not present
         // Check MAD key
         const MfClassicSectorTrailer* sector_trailer =
             mf_classic_get_sector_trailer_by_sector(data, sector);
         const uint64_t sector_key_a = bit_lib_bytes_to_num_be(
             sector_trailer->key_a.data, COUNT_OF(sector_trailer->key_a.data));
-        if(sector_key_a != mad_key) return false;
+        if(sector_key_a != mad_key) continue;
         // Find NDEF AIDs
         for(uint8_t aid_index = 0; aid_index < mads[mad].aid_count; aid_index++) {
             const uint8_t* aid = &data->block[block].data[2 + aid_index * AID_SIZE];
@@ -917,7 +921,7 @@ static bool ndef_mfc_parse(const NfcDevice* device, FuriString* parsed_data) {
         data_size = 93 + (sector_count - 32) * 15;
     } else {
         data_size = sector_count * 3;
-        if(sector_count >= 16) {
+        if(sector_count > 16) {
             data_size -= 3; // Skip MAD2
         }
     }
