@@ -208,6 +208,7 @@ static bool ndef_get(Ndef* ndef, size_t pos, size_t len, void* buf) {
 
         const size_t chunk_len = MIN((size_t)(end - cur), len);
         memcpy(buf, cur, chunk_len);
+        buf += chunk_len;
         len -= chunk_len;
 
         if(len) {
@@ -585,7 +586,7 @@ bool ndef_parse_record(
     NdefTnf tnf,
     const char* type,
     uint8_t type_len) {
-    FURI_LOG_D(TAG, "payload type: %.*s len: %hu", type_len, type, len);
+    FURI_LOG_D(TAG, "payload type: %.*s len: %hu pos: %zu", type_len, type, len, pos);
     if(!len) {
         furi_string_cat(ndef->output, "Empty\n");
         return true;
@@ -890,13 +891,13 @@ static bool ndef_mfc_parse(const NfcDevice* device, FuriString* parsed_data) {
     for(uint8_t mad = 0; mad < COUNT_OF(mads); mad++) {
         const size_t block = mads[mad].block;
         const size_t sector = mf_classic_get_sector_by_block(block);
-        if(sector_count <= sector) break; // Skip this MAD if not present
+        if(sector_count <= sector) continue; // Skip this MAD if not present
         // Check MAD key
         const MfClassicSectorTrailer* sector_trailer =
             mf_classic_get_sector_trailer_by_sector(data, sector);
         const uint64_t sector_key_a = bit_lib_bytes_to_num_be(
             sector_trailer->key_a.data, COUNT_OF(sector_trailer->key_a.data));
-        if(sector_key_a != mad_key) return false;
+        if(sector_key_a != mad_key) continue;
         // Find NDEF AIDs
         for(uint8_t aid_index = 0; aid_index < mads[mad].aid_count; aid_index++) {
             const uint8_t* aid = &data->block[block].data[2 + aid_index * AID_SIZE];
@@ -920,7 +921,7 @@ static bool ndef_mfc_parse(const NfcDevice* device, FuriString* parsed_data) {
         data_size = 93 + (sector_count - 32) * 15;
     } else {
         data_size = sector_count * 3;
-        if(sector_count >= 16) {
+        if(sector_count > 16) {
             data_size -= 3; // Skip MAD2
         }
     }
