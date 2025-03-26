@@ -9,8 +9,8 @@
 #define RGB_BACKLIGHT_SETTINGS_PATH      INT_PATH(RGB_BACKLIGHT_SETTINGS_FILE_NAME)
 
 #define RGB_BACKLIGHT_SETTINGS_MAGIC    (0x30)
-#define RGB_BACKLIGHT_SETTINGS_VER_PREV (2) // Previous version number
-#define RGB_BACKLIGHT_SETTINGS_VER      (3) // Current version number
+#define RGB_BACKLIGHT_SETTINGS_VER_PREV (4) // Previous version number
+#define RGB_BACKLIGHT_SETTINGS_VER      (5) // Current version number
 
 //pervious settings must be copyed from previous rgb_backlight_settings.h file
 typedef struct {
