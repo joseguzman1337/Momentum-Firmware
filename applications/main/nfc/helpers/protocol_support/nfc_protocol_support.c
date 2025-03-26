@@ -840,6 +840,7 @@ static bool nfc_protocol_support_scene_write_on_event(NfcApp* instance, SceneMan
 
     if(event.type == SceneManagerEventTypeCustom) {
         uint32_t new_state = -1;
+        bool stop_poller = false;
 
         if(event.event == NfcCustomEventCardDetected) {
             new_state = NfcSceneWriteStateWriting;
@@ -851,14 +852,17 @@ static bool nfc_protocol_support_scene_write_on_event(NfcApp* instance, SceneMan
             dolphin_deed(DolphinDeedNfcSave);
             notification_message(instance->notifications, &sequence_success);
             new_state = NfcSceneWriteStateSuccess;
+            stop_poller = true;
             consumed = true;
         } else if(event.event == NfcCustomEventPollerFailure) {
             notification_message(instance->notifications, &sequence_error);
             new_state = NfcSceneWriteStateFailure;
+            stop_poller = true;
             consumed = true;
         } else if(event.event == NfcCustomEventWrongCard) {
             notification_message(instance->notifications, &sequence_error);
             new_state = NfcSceneWriteStateWrongCard;
+            stop_poller = true;
             consumed = true;
         } else if(event.event == NfcCustomEventViewExit) {
             scene_manager_previous_scene(instance->scene_manager);
@@ -869,6 +873,14 @@ static bool nfc_protocol_support_scene_write_on_event(NfcApp* instance, SceneMan
             consumed = true;
         }
 
+        if(stop_poller) {
+            if(instance->poller) {
+                nfc_poller_stop(instance->poller);
+                nfc_poller_free(instance->poller);
+                instance->poller = NULL;
+            }
+            nfc_blink_stop(instance);
+        }
         if(new_state != (uint32_t)-1) {
             scene_manager_set_scene_state(instance->scene_manager, NfcSceneWrite, new_state);
             nfc_protocol_support_scene_write_setup_view(instance);
@@ -879,8 +891,10 @@ static bool nfc_protocol_support_scene_write_on_event(NfcApp* instance, SceneMan
 }
 
 static void nfc_protocol_support_scene_write_on_exit(NfcApp* instance) {
-    nfc_poller_stop(instance->poller);
-    nfc_poller_free(instance->poller);
+    if(instance->poller) {
+        nfc_poller_stop(instance->poller);
+        nfc_poller_free(instance->poller);
+    }
 
     // Clear view
     popup_reset(instance->popup);
