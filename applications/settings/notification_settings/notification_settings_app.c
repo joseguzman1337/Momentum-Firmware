@@ -182,6 +182,66 @@ typedef enum {
 
 // --- RGB BACKLIGHT END ---
 
+ // --- NIGHT SHIFT ---
+ #define NIGHT_SHIFT_COUNT 7
+ const char* const night_shift_text[NIGHT_SHIFT_COUNT] = {
+     "OFF",
+     "5%",
+     "10%"
+     "15%",
+     "20%",
+     "25%",
+     "30%"
+
+ };
+ const float night_shift_value[NIGHT_SHIFT_COUNT] = { 
+    0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3,
+ };
+
+ #define NIGHT_SHIFT_START_COUNT 14
+ const char* const night_shift_start_text[NIGHT_SHIFT_START_COUNT] = {
+     "17:00",
+     "17:30",
+     "18:00"
+     "18:30",
+     "19:00",
+     "19:30",
+     "20:00",
+     "20:30",
+     "21:00",
+     "21:30",
+     "22:00",
+     "22:30",
+     "23:00",
+     "23:30",
+ };
+ const uint32_t night_shift_start_value[NIGHT_SHIFT_START_COUNT] = { 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ };
+
+ #define NIGHT_SHIFT_END_COUNT 14
+ const char* const night_shift_end_text[NIGHT_SHIFT_END_COUNT] = {
+     "05:00",
+     "05:30",
+     "06:00"
+     "06:30",
+     "07:00",
+     "07:30",
+     "08:00",
+     "08:30",
+     "09:00",
+     "09:30",
+     "10:00",
+     "10:30",
+     "11:00",
+     "11:30",
+ };
+ const uint32_t night_shift_end_value[NIGHT_SHIFT_END_COUNT] = { 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ };
+
+ // --- NIGHT SHIFT END ---
+
 static void contrast_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
@@ -443,6 +503,11 @@ static uint32_t notification_app_rgb_settings_exit(void* context) {
 }
 //--- RGB BACKLIGHT END ---
 
+// --- NIGHT SHIFT ---
+
+
+// --- NIGHT SHIFT END ---
+
 static uint32_t notification_app_settings_exit(void* context) {
     UNUSED(context);
     return VIEW_NONE;
@@ -494,6 +559,31 @@ static NotificationAppSettings* alloc_settings(void) {
         app->notification->settings.display_off_delay_ms, delay_value, DELAY_COUNT);
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, delay_text[value_index]);
+
+    // --- NIGHT SHIFT ---
+    item = variable_item_list_add(
+        app->variable_item_list, "Night Shift", NIGHT_SHIFT_COUNT, night_shift_changed, app);
+    value_index = value_index_float(
+        app->notification->settings.night_shift, night_shift_value, NIGHT_SHIFT_COUNT);
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, night_shift_text[value_index]);
+
+    item = variable_item_list_add(
+        app->variable_item_list, " . Start", NIGHT_SHIFT_START_COUNT, night_shift_start_changed, app);
+    value_index = value_index_uint32(
+        app->notification->settings.night_shift_start, night_shift_start_value, NIGHT_SHIFT_START_COUNT);
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, night_shift_start_text[value_index]);
+    
+    item = variable_item_list_add(
+        app->variable_item_list, " . End", NIGHT_SHIFT_END_COUNT, night_shift_end_changed, app);
+    value_index = value_index_uint32(
+        app->notification->settings.night_shift_end, night_shift_end_value, NIGHT_SHIFT_END_COUNT);
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, night_shift_end_text[value_index]);
+    
+    // --- NIGHT SHIFT END---
+
 
     item = variable_item_list_add(
         app->variable_item_list, "LED Brightness", BACKLIGHT_COUNT, led_changed, app);
