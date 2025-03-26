@@ -89,6 +89,7 @@
   - UL: Came Atomo button hold simulation with full cycle to allow proper pairing with receiver (by @xMasterX)
 - OFW: NFC: ST25TB poller mode check (by @RebornedBrain)
 - OFW: RFID: Fix Detection Conflict Between Securakey and Noralsy Format (by @zinongli)
+- OFW: GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
 - Furi:
   - OFW: EventLoop unsubscribe fix (by @gsurkov & @portasynthinca3)
   - OFW: Various bug fixes and improvements (by @skotopes)
