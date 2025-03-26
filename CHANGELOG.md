@@ -67,6 +67,7 @@
 - NFC:
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
+  - OFW: Support DESFire Transaction MAC file type, fixes reading some EV2+ cards (by @Willy-JL)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)
 - UL: Power: Moved Charge Cap to Power Settings as Charge Limit option (by @Dmitry422)
 - Infrared:
