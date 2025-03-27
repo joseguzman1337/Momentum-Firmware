@@ -238,22 +238,12 @@ MfPlusError
 }
 
 MfPlusError mf_plus_version_parse(MfPlusVersion* data, const BitBuffer* buf) {
-    bool can_parse = bit_buffer_get_size_bytes(buf) == sizeof(MfPlusVersion);
+    const bool can_parse = bit_buffer_get_size_bytes(buf) == sizeof(MfPlusVersion);
 
     if(can_parse) {
         bit_buffer_write_bytes(buf, data, sizeof(MfPlusVersion));
-    } else if(
-        bit_buffer_get_size_bytes(buf) == 8 &&
-        bit_buffer_get_byte(buf, 0) == MF_PLUS_STATUS_ADDITIONAL_FRAME) {
-        // HACK(-nofl): There are supposed to be three parts to the GetVersion command,
-        // with the second and third parts fetched by sending the AdditionalFrame
-        // command. I don't know whether the entire MIFARE Plus line uses status as
-        // the first byte, so let's just assume we only have the first part of
-        // the response if it's size 8 and starts with the AF status. The second
-        // part of the response is the same size and status byte, but so far
-        // we're only reading one response.
-        can_parse = true;
-        bit_buffer_write_bytes_mid(buf, data, 1, bit_buffer_get_size_bytes(buf) - 1);
+    } else {
+        memset(data, 0, sizeof(MfPlusVersion));
     }
 
     return can_parse ? MfPlusErrorNone : MfPlusErrorProtocol;
