@@ -32,7 +32,17 @@ MfDesfireError mf_desfire_process_status_code(uint8_t status_code) {
     }
 }
 
-MfDesfireError mf_desfire_send_chunks(
+void mf_desfire_poller_set_command_mode(
+    MfDesfirePoller* instance,
+    NxpNativeCommandMode command_mode) {
+    furi_check(instance);
+    furi_check(instance->state == MfDesfirePollerStateIdle);
+    furi_check(command_mode < NxpNativeCommandModeMAX);
+
+    instance->command_mode = command_mode;
+}
+
+MfDesfireError mf_desfire_poller_send_chunks(
     MfDesfirePoller* instance,
     const BitBuffer* tx_buffer,
     BitBuffer* rx_buffer) {
@@ -44,7 +54,7 @@ MfDesfireError mf_desfire_send_chunks(
         &status_code,
         tx_buffer,
         rx_buffer,
-        NxpNativeCommandModePlain,
+        instance->command_mode,
         instance->tx_buffer,
         instance->rx_buffer);
 
@@ -64,7 +74,8 @@ MfDesfireError mf_desfire_poller_read_version(MfDesfirePoller* instance, MfDesfi
     MfDesfireError error;
 
     do {
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
 
         if(error != MfDesfireErrorNone) break;
 
@@ -86,7 +97,8 @@ MfDesfireError
     MfDesfireError error;
 
     do {
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
 
         if(error != MfDesfireErrorNone) break;
 
@@ -108,7 +120,8 @@ MfDesfireError
     MfDesfireError error;
 
     do {
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
 
         if(error != MfDesfireErrorNone) break;
 
@@ -132,7 +145,7 @@ MfDesfireError mf_desfire_poller_read_key_version(
     bit_buffer_set_byte(instance->input_buffer, 1, key_num);
 
     MfDesfireError error =
-        mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        mf_desfire_poller_send_chunks(instance, instance->input_buffer, instance->result_buffer);
     if(error == MfDesfireErrorNone) {
         if(!mf_desfire_key_version_parse(data, instance->result_buffer)) {
             error = MfDesfireErrorProtocol;
@@ -172,7 +185,8 @@ MfDesfireError
     MfDesfireError error;
 
     do {
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
 
         if(error != MfDesfireErrorNone) break;
 
@@ -205,7 +219,7 @@ MfDesfireError mf_desfire_poller_select_application(
         instance->input_buffer, (const uint8_t*)id, sizeof(MfDesfireApplicationId));
 
     MfDesfireError error =
-        mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        mf_desfire_poller_send_chunks(instance, instance->input_buffer, instance->result_buffer);
 
     return error;
 }
@@ -220,7 +234,8 @@ MfDesfireError mf_desfire_poller_read_file_ids(MfDesfirePoller* instance, Simple
     MfDesfireError error;
 
     do {
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
 
         if(error != MfDesfireErrorNone) break;
 
@@ -255,7 +270,8 @@ MfDesfireError mf_desfire_poller_read_file_settings(
     MfDesfireError error;
 
     do {
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
 
         if(error != MfDesfireErrorNone) break;
 
@@ -316,7 +332,8 @@ static MfDesfireError mf_desfire_poller_read_file(
         bit_buffer_append_bytes(instance->input_buffer, (const uint8_t*)&current_offset, 3);
         bit_buffer_append_bytes(instance->input_buffer, (const uint8_t*)&bytes_to_read, 3);
 
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
         if(error != MfDesfireErrorNone) break;
 
         size_t bytes_received = bit_buffer_get_size_bytes(instance->result_buffer);
@@ -362,7 +379,8 @@ MfDesfireError mf_desfire_poller_read_file_value(
     MfDesfireError error;
 
     do {
-        error = mf_desfire_send_chunks(instance, instance->input_buffer, instance->result_buffer);
+        error = mf_desfire_poller_send_chunks(
+            instance, instance->input_buffer, instance->result_buffer);
 
         if(error != MfDesfireErrorNone) break;
 
