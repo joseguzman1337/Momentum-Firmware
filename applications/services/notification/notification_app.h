@@ -34,7 +34,7 @@ typedef struct {
     Light light;
 } NotificationLedLayer;
 
-#define NOTIFICATION_SETTINGS_VERSION 0x02
+#define NOTIFICATION_SETTINGS_VERSION 0x03
 #define NOTIFICATION_SETTINGS_PATH    INT_PATH(NOTIFICATION_SETTINGS_FILE_NAME)
 
 typedef struct {
@@ -61,6 +61,11 @@ struct NotificationApp {
 
     NotificationSettings settings;
     RGBBacklightApp* rgb_srv;
+
+    FuriTimer* night_shift_timer;
+    float current_night_shift;
 };
 
 void notification_message_save_settings(NotificationApp* app);
+void night_shift_timer_start(NotificationApp* app);
+void night_shift_timer_stop(NotificationApp* app);

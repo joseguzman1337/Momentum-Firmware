@@ -20,7 +20,7 @@ typedef struct {
     uint16_t rainbow_step;
     uint8_t rainbow_saturation;
     uint8_t rainbow_wide;
-
+    
 } RGBBacklightSettings;
 
 #ifdef __cplusplus

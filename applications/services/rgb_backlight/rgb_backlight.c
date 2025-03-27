@@ -137,9 +137,9 @@ void rgb_backlight_update(float brightness) {
 
     if(app->settings->rgb_backlight_installed) {
         for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
-            uint8_t r = current_led[i].red * (brightness * 1.0f);
-            uint8_t g = current_led[i].green * (brightness * 1.0f);
-            uint8_t b = current_led[i].blue * (brightness * 1.0f);
+            uint8_t r = current_led[i].red * brightness;
+            uint8_t g = current_led[i].green * brightness;
+            uint8_t b = current_led[i].blue * brightness;
             SK6805_set_led_color(i, r, g, b);
         }
         SK6805_update();
@@ -154,7 +154,7 @@ void rainbow_timer_start(RGBBacklightApp* app) {
 
 // stop furi timer for rainbow
 void rainbow_timer_stop(RGBBacklightApp* app) {
-    if (furi_timer_is_running (app->rainbow_timer)){
+    if(furi_timer_is_running(app->rainbow_timer)) {
         furi_timer_stop(app->rainbow_timer);
     }
 }
@@ -214,7 +214,7 @@ static void rainbow_timer_callback(void* context) {
             break;
         }
 
-        rgb_backlight_update(app->settings->brightness);
+        rgb_backlight_update(app->settings->brightness * app->current_night_shift);
     }
 }
 
@@ -233,6 +233,7 @@ int32_t rgb_backlight_srv(void* p) {
     rgb_backlight_settings_load(app->settings);
 
     app->rainbow_hue = 1;
+    app->current_night_shift = 1.0f;
 
     furi_record_create(RECORD_RGB_BACKLIGHT, app);
 
@@ -244,7 +245,7 @@ int32_t rgb_backlight_srv(void* p) {
             rgb_backlight_set_led_static_color(2, app->settings->led_2_color_index);
             rgb_backlight_set_led_static_color(1, app->settings->led_1_color_index);
             rgb_backlight_set_led_static_color(0, app->settings->led_0_color_index);
-            rgb_backlight_update(app->settings->brightness);
+            rgb_backlight_update(app->settings->brightness * app->current_night_shift);
         }
         // if rgb_backlight not installed then set default static orange color(index=0) to all leds (0-2) and force light on
     } else {

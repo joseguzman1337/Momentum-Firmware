@@ -33,6 +33,9 @@ typedef struct {
     uint8_t rainbow_green;
     uint8_t rainbow_blue;
     RGBBacklightSettings* settings;
+    // night_shift multiplicator for leds brightnes coming from Notificatoin app.
+    float current_night_shift;
+
 } RGBBacklightApp;
 
 #define RECORD_RGB_BACKLIGHT "rgb_backlight"
