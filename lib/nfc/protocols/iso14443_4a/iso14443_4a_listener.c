@@ -16,6 +16,7 @@ static Iso14443_4aListener*
     instance->data = data;
     instance->iso14443_4_layer = iso14443_4_layer_alloc();
 
+    instance->rx_buffer = bit_buffer_alloc(ISO14443_4A_LISTENER_BUF_SIZE);
     instance->tx_buffer = bit_buffer_alloc(ISO14443_4A_LISTENER_BUF_SIZE);
 
     instance->iso14443_4a_event.data = &instance->iso14443_4a_event_data;
@@ -28,10 +29,9 @@ static Iso14443_4aListener*
 
 static void iso14443_4a_listener_free(Iso14443_4aListener* instance) {
     furi_assert(instance);
-    furi_assert(instance->data);
-    furi_assert(instance->tx_buffer);
 
     iso14443_4_layer_free(instance->iso14443_4_layer);
+    bit_buffer_free(instance->rx_buffer);
     bit_buffer_free(instance->tx_buffer);
     free(instance);
 }
@@ -88,11 +88,11 @@ static NfcCommand iso14443_4a_listener_run(NfcGenericEvent event, void* context)
                 }
             }
         } else {
-            Iso14443_4LayerResult status =
-                iso14443_4_layer_decode_command(instance->iso14443_4_layer, rx_buffer, rx_buffer);
+            Iso14443_4LayerResult status = iso14443_4_layer_decode_command(
+                instance->iso14443_4_layer, rx_buffer, instance->rx_buffer);
             if(status & Iso14443_4LayerResultSend) {
                 iso14443_3a_listener_send_standard_frame(
-                    instance->iso14443_3a_listener, rx_buffer);
+                    instance->iso14443_3a_listener, instance->rx_buffer);
             }
             if(status & Iso14443_4LayerResultHalt) {
                 iso14443_4a_listener_reset(instance);
@@ -104,7 +104,7 @@ static NfcCommand iso14443_4a_listener_run(NfcGenericEvent event, void* context)
             }
             if(status & Iso14443_4LayerResultData) {
                 instance->iso14443_4a_event.type = Iso14443_4aListenerEventTypeReceivedData;
-                instance->iso14443_4a_event.data->buffer = rx_buffer;
+                instance->iso14443_4a_event.data->buffer = instance->rx_buffer;
 
                 if(instance->callback) {
                     command = instance->callback(instance->generic_event, instance->context);

@@ -21,6 +21,7 @@ struct Iso14443_4aListener {
     Iso14443_4Layer* iso14443_4_layer;
     Iso14443_4aListenerState state;
 
+    BitBuffer* rx_buffer;
     BitBuffer* tx_buffer;
 
     NfcGenericEvent generic_event;
