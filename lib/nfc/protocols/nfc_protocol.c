@@ -22,9 +22,9 @@
  *            |               |             |
  *       ISO14443-4A   Mf Ultralight   Mf Classic
  *            |
- *      +-----+------+----------+----------+
- *      |            |          |          |
- *  Mf Desfire   Type 4 Tag   Mf Plus   NTAG4xx
+ *      +-----+----+----------+----------+
+ *      |          |          |          |
+ *  Mf Desfire   Mf Plus   NTAG4xx   Type 4 Tag
  * ```
  *
  * When implementing a new protocol, its place in the tree must be determined first.
