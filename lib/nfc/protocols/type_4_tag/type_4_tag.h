@@ -33,8 +33,7 @@ typedef struct {
     // Tag specific data
     bool is_tag_specific;
     Type4TagPlatform platform;
-    FuriString* platform_name_full;
-    FuriString* platform_name_short;
+    FuriString* platform_name;
     union {
         struct {
             uint8_t minor : 4;

@@ -1,7 +1,6 @@
 #include "type_4_tag_i.h"
 
 #define TYPE_4_TAG_PROTOCOL_NAME "Type 4 Tag"
-#define TYPE_4_TAG_SHORT_NAME    "T4T"
 
 const NfcDeviceBase nfc_device_type_4_tag = {
     .protocol_name = TYPE_4_TAG_PROTOCOL_NAME,
@@ -23,8 +22,7 @@ Type4TagData* type_4_tag_alloc(void) {
     Type4TagData* data = malloc(sizeof(Type4TagData));
     data->iso14443_4a_data = iso14443_4a_alloc();
     data->device_name = furi_string_alloc();
-    data->platform_name_full = furi_string_alloc();
-    data->platform_name_short = furi_string_alloc();
+    data->platform_name = furi_string_alloc();
     data->ndef_data = simple_array_alloc(&simple_array_config_uint8_t);
     return data;
 }
@@ -34,8 +32,7 @@ void type_4_tag_free(Type4TagData* data) {
 
     type_4_tag_reset(data);
     simple_array_free(data->ndef_data);
-    furi_string_free(data->platform_name_short);
-    furi_string_free(data->platform_name_full);
+    furi_string_free(data->platform_name);
     furi_string_free(data->device_name);
     iso14443_4a_free(data->iso14443_4a_data);
     free(data);
@@ -48,8 +45,7 @@ void type_4_tag_reset(Type4TagData* data) {
 
     data->is_tag_specific = false;
     furi_string_reset(data->device_name);
-    furi_string_reset(data->platform_name_full);
-    furi_string_reset(data->platform_name_short);
+    furi_string_reset(data->platform_name);
     data->t4t_version.value = 0;
     data->chunk_max_read = 0;
     data->chunk_max_write = 0;
@@ -71,8 +67,7 @@ void type_4_tag_copy(Type4TagData* data, const Type4TagData* other) {
 
     data->is_tag_specific = other->is_tag_specific;
     furi_string_set(data->device_name, other->device_name);
-    furi_string_set(data->platform_name_full, other->platform_name_full);
-    furi_string_set(data->platform_name_short, other->platform_name_short);
+    furi_string_set(data->platform_name, other->platform_name);
     data->t4t_version.value = other->t4t_version.value;
     data->chunk_max_read = other->chunk_max_read;
     data->chunk_max_write = other->chunk_max_write;
@@ -150,19 +145,9 @@ bool type_4_tag_is_equal(const Type4TagData* data, const Type4TagData* other) {
 }
 
 const char* type_4_tag_get_device_name(const Type4TagData* data, NfcDeviceNameType name_type) {
-    FuriString* platform_name = name_type == NfcDeviceNameTypeFull ? data->platform_name_full :
-                                                                     data->platform_name_short;
-    if(furi_string_empty(platform_name)) {
-        return TYPE_4_TAG_PROTOCOL_NAME;
-    }
-    furi_string_printf(
-        data->device_name,
-        "%s%c(%s)",
-        name_type == NfcDeviceNameTypeFull ? TYPE_4_TAG_PROTOCOL_NAME : TYPE_4_TAG_SHORT_NAME,
-        name_type == NfcDeviceNameTypeFull ? '\n' : ' ',
-        furi_string_get_cstr(platform_name));
-    furi_string_replace_str(data->device_name, "Mifare", "MIFARE");
-    return furi_string_get_cstr(data->device_name);
+    UNUSED(data);
+    UNUSED(name_type);
+    return TYPE_4_TAG_PROTOCOL_NAME;
 }
 
 const uint8_t* type_4_tag_get_uid(const Type4TagData* data, size_t* uid_len) {

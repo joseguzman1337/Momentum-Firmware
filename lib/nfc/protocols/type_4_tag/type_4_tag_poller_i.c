@@ -252,15 +252,10 @@ Type4TagError type_4_tag_poller_detect_platform(Type4TagPoller* instance) {
     Type4TagError error;
     if(platform != Type4TagPlatformUnknown) {
         furi_string_set(
-            instance->data->platform_name_full,
-            nfc_device_get_name(device, NfcDeviceNameTypeFull));
-        furi_string_set(
-            instance->data->platform_name_short,
-            nfc_device_get_name(device, NfcDeviceNameTypeShort));
+            instance->data->platform_name, nfc_device_get_name(device, NfcDeviceNameTypeFull));
         error = Type4TagErrorNone;
     } else {
-        furi_string_reset(instance->data->platform_name_full);
-        furi_string_reset(instance->data->platform_name_short);
+        furi_string_reset(instance->data->platform_name);
         error = Type4TagErrorNotSupported;
     }
     instance->data->platform = platform;

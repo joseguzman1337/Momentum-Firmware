@@ -14,6 +14,11 @@ void nfc_render_type_4_tag_info(
     if(data->is_tag_specific) {
         furi_string_cat(str, "\n::::::::::::::::::[Tag Specs]::::::::::::::::::\n");
         furi_string_cat_printf(
+            str,
+            "Card: %s\n",
+            furi_string_empty(data->platform_name) ? "unknown" :
+                                                     furi_string_get_cstr(data->platform_name));
+        furi_string_cat_printf(
             str, "T4T Mapping Version: %u.%u\n", data->t4t_version.major, data->t4t_version.minor);
         furi_string_cat_printf(str, "NDEF File ID: %04X\n", data->ndef_file_id);
         furi_string_cat_printf(str, "Max NDEF Size: %u\n", data->ndef_max_len);

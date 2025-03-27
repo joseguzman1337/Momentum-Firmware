@@ -41,10 +41,10 @@
 #error Invalid NDEF_PROTO specified!
 #endif
 
-#define NDEF_TITLE(device, parsed_data)         \
-    furi_string_printf(                         \
-        parsed_data,                            \
-        "\e#NDEF Format Data\nCard type: %s\n", \
+#define NDEF_TITLE(device, parsed_data)    \
+    furi_string_printf(                    \
+        parsed_data,                       \
+        "\e#NDEF Format Data\nCard: %s\n", \
         nfc_device_get_name(device, NfcDeviceNameTypeFull))
 
 // ---=== structures ===---
@@ -1055,6 +1055,12 @@ static bool ndef_t4t_parse(const NfcDevice* device, FuriString* parsed_data) {
     size_t data_size = simple_array_get_count(data->ndef_data);
 
     NDEF_TITLE(device, parsed_data);
+
+    furi_string_replace(parsed_data, "Card: ", "Protocol: ");
+    if(data->is_tag_specific && !furi_string_empty(data->platform_name)) {
+        furi_string_cat_printf(
+            parsed_data, "Card: %s\n", furi_string_get_cstr(data->platform_name));
+    }
 
     Ndef ndef = {
         .output = parsed_data,
