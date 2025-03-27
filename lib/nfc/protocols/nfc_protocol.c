@@ -22,7 +22,9 @@
  *            |               |             |
  *       ISO14443-4A   Mf Ultralight   Mf Classic
  *            |
- *       Mf Desfire
+ *      +-----+----+
+ *      |          |
+ *  Mf Desfire   Mf Plus
  * ```
  *
  * When implementing a new protocol, its place in the tree must be determined first.
@@ -60,8 +62,8 @@ static const NfcProtocol nfc_protocol_iso14443_3b_children_protocol[] = {
 
 /** List of ISO14443-4A child protocols. */
 static const NfcProtocol nfc_protocol_iso14443_4a_children_protocol[] = {
-    NfcProtocolMfDesfire,
     NfcProtocolMfPlus,
+    NfcProtocolMfDesfire,
 };
 
 /** List of ISO115693-3 child protocols. */

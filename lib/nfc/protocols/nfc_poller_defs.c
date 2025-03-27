@@ -25,6 +25,6 @@ const NfcPollerBase* nfc_pollers_api[NfcProtocolNum] = {
     [NfcProtocolMfPlus] = &mf_plus_poller,
     [NfcProtocolMfDesfire] = &mf_desfire_poller,
     [NfcProtocolSlix] = &nfc_poller_slix,
-    /* Add new pollers here */
     [NfcProtocolSt25tb] = &nfc_poller_st25tb,
+    /* Add new pollers here */
 };
