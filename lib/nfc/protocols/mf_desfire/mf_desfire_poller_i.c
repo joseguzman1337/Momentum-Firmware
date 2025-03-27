@@ -21,11 +21,11 @@ MfDesfireError mf_desfire_process_error(Iso14443_4aError error) {
 
 MfDesfireError mf_desfire_process_status_code(uint8_t status_code) {
     switch(status_code) {
-    case MF_DESFIRE_STATUS_OPERATION_OK:
+    case NXP_NATIVE_COMMAND_STATUS_OPERATION_OK:
         return MfDesfireErrorNone;
-    case MF_DESFIRE_STATUS_AUTHENTICATION_ERROR:
+    case NXP_NATIVE_COMMAND_STATUS_AUTHENTICATION_ERROR:
         return MfDesfireErrorAuthentication;
-    case MF_DESFIRE_STATUS_ILLEGAL_COMMAND_CODE:
+    case NXP_NATIVE_COMMAND_STATUS_ILLEGAL_COMMAND_CODE:
         return MfDesfireErrorCommandNotSupported;
     default:
         return MfDesfireErrorProtocol;
@@ -37,60 +37,22 @@ MfDesfireError mf_desfire_send_chunks(
     const BitBuffer* tx_buffer,
     BitBuffer* rx_buffer) {
     furi_check(instance);
-    furi_check(instance->iso14443_4a_poller);
-    furi_check(instance->tx_buffer);
-    furi_check(instance->rx_buffer);
-    furi_check(tx_buffer);
-    furi_check(rx_buffer);
 
-    MfDesfireError error = MfDesfireErrorNone;
+    NxpNativeCommandStatus status_code = NXP_NATIVE_COMMAND_STATUS_OPERATION_OK;
+    Iso14443_4aError iso14443_4a_error = nxp_native_command_iso14443_4a_poller(
+        instance->iso14443_4a_poller,
+        &status_code,
+        tx_buffer,
+        rx_buffer,
+        NxpNativeCommandModePlain,
+        instance->tx_buffer,
+        instance->rx_buffer);
 
-    do {
-        Iso14443_4aError iso14443_4a_error = iso14443_4a_poller_send_block(
-            instance->iso14443_4a_poller, tx_buffer, instance->rx_buffer);
-
-        if(iso14443_4a_error != Iso14443_4aErrorNone) {
-            error = mf_desfire_process_error(iso14443_4a_error);
-            break;
-        }
-
-        bit_buffer_reset(instance->tx_buffer);
-        bit_buffer_append_byte(instance->tx_buffer, MF_DESFIRE_STATUS_ADDITIONAL_FRAME);
-
-        if(bit_buffer_get_size_bytes(instance->rx_buffer) > sizeof(uint8_t)) {
-            bit_buffer_copy_right(rx_buffer, instance->rx_buffer, sizeof(uint8_t));
-        } else {
-            bit_buffer_reset(rx_buffer);
-        }
-
-        while(
-            bit_buffer_starts_with_byte(instance->rx_buffer, MF_DESFIRE_STATUS_ADDITIONAL_FRAME)) {
-            Iso14443_4aError iso14443_4a_error = iso14443_4a_poller_send_block(
-                instance->iso14443_4a_poller, instance->tx_buffer, instance->rx_buffer);
-
-            if(iso14443_4a_error != Iso14443_4aErrorNone) {
-                error = mf_desfire_process_error(iso14443_4a_error);
-                break;
-            }
-
-            const size_t rx_size = bit_buffer_get_size_bytes(instance->rx_buffer);
-            const size_t rx_capacity_remaining =
-                bit_buffer_get_capacity_bytes(rx_buffer) - bit_buffer_get_size_bytes(rx_buffer);
-
-            if(rx_size <= rx_capacity_remaining + 1) {
-                bit_buffer_append_right(rx_buffer, instance->rx_buffer, sizeof(uint8_t));
-            } else {
-                FURI_LOG_W(TAG, "RX buffer overflow: ignoring %zu bytes", rx_size - 1);
-            }
-        }
-    } while(false);
-
-    if(error == MfDesfireErrorNone) {
-        uint8_t err_code = bit_buffer_get_byte(instance->rx_buffer, 0);
-        error = mf_desfire_process_status_code(err_code);
+    if(iso14443_4a_error != Iso14443_4aErrorNone) {
+        return mf_desfire_process_error(iso14443_4a_error);
     }
 
-    return error;
+    return mf_desfire_process_status_code(status_code);
 }
 
 MfDesfireError mf_desfire_poller_read_version(MfDesfirePoller* instance, MfDesfireVersion* data) {
