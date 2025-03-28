@@ -137,9 +137,9 @@ void rgb_backlight_update(float brightness) {
 
     if(app->settings->rgb_backlight_installed) {
         for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
-            uint8_t r = current_led[i].red * brightness;
-            uint8_t g = current_led[i].green * brightness;
-            uint8_t b = current_led[i].blue * brightness;
+            uint8_t r = current_led[i].red * brightness * 1.0f;
+            uint8_t g = current_led[i].green * brightness * 1.0f;
+            uint8_t b = current_led[i].blue * brightness * 1.0f;
             SK6805_set_led_color(i, r, g, b);
         }
         SK6805_update();

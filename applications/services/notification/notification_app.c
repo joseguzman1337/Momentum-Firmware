@@ -53,7 +53,8 @@ void night_shift_timer_callback(void* context) {
     NotificationApp* app = context;
     DateTime current_date_time;
 
-    // save current night_shift;
+    // IN DEVELOPMENT
+    // // save current night_shift;
     // float old_night_shift = app->current_night_shift;
 
     // take system time and convert to minutes
@@ -70,6 +71,7 @@ void night_shift_timer_callback(void* context) {
         app->rgb_srv->current_night_shift = app->settings.night_shift;
     }
 
+    // IN DEVELOPMENT
     // // if night shift was changed then update stock and rgb backlight to new value
     // if(old_night_shift != app->current_night_shift) {
     //      notification_message(app, &sequence_display_backlight_on);
@@ -177,7 +179,7 @@ static void notification_reset_notification_layer(
             // --- NIGHT SHIFT ---
             furi_hal_light_set(
                 LightBacklight,
-                app->settings.display_brightness * 0xFF * app->current_night_shift);
+                app->settings.display_brightness * 0xFF * app->current_night_shift * 1.0f);
             // --- NIGHT SHIFT END---
         }
         furi_timer_start(app->display_timer, notification_settings_display_off_delay_ticks(app));
@@ -268,7 +270,7 @@ static void notification_process_notification_message(
                 notification_apply_notification_led_layer(
                     &app->display,
                     notification_message->data.led.value * display_brightness_setting *
-                        app->current_night_shift);
+                        app->current_night_shift * 1.0f);
                 reset_mask |= reset_display_mask;
 
                 //start rgb_mod_rainbow_timer when display backlight is ON and all corresponding settings is ON too
@@ -294,7 +296,7 @@ static void notification_process_notification_message(
                 notification_apply_internal_led_layer(
                     &app->display,
                     notification_message->data.led.value * display_brightness_setting *
-                        app->current_night_shift);
+                        app->current_night_shift * 1.0f);
             }
             break;
         case NotificationMessageTypeLedDisplayBacklightEnforceAuto:
@@ -304,7 +306,7 @@ static void notification_process_notification_message(
                     notification_apply_internal_led_layer(
                         &app->display,
                         notification_message->data.led.value * display_brightness_setting *
-                            app->current_night_shift);
+                            app->current_night_shift * 1.0f);
                 }
                 // --- NIGHT SHIFT END ---
             } else {

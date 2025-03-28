@@ -30,7 +30,7 @@ typedef struct {
     uint16_t rainbow_step;
     uint8_t rainbow_saturation;
     uint8_t rainbow_wide;
-    
+
 } RGBBacklightSettingsPrevious;
 
 void rgb_backlight_settings_load(RGBBacklightSettings* settings) {
