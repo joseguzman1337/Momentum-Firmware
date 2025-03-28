@@ -47,7 +47,7 @@ typedef struct {
     bool vibro_on;
     float night_shift;
     uint32_t night_shift_start;
-    uint32_t night_shift_end; 
+    uint32_t night_shift_end;
 } NotificationSettings;
 
 struct NotificationApp {
