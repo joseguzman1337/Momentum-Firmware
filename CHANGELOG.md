@@ -1,5 +1,5 @@
 ## Main changes
-- Current API: 83.1
+- Current API: 83.2
 * SubGHz: Add **Revers RB2 / RB2M Protocol** (static 64 bit) **full support** with add manually (by @xMasterX)
 * SubGHz: **Fix Hollarm protocol with more verification**
 * SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte (who spent 2 weeks on this))
@@ -20,6 +20,11 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW PR 4164: Added Doom animation (by @doomwastaken)
+* OFW PR 4133: add nfc apdu cli command back (by @leommxj)
+* OFW PR 4159: NFC: Support DESFire Transaction MAC file type (by @Willy-JL)
+* OFW PR 4153: NFC: Fix NDEF parser for MIFARE Classic (by @Willy-JL)
+* OFW PR 4160: GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
 * OFW PR 4132: Infrared: Fix universals sending (by @Willy-JL)
 * OFW PR 4149: HID Ble: increased stack and improvements (by @doomwastaken)
 * OFW PR 4126: Stricter constness for const data (by @hedger)
