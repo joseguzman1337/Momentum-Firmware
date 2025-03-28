@@ -149,6 +149,9 @@ void rgb_backlight_update(float brightness) {
 
 // start furi timer for rainbow
 void rainbow_timer_start(RGBBacklightApp* app) {
+    if(furi_timer_is_running(app->rainbow_timer)) {
+        furi_timer_stop(app->rainbow_timer);
+    }
     furi_timer_start(app->rainbow_timer, furi_ms_to_ticks(app->settings->rainbow_speed_ms));
 }
 

@@ -37,6 +37,9 @@ static uint32_t notification_settings_display_off_delay_ticks(NotificationApp* a
 
 void night_shift_timer_start(NotificationApp* app) {
     if(app->settings.night_shift != 1) {
+        if(furi_timer_is_running(app->night_shift_timer)) {
+            furi_timer_stop(app->night_shift_timer);
+        }
         furi_timer_start(app->night_shift_timer, furi_ms_to_ticks(2000));
     }
 }
