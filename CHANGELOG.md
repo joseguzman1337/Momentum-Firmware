@@ -1,5 +1,5 @@
 ## Main changes
-- Current API: 83.2
+- Current API: 83.0
 * SubGHz: Add **Revers RB2 / RB2M Protocol** (static 64 bit) **full support** with add manually (by @xMasterX)
 * SubGHz: **Fix Hollarm protocol with more verification**
 * SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte (who spent 2 weeks on this))
@@ -20,14 +20,17 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
-* OFW PR 4164: Added Doom animation (by @doomwastaken)
+* OFW: Fix DWARF dead code elimination and linking 
+* OFW: NFC: Fix crash on ISO15693-3 save when memory is empty or cannot be read
+* OFW: Reduced ieee754 parser size
+* OFW: Added Doom animation (by @doomwastaken)
 * OFW PR 4133: add nfc apdu cli command back (by @leommxj)
-* OFW PR 4159: NFC: Support DESFire Transaction MAC file type (by @Willy-JL)
-* OFW PR 4153: NFC: Fix NDEF parser for MIFARE Classic (by @Willy-JL)
-* OFW PR 4160: GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
-* OFW PR 4132: Infrared: Fix universals sending (by @Willy-JL)
-* OFW PR 4149: HID Ble: increased stack and improvements (by @doomwastaken)
-* OFW PR 4126: Stricter constness for const data (by @hedger)
+* OFW: NFC: Support DESFire Transaction MAC file type (by @Willy-JL)
+* OFW: NFC: Fix NDEF parser for MIFARE Classic (by @Willy-JL)
+* OFW: GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
+* OFW: Infrared: Fix universals sending (by @Willy-JL)
+* OFW: HID Ble: increased stack and improvements (by @doomwastaken)
+* OFW: Stricter constness for const data (by @hedger)
 * OFW PR 4017: Alarm improvements: Snooze, timeouts, and dismissing from the locked state (by @Astrrra)
 * OFW: fix: flipper detected before it was rebooted
 * OFW: NFC: FeliCa Protocol Expose Read Block API and Allow Specifying Service
