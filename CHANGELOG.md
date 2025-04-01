@@ -85,6 +85,7 @@
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)
+- OFW: BadKB: Support arbitrary key combinations (by @portasynthinca3)
 - UL: Power: Moved Charge Cap to Power Settings as Charge Limit option (by @Dmitry422)
 - Infrared:
   - OFW: Add Fujitsu ASTG12LVCC to AC Universal Remote (by @KereruA0i)
