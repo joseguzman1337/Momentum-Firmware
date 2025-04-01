@@ -15,7 +15,9 @@
 ### Added:
 - Apps:
   - Games: Quadrastic (by @ivanbarsukov)
-  - GPIO: Longwave Clock (by @m7i-org)
+  - GPIO:
+    - A33 Flipper Blackhat (by @o7-machinehum)
+    - Longwave Clock (by @m7i-org)
   - USB: Portal Of Flipper (by @Bettse)
 - UL: Sub-GHz: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
 - RFID:
