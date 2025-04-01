@@ -92,24 +92,24 @@ static int32_t ducky_fnc_string(BadUsbScript* bad_usb, const char* line, int32_t
         token[token_length] = '\0';
 
         // Determine the appropriate map
-        Map* temp_map = bad_usb->constants;
+        map_str_t* temp_map = &(bad_usb->constants);
         if (token[0] == '#')
-            temp_map = bad_usb->constants_sharp;
+            temp_map = &(bad_usb->constants_sharp);
         else if (token[0] == '$')
-            temp_map = bad_usb->variables;
+            temp_map = &(bad_usb->variables);
 
         // Handle mapping
         if (first) {
-            if (ducky_map_get(temp_map, token) == NULL)
+            if (ducky_map_get(*temp_map, token) == NULL)
                 furi_string_set_str(bad_usb->string_print, token);
             else
-                furi_string_set_str(bad_usb->string_print, ducky_map_get(temp_map, token));
+                furi_string_set_str(bad_usb->string_print, ducky_map_get(*temp_map, token));
             first = false;
         } else {
-            if (ducky_map_get(temp_map, token) == NULL)
+            if (ducky_map_get(*temp_map, token) == NULL)
                 furi_string_cat_str(bad_usb->string_print, token);
             else
-                furi_string_cat_str(bad_usb->string_print, ducky_map_get(temp_map, token));
+                furi_string_cat_str(bad_usb->string_print, ducky_map_get(*temp_map, token));
         }
 
         // Free allocated memory
