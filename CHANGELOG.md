@@ -55,6 +55,7 @@
   - BH1750 Lightmeter: Update EV compute logic (by @bogdumi)
   - Cross Remote: Support external IR modules, fix loop transmit with RAW files, support pinning to favorites in firmware (by @leedave)
   - DTMF Dolphin: GPIO sound output (by @Dmitry422)
+  - ESP Flasher Bump Marauder 1.3.0 (by @justcallmekoko), FlipperHTTP 1.8.2 (by @jblanked)
   - FlipSocial: New server backend (by @jblanked)
   - FlipWiFi: Update FlipperHTTP, improve handling of connection errors and network names with symbols (by @jblanked)
   - FlipWorld: Added NPCs, tutorial, in-game menu, new controls, weapon option, many bugfixes and improvements (by @jblanked)
