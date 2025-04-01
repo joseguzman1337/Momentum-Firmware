@@ -77,7 +77,7 @@ Read from serial port until line break character.
 
 **Parameters**
 
-*(optional)* Timeout value in ms.
+- *(optional)* Timeout value in ms.
 
 **Returns**
 
@@ -93,11 +93,11 @@ serial.readln(5000); // Read with 5s timeout
 <br>
 
 ## readAny()
-Read any available amount of data from serial port, can help avoid starving your loop with small reads
+Read any available amount of data from serial port, can help avoid starving your loop with small reads.
 
 **Parameters**
 
-*(optional)* Timeout value in ms
+- *(optional)* Timeout value in ms
 
 **Returns**
 

@@ -130,7 +130,7 @@ Prints a string by Alt+Numpad method - works only on Windows!
 **Parameters**
 
 - A string to print
-- (optional) delay between key presses
+- *(optional)* delay between key presses
 
 **Examples**
 ```js
@@ -145,7 +145,7 @@ Same as `altPrint` but ended with "ENTER" press.
 **Parameters**
 
 - A string to print
-- (optional) delay between key presses
+- *(optional)* delay between key presses
 
 **Examples**
 ```js

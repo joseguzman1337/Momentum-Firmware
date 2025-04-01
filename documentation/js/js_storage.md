@@ -507,5 +507,3 @@ Deinitialize virtual mount api.
 **Returns**
 
 Nothing on success, error on failure.
-
-<br>

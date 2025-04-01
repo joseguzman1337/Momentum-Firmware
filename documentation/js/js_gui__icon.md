@@ -9,6 +9,7 @@ For an example, refer to the `gui.js` example script.
 
 ## getBuiltin()
 Gets a built-in firmware icon by its name.
+All known icons bundled with firmware are supported.
 
 **Parameters**
   - `icon`: name of the icon
@@ -29,5 +30,3 @@ It will be automatically unloaded when the script exits.
 **Returns**
 
 An `IconData` object.
-
-<br>

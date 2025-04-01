@@ -144,7 +144,7 @@ Wrappers around `ArrayBuffer` objects, with dedicated types such as:
 **Fields**
 
 - byteLength: The length of the buffer in bytes
-- length: The length of the buffer in bytestyped elements
+- length: The length of the buffer in typed elements
 - buffer: The underlying `ArrayBuffer`
 <br>
 
@@ -313,4 +313,3 @@ Checks whether all of the specified extra features are supported by the interpre
 ```js
 checkSdkFeatures(["gui-widget"]);
 ```
-<br>
