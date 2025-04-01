@@ -182,6 +182,7 @@ void desktop_settings_scene_start_on_enter(void* context) {
     variable_item_list_add(variable_item_list, "Favorite App - Left Long", 1, NULL, NULL);
     variable_item_list_add(variable_item_list, "Favorite App - Right Short", 1, NULL, NULL);
     variable_item_list_add(variable_item_list, "Favorite App - Right Long", 1, NULL, NULL);
+    variable_item_list_add(variable_item_list, "Favorite App - Ok Long", 1, NULL, NULL);
 
     variable_item_list_add(variable_item_list, "DummyMode - Left", 1, NULL, NULL);
     variable_item_list_add(variable_item_list, "DummyMode - Left Long", 1, NULL, NULL);
