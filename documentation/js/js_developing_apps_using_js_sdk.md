@@ -14,6 +14,10 @@ In this guide, we'll install the JavaScript SDK and learn how to run JavaScript 
 
 The JavaScript SDK for Flipper Zero is distributed as an [NPM package](npmjs.com/package/\@flipperdevices/fz-sdk), so you can install it using a package manager like npm, pnpm, or yarn. You'll also need Node.js, a JavaScript runtime environment required for the NPM package manager to work.
 
+Some Custom Firmwares have their own JavaScript SDK, which can contain additional features. Scripts made with the Official Flipper JavaScript SDK will work on Custom Firmwares, while the opposite might not always be true. The SDK offers [ways to check this compatibility](#js_builtin_sdk_compatibility) as a script developer, so you can make your script work on multiple Firmwares, and take advantage of the extra features when they are available.
+
+You can find the Momentum JavaScript SDK NPM package [here](https://www.npmjs.com/package/@next-flip/fz-sdk-mntm).
+
 > [!note]
 > In this guide, we'll use **npm**, the default package manager for Node.js.
 
@@ -68,6 +72,27 @@ Code completion helps speed up the development process by automatically suggesti
 The JS minifier reduces the size of JavaScript files by removing unnecessary characters (like spaces, tabs and line breaks) and shortening variable names. This can make your scripts run a bit faster without changing their logic.
 
 However, it has a drawback — it can make debugging harder, as error messages in minified files are harder to read in larger applications. For this reason, it's recommended to disable the JS minifier during debugging and it's disabled by default. To enable it, set the `minify` parameter to `true` in the `fz-sdk.config.json5` file in your app folder. This will minify your JavaScript app before loading it onto Flipper Zero.
+
+
+## Differences with normal Flipper JavaScript
+
+With the Flipper JavaScript SDK, you will be developing in **TypeScript**. This means that you get a better development experience, with more accurate code completion and warnings when variable types are incompatible, but it also means your code will be different from basic Flipper JS.
+
+Some things to look out for:
+- Importing modules:
+  - Instead of `let module = require("module");`
+  - You will use `import * as module from "@flipperdevices/fz-sdk/module";`
+- Multiple source code files:
+  - The Flipper JavaScript SDK does not yet support having multiple `.ts` files and importing them
+  - You can use `load()`, but this will not benefit from TypeScript type checking
+- Casting values:
+  - Some Flipper JavaScript functions will return generic types
+  - For example `eventLoop.subscribe()` will run your callback with a generic `Item` type
+  - In some cases you might need to cast these values before using them, you can do this by:
+  - Inline casting: `<string>item`
+  - Declare with new type: `let text = item as string;`
+
+When you upload the script to Flipper with `npm start`, it gets transpiled to normal JavaScript and optionally minified (see below). If you're looking to share your script with others, this is what you should give them to run.
 
 
 ## What's next?

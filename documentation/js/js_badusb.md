@@ -23,7 +23,7 @@ badusb.setup();
 // Start USB HID with custom vid:pid = AAAA:BBBB, manufacturer and product strings not defined
 badusb.setup({ vid: 0xAAAA, pid: 0xBBBB }); 
 // Start USB HID with custom vid:pid = AAAA:BBBB, manufacturer string = "Flipper Devices", product string = "Flipper Zero"
-badusb.setup({ vid: 0xAAAA, pid: 0xBBBB, mfr_name: "Flipper Devices", prod_name: "Flipper Zero" });
+badusb.setup({ vid: 0xAAAA, pid: 0xBBBB, mfrName: "Flipper Devices", prodName: "Flipper Zero" });
 ```
 
 <br>

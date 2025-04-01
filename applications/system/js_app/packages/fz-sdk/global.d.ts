@@ -329,7 +329,7 @@ declare class Array<T> {
      *          array
      * @version Added in JS SDK 0.1
      */
-    splice(start: number, deleteCount: number): T[];
+    splice(start: number, deleteCount?: number): T[];
     /**
      * @brief Adds a value to the end of the array
      * @param value The value to add

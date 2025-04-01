@@ -1,7 +1,6 @@
-# js_gui__byte_input {#js_gui__byte_input}
+# Byte input GUI view {#js_gui__byte_input}
 
-# Byte input GUI view
-Displays a keyboard.
+Displays a hexadecimal keyboard.
 
 <img src="byte_input.png" width="200" alt="Sample screenshot of the view" />
 
