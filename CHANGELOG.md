@@ -18,7 +18,9 @@
   - GPIO:
     - A33 Flipper Blackhat (by @o7-machinehum)
     - Longwave Clock (by @m7i-org)
-  - NFC: Passport Reader (by @bettse)
+  - NFC:
+    - APDU Runner: (by @SpenserCai)
+    - Passport Reader (by @bettse)
   - USB: Portal Of Flipper (by @Bettse & @sanjay900)
 - UL: Sub-GHz: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
 - RFID:
