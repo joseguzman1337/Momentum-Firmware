@@ -95,6 +95,7 @@
   - Fix crash on ISO15693-3 save when memory is empty or cannot be read (by @Willy-JL)
 - Infrared: Fix universals sending (by @Willy-JL)
 - GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
+- JS: Fix `Number.toString()` with decimals (by @Willy-JL)
 - Sub-GHz:
   - UL: Fix Hollarm protocol with more verification (by @xMasterX)
   - UL: Fix GangQi protocol (by @DoberBit and @mishamyte)
