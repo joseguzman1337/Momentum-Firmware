@@ -4,18 +4,19 @@
 let badusb = require("badusb");
 ```
 # Methods
-## setup
+## setup()
 Start USB HID with optional parameters. Should be called before all other methods.
 Automatically unlocks USB profile, so qFlipper connection will be interrupted.
 
-### Parameters
-Configuration object (optional):
+**Parameters**
+
+Configuration object *(optional)*:
 - vid, pid (number): VID and PID values, both are mandatory
 - mfrName (string): Manufacturer name (32  ASCII characters max), optional
 - prodName (string): Product name (32  ASCII characters max), optional
 - layoutPath (string): Path to keyboard layout file, optional
 
-### Examples:
+**Examples**
 ```js
 // Start USB HID with default parameters
 badusb.setup();
@@ -25,10 +26,12 @@ badusb.setup({ vid: 0xAAAA, pid: 0xBBBB });
 badusb.setup({ vid: 0xAAAA, pid: 0xBBBB, mfr_name: "Flipper Devices", prod_name: "Flipper Zero" });
 ```
 
-## isConnected
+<br>
+
+## isConnected()
 Returns USB connection state.
 
-### Example:
+**Example**
 ```js
 if (badusb.isConnected()) {
     // Do something
@@ -37,15 +40,18 @@ if (badusb.isConnected()) {
 }
 ```
 
-## press
+<br>
+
+## press()
 Press and release a key.
 
-### Parameters
+**Parameters**
+
 Key or modifier name, key code.
 
-See a list of key names below.
+See a [list of key names below](#js_badusb_keynames).
 
-### Examples:
+**Examples**
 ```js
 badusb.press("a"); // Press "a" key
 badusb.press("A"); // SHIFT + "a"
@@ -55,92 +61,109 @@ badusb.press(98); // Press key with HID code (dec) 98 (Numpad 0 / Insert)
 badusb.press(0x47); // Press key with HID code (hex) 0x47 (Scroll lock)
 ```
 
-## hold
+<br>
+
+## hold()
 Hold a key. Up to 5 keys (excluding modifiers) can be held simultaneously.
 
-### Parameters
+**Parameters**
+
 Same as `press`.
 
-### Examples:
+**Examples**
 ```js
 badusb.hold("a"); // Press and hold "a" key
 badusb.hold("CTRL", "v"); // Press and hold CTRL + "v" combo
 ```
 
-## release
+<br>
+
+## release()
 Release a previously held key.
 
-### Parameters
+**Parameters**
+
 Same as `press`.
 
 Release all keys if called without parameters.
 
-### Examples:
+**Examples**
 ```js
 badusb.release(); // Release all keys
 badusb.release("a"); // Release "a" key
 ```
 
-## print
+<br>
+
+## print()
 Print a string.
 
-### Parameters
+**Parameters**
+
 - A string to print
 - *(optional)* Delay between key presses
 
-### Examples:
+**Examples**
 ```js
 badusb.print("Hello, world!"); // print "Hello, world!"
 badusb.print("Hello, world!", 100); // Add 100ms delay between key presses
 ```
+<br>
 
-## println
+## println()
 Same as `print` but ended with "ENTER" press.
 
-### Parameters
+**Parameters**
+
 - A string to print
 - *(optional)* Delay between key presses
 
-### Examples:
+**Examples**
 ```js
 badusb.println("Hello, world!");  // print "Hello, world!" and press "ENTER"
 ```
+<br>
 
-## altPrint
+## altPrint()
 Prints a string by Alt+Numpad method - works only on Windows!
 
-### Parameters
+**Parameters**
+
 - A string to print
 - (optional) delay between key presses
 
-### Examples:
+**Examples**
 ```js
 badusb.altPrint("Hello, world!"); // print "Hello, world!"
 badusb.altPrint("Hello, world!", 100); // Add 100ms delay between key presses
 ```
+<br>
 
-## altPrintln
+## altPrintln()
 Same as `altPrint` but ended with "ENTER" press.
 
-### Parameters
+**Parameters**
+
 - A string to print
 - (optional) delay between key presses
 
-### Examples:
+**Examples**
 ```js
 badusb.altPrintln("Hello, world!");  // print "Hello, world!" and press "ENTER"
 ```
+<br>
 
-## quit
+## quit()
 Releases usb, optional, but allows to interchange with usbdisk.
 
-### Examples:
+**Examples**
 ```js
 badusb.quit();
 usbdisk.start(...)
 ```
+<br>
 
-# Key names list
+# Key names list {#js_badusb_keynames}
 
 ## Modifier keys
 

@@ -31,6 +31,7 @@
 - Desktop:
   - UL: Option to prevent Auto Lock when connected to USB/RPC (by @Dmitry422)
   - OFW: Add the Showtime animation (by @Astrrra)
+  - OFW: Added Doom animation, removed winter holiday animations (by @doomwastaken)
 - JS:
   - OFW: Features & bugfixes, SDK 0.2 (by @portasynthinca3)
     - New `gui/widget` view, replaces old `widget` module
@@ -61,6 +62,7 @@
   - Solitaire: Fixed cards from waste can be placed on the first tableau (by @Erbonator3000)
   - W5500 Ethernet: Add traceroute command (by @arag0re)
   - Wardriver: Fix swapped Channel/RSSI (by @jamisonderek)
+  - OFW: USB/BT Remote: Fix TikTok remote, increased stack size (by @doomwastaken)
   - Many app fixes for new firmware changes (by @xMasterX & @Willy-JL)
 - BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
   - Additionally, can now customize MAC address when BLE Remember is enabled
@@ -68,7 +70,7 @@
 - Main Menu: Refined CoverFlow menu style (#379 by @956MB)
 - NFC:
   - Support MIFARE DESFire Transaction MAC file type, fixes reading some EV2+ cards (by @Willy-JL)
-  - Improvements and fixes for NDEF parsing on MIFARE Classic (by @Willy-JL)
+  - Improve NDEF parser handling and display of raw non-text data (by @Willy-JL)
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)
@@ -83,10 +85,15 @@
   - OFW: Update mbedtls & expose AES to API (by @portasynthinca3)
   - OFW: Stdio API improvements, pipe stdout timeout (by @portasynthinca3)
   - OFW: Stricter constness for const data (by @hedger)
+  - OFW: Reduced ieee754 parser size (by @portasynthinca3)
 
 ### Fixed:
 - Asset Packs: Fix level-up animations not being themed (by @Willy-JL)
 - About: Fix missing Prev. button when invoked from Device Info keybind (by @Willy-JL)
+- NFC:
+  - Fix parsing large NDEF payloads on MIFARE Classic cards, fix MAD format edge cases (by @Willy-JL)
+  - Fix crash on ISO15693-3 save when memory is empty or cannot be read (by @Willy-JL)
+- Infrared: Fix universals sending (by @Willy-JL)
 - GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
 - Sub-GHz:
   - UL: Fix Hollarm protocol with more verification (by @xMasterX)
@@ -99,6 +106,7 @@
   - OFW: Various bug fixes and improvements (by @skotopes)
   - OFW: Clear IRQ status before calling user handler, fixes some interrupt edge cases / weirdness (by @mammothbane)
   - OFW: Ensure that `furi_record_create()` is passed a non-NULL data pointer (by @dcoles)
+- OFW: FBT: Fix DWARF dead code elimination and linking (by @GMMan)
 - OFW: CLI: Fixed repeat in subghz tx_from_file command (by @Jnesselr)
 - OFW: VSCode: Disabled auto-update for clangd since correct version is in the toolchain (by @hedger)
 - OFW: uFBT: Bumped action version in example github workflow for project template (by @hedger)

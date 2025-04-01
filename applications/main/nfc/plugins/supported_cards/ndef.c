@@ -22,6 +22,7 @@
 #include <nfc/protocols/slix/slix.h>
 
 #include <bit_lib.h>
+#include <toolbox/pretty_format.h>
 
 #define TAG "NDEF"
 
@@ -248,7 +249,9 @@ static inline bool is_printable(char c) {
 
 static bool is_text(const uint8_t* buf, size_t len) {
     for(size_t i = 0; i < len; i++) {
-        if(!is_printable(buf[i])) return false;
+        if(!is_printable(buf[i]) && !(buf[i] == '\0' && i == len - 1)) {
+            return false;
+        }
     }
     return true;
 }
@@ -264,7 +267,7 @@ static bool ndef_dump(Ndef* ndef, const char* prefix, size_t pos, size_t len, bo
         for(size_t i = 0; i < len; i++) {
             char c;
             if(!ndef_get(ndef, pos + i, 1, &c)) return false;
-            if(!is_printable(c)) {
+            if(!is_printable(c) && !(c == '\0' && i == len - 1)) {
                 furi_string_left(ndef->output, string_prev);
                 force_hex = true;
                 break;
@@ -272,14 +275,18 @@ static bool ndef_dump(Ndef* ndef, const char* prefix, size_t pos, size_t len, bo
             furi_string_push_back(ndef->output, c);
         }
     }
-    if(force_hex) {
-        for(size_t i = 0; i < len; i++) {
-            uint8_t b;
-            if(!ndef_get(ndef, pos + i, 1, &b)) return false;
-            furi_string_cat_printf(ndef->output, "%02X ", b);
+    if(!force_hex) {
+        furi_string_cat(ndef->output, "\n");
+    } else {
+        uint8_t buf[4];
+        for(size_t i = 0; i < len; i += sizeof(buf)) {
+            uint8_t buf_len = MIN(sizeof(buf), len - i);
+            if(!ndef_get(ndef, pos + i, buf_len, &buf)) return false;
+            pretty_format_bytes_hex_canonical(
+                ndef->output, 4, PRETTY_FORMAT_FONT_MONOSPACE, buf, buf_len);
+            furi_string_cat(ndef->output, "\n");
         }
     }
-    furi_string_cat(ndef->output, "\n");
     return true;
 }
 
@@ -289,9 +296,7 @@ static void
     if(!force_hex && is_text(buf, len)) {
         furi_string_cat_printf(ndef->output, "%.*s", len, (const char*)buf);
     } else {
-        for(size_t i = 0; i < len; i++) {
-            furi_string_cat_printf(ndef->output, "%02X ", ((const uint8_t*)buf)[i]);
-        }
+        pretty_format_bytes_hex_canonical(ndef->output, 4, PRETTY_FORMAT_FONT_MONOSPACE, buf, len);
     }
     furi_string_cat(ndef->output, "\n");
 }

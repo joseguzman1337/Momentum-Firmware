@@ -1,90 +1,112 @@
 # Built-in methods {#js_builtin}
 
-## require
+## require()
 Load a module plugin.
 
-### Parameters
+**Parameters**
 - Module name
 
-### Examples:
+**Examples**
 ```js
 let serial = require("serial"); // Load "serial" module
 ```
 
-## delay
-### Parameters
+<br>
+
+## delay()
+**Parameters**
 - Delay value in ms
 
-### Examples:
+**Examples**
 ```js
 delay(500); // Delay for 500ms
 ```
-## print
+<br>
+
+## print()
 Print a message on a screen console.
 
-### Parameters
+**Parameters**
 The following argument types are supported:
 - String
 - Number
 - Bool
 - undefined
 
-### Examples:
+**Examples**
 ```js
 print("string1", "string2", 123);
 ```
+<br>
 
-## console.log
-## console.warn
-## console.error
-## console.debug
+## console.log()
+
+<br>
+
+## console.warn()
+
+<br>
+
+## console.error()
+
+<br>
+
+## console.debug()
 Same as `print`, but output to serial console only, with corresponding log level.
 
-## toString
+<br>
+
+## toString()
 Convert a number to string with an optional base.
 
-### Examples:
+**Examples**
 ```js
 toString(123) // "123"
 toString(123, 16) // "0x7b"
 ```
+<br>
 
-## parseInt
+## parseInt()
 Converts a string to a number.
 
-### Examples:
+**Examples**
 ```js
 parseInt("123") // 123
 ```
+<br>
 
-## toUpperCase
+## toUpperCase()
 Transforms a string to upper case.
 
-### Examples:
+**Examples**
 ```js
 toUpperCase("Example") // "EXAMPLE"
 ```
+<br>
 
-## toLowerCase
+## toLowerCase()
 Transforms a string to lower case.
 
-### Examples:
+**Examples**
 ```js
 toLowerCase("Example") // "example"
 ```
+<br>
 
 ## __dirname
 Path to the directory containing the current script.
 
-### Examples:
+**Examples**
 ```js
 print(__dirname); // /ext/apps/Scripts/Examples
 ```
+<br>
 
 ## __filename
 Path to the current script file.
 
-### Examples:
+**Examples**
 ```js
 print(__filename); // /ext/apps/Scripts/Examples/path.js
 ```
+<br>
