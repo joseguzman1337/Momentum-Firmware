@@ -162,6 +162,8 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                 // Apply to current script config
                 furi_hal_random_fill_buf(
                     bad_usb->script_hid_cfg.ble.mac, sizeof(bad_usb->script_hid_cfg.ble.mac));
+                bad_usb->script_hid_cfg.ble.mac[sizeof(bad_usb->script_hid_cfg.ble.mac) - 1] |=
+                    0b11 << 6; // Set 2 MSB for Random Static Address
                 // Set in user config to save in settings file
                 memcpy(
                     bad_usb->user_hid_cfg.ble.mac,
