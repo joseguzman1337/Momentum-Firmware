@@ -63,7 +63,7 @@ jobs:
         id: check_timeout
         if: failure()
         run: |
-          echo "${{ steps.flashing.outcome }}" "${{ steps.flashing.conclusion }}"
+          echo "outcome" "${{ steps.flashing.outcome }}" "conclusion" "${{ steps.flashing.conclusion }}" "exitCode" "${{ steps.flashing.exitCode }}"
           if grep -q "has timed out" "${{ github.workspace }}/logs.txt" 2>/dev/null; then
             echo "timed_out=true" >> $GITHUB_OUTPUT
           elif [ "${{ steps.flashing.conclusion }}" == "timed_out" ] || \
