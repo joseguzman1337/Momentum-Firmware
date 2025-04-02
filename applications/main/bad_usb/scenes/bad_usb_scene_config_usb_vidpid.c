@@ -14,8 +14,8 @@ void bad_usb_scene_config_usb_vidpid_on_enter(void* context) {
     BadUsbApp* bad_usb = context;
     ByteInput* byte_input = bad_usb->byte_input;
 
-    bad_usb->usb_vidpid_buf[0] = __REVSH(bad_usb->script_hid_cfg.usb.vid);
-    bad_usb->usb_vidpid_buf[1] = __REVSH(bad_usb->script_hid_cfg.usb.pid);
+    bad_usb->usb_vidpid_buf[0] = __builtin_bswap16(bad_usb->script_hid_cfg.usb.vid);
+    bad_usb->usb_vidpid_buf[1] = __builtin_bswap16(bad_usb->script_hid_cfg.usb.pid);
     byte_input_set_header_text(byte_input, "Set USB VID:PID");
 
     byte_input_set_result_callback(
@@ -37,8 +37,8 @@ bool bad_usb_scene_config_usb_vidpid_on_event(void* context, SceneManagerEvent e
         consumed = true;
         if(event.event == ByteInputResultOk) {
             // Apply to current script config
-            bad_usb->script_hid_cfg.usb.vid = __REVSH(bad_usb->usb_vidpid_buf[0]);
-            bad_usb->script_hid_cfg.usb.pid = __REVSH(bad_usb->usb_vidpid_buf[1]);
+            bad_usb->script_hid_cfg.usb.vid = __builtin_bswap16(bad_usb->usb_vidpid_buf[0]);
+            bad_usb->script_hid_cfg.usb.pid = __builtin_bswap16(bad_usb->usb_vidpid_buf[1]);
             // Set in user config to save in settings file
             bad_usb->user_hid_cfg.usb.vid = bad_usb->script_hid_cfg.usb.vid;
             bad_usb->user_hid_cfg.usb.pid = bad_usb->script_hid_cfg.usb.pid;
