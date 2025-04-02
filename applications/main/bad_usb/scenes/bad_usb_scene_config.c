@@ -175,6 +175,7 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                     bad_usb->user_hid_cfg.ble.mac,
                     bad_usb->script_hid_cfg.ble.mac,
                     sizeof(bad_usb->user_hid_cfg.ble.mac));
+                scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneDone);
                 break;
             case ConfigIndexBleRemovePairing:
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfirmUnpair);
@@ -207,6 +208,7 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                 // Set in user config to save in settings file
                 bad_usb->user_hid_cfg.usb.vid = bad_usb->script_hid_cfg.usb.vid;
                 bad_usb->user_hid_cfg.usb.pid = bad_usb->script_hid_cfg.usb.pid;
+                scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneDone);
                 break;
             default:
                 break;
