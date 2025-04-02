@@ -9,7 +9,7 @@ env:
   FBT_GIT_SUBMODULE_SHALLOW: 1
 
 jobs:
-  attempt1:
+  updater_attempt1:
     runs-on: [self-hosted, FlipperZeroTest]
     outputs:
       timed_out: ${{ steps.check_timeout.outputs.timed_out }}
@@ -22,7 +22,7 @@ jobs:
 
       - name: Flashing target firmware
         id: first_full_flash
-        timeout-minutes: 5
+        timeout-minutes: 4
         continue-on-error: true
         run: |
           source scripts/toolchain/fbtenv.sh
@@ -32,7 +32,7 @@ jobs:
       - name: Validating updater
         id: second_full_flash
         if: steps.first_full_flash.outcome == 'success'
-        timeout-minutes: 5
+        timeout-minutes: 4
         continue-on-error: true
         run: |
           source scripts/toolchain/fbtenv.sh
@@ -53,55 +53,9 @@ jobs:
             echo "timed_out=false" >> $GITHUB_OUTPUT
           fi
 
-  attempt2:
-    needs: attempt1
-    if: needs.attempt1.outputs.timed_out == 'true'
-    runs-on: [self-hosted, FlipperZeroTest]
-    outputs:
-      timed_out: ${{ steps.check_timeout.outputs.timed_out }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Flashing target firmware
-        id: first_full_flash
-        timeout-minutes: 5
-        continue-on-error: true
-        run: |
-          source scripts/toolchain/fbtenv.sh
-          python3 scripts/testops.py -t=180 await_flipper
-          ./fbt flash_usb_full FORCE=1
-
-      - name: Validating updater
-        id: second_full_flash
-        if: steps.first_full_flash.outcome == 'success'
-        timeout-minutes: 5
-        continue-on-error: true
-        run: |
-          source scripts/toolchain/fbtenv.sh
-          python3 scripts/testops.py -t=180 await_flipper
-          ./fbt flash_usb FORCE=1
-          python3 scripts/testops.py -t=180 await_flipper
-
-      - name: Check for timeout
-        id: check_timeout
-        run: |
-          if grep -q "Timeout" "${{ github.workspace }}/logs.txt" 2>/dev/null; then
-            echo "timed_out=true" >> $GITHUB_OUTPUT
-          elif [ "${{ steps.first_full_flash.outcome }}" == "failure" ] && [ "${{ steps.first_full_flash.conclusion }}" == "timed_out" ]; then
-            echo "timed_out=true" >> $GITHUB_OUTPUT
-          elif [ "${{ steps.second_full_flash.outcome }}" == "failure" ] && [ "${{ steps.second_full_flash.conclusion }}" == "timed_out" ]; then
-            echo "timed_out=true" >> $GITHUB_OUTPUT
-          else
-            echo "timed_out=false" >> $GITHUB_OUTPUT
-          fi
-
-  attempt3:
-    needs: attempt2
-    if: needs.attempt2.outputs.timed_out == 'true'
+  updater_attempt2:
+    needs: updater_attempt1
+    if: needs.updater_attempt1.outputs.timed_out == 'true'
     runs-on: [self-hosted, FlipperZeroTest]
     steps:
       - name: Checkout code
@@ -111,14 +65,14 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Flashing target firmware
-        timeout-minutes: 5
+        timeout-minutes: 4
         run: |
           source scripts/toolchain/fbtenv.sh
           python3 scripts/testops.py -t=180 await_flipper
           ./fbt flash_usb_full FORCE=1
 
       - name: Validating updater
-        timeout-minutes: 5
+        timeout-minutes: 4
         run: |
           source scripts/toolchain/fbtenv.sh
           python3 scripts/testops.py -t=180 await_flipper
