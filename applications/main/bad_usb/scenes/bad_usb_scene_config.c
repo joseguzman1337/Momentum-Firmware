@@ -10,7 +10,7 @@ enum ConfigIndexBle {
     ConfigIndexBlePairingMode,
     ConfigIndexBleSetDeviceName,
     ConfigIndexBleSetMacAddress,
-    ConfigIndexBleRandomizeMac,
+    ConfigIndexBleRandomizeMacAddress,
     ConfigIndexBleRestoreDefaults,
     ConfigIndexBleRemovePairing,
 };
@@ -108,7 +108,7 @@ static void draw_menu(BadUsbApp* bad_usb) {
 
         variable_item_list_add(var_item_list, "Set MAC Address", 0, NULL, NULL);
 
-        variable_item_list_add(var_item_list, "Randomize MAC", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Randomize MAC Address", 0, NULL, NULL);
 
         variable_item_list_add(var_item_list, "Restore BLE Defaults", 0, NULL, NULL);
 
@@ -169,7 +169,7 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
             case ConfigIndexBleSetMacAddress:
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfigBleMac);
                 break;
-            case ConfigIndexBleRandomizeMac:
+            case ConfigIndexBleRandomizeMacAddress:
                 // Apply to current script config
                 furi_hal_random_fill_buf(
                     bad_usb->script_hid_cfg.ble.mac, sizeof(bad_usb->script_hid_cfg.ble.mac));
