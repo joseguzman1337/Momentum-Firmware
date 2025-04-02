@@ -6,18 +6,18 @@ enum ConfigIndex {
 };
 
 enum ConfigIndexBle {
-    ConfigIndexBleRemember = ConfigIndexConnection + 1,
-    ConfigIndexBlePairing,
-    ConfigIndexBleDeviceName,
-    ConfigIndexBleMacAddress,
+    ConfigIndexBlePersistPairing = ConfigIndexConnection + 1,
+    ConfigIndexBlePairingMode,
+    ConfigIndexBleSetDeviceName,
+    ConfigIndexBleSetMacAddress,
     ConfigIndexBleRandomizeMac,
-    ConfigIndexBleUnpair,
+    ConfigIndexBleRemovePairing,
 };
 
 enum ConfigIndexUsb {
-    ConfigIndexUsbManufacturer = ConfigIndexConnection + 1,
-    ConfigIndexUsbProductName,
-    ConfigIndexUsbVidPid,
+    ConfigIndexUsbSetManufacturerName = ConfigIndexConnection + 1,
+    ConfigIndexUsbSetProductName,
+    ConfigIndexUsbSetVidPid,
     ConfigIndexUsbRandomizeVidPid,
 };
 
@@ -32,7 +32,7 @@ void bad_usb_scene_config_connection_callback(VariableItem* item) {
     view_dispatcher_send_custom_event(bad_usb->view_dispatcher, ConfigIndexConnection);
 }
 
-void bad_usb_scene_config_ble_remember_callback(VariableItem* item) {
+void bad_usb_scene_config_ble_persist_pairing_callback(VariableItem* item) {
     BadUsbApp* bad_usb = variable_item_get_context(item);
     bool value = variable_item_get_current_value_index(item);
     // Apply to current script config
@@ -42,19 +42,19 @@ void bad_usb_scene_config_ble_remember_callback(VariableItem* item) {
     variable_item_set_current_value_text(item, value ? "ON" : "OFF");
 }
 
-const char* const ble_pairing_names[GapPairingCount] = {
+const char* const ble_pairing_mode_names[GapPairingCount] = {
     "YesNo",
     "PIN Type",
     "PIN Y/N",
 };
-void bad_usb_scene_config_ble_pairing_callback(VariableItem* item) {
+void bad_usb_scene_config_ble_pairing_mode_callback(VariableItem* item) {
     BadUsbApp* bad_usb = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
     // Apply to current script config
     bad_usb->script_hid_cfg.ble.pairing = index;
     // Set in user config to save in settings file
     bad_usb->user_hid_cfg.ble.pairing = index;
-    variable_item_set_current_value_text(item, ble_pairing_names[index]);
+    variable_item_set_current_value_text(item, ble_pairing_mode_names[index]);
 }
 
 void bad_usb_scene_config_select_callback(void* context, uint32_t index) {
@@ -81,34 +81,38 @@ static void draw_menu(BadUsbApp* bad_usb) {
         BleProfileHidParams* ble_hid_cfg = &bad_usb->script_hid_cfg.ble;
 
         item = variable_item_list_add(
-            var_item_list, "BLE Remember", 2, bad_usb_scene_config_ble_remember_callback, bad_usb);
+            var_item_list,
+            "Persist Pairing",
+            2,
+            bad_usb_scene_config_ble_persist_pairing_callback,
+            bad_usb);
         variable_item_set_current_value_index(item, ble_hid_cfg->bonding);
         variable_item_set_current_value_text(item, ble_hid_cfg->bonding ? "ON" : "OFF");
 
         item = variable_item_list_add(
             var_item_list,
-            "BLE Pairing",
+            "Pairing Mode",
             GapPairingCount,
-            bad_usb_scene_config_ble_pairing_callback,
+            bad_usb_scene_config_ble_pairing_mode_callback,
             bad_usb);
         variable_item_set_current_value_index(item, ble_hid_cfg->pairing);
-        variable_item_set_current_value_text(item, ble_pairing_names[ble_hid_cfg->pairing]);
+        variable_item_set_current_value_text(item, ble_pairing_mode_names[ble_hid_cfg->pairing]);
 
-        variable_item_list_add(var_item_list, "BLE Device Name", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Set Device Name", 0, NULL, NULL);
 
-        variable_item_list_add(var_item_list, "BLE MAC Address", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Set MAC Address", 0, NULL, NULL);
 
-        variable_item_list_add(var_item_list, "Randomize BLE MAC", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Randomize MAC", 0, NULL, NULL);
 
         variable_item_list_add(var_item_list, "Remove BLE Pairing", 0, NULL, NULL);
     } else {
-        variable_item_list_add(var_item_list, "USB Manufacturer", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Set Manufacturer Name", 0, NULL, NULL);
 
-        variable_item_list_add(var_item_list, "USB Product Name", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Set Product Name", 0, NULL, NULL);
 
-        variable_item_list_add(var_item_list, "USB VID and PID", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Set VID and PID", 0, NULL, NULL);
 
-        variable_item_list_add(var_item_list, "Randomize USB VID:PID", 0, NULL, NULL);
+        variable_item_list_add(var_item_list, "Randomize VID and PID", 0, NULL, NULL);
     }
 }
 
@@ -148,10 +152,10 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
         }
         if(bad_usb->interface == BadUsbHidInterfaceBle) {
             switch(event.event) {
-            case ConfigIndexBleDeviceName:
+            case ConfigIndexBleSetDeviceName:
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfigBleName);
                 break;
-            case ConfigIndexBleMacAddress:
+            case ConfigIndexBleSetMacAddress:
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfigBleMac);
                 break;
             case ConfigIndexBleRandomizeMac:
@@ -164,7 +168,7 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                     bad_usb->script_hid_cfg.ble.mac,
                     sizeof(bad_usb->user_hid_cfg.ble.mac));
                 break;
-            case ConfigIndexBleUnpair:
+            case ConfigIndexBleRemovePairing:
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfirmUnpair);
                 break;
             default:
@@ -172,17 +176,17 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
             }
         } else {
             switch(event.event) {
-            case ConfigIndexUsbManufacturer:
+            case ConfigIndexUsbSetManufacturerName:
                 scene_manager_set_scene_state(
                     bad_usb->scene_manager, BadUsbSceneConfigUsbName, true);
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfigUsbName);
                 break;
-            case ConfigIndexUsbProductName:
+            case ConfigIndexUsbSetProductName:
                 scene_manager_set_scene_state(
                     bad_usb->scene_manager, BadUsbSceneConfigUsbName, false);
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfigUsbName);
                 break;
-            case ConfigIndexUsbVidPid:
+            case ConfigIndexUsbSetVidPid:
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfigUsbVidPid);
                 break;
             case ConfigIndexUsbRandomizeVidPid:
