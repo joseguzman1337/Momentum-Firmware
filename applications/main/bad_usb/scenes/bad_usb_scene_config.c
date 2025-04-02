@@ -11,6 +11,7 @@ enum ConfigIndexBle {
     ConfigIndexBleSetDeviceName,
     ConfigIndexBleSetMacAddress,
     ConfigIndexBleRandomizeMac,
+    ConfigIndexBleRestoreDefaults,
     ConfigIndexBleRemovePairing,
 };
 
@@ -19,6 +20,7 @@ enum ConfigIndexUsb {
     ConfigIndexUsbSetProductName,
     ConfigIndexUsbSetVidPid,
     ConfigIndexUsbRandomizeVidPid,
+    ConfigIndexUsbRestoreDefaults,
 };
 
 void bad_usb_scene_config_connection_callback(VariableItem* item) {
@@ -108,6 +110,8 @@ static void draw_menu(BadUsbApp* bad_usb) {
 
         variable_item_list_add(var_item_list, "Randomize MAC", 0, NULL, NULL);
 
+        variable_item_list_add(var_item_list, "Restore BLE Defaults", 0, NULL, NULL);
+
         variable_item_list_add(var_item_list, "Remove BLE Pairing", 0, NULL, NULL);
     } else {
         variable_item_list_add(var_item_list, "Set Manufacturer Name", 0, NULL, NULL);
@@ -117,6 +121,8 @@ static void draw_menu(BadUsbApp* bad_usb) {
         variable_item_list_add(var_item_list, "Set VID and PID", 0, NULL, NULL);
 
         variable_item_list_add(var_item_list, "Randomize VID and PID", 0, NULL, NULL);
+
+        variable_item_list_add(var_item_list, "Restore USB Defaults", 0, NULL, NULL);
     }
 }
 
@@ -177,6 +183,21 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                     sizeof(bad_usb->user_hid_cfg.ble.mac));
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneDone);
                 break;
+            case ConfigIndexBleRestoreDefaults:
+                // Apply to current script config
+                bad_usb->script_hid_cfg.ble.name[0] = '\0';
+                memset(
+                    bad_usb->script_hid_cfg.ble.mac, 0, sizeof(bad_usb->script_hid_cfg.ble.mac));
+                bad_usb->script_hid_cfg.ble.bonding = true;
+                bad_usb->script_hid_cfg.ble.pairing = GapPairingPinCodeVerifyYesNo;
+                hid->adjust_config(&bad_usb->script_hid_cfg);
+                // Set in user config to save in settings file
+                memcpy(
+                    &bad_usb->user_hid_cfg.ble,
+                    &bad_usb->script_hid_cfg.ble,
+                    sizeof(bad_usb->user_hid_cfg.ble));
+                scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneDone);
+                break;
             case ConfigIndexBleRemovePairing:
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfirmUnpair);
                 break;
@@ -208,6 +229,20 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                 // Set in user config to save in settings file
                 bad_usb->user_hid_cfg.usb.vid = bad_usb->script_hid_cfg.usb.vid;
                 bad_usb->user_hid_cfg.usb.pid = bad_usb->script_hid_cfg.usb.pid;
+                scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneDone);
+                break;
+            case ConfigIndexUsbRestoreDefaults:
+                // Apply to current script config
+                bad_usb->script_hid_cfg.usb.vid = 0;
+                bad_usb->script_hid_cfg.usb.pid = 0;
+                bad_usb->script_hid_cfg.usb.manuf[0] = '\0';
+                bad_usb->script_hid_cfg.usb.product[0] = '\0';
+                hid->adjust_config(&bad_usb->script_hid_cfg);
+                // Set in user config to save in settings file
+                memcpy(
+                    &bad_usb->user_hid_cfg.usb,
+                    &bad_usb->script_hid_cfg.usb,
+                    sizeof(bad_usb->user_hid_cfg.usb));
                 scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneDone);
                 break;
             default:
