@@ -23,7 +23,6 @@ jobs:
       - name: Flashing target firmware
         id: first_full_flash
         timeout-minutes: 4
-        continue-on-error: true
         run: |
           source scripts/toolchain/fbtenv.sh
           python3 scripts/testops.py -t=180 await_flipper
@@ -33,7 +32,6 @@ jobs:
         id: second_full_flash
         if: steps.first_full_flash.outcome == 'success'
         timeout-minutes: 4
-        continue-on-error: true
         run: |
           source scripts/toolchain/fbtenv.sh
           python3 scripts/testops.py -t=180 await_flipper
@@ -42,6 +40,7 @@ jobs:
 
       - name: Check for timeout
         id: check_timeout
+        if: failure()
         run: |
           if grep -q "Timeout" "${{ github.workspace }}/logs.txt" 2>/dev/null; then
             echo "timed_out=true" >> $GITHUB_OUTPUT
