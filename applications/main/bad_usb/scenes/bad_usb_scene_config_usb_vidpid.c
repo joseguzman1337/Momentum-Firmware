@@ -36,9 +36,11 @@ bool bad_usb_scene_config_usb_vidpid_on_event(void* context, SceneManagerEvent e
     if(event.type == SceneManagerEventTypeCustom) {
         consumed = true;
         if(event.event == ByteInputResultOk) {
+            const BadUsbHidApi* hid = bad_usb_hid_get_interface(bad_usb->interface);
             // Apply to current script config
             bad_usb->script_hid_cfg.usb.vid = __builtin_bswap16(bad_usb->usb_vidpid_buf[0]);
             bad_usb->script_hid_cfg.usb.pid = __builtin_bswap16(bad_usb->usb_vidpid_buf[1]);
+            hid->adjust_config(&bad_usb->script_hid_cfg);
             // Set in user config to save in settings file
             bad_usb->user_hid_cfg.usb.vid = bad_usb->script_hid_cfg.usb.vid;
             bad_usb->user_hid_cfg.usb.pid = bad_usb->script_hid_cfg.usb.pid;

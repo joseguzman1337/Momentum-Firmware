@@ -35,8 +35,10 @@ void bad_usb_scene_config_connection_callback(VariableItem* item) {
 void bad_usb_scene_config_ble_persist_pairing_callback(VariableItem* item) {
     BadUsbApp* bad_usb = variable_item_get_context(item);
     bool value = variable_item_get_current_value_index(item);
+    const BadUsbHidApi* hid = bad_usb_hid_get_interface(bad_usb->interface);
     // Apply to current script config
     bad_usb->script_hid_cfg.ble.bonding = value;
+    hid->adjust_config(&bad_usb->script_hid_cfg);
     // Set in user config to save in settings file
     bad_usb->user_hid_cfg.ble.bonding = value;
     variable_item_set_current_value_text(item, value ? "ON" : "OFF");
@@ -50,8 +52,10 @@ const char* const ble_pairing_mode_names[GapPairingCount] = {
 void bad_usb_scene_config_ble_pairing_mode_callback(VariableItem* item) {
     BadUsbApp* bad_usb = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
+    const BadUsbHidApi* hid = bad_usb_hid_get_interface(bad_usb->interface);
     // Apply to current script config
     bad_usb->script_hid_cfg.ble.pairing = index;
+    hid->adjust_config(&bad_usb->script_hid_cfg);
     // Set in user config to save in settings file
     bad_usb->user_hid_cfg.ble.pairing = index;
     variable_item_set_current_value_text(item, ble_pairing_mode_names[index]);
@@ -136,13 +140,14 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
     if(event.type == SceneManagerEventTypeCustom) {
         scene_manager_set_scene_state(bad_usb->scene_manager, BadUsbSceneConfig, event.event);
         consumed = true;
+        const BadUsbHidApi* hid = bad_usb_hid_get_interface(bad_usb->interface);
+
         switch(event.event) {
         case ConfigIndexKeyboardLayout:
             scene_manager_next_scene(bad_usb->scene_manager, BadUsbSceneConfigLayout);
             break;
         case ConfigIndexConnection:
             // Refresh default values for new interface
-            const BadUsbHidApi* hid = bad_usb_hid_get_interface(bad_usb->interface);
             hid->adjust_config(&bad_usb->script_hid_cfg);
             // Redraw menu with new interface options
             draw_menu(bad_usb);
@@ -164,6 +169,7 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                     bad_usb->script_hid_cfg.ble.mac, sizeof(bad_usb->script_hid_cfg.ble.mac));
                 bad_usb->script_hid_cfg.ble.mac[sizeof(bad_usb->script_hid_cfg.ble.mac) - 1] |=
                     0b11 << 6; // Set 2 MSB for Random Static Address
+                hid->adjust_config(&bad_usb->script_hid_cfg);
                 // Set in user config to save in settings file
                 memcpy(
                     bad_usb->user_hid_cfg.ble.mac,
@@ -197,6 +203,7 @@ bool bad_usb_scene_config_on_event(void* context, SceneManagerEvent event) {
                 // Apply to current script config
                 bad_usb->script_hid_cfg.usb.vid = bad_usb->usb_vidpid_buf[0];
                 bad_usb->script_hid_cfg.usb.pid = bad_usb->usb_vidpid_buf[1];
+                hid->adjust_config(&bad_usb->script_hid_cfg);
                 // Set in user config to save in settings file
                 bad_usb->user_hid_cfg.usb.vid = bad_usb->script_hid_cfg.usb.vid;
                 bad_usb->user_hid_cfg.usb.pid = bad_usb->script_hid_cfg.usb.pid;
