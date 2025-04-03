@@ -80,6 +80,7 @@
 - BadKB: Rewritten BadKB extras on top of "new" OFW BadUSB structure (by @Willy-JL)
   - Additionally, can now customize MAC address when BLE Remember is enabled
   - Also added `BLE_ID` command, same as `BT_ID`
+  - Improved UI with better naming and action acknowledgement
 - Main Menu: Refined CoverFlow menu style (#379 by @956MB)
 - NFC:
   - Support MIFARE DESFire Transaction MAC file type, fixes reading some EV2+ cards (by @Willy-JL)
