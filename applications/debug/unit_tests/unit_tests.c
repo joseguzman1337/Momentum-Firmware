@@ -1,15 +1,15 @@
 #include <furi.h>
 #include <furi_hal.h>
 #include <cli/cli.h>
+#include <toolbox/pipe.h>
 #include <toolbox/run_parallel.h>
 
 #include "test_runner.h"
 
-void unit_tests_cli(Cli* cli, FuriString* args, void* context) {
-    UNUSED(cli);
+void unit_tests_cli(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
 
-    TestRunner* test_runner = test_runner_alloc(cli, args);
+    TestRunner* test_runner = test_runner_alloc(pipe, args);
     test_runner_run(test_runner);
     test_runner_free(test_runner);
 }

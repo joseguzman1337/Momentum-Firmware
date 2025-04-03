@@ -402,9 +402,9 @@ void desktop_lock(Desktop* desktop, bool with_pin) {
 
     if(with_pin) {
         if(!momentum_settings.allow_locked_rpc_usb) {
-            Cli* cli = furi_record_open(RECORD_CLI);
-            cli_session_close(cli);
-            furi_record_close(RECORD_CLI);
+            CliVcp* cli_vcp = furi_record_open(RECORD_CLI_VCP);
+            cli_vcp_disable(cli_vcp);
+            furi_record_close(RECORD_CLI_VCP);
         }
         if(!momentum_settings.allow_locked_rpc_ble) {
             Bt* bt = furi_record_open(RECORD_BT);
@@ -440,9 +440,9 @@ void desktop_unlock(Desktop* desktop) {
 
     if(with_pin) {
         if(!momentum_settings.allow_locked_rpc_usb) {
-            Cli* cli = furi_record_open(RECORD_CLI);
-            cli_session_open(cli, &cli_vcp);
-            furi_record_close(RECORD_CLI);
+            CliVcp* cli_vcp = furi_record_open(RECORD_CLI_VCP);
+            cli_vcp_enable(cli_vcp);
+            furi_record_close(RECORD_CLI_VCP);
         }
         if(!momentum_settings.allow_locked_rpc_ble) {
             Bt* bt = furi_record_open(RECORD_BT);
@@ -559,6 +559,10 @@ int32_t desktop_srv(void* p) {
     if(desktop_pin_code_is_set() &&
        (momentum_settings.lock_on_boot || furi_hal_rtc_is_flag_set(FuriHalRtcFlagLock))) {
         desktop_lock(desktop, true);
+    } else {
+        CliVcp* cli_vcp = furi_record_open(RECORD_CLI_VCP);
+        cli_vcp_enable(cli_vcp);
+        furi_record_close(RECORD_CLI_VCP);
     }
 
     if(storage_file_exists(desktop->storage, SLIDESHOW_FS_PATH)) {

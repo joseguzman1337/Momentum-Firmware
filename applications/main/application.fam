@@ -22,6 +22,7 @@ App(
     name="On start hooks",
     apptype=FlipperAppType.METAPACKAGE,
     provides=[
+        "cli",
         "ibutton_start",
         "onewire_start",
         "subghz_start",

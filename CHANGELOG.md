@@ -45,7 +45,9 @@
   - OFW: SDK 0.3
     - Backport of missing features to new `gui/widget` (by @Willy-JL)
     - UART framing data/stop/parity bits options in `serial` module (by @portasynthinca3)
+  - OFW: New JS value destructuring (by @portasynthinca3)
 - OFW: Alarm: Snooze, timeouts, and dismissing from the locked state (by @Astrrra)
+- OFW: BLE: Advertising improvements, 128bit service UUID support, manufacturer scan response data support (by @bettse)
 - OFW: Furi: UART framing mode selection, support for different data/stop/parity bits (by @portasynthinca3)
 - OFW: GUI: Widget elements for line, rect and circle with fill options (by @Willy-JL)
 
@@ -90,6 +92,7 @@
 - Infrared:
   - OFW: Add Fujitsu ASTG12LVCC to AC Universal Remote (by @KereruA0i)
   - OFW: Increase max carrier limit to 1000000 (by @skotopes)
+- OFW: CLI: New CLI architecture, some text formatting, better stability and less RAM usage (by @portasynthinca3)
 - OFW: Power: Added OTG controls to Power service, remembers OTG when unplugging USB (by @Astrrra & @skotopes)
 - OFW: GUI: Updated Button Panel with more options for button handling (by @Akiva-Cohen)
 - Furi:
@@ -125,5 +128,6 @@
 - OFW: uFBT: Bumped action version in example github workflow for project template (by @hedger)
 
 ### Removed:
+- Apps: CLI-GUI Bridge: Temporarily removed due to breakage after OFW API changes
 - JS: Removed old `widget` module, replaced by new `gui/widget` view
 - MNTM: Removed Charge Cap option, replaced by Charge Limit in Power Settings

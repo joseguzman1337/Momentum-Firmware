@@ -3,6 +3,7 @@
 #include <furi.h>
 #include <cli/cli.h>
 #include <toolbox/args.h>
+#include <toolbox/pipe.h>
 
 static void input_cli_usage(void) {
     printf("Usage:\r\n");
@@ -20,7 +21,7 @@ static void input_cli_dump_events_callback(const void* value, void* ctx) {
     furi_message_queue_put(input_queue, value, FuriWaitForever);
 }
 
-static void input_cli_dump(Cli* cli, FuriString* args, FuriPubSub* event_pubsub) {
+static void input_cli_dump(PipeSide* pipe, FuriString* args, FuriPubSub* event_pubsub) {
     UNUSED(args);
     FuriMessageQueue* input_queue = furi_message_queue_alloc(8, sizeof(InputEvent));
     FuriPubSubSubscription* input_subscription =
@@ -28,7 +29,7 @@ static void input_cli_dump(Cli* cli, FuriString* args, FuriPubSub* event_pubsub)
 
     InputEvent input_event;
     printf("Press CTRL+C to stop\r\n");
-    while(!cli_cmd_interrupt_received(cli)) {
+    while(!cli_is_pipe_broken_or_is_etx_next_char(pipe)) {
         if(furi_message_queue_get(input_queue, &input_event, 100) == FuriStatusOk) {
             printf(
                 "key: %s type: %s\r\n",
@@ -58,7 +59,7 @@ static void fake_input(FuriPubSub* event_pubsub, InputKey key, InputType type) {
     }
 }
 
-static void input_cli_keyboard(Cli* cli, FuriString* args, FuriPubSub* event_pubsub) {
+static void input_cli_keyboard(PipeSide* pipe, FuriString* args, FuriPubSub* event_pubsub) {
     UNUSED(args);
     printf("Using console keyboard feedback for flipper input\r\n");
 
@@ -71,16 +72,16 @@ static void input_cli_keyboard(Cli* cli, FuriString* args, FuriPubSub* event_pub
     printf("\r\nPress CTRL+C to stop\r\n");
     bool hold = false;
     FuriPubSub* ascii_pubsub = furi_record_open(RECORD_ASCII_EVENTS);
-    while(cli_is_connected(cli)) {
-        char in_chr = cli_getc(cli);
-        if(in_chr == CliSymbolAsciiETX) break;
+    while(pipe_state(pipe) == PipeStateOpen) {
+        char in_chr = getchar();
+        if(in_chr == CliKeyETX) break;
         InputKey send_key = InputKeyMAX;
         uint8_t send_ascii = AsciiValueNUL;
 
         switch(in_chr) {
-        case CliSymbolAsciiEsc: // Escape code for arrows
-            if(!cli_read(cli, (uint8_t*)&in_chr, 1) || in_chr != '[') break;
-            if(!cli_read(cli, (uint8_t*)&in_chr, 1)) break;
+        case CliKeyEsc: // Escape code for arrows
+            if(!pipe_receive(pipe, &in_chr, 1) || in_chr != '[') break;
+            if(!pipe_receive(pipe, &in_chr, 1)) break;
             if(in_chr >= 'A' && in_chr <= 'D') { // Arrows = Dpad
                 if(hold) {
                     send_key = InputKeyUp + (in_chr - 'A'); // Same order as InputKey
@@ -89,8 +90,8 @@ static void input_cli_keyboard(Cli* cli, FuriString* args, FuriPubSub* event_pub
                 }
             }
             break;
-        case CliSymbolAsciiBackspace: // (minicom) Backspace = Back
-        case CliSymbolAsciiDel: // (putty/picocom) Backspace = Back
+        case CliKeyBackspace: // (minicom) Backspace = Back
+        case CliKeyDEL: // (putty/picocom) Backspace = Back
             if(hold) {
                 send_key = InputKeyBack;
             } else {
@@ -104,14 +105,14 @@ static void input_cli_keyboard(Cli* cli, FuriString* args, FuriPubSub* event_pub
                 send_ascii = AsciiValueESC;
             }
             break;
-        case CliSymbolAsciiCR: // Enter = Ok
+        case CliKeyCR: // Enter = Ok
             if(hold) {
                 send_key = InputKeyOk;
             } else {
                 send_ascii = AsciiValueCR;
             }
             break;
-        case CliSymbolAsciiSpace: // Space = Toggle hold next key
+        case CliKeySpace: // Space = Toggle hold next key
             if(hold) {
                 send_ascii = ' ';
             } else {
@@ -143,8 +144,8 @@ static void input_cli_send_print_usage(void) {
     printf("\t\t <type>\t - one of 'press', 'release', 'short', 'long'\r\n");
 }
 
-static void input_cli_send(Cli* cli, FuriString* args, FuriPubSub* event_pubsub) {
-    UNUSED(cli);
+static void input_cli_send(PipeSide* pipe, FuriString* args, FuriPubSub* event_pubsub) {
+    UNUSED(pipe);
     InputKey key;
     InputType type;
     FuriString* key_str;
@@ -194,8 +195,7 @@ static void input_cli_send(Cli* cli, FuriString* args, FuriPubSub* event_pubsub)
     furi_string_free(key_str);
 }
 
-void input_cli(Cli* cli, FuriString* args, void* context) {
-    furi_assert(cli);
+void input_cli(PipeSide* pipe, FuriString* args, void* context) {
     furi_assert(context);
     FuriPubSub* event_pubsub = context;
     FuriString* cmd;
@@ -207,15 +207,15 @@ void input_cli(Cli* cli, FuriString* args, void* context) {
             break;
         }
         if(furi_string_cmp_str(cmd, "dump") == 0) {
-            input_cli_dump(cli, args, event_pubsub);
+            input_cli_dump(pipe, args, event_pubsub);
             break;
         }
         if(furi_string_cmp_str(cmd, "keyboard") == 0) {
-            input_cli_keyboard(cli, args, event_pubsub);
+            input_cli_keyboard(pipe, args, event_pubsub);
             break;
         }
         if(furi_string_cmp_str(cmd, "send") == 0) {
-            input_cli_send(cli, args, event_pubsub);
+            input_cli_send(pipe, args, event_pubsub);
             break;
         }
 

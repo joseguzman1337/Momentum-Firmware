@@ -8,6 +8,7 @@
 #include <furi.h>
 #include <cli/cli.h>
 #include <furi_hal_gpio.h>
+#include <toolbox/pipe.h>
 #include <furi_hal_vibro.h>
 
 #define INPUT_DEBOUNCE_TICKS_HALF (INPUT_DEBOUNCE_TICKS / 2)
@@ -30,7 +31,7 @@ typedef struct {
 } InputPinState;
 
 /** Input CLI command handler */
-void input_cli_wrapper(Cli* cli, FuriString* args, void* context);
+void input_cli_wrapper(PipeSide* pipe, FuriString* args, void* context);
 
 // #define INPUT_DEBUG
 
