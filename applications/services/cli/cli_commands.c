@@ -1,6 +1,5 @@
 #include "cli_commands.h"
 #include "cli_command_gpio.h"
-#include "cli_ansi.h"
 
 #include <core/thread.h>
 #include <furi_hal.h>
@@ -73,7 +72,9 @@ void cli_command_neofetch(Cli* cli, FuriString* args, void* context) {
         "|    `-...|        -.___-Z:_______J...---;",
         ":         `                           _-'",
     };
-#define NEOFETCH_COLOR ANSI_FLIPPER_BRAND_ORANGE
+#define ANSI_RESET                "\e[0m"
+#define ANSI_FLIPPER_BRAND_ORANGE "\e[38;2;255;130;0m"
+#define NEOFETCH_COLOR            ANSI_FLIPPER_BRAND_ORANGE
 
     // Determine logo parameters
     size_t logo_height = COUNT_OF(neofetch_logo), logo_width = 0;
@@ -205,46 +206,41 @@ void cli_command_neofetch(Cli* cli, FuriString* args, void* context) {
     }
     printf(ANSI_RESET);
 #undef NEOFETCH_COLOR
+#undef ANSI_FLIPPER_BRAND_ORANGE
+#undef ANSI_RESET
 }
 
 void cli_command_help(Cli* cli, FuriString* args, void* context) {
+    UNUSED(args);
     UNUSED(context);
     printf("Commands available:");
 
-    // Count non-hidden commands
-    CliCommandTree_it_t it_count;
-    CliCommandTree_it(it_count, cli->commands);
-    size_t commands_count = 0;
-    while(!CliCommandTree_end_p(it_count)) {
-        if(!(CliCommandTree_cref(it_count)->value_ptr->flags & CliCommandFlagHidden))
-            commands_count++;
-        CliCommandTree_next(it_count);
-    }
+    // Command count
+    const size_t commands_count = CliCommandTree_size(cli->commands);
+    const size_t commands_count_mid = commands_count / 2 + commands_count % 2;
 
-    // Create iterators starting at different positions
-    const size_t columns = 3;
-    const size_t commands_per_column = (commands_count / columns) + (commands_count % columns);
-    CliCommandTree_it_t iterators[columns];
-    for(size_t c = 0; c < columns; c++) {
-        CliCommandTree_it(iterators[c], cli->commands);
-        for(size_t i = 0; i < c * commands_per_column; i++)
-            CliCommandTree_next(iterators[c]);
-    }
+    // Use 2 iterators from start and middle to show 2 columns
+    CliCommandTree_it_t it_left;
+    CliCommandTree_it(it_left, cli->commands);
+    CliCommandTree_it_t it_right;
+    CliCommandTree_it(it_right, cli->commands);
+    for(size_t i = 0; i < commands_count_mid; i++)
+        CliCommandTree_next(it_right);
 
-    // Print commands
-    for(size_t r = 0; r < commands_per_column; r++) {
+    // Iterate throw tree
+    for(size_t i = 0; i < commands_count_mid; i++) {
         printf("\r\n");
-
-        for(size_t c = 0; c < columns; c++) {
-            if(!CliCommandTree_end_p(iterators[c])) {
-                const CliCommandTree_itref_t* item = CliCommandTree_cref(iterators[c]);
-                if(!(item->value_ptr->flags & CliCommandFlagHidden)) {
-                    printf("%-30s", furi_string_get_cstr(*item->key_ptr));
-                }
-                CliCommandTree_next(iterators[c]);
-            }
+        // Left Column
+        if(!CliCommandTree_end_p(it_left)) {
+            printf("%-30s", furi_string_get_cstr(*CliCommandTree_ref(it_left)->key_ptr));
+            CliCommandTree_next(it_left);
         }
-    }
+        // Right Column
+        if(!CliCommandTree_end_p(it_right)) {
+            printf("%s", furi_string_get_cstr(*CliCommandTree_ref(it_right)->key_ptr));
+            CliCommandTree_next(it_right);
+        }
+    };
 
     if(furi_string_size(args) > 0) {
         cli_nl(cli);
@@ -617,18 +613,16 @@ static void cli_command_top(Cli* cli, FuriString* args, void* context) {
     int interval = 1000;
     args_read_int_and_trim(args, &interval);
 
-    if(interval) printf("\e[2J\e[?25l"); // Clear display, hide cursor
-
     FuriThreadList* thread_list = furi_thread_list_alloc();
     while(!cli_cmd_interrupt_received(cli)) {
         uint32_t tick = furi_get_tick();
         furi_thread_enumerate(thread_list);
 
-        if(interval) printf("\e[0;0f"); // Return to 0,0
+        if(interval) printf("\e[2J\e[0;0f"); // Clear display and return to 0
 
         uint32_t uptime = tick / furi_kernel_get_tick_frequency();
         printf(
-            "\rThreads: %zu, ISR Time: %0.2f%%, Uptime: %luh%lum%lus\e[0K\r\n",
+            "Threads: %zu, ISR Time: %0.2f%%, Uptime: %luh%lum%lus\r\n",
             furi_thread_list_size(thread_list),
             (double)furi_thread_list_get_isr_time(thread_list),
             uptime / 60 / 60,
@@ -636,14 +630,14 @@ static void cli_command_top(Cli* cli, FuriString* args, void* context) {
             uptime % 60);
 
         printf(
-            "\rHeap: total %zu, free %zu, minimum %zu, max block %zu\e[0K\r\n\r\n",
+            "Heap: total %zu, free %zu, minimum %zu, max block %zu\r\n\r\n",
             memmgr_get_total_heap(),
             memmgr_get_free_heap(),
             memmgr_get_minimum_free_heap(),
             memmgr_heap_get_max_free_block());
 
         printf(
-            "\r%-17s %-20s %-10s %5s %12s %6s %10s %7s %5s\e[0K\r\n",
+            "%-17s %-20s %-10s %5s %12s %6s %10s %7s %5s\r\n",
             "AppID",
             "Name",
             "State",
@@ -657,7 +651,7 @@ static void cli_command_top(Cli* cli, FuriString* args, void* context) {
         for(size_t i = 0; i < furi_thread_list_size(thread_list); i++) {
             const FuriThreadListItem* item = furi_thread_list_get_at(thread_list, i);
             printf(
-                "\r%-17s %-20s %-10s %5d   0x%08lx %6lu %10lu %7zu %5.1f\e[0K\r\n",
+                "%-17s %-20s %-10s %5d   0x%08lx %6lu %10lu %7zu %5.1f\r\n",
                 item->app_id,
                 item->name,
                 item->state,
@@ -676,8 +670,6 @@ static void cli_command_top(Cli* cli, FuriString* args, void* context) {
         }
     }
     furi_thread_list_free(thread_list);
-
-    if(interval) printf("\e[?25h"); // Show cursor
 }
 
 void cli_command_free(Cli* cli, FuriString* args, void* context) {
@@ -751,11 +743,7 @@ void cli_commands_init(Cli* cli) {
     cli_add_command(cli, "source", CliCommandFlagParallelSafe, cli_command_src_wrapper, NULL);
     cli_add_command(cli, "src", CliCommandFlagParallelSafe, cli_command_src_wrapper, NULL);
     cli_add_command(
-        cli,
-        "neofetch",
-        CliCommandFlagParallelSafe | CliCommandFlagHidden,
-        cli_command_neofetch_wrapper,
-        NULL);
+        cli, "neofetch", CliCommandFlagParallelSafe, cli_command_neofetch_wrapper, NULL);
 
     cli_add_command(cli, "?", CliCommandFlagParallelSafe, cli_command_help_wrapper, NULL);
     cli_add_command(cli, "help", CliCommandFlagParallelSafe, cli_command_help_wrapper, NULL);

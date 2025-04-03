@@ -2,7 +2,6 @@
 
 #include <furi.h>
 #include <cli/cli.h>
-#include <cli/cli_ansi.h>
 #include <toolbox/args.h>
 
 static void input_cli_usage(void) {
@@ -74,12 +73,12 @@ static void input_cli_keyboard(Cli* cli, FuriString* args, FuriPubSub* event_pub
     FuriPubSub* ascii_pubsub = furi_record_open(RECORD_ASCII_EVENTS);
     while(cli_is_connected(cli)) {
         char in_chr = cli_getc(cli);
-        if(in_chr == CliKeyETX) break;
+        if(in_chr == CliSymbolAsciiETX) break;
         InputKey send_key = InputKeyMAX;
         uint8_t send_ascii = AsciiValueNUL;
 
         switch(in_chr) {
-        case CliKeyEsc: // Escape code for arrows
+        case CliSymbolAsciiEsc: // Escape code for arrows
             if(!cli_read(cli, (uint8_t*)&in_chr, 1) || in_chr != '[') break;
             if(!cli_read(cli, (uint8_t*)&in_chr, 1)) break;
             if(in_chr >= 'A' && in_chr <= 'D') { // Arrows = Dpad
@@ -90,8 +89,8 @@ static void input_cli_keyboard(Cli* cli, FuriString* args, FuriPubSub* event_pub
                 }
             }
             break;
-        case CliKeyBackspace: // (minicom) Backspace = Back
-        case CliKeyDEL: // (putty/picocom) Backspace = Back
+        case CliSymbolAsciiBackspace: // (minicom) Backspace = Back
+        case CliSymbolAsciiDel: // (putty/picocom) Backspace = Back
             if(hold) {
                 send_key = InputKeyBack;
             } else {
@@ -105,14 +104,14 @@ static void input_cli_keyboard(Cli* cli, FuriString* args, FuriPubSub* event_pub
                 send_ascii = AsciiValueESC;
             }
             break;
-        case CliKeyCR: // Enter = Ok
+        case CliSymbolAsciiCR: // Enter = Ok
             if(hold) {
                 send_key = InputKeyOk;
             } else {
                 send_ascii = AsciiValueCR;
             }
             break;
-        case CliKeySpace: // Space = Toggle hold next key
+        case CliSymbolAsciiSpace: // Space = Toggle hold next key
             if(hold) {
                 send_ascii = ' ';
             } else {
