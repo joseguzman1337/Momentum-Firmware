@@ -4,6 +4,7 @@
 #include <lib/toolbox/args.h>
 #include <toolbox/pipe.h>
 #include <cli/cli.h>
+#include <cli/cli_commands.h>
 
 void crypto_cli_print_usage(void) {
     printf("Usage:\r\n");
@@ -280,7 +281,7 @@ void crypto_cli_store_key(PipeSide* pipe, FuriString* args) {
     furi_string_free(key_type);
 }
 
-static void crypto_cli(PipeSide* pipe, FuriString* args, void* context) {
+static void execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     FuriString* cmd;
     cmd = furi_string_alloc();
@@ -317,15 +318,4 @@ static void crypto_cli(PipeSide* pipe, FuriString* args, void* context) {
     furi_string_free(cmd);
 }
 
-#include <cli/cli_i.h>
-CLI_PLUGIN_WRAPPER("crypto", crypto_cli)
-
-void crypto_on_system_start(void) {
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_add_command(cli, "crypto", CliCommandFlagDefault, crypto_cli_wrapper, NULL);
-    furi_record_close(RECORD_CLI);
-#else
-    UNUSED(crypto_cli);
-#endif
-}
+CLI_COMMAND_INTERFACE(crypto, execute, CliCommandFlagDefault, 1024);

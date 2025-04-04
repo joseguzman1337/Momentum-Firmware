@@ -14,7 +14,6 @@
 #include <lib/toolbox/args.h>
 #include <lib/toolbox/strint.h>
 #include <toolbox/pipe.h>
-#include <storage/storage.h>
 
 // Close to ISO, `date +'%Y-%m-%d %H:%M:%S %u'`
 #define CLI_DATE_FORMAT "%.4d-%.2d-%.2d %.2d:%.2d:%.2d %d"
@@ -57,158 +56,6 @@ void cli_command_info(PipeSide* pipe, FuriString* args, void* context) {
     }
 }
 
-// Lil Easter egg :>
-void cli_command_neofetch(PipeSide* pipe, FuriString* args, void* context) {
-    UNUSED(pipe);
-    UNUSED(args);
-    UNUSED(context);
-
-    static const char* const neofetch_logo[] = {
-        "            _.-------.._                    -,",
-        "        .-\"```\"--..,,_/ /`-,               -,  \\ ",
-        "     .:\"          /:/  /'\\  \\     ,_...,  `. |  |",
-        "    /       ,----/:/  /`\\ _\\~`_-\"`     _;",
-        "   '      / /`\"\"\"'\\ \\ \\.~`_-'      ,-\"'/ ",
-        "  |      | |  0    | | .-'      ,/`  /",
-        " |    ,..\\ \\     ,.-\"`       ,/`    /",
-        ";    :    `/`\"\"\\`           ,/--==,/-----,",
-        "|    `-...|        -.___-Z:_______J...---;",
-        ":         `                           _-'",
-    };
-#define NEOFETCH_COLOR ANSI_FLIPPER_BRAND_ORANGE
-
-    // Determine logo parameters
-    size_t logo_height = COUNT_OF(neofetch_logo), logo_width = 0;
-    for(size_t i = 0; i < logo_height; i++)
-        logo_width = MAX(logo_width, strlen(neofetch_logo[i]));
-    logo_width += 4; // space between logo and info
-
-    // Format hostname delimiter
-    const size_t size_of_hostname = 4 + strlen(furi_hal_version_get_name_ptr());
-    char delimiter[64];
-    memset(delimiter, '-', size_of_hostname);
-    delimiter[size_of_hostname] = '\0';
-
-    // Get heap info
-    size_t heap_total = memmgr_get_total_heap();
-    size_t heap_used = heap_total - memmgr_get_free_heap();
-    uint16_t heap_percent = (100 * heap_used) / heap_total;
-
-    // Get storage info
-    Storage* storage = furi_record_open(RECORD_STORAGE);
-    uint64_t ext_total, ext_free, ext_used, ext_percent;
-    storage_common_fs_info(storage, "/ext", &ext_total, &ext_free);
-    ext_used = ext_total - ext_free;
-    ext_percent = (100 * ext_used) / ext_total;
-    ext_used /= 1024 * 1024;
-    ext_total /= 1024 * 1024;
-    furi_record_close(RECORD_STORAGE);
-
-    // Get battery info
-    uint16_t charge_percent = furi_hal_power_get_pct();
-    const char* charge_state;
-    if(furi_hal_power_is_charging()) {
-        if((charge_percent < 100) && (!furi_hal_power_is_charging_done())) {
-            charge_state = "charging";
-        } else {
-            charge_state = "charged";
-        }
-    } else {
-        charge_state = "discharging";
-    }
-
-    // Get misc info
-    uint32_t uptime = furi_get_tick() / furi_kernel_get_tick_frequency();
-    const Version* version = version_get();
-    uint16_t major, minor;
-    furi_hal_info_get_api_version(&major, &minor);
-
-    // Print ASCII art with info
-    const size_t info_height = 16;
-    for(size_t i = 0; i < MAX(logo_height, info_height); i++) {
-        printf(NEOFETCH_COLOR "%-*s", logo_width, (i < logo_height) ? neofetch_logo[i] : "");
-        switch(i) {
-        case 0: // you@<hostname>
-            printf("you" ANSI_RESET "@" NEOFETCH_COLOR "%s", furi_hal_version_get_name_ptr());
-            break;
-        case 1: // delimiter
-            printf(ANSI_RESET "%s", delimiter);
-            break;
-        case 2: // OS: FURI <edition> <branch> <version> <commit> (SDK <maj>.<min>)
-            printf(
-                "OS" ANSI_RESET ": FURI %s %s %s %s (SDK %hu.%hu)",
-                version_get_version(version),
-                version_get_gitbranch(version),
-                version_get_version(version),
-                version_get_githash(version),
-                major,
-                minor);
-            break;
-        case 3: // Host: <model> <hostname>
-            printf(
-                "Host" ANSI_RESET ": %s %s",
-                furi_hal_version_get_model_code(),
-                furi_hal_version_get_device_name_ptr());
-            break;
-        case 4: // Kernel: FreeRTOS <maj>.<min>.<build>
-            printf(
-                "Kernel" ANSI_RESET ": FreeRTOS %d.%d.%d",
-                tskKERNEL_VERSION_MAJOR,
-                tskKERNEL_VERSION_MINOR,
-                tskKERNEL_VERSION_BUILD);
-            break;
-        case 5: // Uptime: ?h?m?s
-            printf(
-                "Uptime" ANSI_RESET ": %luh%lum%lus",
-                uptime / 60 / 60,
-                uptime / 60 % 60,
-                uptime % 60);
-            break;
-        case 6: // ST7567 128x64 @ 1 bpp in 1.4"
-            printf("Display" ANSI_RESET ": ST7567 128x64 @ 1 bpp in 1.4\"");
-            break;
-        case 7: // DE: GuiSrv
-            printf("DE" ANSI_RESET ": GuiSrv");
-            break;
-        case 8: // Shell: CliSrv
-            printf("Shell" ANSI_RESET ": CliSrv");
-            break;
-        case 9: // CPU: STM32WB55RG @ 64 MHz
-            printf("CPU" ANSI_RESET ": STM32WB55RG @ 64 MHz");
-            break;
-        case 10: // Memory: <used> / <total> B (??%)
-            printf(
-                "Memory" ANSI_RESET ": %zu / %zu B (%hu%%)", heap_used, heap_total, heap_percent);
-            break;
-        case 11: // Disk (/ext): <used> / <total> MiB (??%)
-            printf(
-                "Disk (/ext)" ANSI_RESET ": %llu / %llu MiB (%llu%%)",
-                ext_used,
-                ext_total,
-                ext_percent);
-            break;
-        case 12: // Battery: ??% (<state>)
-            printf("Battery" ANSI_RESET ": %hu%% (%s)" ANSI_RESET, charge_percent, charge_state);
-            break;
-        case 13: // empty space
-            break;
-        case 14: // Colors (line 1)
-            for(size_t j = 30; j <= 37; j++)
-                printf("\e[%dm███", j);
-            break;
-        case 15: // Colors (line 2)
-            for(size_t j = 90; j <= 97; j++)
-                printf("\e[%dm███", j);
-            break;
-        default:
-            break;
-        }
-        printf("\r\n");
-    }
-    printf(ANSI_RESET);
-#undef NEOFETCH_COLOR
-}
-
 void cli_command_help(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(pipe);
     UNUSED(args);
@@ -244,6 +91,8 @@ void cli_command_help(PipeSide* pipe, FuriString* args, void* context) {
         }
     }
 
+    printf(ANSI_RESET
+           "\r\nIf you just added a new command and can't see it above, run `reload_ext_cmds`");
     printf(ANSI_RESET "\r\nFind out more: https://docs.flipper.net/development/cli");
 
     cli_unlock_commands(cli);
@@ -718,6 +567,16 @@ void cli_command_i2c(PipeSide* pipe, FuriString* args, void* context) {
     furi_hal_i2c_release(&furi_hal_i2c_handle_external);
 }
 
+void cli_command_reload_external(PipeSide* pipe, FuriString* args, void* context) {
+    UNUSED(pipe);
+    UNUSED(args);
+    UNUSED(context);
+    Cli* cli = furi_record_open(RECORD_CLI);
+    cli_enumerate_external_commands(cli);
+    furi_record_close(RECORD_CLI);
+    printf("OK!");
+}
+
 /**
  * Echoes any bytes it receives except ASCII ETX (0x03, Ctrl+C)
  */
@@ -746,44 +605,29 @@ void cli_command_clear(PipeSide* pipe, FuriString* args, void* context) {
     printf("\e[2J\e[H");
 }
 
-CLI_PLUGIN_WRAPPER("src", cli_command_src)
-CLI_PLUGIN_WRAPPER("neofetch", cli_command_neofetch)
-CLI_PLUGIN_WRAPPER("uptime", cli_command_uptime)
-CLI_PLUGIN_WRAPPER("date", cli_command_date)
-CLI_PLUGIN_WRAPPER("sysctl", cli_command_sysctl)
-CLI_PLUGIN_WRAPPER("vibro", cli_command_vibro)
-CLI_PLUGIN_WRAPPER("led", cli_command_led)
-CLI_PLUGIN_WRAPPER("gpio", cli_command_gpio)
-CLI_PLUGIN_WRAPPER("i2c", cli_command_i2c)
-CLI_PLUGIN_WRAPPER("clear", cli_command_clear)
-
 void cli_commands_init(Cli* cli) {
     cli_add_command(cli, "!", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
     cli_add_command(cli, "info", CliCommandFlagParallelSafe, cli_command_info, NULL);
     cli_add_command(cli, "device_info", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
-    cli_add_command(cli, "source", CliCommandFlagParallelSafe, cli_command_src_wrapper, NULL);
-    cli_add_command(cli, "src", CliCommandFlagParallelSafe, cli_command_src_wrapper, NULL);
     cli_add_command(
-        cli, "neofetch", CliCommandFlagParallelSafe, cli_command_neofetch_wrapper, NULL);
+        cli, "reload_ext_cmds", CliCommandFlagDefault, cli_command_reload_external, NULL);
 
     cli_add_command(cli, "?", CliCommandFlagParallelSafe, cli_command_help, NULL);
     cli_add_command(cli, "help", CliCommandFlagParallelSafe, cli_command_help, NULL);
 
-    cli_add_command(cli, "uptime", CliCommandFlagDefault, cli_command_uptime_wrapper, NULL);
-    cli_add_command(cli, "date", CliCommandFlagParallelSafe, cli_command_date_wrapper, NULL);
     cli_add_command(cli, "log", CliCommandFlagParallelSafe, cli_command_log, NULL);
-    cli_add_command(cli, "l", CliCommandFlagParallelSafe, cli_command_log, NULL);
-    cli_add_command(cli, "sysctl", CliCommandFlagDefault, cli_command_sysctl_wrapper, NULL);
-    cli_add_command(cli, "top", CliCommandFlagParallelSafe, cli_command_top, NULL);
     cli_add_command(cli, "free", CliCommandFlagParallelSafe, cli_command_free, NULL);
     cli_add_command(cli, "free_blocks", CliCommandFlagParallelSafe, cli_command_free_blocks, NULL);
     cli_add_command(cli, "echo", CliCommandFlagParallelSafe, cli_command_echo, NULL);
-
-    cli_add_command(cli, "vibro", CliCommandFlagDefault, cli_command_vibro_wrapper, NULL);
-    cli_add_command(cli, "led", CliCommandFlagDefault, cli_command_led_wrapper, NULL);
-    cli_add_command(cli, "gpio", CliCommandFlagDefault, cli_command_gpio_wrapper, NULL);
-    cli_add_command(cli, "i2c", CliCommandFlagDefault, cli_command_i2c_wrapper, NULL);
-
-    cli_add_command(cli, "clear", CliCommandFlagParallelSafe, cli_command_clear, NULL);
-    cli_add_command(cli, "cls", CliCommandFlagParallelSafe, cli_command_clear, NULL);
 }
+
+CLI_COMMAND_INTERFACE(src, cli_command_src, CliCommandFlagParallelSafe, 768);
+CLI_COMMAND_INTERFACE(uptime, cli_command_uptime, CliCommandFlagDefault, 768);
+CLI_COMMAND_INTERFACE(date, cli_command_date, CliCommandFlagParallelSafe, 768);
+CLI_COMMAND_INTERFACE(sysctl, cli_command_sysctl, CliCommandFlagDefault, 1024);
+CLI_COMMAND_INTERFACE(top, cli_command_top, CliCommandFlagParallelSafe, 1024);
+CLI_COMMAND_INTERFACE(vibro, cli_command_vibro, CliCommandFlagDefault, 1024);
+CLI_COMMAND_INTERFACE(led, cli_command_led, CliCommandFlagDefault, 1024);
+CLI_COMMAND_INTERFACE(gpio, cli_command_gpio, CliCommandFlagDefault, 1024);
+CLI_COMMAND_INTERFACE(i2c, cli_command_i2c, CliCommandFlagDefault, 1024);
+CLI_COMMAND_INTERFACE(clear, cli_command_clear, CliCommandFlagParallelSafe, 768);

@@ -30,9 +30,6 @@ typedef struct {
     volatile uint32_t counter;
 } InputPinState;
 
-/** Input CLI command handler */
-void input_cli_wrapper(PipeSide* pipe, FuriString* args, void* context);
-
 // #define INPUT_DEBUG
 
 #define GPIO_Read(input_pin) (furi_hal_gpio_read(input_pin.pin->gpio) ^ (input_pin.pin->inverted))
@@ -102,11 +99,6 @@ int32_t input_srv(void* p) {
 
 #ifdef INPUT_DEBUG
     furi_hal_gpio_init_simple(&gpio_ext_pa4, GpioModeOutputPushPull);
-#endif
-
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_add_command(cli, "input", CliCommandFlagParallelSafe, input_cli_wrapper, event_pubsub);
 #endif
 
     InputPinState pin_states[input_pins_count];

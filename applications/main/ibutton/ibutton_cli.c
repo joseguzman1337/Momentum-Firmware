@@ -204,7 +204,7 @@ void ibutton_cli_emulate(PipeSide* pipe, FuriString* args) {
 
         while(!cli_is_pipe_broken_or_is_etx_next_char(pipe)) {
             furi_delay_ms(100);
-        }
+        };
 
     } while(false);
 
@@ -216,8 +216,7 @@ void ibutton_cli_emulate(PipeSide* pipe, FuriString* args) {
     ibutton_protocols_free(protocols);
 }
 
-void ibutton_cli(PipeSide* pipe, FuriString* args, void* context) {
-    UNUSED(pipe);
+static void execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     FuriString* cmd;
     cmd = furi_string_alloc();
@@ -241,15 +240,4 @@ void ibutton_cli(PipeSide* pipe, FuriString* args, void* context) {
     furi_string_free(cmd);
 }
 
-#include <cli/cli_i.h>
-CLI_PLUGIN_WRAPPER("ibutton", ibutton_cli)
-
-void ibutton_on_system_start(void) {
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_add_command(cli, "ikey", CliCommandFlagDefault, ibutton_cli_wrapper, cli);
-    furi_record_close(RECORD_CLI);
-#else
-    UNUSED(ibutton_cli);
-#endif
-}
+CLI_COMMAND_INTERFACE(ikey, execute, CliCommandFlagDefault, 1024);

@@ -536,7 +536,7 @@ static void lfrfid_cli_raw_emulate(PipeSide* pipe, FuriString* args) {
     furi_string_free(filepath);
 }
 
-static void lfrfid_cli(PipeSide* pipe, FuriString* args, void* context) {
+static void execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     FuriString* cmd;
     cmd = furi_string_alloc();
@@ -566,11 +566,4 @@ static void lfrfid_cli(PipeSide* pipe, FuriString* args, void* context) {
     furi_string_free(cmd);
 }
 
-#include <cli/cli_i.h>
-CLI_PLUGIN_WRAPPER("lfrfid", lfrfid_cli)
-
-void lfrfid_on_system_start(void) {
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_add_command(cli, "rfid", CliCommandFlagDefault, lfrfid_cli_wrapper, NULL);
-    furi_record_close(RECORD_CLI);
-}
+CLI_COMMAND_INTERFACE(rfid, execute, CliCommandFlagDefault, 2048);

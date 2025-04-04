@@ -23,12 +23,12 @@ typedef struct {
         stack_depth,                                                      \
     };                                                                    \
                                                                           \
-    static const FlipperAppPluginDescriptor plugin_descriptor = {         \
+    static const FlipperAppPluginDescriptor plugin_descriptor_##name = {  \
         .appid = PLUGIN_APP_ID,                                           \
         .ep_api_version = PLUGIN_API_VERSION,                             \
         .entry_point = &cli_##name##_desc,                                \
     };                                                                    \
                                                                           \
     const FlipperAppPluginDescriptor* cli_##name##_ep(void) {             \
-        return &plugin_descriptor;                                        \
+        return &plugin_descriptor_##name;                                 \
     }

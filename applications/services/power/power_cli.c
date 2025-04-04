@@ -2,6 +2,7 @@
 
 #include <furi_hal.h>
 #include <cli/cli.h>
+#include <cli/cli_commands.h>
 #include <lib/toolbox/args.h>
 #include <power/power_service/power.h>
 #include <toolbox/pipe.h>
@@ -68,7 +69,7 @@ static void power_cli_command_print_usage(void) {
     }
 }
 
-void power_cli(PipeSide* pipe, FuriString* args, void* context) {
+static void execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     FuriString* cmd;
     cmd = furi_string_alloc();
@@ -112,17 +113,4 @@ void power_cli(PipeSide* pipe, FuriString* args, void* context) {
     furi_string_free(cmd);
 }
 
-#include <cli/cli_i.h>
-CLI_PLUGIN_WRAPPER("power", power_cli)
-
-void power_on_system_start(void) {
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-
-    cli_add_command(cli, "power", CliCommandFlagParallelSafe, power_cli_wrapper, NULL);
-
-    furi_record_close(RECORD_CLI);
-#else
-    UNUSED(power_cli);
-#endif
-}
+CLI_COMMAND_INTERFACE(power, execute, CliCommandFlagParallelSafe, 1024);

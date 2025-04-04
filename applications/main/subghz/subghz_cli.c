@@ -1115,7 +1115,7 @@ static void subghz_cli_command_chat(PipeSide* pipe, FuriString* args) {
     printf("\r\nExit chat\r\n");
 }
 
-static void subghz_cli_command(PipeSide* pipe, FuriString* args, void* context) {
+static void execute(PipeSide* pipe, FuriString* args, void* context) {
     FuriString* cmd = furi_string_alloc();
 
     do {
@@ -1182,24 +1182,4 @@ static void subghz_cli_command(PipeSide* pipe, FuriString* args, void* context) 
     furi_string_free(cmd);
 }
 
-#include <cli/cli_i.h>
-CLI_PLUGIN_WRAPPER("subghz", subghz_cli_command)
-
-static void subghz_cli_command_chat_wrapper(PipeSide* pipe, FuriString* args, void* context) {
-    furi_string_replace_at(args, 0, 0, "chat ");
-    subghz_cli_command_wrapper(pipe, args, context);
-}
-
-void subghz_on_system_start(void) {
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-
-    cli_add_command(cli, "subghz", CliCommandFlagDefault, subghz_cli_command_wrapper, NULL);
-    cli_add_command(cli, "chat", CliCommandFlagDefault, subghz_cli_command_chat_wrapper, NULL);
-
-    furi_record_close(RECORD_CLI);
-#else
-    UNUSED(subghz_cli_command);
-    UNUSED(subghz_cli_command_chat_wrapper);
-#endif
-}
+CLI_COMMAND_INTERFACE(subghz, execute, CliCommandFlagDefault, 2048);

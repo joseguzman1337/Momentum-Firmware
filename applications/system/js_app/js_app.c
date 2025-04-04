@@ -5,6 +5,7 @@
 #include <toolbox/path.h>
 #include <assets_icons.h>
 #include <cli/cli.h>
+#include <cli/cli_commands.h>
 #include <toolbox/pipe.h>
 
 #define TAG "JS app"
@@ -207,13 +208,4 @@ void js_cli_execute(PipeSide* pipe, FuriString* args, void* context) {
     furi_record_close(RECORD_STORAGE);
 }
 
-#include <cli/cli_i.h>
-CLI_PLUGIN_WRAPPER("js", js_cli_execute)
-
-void js_app_on_system_start(void) {
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_add_command(cli, "js", CliCommandFlagDefault, js_cli_execute_wrapper, NULL);
-    furi_record_close(RECORD_CLI);
-#endif
-}
+CLI_COMMAND_INTERFACE(js, js_cli_execute, CliCommandFlagDefault, 1024);

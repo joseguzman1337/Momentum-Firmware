@@ -1,6 +1,7 @@
 #include <furi.h>
 #include <furi_hal.h>
 #include <cli/cli.h>
+#include <cli/cli_commands.h>
 #include <lib/toolbox/args.h>
 #include <toolbox/pipe.h>
 
@@ -180,7 +181,7 @@ static void bt_cli_print_usage(void) {
     }
 }
 
-static void bt_cli(PipeSide* pipe, FuriString* args, void* context) {
+static void execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     Bt* bt = furi_record_open(RECORD_BT);
 
@@ -228,15 +229,4 @@ static void bt_cli(PipeSide* pipe, FuriString* args, void* context) {
     furi_record_close(RECORD_BT);
 }
 
-#include <cli/cli_i.h>
-CLI_PLUGIN_WRAPPER("bt", bt_cli)
-
-void bt_on_system_start(void) {
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_add_command(cli, RECORD_BT, CliCommandFlagDefault, bt_cli_wrapper, NULL);
-    furi_record_close(RECORD_CLI);
-#else
-    UNUSED(bt_cli);
-#endif
-}
+CLI_COMMAND_INTERFACE(bt, execute, CliCommandFlagDefault, 1024);

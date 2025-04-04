@@ -883,8 +883,10 @@ Function,+,cli_ansi_parser_feed,CliAnsiParserResult,"CliAnsiParser*, char"
 Function,+,cli_ansi_parser_feed_timeout,CliAnsiParserResult,CliAnsiParser*
 Function,+,cli_ansi_parser_free,void,CliAnsiParser*
 Function,+,cli_delete_command,void,"Cli*, const char*"
+Function,+,cli_enumerate_external_commands,void,Cli*
 Function,+,cli_is_pipe_broken_or_is_etx_next_char,_Bool,PipeSide*
 Function,+,cli_print_usage,void,"const char*, const char*, const char*"
+Function,+,cli_remove_external_commands,void,Cli*
 Function,+,cli_vcp_disable,void,CliVcp*
 Function,+,cli_vcp_enable,void,CliVcp*
 Function,+,composite_api_resolver_add,void,"CompositeApiResolver*, const ElfApiInterface*"
@@ -3572,10 +3574,10 @@ Function,+,subghz_file_encoder_worker_start,_Bool,"SubGhzFileEncoderWorker*, con
 Function,+,subghz_file_encoder_worker_stop,void,SubGhzFileEncoderWorker*
 Function,+,subghz_keystore_alloc,SubGhzKeystore*,
 Function,+,subghz_keystore_free,void,SubGhzKeystore*
-Function,-,subghz_keystore_get_data,SubGhzKeyArray_t*,SubGhzKeystore*
+Function,+,subghz_keystore_get_data,SubGhzKeyArray_t*,SubGhzKeystore*
 Function,+,subghz_keystore_load,_Bool,"SubGhzKeystore*, const char*"
 Function,+,subghz_keystore_raw_encrypted_save,_Bool,"const char*, const char*, uint8_t*"
-Function,-,subghz_keystore_raw_get_data,_Bool,"const char*, size_t, uint8_t*, size_t"
+Function,+,subghz_keystore_raw_get_data,_Bool,"const char*, size_t, uint8_t*, size_t"
 Function,-,subghz_keystore_reset_kl,void,SubGhzKeystore*
 Function,+,subghz_keystore_save,_Bool,"SubGhzKeystore*, const char*, uint8_t*"
 Function,+,subghz_protocol_alutech_at_4n_create_data,_Bool,"void*, FlipperFormat*, uint32_t, uint8_t, uint16_t, SubGhzRadioPreset*"

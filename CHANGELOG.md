@@ -93,7 +93,10 @@
 - Infrared:
   - OFW: Add Fujitsu ASTG12LVCC to AC Universal Remote (by @KereruA0i)
   - OFW: Increase max carrier limit to 1000000 (by @skotopes)
-- OFW: CLI: New CLI architecture, some text formatting, better stability and less RAM usage (by @portasynthinca3)
+- CLI:
+  - OFW: New CLI architecture, some text formatting, better stability and less RAM usage (by @portasynthinca3)
+  - OFW: Autocomplete and more keyboard shortcuts (by @portasynthinca3)
+  - OFW: Improved loading of CLI commands from SD card with fals and threads (by @portasynthinca3)
 - OFW: Power: Added OTG controls to Power service, remembers OTG when unplugging USB (by @Astrrra & @skotopes)
 - OFW: GUI: Updated Button Panel with more options for button handling (by @Akiva-Cohen)
 - Furi:
