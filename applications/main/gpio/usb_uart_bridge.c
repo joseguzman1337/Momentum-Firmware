@@ -35,12 +35,12 @@ typedef enum {
 
     WorkerEvtLineCfgSet = (1 << 6),
     WorkerEvtCtrlLineSet = (1 << 7),
-    WorkerEvtSendBreak = (1 << 8),
+
 } WorkerEvtFlags;
 
 #define WORKER_ALL_RX_EVENTS                                                      \
     (WorkerEvtStop | WorkerEvtRxDone | WorkerEvtCfgChange | WorkerEvtLineCfgSet | \
-     WorkerEvtCtrlLineSet | WorkerEvtCdcTxComplete | WorkerEvtSendBreak)
+     WorkerEvtCtrlLineSet | WorkerEvtCdcTxComplete)
 #define WORKER_ALL_TX_EVENTS (WorkerEvtTxStop | WorkerEvtCdcRx)
 
 struct UsbUartBridge {
@@ -69,7 +69,6 @@ static void vcp_on_cdc_rx(void* context);
 static void vcp_state_callback(void* context, uint8_t state);
 static void vcp_on_cdc_control_line(void* context, uint8_t state);
 static void vcp_on_line_config(void* context, struct usb_cdc_line_coding* config);
-static void vcp_on_cdc_break(void* context, uint16_t duration);
 
 static const CdcCallbacks cdc_cb = {
     vcp_on_cdc_tx_complete,
@@ -77,7 +76,6 @@ static const CdcCallbacks cdc_cb = {
     vcp_state_callback,
     vcp_on_cdc_control_line,
     vcp_on_line_config,
-    vcp_on_cdc_break,
 };
 
 /* USB UART worker */
@@ -289,9 +287,6 @@ static int32_t usb_uart_worker(void* context) {
         if(events & WorkerEvtCtrlLineSet) {
             usb_uart_update_ctrl_lines(usb_uart);
         }
-        if(events & WorkerEvtSendBreak) {
-            furi_hal_serial_send_break(usb_uart->serial_handle);
-        }
     }
 
     furi_hal_gpio_init(USB_USART_DE_RE_PIN, GpioModeAnalog, GpioPullNo, GpioSpeedLow);
@@ -381,12 +376,6 @@ static void vcp_on_line_config(void* context, struct usb_cdc_line_coding* config
     UNUSED(config);
     UsbUartBridge* usb_uart = (UsbUartBridge*)context;
     furi_thread_flags_set(furi_thread_get_id(usb_uart->thread), WorkerEvtLineCfgSet);
-}
-
-static void vcp_on_cdc_break(void* context, uint16_t duration) {
-    UNUSED(duration);
-    UsbUartBridge* usb_uart = (UsbUartBridge*)context;
-    furi_thread_flags_set(furi_thread_get_id(usb_uart->thread), WorkerEvtSendBreak);
 }
 
 UsbUartBridge* usb_uart_enable(UsbUartConfig* cfg) {
