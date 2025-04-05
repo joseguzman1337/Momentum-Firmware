@@ -1,6 +1,6 @@
 #include <furi.h>
 #include <furi_hal.h>
-#include <cli/cli.h>
+#include <cli/cli_main_commands.h>
 #include <lib/toolbox/args.h>
 #include <lib/toolbox/hex.h>
 #include <lib/toolbox/bit_buffer.h>
@@ -8,6 +8,7 @@
 #include <lib/nfc/protocols/iso14443_4a/iso14443_4a_poller.h>
 #include <lib/nfc/protocols/iso14443_4b/iso14443_4b_poller.h>
 #include <lib/nfc/protocols/iso15693_3/iso15693_3_poller.h>
+#include <toolbox/pipe.h>
 
 #include <furi_hal_nfc.h>
 
@@ -38,7 +39,7 @@ static void nfc_cli_print_usage(void) {
     }
 }
 
-static void nfc_cli_field(Cli* cli, FuriString* args) {
+static void nfc_cli_field(PipeSide* pipe, FuriString* args) {
     UNUSED(args);
     // Check if nfc worker is not busy
     if(furi_hal_nfc_is_hal_ready() != FuriHalNfcErrorNone) {
@@ -53,7 +54,7 @@ static void nfc_cli_field(Cli* cli, FuriString* args) {
     printf("Field is on. Don't leave device in this mode for too long.\r\n");
     printf("Press Ctrl+C to abort\r\n");
 
-    while(!cli_cmd_interrupt_received(cli)) {
+    while(!cli_is_pipe_broken_or_is_etx_next_char(pipe)) {
         furi_delay_ms(50);
     }
 
@@ -199,7 +200,7 @@ static void nfc_cli_apdu(Cli* cli, FuriString* args) {
     furi_string_free(data);
 }
 
-static void nfc_cli(Cli* cli, FuriString* args, void* context) {
+static void execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     FuriString* cmd;
     cmd = furi_string_alloc();
@@ -215,7 +216,7 @@ static void nfc_cli(Cli* cli, FuriString* args, void* context) {
         }
         if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
             if(furi_string_cmp_str(cmd, "field") == 0) {
-                nfc_cli_field(cli, args);
+                nfc_cli_field(pipe, args);
                 break;
             }
         }
@@ -226,12 +227,4 @@ static void nfc_cli(Cli* cli, FuriString* args, void* context) {
     furi_string_free(cmd);
 }
 
-void nfc_on_system_start(void) {
-#ifdef SRV_CLI
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_add_command(cli, "nfc", CliCommandFlagDefault, nfc_cli, NULL);
-    furi_record_close(RECORD_CLI);
-#else
-    UNUSED(nfc_cli);
-#endif
-}
+CLI_COMMAND_INTERFACE(nfc, execute, CliCommandFlagDefault, 1024, CLI_APPID);
