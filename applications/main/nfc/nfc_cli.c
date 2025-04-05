@@ -112,8 +112,8 @@ static NfcCommand trx_callback(NfcGenericEvent event, void* context) {
     return NfcCommandContinue;
 }
 
-static void nfc_cli_apdu(Cli* cli, FuriString* args) {
-    UNUSED(cli);
+static void nfc_cli_apdu(PipeSide* pipe, FuriString* args) {
+    UNUSED(pipe);
     Nfc* nfc = NULL;
     NfcPoller* poller = NULL;
     FuriString* data = furi_string_alloc();
@@ -211,7 +211,7 @@ static void execute(PipeSide* pipe, FuriString* args, void* context) {
             break;
         }
         if(furi_string_cmp_str(cmd, "apdu") == 0) {
-            nfc_cli_apdu(cli, args);
+            nfc_cli_apdu(pipe, args);
             break;
         }
         if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
