@@ -22,7 +22,9 @@ extern "C" {
 #define HID_MOUSE_NONE    0
 
 struct BadUsbScript {
-    FuriHalUsbHidConfig hid_cfg;
+    BadUsbHidInterface* interface;
+    BadUsbHidConfig* hid_cfg;
+    bool load_id_cfg;
     const BadUsbHidApi* hid;
     void* hid_inst;
     FuriThread* thread;
@@ -53,6 +55,8 @@ uint16_t ducky_get_keycode(BadUsbScript* bad_usb, const char* param, bool accept
 uint32_t ducky_get_command_len(const char* line);
 
 bool ducky_is_line_end(const char chr);
+
+uint16_t ducky_get_next_modifier_keycode_by_name(const char** param);
 
 uint16_t ducky_get_keycode_by_name(const char* param);
 

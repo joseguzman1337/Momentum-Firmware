@@ -1,9 +1,11 @@
-#include "hid_profile.h"
+#include "ble_hid_profile.h"
+
+// Based on <lib/ble_profile/extra_profiles/hid_profile.c>
 
 #include <furi_hal_usb_hid.h>
 #include <services/dev_info_service.h>
 #include <services/battery_service.h>
-#include <extra_services/hid_service.h>
+#include "ble_hid_service.h"
 
 #include <furi.h>
 #include <usb_hid.h>
@@ -398,32 +400,24 @@ static GapConfig template_config = {
 };
 
 static void ble_profile_hid_get_config(GapConfig* config, FuriHalBleProfileParams profile_params) {
+    furi_check(profile_params);
     BleProfileHidParams* hid_profile_params = profile_params;
 
     furi_check(config);
     memcpy(config, &template_config, sizeof(GapConfig));
-    // Set mac address
-    memcpy(config->mac_address, furi_hal_version_get_ble_mac(), sizeof(config->mac_address));
 
-    // Change MAC address for HID profile
-    config->mac_address[2]++;
-    if(hid_profile_params) {
-        config->mac_address[0] ^= hid_profile_params->mac_xor;
-        config->mac_address[1] ^= hid_profile_params->mac_xor >> 8;
-    }
+    // Set MAC address
+    memcpy(config->mac_address, hid_profile_params->mac, sizeof(config->mac_address));
 
     // Set advertise name
-    const char* clicker_str = "Control";
-    if(hid_profile_params && hid_profile_params->device_name_prefix) {
-        clicker_str = hid_profile_params->device_name_prefix;
-    }
-    snprintf(
-        config->adv_name,
-        sizeof(config->adv_name),
-        "%c%s %s",
-        furi_hal_version_get_ble_local_device_name_ptr()[0],
-        clicker_str,
-        furi_hal_version_get_name_ptr());
+    config->adv_name[0] = furi_hal_version_get_ble_local_device_name_ptr()[0];
+    strlcpy(config->adv_name + 1, hid_profile_params->name, sizeof(config->adv_name) - 1);
+
+    // Set bonding mode
+    config->bonding_mode = hid_profile_params->bonding;
+
+    // Set pairing method
+    config->pairing_method = hid_profile_params->pairing;
 }
 
 static const FuriHalBleProfileTemplate profile_callbacks = {
