@@ -363,6 +363,30 @@ void furi_hal_bt_start_rx(uint8_t channel) {
     aci_hal_rx_start(channel);
 }
 
+float furi_hal_bt_get_rssi(void) {
+    float val;
+    uint8_t rssi_raw[3];
+
+    if(aci_hal_read_raw_rssi(rssi_raw) != BLE_STATUS_SUCCESS) {
+        return 0.0f;
+    }
+
+    // Some ST magic with rssi
+    uint8_t agc = rssi_raw[2] & 0xFF;
+    int rssi = (((int)rssi_raw[1] << 8) & 0xFF00) + (rssi_raw[0] & 0xFF);
+    if(rssi == 0 || agc > 11) {
+        val = -127.0;
+    } else {
+        val = agc * 6.0f - 127.0f;
+        while(rssi > 30) {
+            val += 6.0;
+            rssi >>= 1;
+        }
+        val += (float)((417 * rssi + 18080) >> 10);
+    }
+    return val;
+}
+
 uint32_t furi_hal_bt_get_transmitted_packets(void) {
     uint32_t packets = 0;
     aci_hal_le_tx_test_packet_number(&packets);
