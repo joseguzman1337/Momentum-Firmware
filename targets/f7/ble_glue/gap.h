@@ -96,8 +96,6 @@ void gap_thread_stop(void);
 
 void gap_emit_ble_beacon_status_event(bool active);
 
-uint32_t gap_get_remote_conn_rssi(int8_t* rssi);
-
 #ifdef __cplusplus
 }
 #endif

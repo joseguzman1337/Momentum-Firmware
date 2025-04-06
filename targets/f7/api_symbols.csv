@@ -782,7 +782,6 @@ Function,+,ble_svc_serial_start,BleServiceSerial*,
 Function,+,ble_svc_serial_stop,void,BleServiceSerial*
 Function,+,ble_svc_serial_update_tx,_Bool,"BleServiceSerial*, uint8_t*, uint16_t"
 Function,-,bsearch,void*,"const void*, const void*, size_t, size_t, __compar_fn_t"
-Function,-,bt_close_rpc_connection,void,Bt*
 Function,+,bt_disconnect,void,Bt*
 Function,+,bt_forget_bonded_devices,void,Bt*
 Function,+,bt_keys_storage_alloc,BtKeysStorage*,const char*
@@ -795,10 +794,8 @@ Function,+,bt_keys_storage_set_file_path,void,"BtKeysStorage*, const char*"
 Function,+,bt_keys_storage_set_ram_params,void,"BtKeysStorage*, uint8_t*, uint16_t"
 Function,+,bt_keys_storage_set_storage_path,void,"Bt*, const char*"
 Function,+,bt_keys_storage_update,_Bool,"BtKeysStorage*, uint8_t*, uint32_t"
-Function,-,bt_open_rpc_connection,void,Bt*
 Function,+,bt_profile_restore_default,_Bool,Bt*
 Function,+,bt_profile_start,FuriHalBleProfileBase*,"Bt*, const FuriHalBleProfileTemplate*, FuriHalBleProfileParams"
-Function,+,bt_remote_rssi,_Bool,"Bt*, uint8_t*"
 Function,+,bt_set_status_changed_callback,void,"Bt*, BtStatusChangedCallback, void*"
 Function,+,buffered_file_stream_alloc,Stream*,Storage*
 Function,+,buffered_file_stream_close,_Bool,Stream*
@@ -1331,7 +1328,6 @@ Function,+,furi_hal_bt_extra_beacon_set_config,_Bool,const GapExtraBeaconConfig*
 Function,+,furi_hal_bt_extra_beacon_set_data,_Bool,"const uint8_t*, uint8_t"
 Function,+,furi_hal_bt_extra_beacon_start,_Bool,
 Function,+,furi_hal_bt_extra_beacon_stop,_Bool,
-Function,-,furi_hal_bt_get_conn_rssi,uint32_t,uint8_t*
 Function,+,furi_hal_bt_get_key_storage_buff,void,"uint8_t**, uint16_t*"
 Function,+,furi_hal_bt_get_radio_stack,FuriHalBtStack,
 Function,+,furi_hal_bt_get_rssi,float,
@@ -1339,14 +1335,12 @@ Function,+,furi_hal_bt_get_transmitted_packets,uint32_t,
 Function,-,furi_hal_bt_init,void,
 Function,+,furi_hal_bt_is_active,_Bool,
 Function,+,furi_hal_bt_is_alive,_Bool,
-Function,+,furi_hal_bt_is_connected,_Bool,
 Function,+,furi_hal_bt_is_gatt_gap_supported,_Bool,
 Function,+,furi_hal_bt_is_testing_supported,_Bool,
 Function,+,furi_hal_bt_lock_core2,void,
 Function,+,furi_hal_bt_nvm_sram_sem_acquire,void,
 Function,+,furi_hal_bt_nvm_sram_sem_release,void,
 Function,+,furi_hal_bt_reinit,void,
-Function,+,furi_hal_bt_reverse_mac_addr,void,uint8_t[( 6 )]
 Function,+,furi_hal_bt_set_key_storage_change_callback,void,"BleGlueKeyStorageChangedCallback, void*"
 Function,+,furi_hal_bt_start_advertising,void,
 Function,+,furi_hal_bt_start_app,FuriHalBleProfileBase*,"const FuriHalBleProfileTemplate*, FuriHalBleProfileParams, GapEventCallback, void*"
@@ -2008,7 +2002,6 @@ Function,-,gap_extra_beacon_set_config,_Bool,const GapExtraBeaconConfig*
 Function,-,gap_extra_beacon_set_data,_Bool,"const uint8_t*, uint8_t"
 Function,-,gap_extra_beacon_start,_Bool,
 Function,-,gap_extra_beacon_stop,_Bool,
-Function,-,gap_get_remote_conn_rssi,uint32_t,int8_t*
 Function,-,gap_get_state,GapState,
 Function,-,gap_init,_Bool,"GapConfig*, GapEventCallback, void*"
 Function,-,gap_start_advertising,void,
@@ -3558,9 +3551,9 @@ Function,+,subghz_keystore_get_data,SubGhzKeyArray_t*,SubGhzKeystore*
 Function,+,subghz_keystore_load,_Bool,"SubGhzKeystore*, const char*"
 Function,+,subghz_keystore_raw_encrypted_save,_Bool,"const char*, const char*, uint8_t*"
 Function,+,subghz_keystore_raw_get_data,_Bool,"const char*, size_t, uint8_t*, size_t"
+Function,+,subghz_keystore_reset_kl,void,SubGhzKeystore*
 Function,+,subghz_keystore_save,_Bool,"SubGhzKeystore*, const char*, uint8_t*"
 Function,+,subghz_protocol_alutech_at_4n_create_data,_Bool,"void*, FlipperFormat*, uint32_t, uint8_t, uint16_t, SubGhzRadioPreset*"
-Function,+,subghz_keystore_reset_kl,void,SubGhzKeystore*
 Function,+,subghz_protocol_blocks_add_bit,void,"SubGhzBlockDecoder*, uint8_t"
 Function,+,subghz_protocol_blocks_add_bytes,uint8_t,"const uint8_t[], size_t"
 Function,+,subghz_protocol_blocks_add_to_128_bit,void,"SubGhzBlockDecoder*, uint8_t, uint64_t*"
