@@ -1,5 +1,5 @@
 ## Main changes
-- Current API: 83.0
+- Current API: 85.0
 * SubGHz: Add **Revers RB2 / RB2M Protocol** (static 64 bit) **full support** with add manually (by @xMasterX)
 * SubGHz: **Fix Hollarm protocol with more verification**
 * SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte (who spent 2 weeks on this))
@@ -9,6 +9,7 @@
 * OFW: LFRFID - **EM4305 support**
 * OFW: **Universal IR signal selection**
 * OFW: **BadUSB: Mouse control**
+* OFW PR 4136: BadUSB: Full USB/BLE parameter customization, UI improvements, and more (by @Willy-JL)
 * OFW: NFC - Added naming for DESFire cards + fix MF3ICD40 cards unable to be read
 * Apps: Add **FindMyFlipper to system apps and allow autostart** on system boot [app by @MatthewKuKanich](https://github.com/MatthewKuKanich/FindMyFlipper) and autoloader by @Willy-JL - to use app please check how to add keys in [app repo](https://github.com/MatthewKuKanich/FindMyFlipper)
 * README Update: Enhanced Visuals & Navigation (PR #871 #872 | by @m-xim)
@@ -20,6 +21,19 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW: BadUSB arbitrary key combinations 
+* OFW: JS: Update and fix docs, fix Number.toString() with decimals
+* OFW: New JS value destructuring
+* OFW: Docs: Fix doxygen references from PR 4168
+* OFW: BLE advertising improvements
+* OFW: **New CLI architecture**
+* OFW: **CLI autocomplete and other sugar**
+* OFW: CLI commands in fals and threads
+* OFW: cli: fixed `free_blocks` command
+* OFW: docs: badusb arbitrary modkey chains
+* OFW: Separate cli_shell into toolbox
+* OFW: Move JS modules to new arg parser
+* OFW: Application chaining
 * OFW: Fix DWARF dead code elimination and linking 
 * OFW: NFC: Fix crash on ISO15693-3 save when memory is empty or cannot be read
 * OFW: Reduced ieee754 parser size
