@@ -21,6 +21,7 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW: NFC app now can launch MFKey32
 * OFW: BadUSB arbitrary key combinations 
 * OFW: JS: Update and fix docs, fix Number.toString() with decimals
 * OFW: New JS value destructuring
