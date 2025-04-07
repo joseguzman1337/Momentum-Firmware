@@ -106,6 +106,7 @@ static void cli_vcp_signal_internal_event(CliVcp* cli_vcp, CliVcpInternalEvent e
 
 static void cli_vcp_cdc_tx_done(void* context) {
     CliVcp* cli_vcp = context;
+    cli_vcp->is_currently_transmitting = false;
     cli_vcp_signal_internal_event(cli_vcp, CliVcpInternalEventTxDone);
 }
 
@@ -202,7 +203,6 @@ static void cli_vcp_internal_event_happened(void* context) {
 
     if(event & CliVcpInternalEventTxDone) {
         VCP_TRACE(TAG, "TxDone");
-        cli_vcp->is_currently_transmitting = false;
         cli_vcp_maybe_send_data(cli_vcp);
     }
 
