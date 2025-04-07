@@ -22,7 +22,7 @@ jobs:
 
       - name: Flash unit tests firmware
         id: flashing
-        timeout-minutes: 1
+        timeout-minutes: 5
         run: |
           source scripts/toolchain/fbtenv.sh
           ./fbt resources firmware_latest flash LIB_DEBUG=1 FIRMWARE_APP_SET=unit_tests FORCE=1
@@ -33,7 +33,7 @@ jobs:
         timeout-minutes: 2
         run: |
           source scripts/toolchain/fbtenv.sh
-          python3 scripts/testops.py -t=90 await_flipper
+          python3 scripts/testops.py -t=15 await_flipper
           python3 scripts/storage.py -f send build/latest/resources /ext
           python3 scripts/storage.py -f send /region_data /ext/.int/.region_data
           python3 scripts/power.py reboot
