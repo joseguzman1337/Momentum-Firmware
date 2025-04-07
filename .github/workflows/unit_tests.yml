@@ -33,7 +33,7 @@ jobs:
         timeout-minutes: 2
         run: |
           source scripts/toolchain/fbtenv.sh
-          python3 scripts/testops.py -t=15 await_flipper
+          python3 scripts/testops.py -t=90 await_flipper
           python3 scripts/storage.py -f send build/latest/resources /ext
           python3 scripts/storage.py -f send /region_data /ext/.int/.region_data
           python3 scripts/power.py reboot
@@ -59,26 +59,9 @@ jobs:
         run: |
           ./fbt gdb_trace_all LIB_DEBUG=1 FIRMWARE_APP_SET=unit_tests FORCE=1
 
-      - name: Check for timeout
-        id: check_timeout
-        if: failure()
-        run: |
-          echo "outcome" "${{ steps.flashing.outcome }}" "conclusion" "${{ steps.flashing.conclusion }}" "exitCode" "${{ steps.flashing.exitCode }}"
-          ls "${{ github.workspace }}"
-          ls "${{ github.workspace }}/logs"
-          if grep -q "has timed out" "${{ github.workspace }}/logs/job/job-logs.txt" 2>/dev/null; then
-            echo "timed_out=true" >> $GITHUB_OUTPUT
-          elif [ "${{ steps.flashing.conclusion }}" == "timed_out" ] || \
-             [ "${{ steps.copy.conclusion }}" == "timed_out" ] || \
-             [ "${{ steps.run_units.conclusion }}" == "timed_out" ]; then
-            echo "timed_out=true" >> $GITHUB_OUTPUT
-          else
-            echo "timed_out=false" >> $GITHUB_OUTPUT
-          fi
-
   unit_attempt_2:
     needs: unit_attempt_1
-    if: needs.unit_attempt_1.outputs.timed_out == 'true'
+    if: failure()
     runs-on: [ self-hosted, FlipperZeroTest ]
     steps:
       - name: Checkout code
