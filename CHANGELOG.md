@@ -4,11 +4,15 @@
 * SubGHz: **Fix Hollarm protocol with more verification**
 * SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte (who spent 2 weeks on this))
 * SubGHz: **Came Atomo button hold simulation with full cycle** simulation (to allow proper pairing with receiver)
+* SubGHz: Add **Prastel (42bit static code)** support (OFW PR 4178 by @pmazzini)
 * System: **Night Shift Feature** (dimming backlight in selected time interval) (PR #885 | by @Dmitry422)
 * System: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
 * OFW: LFRFID - **EM4305 support**
 * OFW: **Universal IR signal selection**
 * OFW: **BadUSB: Mouse control**
+* OFW: **Pinning of settings options**
+* OFW: NFC app now can launch MFKey32
+* OFW: BadUSB arbitrary key combinations
 * OFW PR 4136: BadUSB: Full USB/BLE parameter customization, UI improvements, and more (by @Willy-JL)
 * OFW: NFC - Added naming for DESFire cards + fix MF3ICD40 cards unable to be read
 * Apps: Add **FindMyFlipper to system apps and allow autostart** on system boot [app by @MatthewKuKanich](https://github.com/MatthewKuKanich/FindMyFlipper) and autoloader by @Willy-JL - to use app please check how to add keys in [app repo](https://github.com/MatthewKuKanich/FindMyFlipper)
@@ -21,8 +25,8 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
-* OFW: NFC app now can launch MFKey32
-* OFW: BadUSB arbitrary key combinations 
+* OFW: BLE: Slightly increase mfg_data size
+* OFW: fbt: Deterministic STARTUP order & additional checks
 * OFW: JS: Update and fix docs, fix Number.toString() with decimals
 * OFW: New JS value destructuring
 * OFW: Docs: Fix doxygen references from PR 4168
