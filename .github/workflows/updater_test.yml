@@ -9,7 +9,7 @@ env:
   FBT_GIT_SUBMODULE_SHALLOW: 1
 
 jobs:
-  updater_attempt1:
+  Run_updater_test:
     runs-on: [self-hosted, FlipperZeroTest]
     outputs:
       timed_out: ${{ steps.check_timeout.outputs.timed_out }}
@@ -38,8 +38,8 @@ jobs:
           ./fbt flash_usb FORCE=1
           python3 scripts/testops.py -t=180 await_flipper
 
-  updater_attempt2:
-    needs: updater_attempt1
+  Retry_updater_test:
+    needs: Run_updater_test
     if: failure()
     runs-on: [self-hosted, FlipperZeroTest]
     steps:
