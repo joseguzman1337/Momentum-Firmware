@@ -11,7 +11,7 @@
 static void onewire_cli_print_usage(void) {
     printf("Usage:\r\n");
     printf("onewire search\r\n");
-};
+}
 
 static void onewire_cli_search(PipeSide* pipe) {
     UNUSED(pipe);
