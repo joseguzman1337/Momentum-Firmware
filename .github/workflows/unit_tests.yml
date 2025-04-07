@@ -105,6 +105,6 @@ jobs:
           path: unit_tests*.txt
 
       - name: Check GDB output
-        if: failure() && steps.flashing.outcome == 'success'
+        if: failure()
         run: |
           ./fbt gdb_trace_all LIB_DEBUG=1 FIRMWARE_APP_SET=unit_tests FORCE=1
