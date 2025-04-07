@@ -48,7 +48,9 @@ def main():
             with open("return_block.bin", "wb") as f:
                 f.write(return_block)
 
-            logger.error("Incorrect block received. Saved to `block.bin' and `return_block.bin'.")
+            logger.error(
+                "Incorrect block received. Saved to `block.bin' and `return_block.bin'."
+            )
             logger.error(f"{bytes_to_send} bytes left. Aborting.")
             success = False
             break
