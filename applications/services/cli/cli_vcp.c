@@ -50,7 +50,7 @@ struct CliVcp {
 
     PipeSide* own_pipe;
     PipeSide* shell_pipe;
-    bool is_currently_transmitting;
+    volatile bool is_currently_transmitting;
     size_t previous_tx_length;
 
     CliRegistry* main_registry;
