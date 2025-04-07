@@ -15,7 +15,6 @@
 #define VCP_IF_NUM        0
 #define VCP_MESSAGE_Q_LEN 8
 
-#define CLI_VCP_TRACE
 #ifdef CLI_VCP_TRACE
 #define VCP_TRACE(...) FURI_LOG_T(__VA_ARGS__)
 #else
