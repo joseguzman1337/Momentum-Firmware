@@ -270,6 +270,13 @@ const uint32_t night_shift_end_value[NIGHT_SHIFT_END_COUNT] = {
 
 // --- NIGHT SHIFT END ---
 
+#define LCD_INVERSE_COUNT 2
+const char* const lcd_inverse_text[LCD_INVERSE_COUNT] = {
+    "OFF",
+    "ON",
+};
+const bool lcd_inverse_value[LCD_INVERSE_COUNT] = {false, true};
+
 static void contrast_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
@@ -339,6 +346,16 @@ static void vibro_changed(VariableItem* item) {
     variable_item_set_current_value_text(item, vibro_text[index]);
     app->notification->settings.vibro_on = vibro_value[index];
     notification_message(app->notification, &sequence_single_vibro);
+}
+
+static void lcd_inverse_changed(VariableItem* item) {
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+
+    variable_item_set_current_value_text(item, lcd_inverse_text[index]);
+    app->notification->settings.lcd_inverse = lcd_inverse_value[index];
+    notification_message(app->notification, &sequence_display_backlight_on);
+
 }
 
 //--- RGB BACKLIGHT ---
@@ -720,6 +737,13 @@ static NotificationAppSettings* alloc_settings(void) {
         variable_item_set_current_value_index(item, value_index);
         variable_item_set_current_value_text(item, vibro_text[value_index]);
     }
+
+    item = variable_item_list_add(
+        app->variable_item_list, "LCD Inverse", LCD_INVERSE_COUNT, lcd_inverse_changed, app);
+    value_index = value_index_bool(
+        app->notification->settings.lcd_inverse, lcd_inverse_value, LCD_INVERSE_COUNT);
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, lcd_inverse_text[value_index]);
 
     //--- RGB BACKLIGHT ---
 
