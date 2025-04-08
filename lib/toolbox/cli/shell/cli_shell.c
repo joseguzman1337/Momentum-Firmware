@@ -103,15 +103,15 @@ void cli_command_help(PipeSide* pipe, FuriString* args, void* context) {
 
     printf("Available commands:\r\n" ANSI_FG_GREEN);
     cli_registry_lock(registry);
-    CliCommandTree_t* commands = cli_registry_get_commands(registry);
-    size_t commands_count = CliCommandTree_size(*commands);
+    CliCommandDict_t* commands = cli_registry_get_commands(registry);
+    size_t commands_count = CliCommandDict_size(*commands);
 
-    CliCommandTree_it_t iterator;
-    CliCommandTree_it(iterator, *commands);
+    CliCommandDict_it_t iterator;
+    CliCommandDict_it(iterator, *commands);
     for(size_t i = 0; i < commands_count; i++) {
-        const CliCommandTree_itref_t* item = CliCommandTree_cref(iterator);
-        printf("%-30s", furi_string_get_cstr(*item->key_ptr));
-        CliCommandTree_next(iterator);
+        const CliCommandDict_itref_t* item = CliCommandDict_cref(iterator);
+        printf("%-30s", furi_string_get_cstr(item->key));
+        CliCommandDict_next(iterator);
 
         if(i % columns == columns - 1) printf("\r\n");
     }
