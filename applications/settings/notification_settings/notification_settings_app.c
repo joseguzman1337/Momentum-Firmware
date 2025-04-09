@@ -355,11 +355,11 @@ static void lcd_inverse_changed(VariableItem* item) {
     variable_item_set_current_value_text(item, lcd_inverse_text[index]);
     app->notification->settings.lcd_inverse = lcd_inverse_value[index];
 
-    //setup global variable for using in canvas.c
-    lcd_inverted = lcd_inverse_value[index];
+    Canvas* tmp_canvas = gui_direct_draw_acquire(app->gui);
+    canvas_set_inverted_lcd(tmp_canvas, lcd_inverse_value[index]);
+    gui_direct_draw_release(app->gui);
 
     notification_message(app->notification, &sequence_display_backlight_on);
-
 }
 
 //--- RGB BACKLIGHT ---

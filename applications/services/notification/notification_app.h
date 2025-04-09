@@ -70,6 +70,3 @@ struct NotificationApp {
 void notification_message_save_settings(NotificationApp* app);
 void night_shift_timer_start(NotificationApp* app);
 void night_shift_timer_stop(NotificationApp* app);
-
-//global variable for using in canvac.c
-extern bool lcd_inverted;

@@ -620,7 +620,11 @@ static NotificationApp* notification_app_alloc(void) {
         furi_timer_alloc(night_shift_timer_callback, FuriTimerTypePeriodic, app);
     // --- NIGHT SHIFT END ---
 
-    lcd_inverted = false;
+    Gui* tmp_gui = furi_record_open(RECORD_GUI);
+    Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
+    canvas_set_inverted_lcd(tmp_canvas, false);
+    gui_direct_draw_release(tmp_gui);
+    furi_record_close(RECORD_GUI);
 
     return app;
 }
@@ -653,8 +657,12 @@ static void notification_apply_settings(NotificationApp* app) {
     }
     // --- NIGHT SHIFT END ---
 
-    //setup global variable "inverted" by settings value;
-    lcd_inverted = app->settings.lcd_inverse;
+    //setup canvas variable "inverse" by settings value;
+    Gui* tmp_gui = furi_record_open(RECORD_GUI);
+    Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
+    canvas_set_inverted_lcd(tmp_canvas, app->settings.lcd_inverse);
+    gui_direct_draw_release(tmp_gui);
+    furi_record_close(RECORD_GUI);
 }
 
 static void notification_init_settings(NotificationApp* app) {
