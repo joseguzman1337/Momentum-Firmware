@@ -270,12 +270,12 @@ const uint32_t night_shift_end_value[NIGHT_SHIFT_END_COUNT] = {
 
 // --- NIGHT SHIFT END ---
 
-#define LCD_INVERSE_COUNT 2
-const char* const lcd_inverse_text[LCD_INVERSE_COUNT] = {
+#define LCD_INVERSION_COUNT 2
+const char* const lcd_inversion_text[LCD_INVERSION_COUNT] = {
     "OFF",
     "ON",
 };
-const bool lcd_inverse_value[LCD_INVERSE_COUNT] = {false, true};
+const bool lcd_inversion_value[LCD_INVERSION_COUNT] = {false, true};
 
 static void contrast_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
@@ -348,15 +348,15 @@ static void vibro_changed(VariableItem* item) {
     notification_message(app->notification, &sequence_single_vibro);
 }
 
-static void lcd_inverse_changed(VariableItem* item) {
+static void lcd_inversion_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
 
-    variable_item_set_current_value_text(item, lcd_inverse_text[index]);
-    app->notification->settings.lcd_inverse = lcd_inverse_value[index];
+    variable_item_set_current_value_text(item, lcd_inversion_text[index]);
+    app->notification->settings.lcd_inversion = lcd_inversion_value[index];
 
     Canvas* tmp_canvas = gui_direct_draw_acquire(app->gui);
-    canvas_set_inverted_lcd(tmp_canvas, lcd_inverse_value[index]);
+    canvas_set_inverted_lcd(tmp_canvas, lcd_inversion_value[index]);
     gui_direct_draw_release(app->gui);
 
     notification_message(app->notification, &sequence_display_backlight_on);
@@ -743,11 +743,11 @@ static NotificationAppSettings* alloc_settings(void) {
     }
 
     item = variable_item_list_add(
-        app->variable_item_list, "LCD Inverse", LCD_INVERSE_COUNT, lcd_inverse_changed, app);
+        app->variable_item_list,"LCD inversion",LCD_INVERSION_COUNT,lcd_inversion_changed,app);
     value_index = value_index_bool(
-        app->notification->settings.lcd_inverse, lcd_inverse_value, LCD_INVERSE_COUNT);
+        app->notification->settings.lcd_inversion, lcd_inversion_value, LCD_INVERSION_COUNT);
     variable_item_set_current_value_index(item, value_index);
-    variable_item_set_current_value_text(item, lcd_inverse_text[value_index]);
+    variable_item_set_current_value_text(item, lcd_inversion_text[value_index]);
 
     //--- RGB BACKLIGHT ---
 

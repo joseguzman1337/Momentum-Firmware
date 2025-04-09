@@ -47,7 +47,7 @@ struct Canvas {
     CompressIcon* compress_icon;
     CanvasCallbackPairArray_t canvas_callback_pair;
     FuriMutex* mutex;
-    bool lcd_inverse;
+    bool lcd_inversion;
 };
 
 /** Allocate memory and initialize canvas

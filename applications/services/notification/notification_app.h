@@ -48,7 +48,7 @@ typedef struct {
     float night_shift;
     uint32_t night_shift_start;
     uint32_t night_shift_end;
-    bool lcd_inverse;
+    bool lcd_inversion;
 } NotificationSettings;
 
 struct NotificationApp {

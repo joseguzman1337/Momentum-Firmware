@@ -96,12 +96,12 @@ size_t canvas_get_buffer_size(const Canvas* canvas) {
 
 bool canvas_is_inverted_lcd(Canvas* canvas) {
     furi_assert(canvas);
-    return canvas->lcd_inverse;
+    return canvas->lcd_inversion;
 }
 
 void canvas_set_inverted_lcd(Canvas* canvas, bool inverted) {
     furi_assert(canvas);
-    canvas->lcd_inverse = inverted;
+    canvas->lcd_inversion = inverted;
 }
 
 void canvas_frame_set(
@@ -152,7 +152,7 @@ const CanvasFontParameters* canvas_get_font_params(const Canvas* canvas, Font fo
 void canvas_clear(Canvas* canvas) {
     furi_check(canvas);
 
-    if(canvas->lcd_inverse) {
+    if(canvas->lcd_inversion) {
         u8g2_FillBuffer(&canvas->fb);
     } else {
         u8g2_ClearBuffer(&canvas->fb);
@@ -162,7 +162,7 @@ void canvas_clear(Canvas* canvas) {
 void canvas_set_color(Canvas* canvas, Color color) {
     furi_check(canvas);
 
-    if(canvas->lcd_inverse) {
+    if(canvas->lcd_inversion) {
         if(color == ColorBlack) {
             color = ColorWhite;
         } else if(color == ColorWhite) {
@@ -178,9 +178,9 @@ void canvas_set_font_direction(Canvas* canvas, CanvasDirection dir) {
 }
 
 void canvas_invert_color(Canvas* canvas) {
-    if((canvas->fb.draw_color == ColorXOR) && canvas->lcd_inverse) {
+    if((canvas->fb.draw_color == ColorXOR) && canvas->lcd_inversion) {
         // ColorXOR = 0x02, inversion change it to White = 0x00
-        // but if we have lcd_inverse ON then we need Black =0x01 instead White 0x00
+        // but if we have lcd_inversion ON then we need Black =0x01 instead White 0x00
         // so we force changing color to black
         canvas->fb.draw_color = ColorBlack;
     } else {

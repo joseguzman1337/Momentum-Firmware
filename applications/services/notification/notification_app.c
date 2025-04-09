@@ -657,10 +657,10 @@ static void notification_apply_settings(NotificationApp* app) {
     }
     // --- NIGHT SHIFT END ---
 
-    //setup canvas variable "inverse" by settings value;
+    //setup canvas variable "inversion" by settings value;
     Gui* tmp_gui = furi_record_open(RECORD_GUI);
     Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
-    canvas_set_inverted_lcd(tmp_canvas, app->settings.lcd_inverse);
+    canvas_set_inverted_lcd(tmp_canvas, app->settings.lcd_inversion);
     gui_direct_draw_release(tmp_gui);
     furi_record_close(RECORD_GUI);
 }
