@@ -50,7 +50,7 @@ struct CliVcp {
 
     PipeSide* own_pipe;
     PipeSide* shell_pipe;
-    bool is_currently_transmitting;
+    volatile bool is_currently_transmitting;
     size_t previous_tx_length;
 
     CliRegistry* main_registry;
@@ -106,6 +106,7 @@ static void cli_vcp_signal_internal_event(CliVcp* cli_vcp, CliVcpInternalEvent e
 
 static void cli_vcp_cdc_tx_done(void* context) {
     CliVcp* cli_vcp = context;
+    cli_vcp->is_currently_transmitting = false;
     cli_vcp_signal_internal_event(cli_vcp, CliVcpInternalEventTxDone);
 }
 
@@ -195,6 +196,16 @@ static void cli_vcp_internal_event_happened(void* context) {
     CliVcpInternalEvent event = furi_thread_flags_wait(CliVcpInternalEventAll, FuriFlagWaitAny, 0);
     furi_check(!(event & FuriFlagError));
 
+    if(event & CliVcpInternalEventRx) {
+        VCP_TRACE(TAG, "Rx");
+        cli_vcp_maybe_receive_data(cli_vcp);
+    }
+
+    if(event & CliVcpInternalEventTxDone) {
+        VCP_TRACE(TAG, "TxDone");
+        cli_vcp_maybe_send_data(cli_vcp);
+    }
+
     if(event & CliVcpInternalEventDisconnected) {
         if(!cli_vcp->is_connected) return;
         FURI_LOG_D(TAG, "Disconnected");
@@ -233,17 +244,6 @@ static void cli_vcp_internal_event_happened(void* context) {
         cli_vcp->shell = cli_shell_alloc(
             cli_main_motd, NULL, cli_vcp->shell_pipe, cli_vcp->main_registry, &cli_main_ext_config);
         cli_shell_start(cli_vcp->shell);
-    }
-
-    if(event & CliVcpInternalEventRx) {
-        VCP_TRACE(TAG, "Rx");
-        cli_vcp_maybe_receive_data(cli_vcp);
-    }
-
-    if(event & CliVcpInternalEventTxDone) {
-        VCP_TRACE(TAG, "TxDone");
-        cli_vcp->is_currently_transmitting = false;
-        cli_vcp_maybe_send_data(cli_vcp);
     }
 }
 

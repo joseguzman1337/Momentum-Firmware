@@ -25,6 +25,7 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW PR 4181: vcp, cli: Handle Tx/Rx events before Connect/Disconnect + extra fixes (by @portasynthinca3)
 * OFW: BLE: Slightly increase mfg_data size
 * OFW: fbt: Deterministic STARTUP order & additional checks
 * OFW: JS: Update and fix docs, fix Number.toString() with decimals
