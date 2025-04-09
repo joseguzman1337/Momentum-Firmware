@@ -143,33 +143,18 @@ const CanvasFontParameters* canvas_get_font_params(const Canvas* canvas, Font fo
 
 void canvas_clear(Canvas* canvas) {
     furi_check(canvas);
-    furi_delay_ms (500);
-    NotificationApp* app = malloc (sizeof(NotificationApp));
-    app = furi_record_open(RECORD_NOTIFICATION);
-
-    // open Notification record for access to NotificationApp settings
-    // NotificationApp* app = malloc (sizeof(NotificationApp));
-    // app = furi_record_open(RECORD_NOTIFICATION);
     
-    if(app->settings.lcd_inverse) {
+    if(lcd_inverted) {
         u8g2_FillBuffer(&canvas->fb);
     } else {
         u8g2_ClearBuffer(&canvas->fb);
     }
-
-    u8g2_ClearBuffer(&canvas->fb);
-    // furi_record_close (RECORD_NOTIFICATION);
-    // free (app);
 }
 
 void canvas_set_color(Canvas* canvas, Color color) {
     furi_check(canvas);
-    furi_delay_ms (500);
-    // open Notification record for access to NotificationApp settings
-    NotificationApp* app = malloc (sizeof(NotificationApp));
-    app = furi_record_open(RECORD_NOTIFICATION);
 
-    if(app->settings.lcd_inverse) {
+    if(lcd_inverted) {
         if(color == ColorBlack) {
             color = ColorWhite;
         } else if(color == ColorWhite) {
@@ -185,24 +170,14 @@ void canvas_set_font_direction(Canvas* canvas, CanvasDirection dir) {
 }
 
 void canvas_invert_color(Canvas* canvas) {
-
-    // // open Notification record for access to NotificationApp settings
-    // NotificationApp* app = malloc (sizeof(NotificationApp));
-    // app = furi_record_open(RECORD_NOTIFICATION);
-
-    // if((canvas->fb.draw_color == ColorXOR) && app->settings.lcd_inverse) {
-    //     // ColorXOR = 0x02, inversion change it to White = 0x00
-    //     // but if we have lcd_inverse ON then we need Black =0x01 instead White 0x00
-    //     // so we force changing color to black 
-    //     canvas->fb.draw_color = ColorBlack;
-    // } else {
-    //     canvas->fb.draw_color = !canvas->fb.draw_color;
-    // }
-
-    // furi_record_close (RECORD_NOTIFICATION);
-    // free (app);
-
-    canvas->fb.draw_color = !canvas->fb.draw_color;
+    if((canvas->fb.draw_color == ColorXOR) && lcd_inverted) {
+        // ColorXOR = 0x02, inversion change it to White = 0x00
+        // but if we have lcd_inverse ON then we need Black =0x01 instead White 0x00
+        // so we force changing color to black 
+        canvas->fb.draw_color = ColorBlack;
+    } else {
+        canvas->fb.draw_color = !canvas->fb.draw_color;
+    }
 }
 
 void canvas_set_font(Canvas* canvas, Font font) {

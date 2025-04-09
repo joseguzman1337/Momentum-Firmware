@@ -620,6 +620,8 @@ static NotificationApp* notification_app_alloc(void) {
         furi_timer_alloc(night_shift_timer_callback, FuriTimerTypePeriodic, app);
     // --- NIGHT SHIFT END ---
 
+    lcd_inverted = false;
+
     return app;
 }
 
@@ -650,6 +652,9 @@ static void notification_apply_settings(NotificationApp* app) {
         night_shift_timer_start(app);
     }
     // --- NIGHT SHIFT END ---
+
+    //setup global variable "inverted" by settings value;
+    lcd_inverted = app->settings.lcd_inverse;
 }
 
 static void notification_init_settings(NotificationApp* app) {
