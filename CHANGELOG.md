@@ -1,12 +1,15 @@
 ## Main changes
 - Current API: 85.0
+**WARNING! After install of this version your Desktop (fav apps) and LCD & Notifications settings will be reset to default values, please configure them again after this update!** (this is required due to big updates on that parts and config struct changes)
 * SubGHz: Add **Revers RB2 / RB2M Protocol** (static 64 bit) **full support** with add manually (by @xMasterX)
 * SubGHz: **Fix Hollarm protocol with more verification**
 * SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte (who spent 2 weeks on this))
 * SubGHz: **Came Atomo button hold simulation with full cycle** simulation (to allow proper pairing with receiver)
 * SubGHz: Add **Prastel (42bit static code)** support (OFW PR 4178 by @pmazzini)
-* System: **Night Shift Feature** (dimming backlight in selected time interval) (PR #885 | by @Dmitry422)
-* System: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
+* Desktop: **Add support for Favorite App - Ok Long** (Warning! Old favourites apps list will be reset!) (PR #886 | by @DrEverr)
+* Display: **LCD Color Inversion** (Settings - LCD and Notifications - LCD inversion.) (PR #887 | by @Dmitry422)
+* Display: **Night Shift Feature** (dimming backlight in selected time interval) (PR #885 | by @Dmitry422)
+* Display: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
 * OFW: LFRFID - **EM4305 support**
 * OFW: **Universal IR signal selection**
 * OFW: **BadUSB: Mouse control**
