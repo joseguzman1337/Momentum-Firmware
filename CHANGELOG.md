@@ -9,7 +9,7 @@
 * Desktop: **Add support for Favorite App - Ok Long** (Warning! Old favourites apps list will be reset!) (PR #886 | by @DrEverr)
 * Display: **LCD Color Inversion** (Settings - LCD and Notifications - LCD inversion.) (PR #887 | by @Dmitry422)
 * Display: **Night Shift Feature** (dimming backlight in selected time interval) (PR #885 | by @Dmitry422)
-* Display: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
+* Display: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 #890 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
 * OFW: LFRFID - **EM4305 support**
 * OFW: **Universal IR signal selection**
 * OFW: **BadUSB: Mouse control**
