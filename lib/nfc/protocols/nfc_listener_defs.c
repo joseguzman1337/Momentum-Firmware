@@ -9,7 +9,7 @@
 #include <nfc/protocols/slix/slix_listener_defs.h>
 #include <nfc/protocols/type_4_tag/type_4_tag_listener_defs.h>
 
-const NfcListenerBase* nfc_listeners_api[NfcProtocolNum] = {
+const NfcListenerBase* const nfc_listeners_api[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = &nfc_listener_iso14443_3a,
     [NfcProtocolIso14443_3b] = NULL,
     [NfcProtocolIso14443_4a] = &nfc_listener_iso14443_4a,

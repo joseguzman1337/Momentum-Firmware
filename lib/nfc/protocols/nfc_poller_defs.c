@@ -15,7 +15,7 @@
 #include <nfc/protocols/ntag4xx/ntag4xx_poller_defs.h>
 #include <nfc/protocols/type_4_tag/type_4_tag_poller_defs.h>
 
-const NfcPollerBase* nfc_pollers_api[NfcProtocolNum] = {
+const NfcPollerBase* const nfc_pollers_api[NfcProtocolNum] = {
     [NfcProtocolIso14443_3a] = &nfc_poller_iso14443_3a,
     [NfcProtocolIso14443_3b] = &nfc_poller_iso14443_3b,
     [NfcProtocolIso14443_4a] = &nfc_poller_iso14443_4a,
