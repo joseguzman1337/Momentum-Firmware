@@ -4,9 +4,9 @@
 #include <gui/modules/variable_item_list.h>
 #include <gui/view_dispatcher.h>
 #include <lib/toolbox/value_index.h>
-#include "applications/services/rgb_backlight/rgb_backlight.h"
 
-#define MAX_NOTIFICATION_SETTINGS 4
+
+#define MAX_NOTIFICATION_SETTINGS 5
 
 typedef struct {
     NotificationApp* notification;
@@ -293,12 +293,6 @@ static void backlight_changed(VariableItem* item) {
     variable_item_set_current_value_text(item, backlight_text[index]);
     app->notification->settings.display_brightness = backlight_value[index];
 
-    //--- RGB BACKLIGHT ---
-    // set selected brightness to current rgb backlight service settings and save settings
-    app->notification->rgb_srv->settings->brightness = backlight_value[index];
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
-    //--- RGB BACKLIGHT END ---
-
     notification_message(app->notification, &sequence_display_backlight_on);
 }
 
@@ -368,11 +362,8 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
     variable_item_set_current_value_text(item, rgb_backlight_installed_text[index]);
-    app->notification->rgb_srv->settings->rgb_backlight_installed =
+    app->notification->settings.rgb.rgb_backlight_installed =
         rgb_backlight_installed_value[index];
-
-    app->notification->rgb_srv->settings->brightness =
-        app->notification->settings.display_brightness;
 
     // In case of user playing with rgb_backlight_installed swith:
     // if user swith_off rgb_backlight_installed (but may be he have mod installed)
@@ -382,18 +373,18 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
         rgb_backlight_set_led_static_color(1, 0);
         rgb_backlight_set_led_static_color(0, 0);
         SK6805_update();
-        rainbow_timer_stop(app->notification->rgb_srv);
+        rainbow_timer_stop(app->notification);
         // start rainbow (if its Enabled) or set saved static colors if user swith_on rgb_backlight_installed switch
     } else {
-        if(app->notification->rgb_srv->settings->rainbow_mode > 0) {
-            rainbow_timer_starter(app->notification->rgb_srv);
+        if(app->notification->settings.rgb.rainbow_mode > 0) {
+            rainbow_timer_starter(app->notification);
         } else {
             rgb_backlight_set_led_static_color(
-                2, app->notification->rgb_srv->settings->led_2_color_index);
+                2, app->notification->settings.rgb.led_2_color_index);
             rgb_backlight_set_led_static_color(
-                1, app->notification->rgb_srv->settings->led_1_color_index);
+                1, app->notification->settings.rgb.led_1_color_index);
             rgb_backlight_set_led_static_color(
-                0, app->notification->rgb_srv->settings->led_0_color_index);
+                0, app->notification->settings.rgb.led_0_color_index);
             rgb_backlight_update(
                 app->notification->settings.display_brightness *
                 app->notification->current_night_shift);
@@ -413,8 +404,7 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
             variable_item_set_locked(t_item, false, "RGB\nOFF!");
         }
     }
-
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
 static void led_2_color_changed(VariableItem* item) {
@@ -422,17 +412,17 @@ static void led_2_color_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_get_color_text(index));
-    app->notification->rgb_srv->settings->led_2_color_index = index;
+    app->notification->settings.rgb.led_2_color_index = index;
 
     // dont update screen color if rainbow timer working
-    if(!furi_timer_is_running(app->notification->rgb_srv->rainbow_timer)) {
+    if(!furi_timer_is_running(app->notification->rainbow_timer)) {
         rgb_backlight_set_led_static_color(2, index);
         rgb_backlight_update(
-            app->notification->rgb_srv->settings->brightness *
+            app->notification->settings.display_brightness *
             app->notification->current_night_shift);
     }
 
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
 static void led_1_color_changed(VariableItem* item) {
@@ -440,17 +430,17 @@ static void led_1_color_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_get_color_text(index));
-    app->notification->rgb_srv->settings->led_1_color_index = index;
+    app->notification->settings.rgb.led_1_color_index = index;
 
     // dont update screen color if rainbow timer working
-    if(!furi_timer_is_running(app->notification->rgb_srv->rainbow_timer)) {
+    if(!furi_timer_is_running(app->notification->rainbow_timer)) {
         rgb_backlight_set_led_static_color(1, index);
         rgb_backlight_update(
-            app->notification->rgb_srv->settings->brightness *
+            app->notification->settings.display_brightness *
             app->notification->current_night_shift);
     }
 
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
 static void led_0_color_changed(VariableItem* item) {
@@ -458,17 +448,17 @@ static void led_0_color_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_get_color_text(index));
-    app->notification->rgb_srv->settings->led_0_color_index = index;
+    app->notification->settings.rgb.led_0_color_index = index;
 
     // dont update screen color if rainbow timer working
-    if(!furi_timer_is_running(app->notification->rgb_srv->rainbow_timer)) {
+    if(!furi_timer_is_running(app->notification->rainbow_timer)) {
         rgb_backlight_set_led_static_color(0, index);
         rgb_backlight_update(
-            app->notification->rgb_srv->settings->brightness *
+            app->notification->settings.display_brightness *
             app->notification->current_night_shift);
     }
 
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
 static void rgb_backlight_rainbow_changed(VariableItem* item) {
@@ -476,25 +466,25 @@ static void rgb_backlight_rainbow_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_mode_text[index]);
-    app->notification->rgb_srv->settings->rainbow_mode = rgb_backlight_rainbow_mode_value[index];
+    app->notification->settings.rgb.rainbow_mode = rgb_backlight_rainbow_mode_value[index];
 
     // restore saved rgb backlight settings if we switch_off effects
     if(index == 0) {
         rgb_backlight_set_led_static_color(
-            2, app->notification->rgb_srv->settings->led_2_color_index);
+            2, app->notification->settings.rgb.led_2_color_index);
         rgb_backlight_set_led_static_color(
-            1, app->notification->rgb_srv->settings->led_1_color_index);
+            1, app->notification->settings.rgb.led_1_color_index);
         rgb_backlight_set_led_static_color(
-            0, app->notification->rgb_srv->settings->led_0_color_index);
+            0, app->notification->settings.rgb.led_0_color_index);
         rgb_backlight_update(
-            app->notification->rgb_srv->settings->brightness *
+            app->notification->settings.display_brightness *
             app->notification->current_night_shift);
-        rainbow_timer_stop(app->notification->rgb_srv);
+        rainbow_timer_stop(app->notification);
     } else {
-        rainbow_timer_starter(app->notification->rgb_srv);
+        rainbow_timer_starter(app->notification);
     }
 
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
 static void rgb_backlight_rainbow_speed_changed(VariableItem* item) {
@@ -502,12 +492,12 @@ static void rgb_backlight_rainbow_speed_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_speed_text[index]);
-    app->notification->rgb_srv->settings->rainbow_speed_ms =
+    app->notification->settings.rgb.rainbow_speed_ms =
         rgb_backlight_rainbow_speed_value[index];
 
     // save settings and restart timer with new speed value
-    rainbow_timer_starter(app->notification->rgb_srv);
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    rainbow_timer_starter(app->notification);
+    notification_message_save_settings(app->notification);
 }
 
 static void rgb_backlight_rainbow_step_changed(VariableItem* item) {
@@ -515,9 +505,9 @@ static void rgb_backlight_rainbow_step_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_step_text[index]);
-    app->notification->rgb_srv->settings->rainbow_step = rgb_backlight_rainbow_step_value[index];
+    app->notification->settings.rgb.rainbow_step = rgb_backlight_rainbow_step_value[index];
 
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
 static void rgb_backlight_rainbow_saturation_changed(VariableItem* item) {
@@ -528,9 +518,9 @@ static void rgb_backlight_rainbow_saturation_changed(VariableItem* item) {
     char valtext[4] = {};
     snprintf(valtext, sizeof(valtext), "%d", index);
     variable_item_set_current_value_text(item, valtext);
-    app->notification->rgb_srv->settings->rainbow_saturation = index;
+    app->notification->settings.rgb.rainbow_saturation = index;
 
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
 static void rgb_backlight_rainbow_wide_changed(VariableItem* item) {
@@ -538,24 +528,24 @@ static void rgb_backlight_rainbow_wide_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_wide_text[index]);
-    app->notification->rgb_srv->settings->rainbow_wide = rgb_backlight_rainbow_wide_value[index];
+    app->notification->settings.rgb.rainbow_wide = rgb_backlight_rainbow_wide_value[index];
 
-    rgb_backlight_settings_save(app->notification->rgb_srv->settings);
+    notification_message_save_settings(app->notification);
 }
 
-// open rgb_settings_view if user press OK on first (index=0) menu string and (debug mode or rgb_backlight_installed is true)
+// open settings.rgb_view if user press OK on first (index=0) menu string and (debug mode or rgb_backlight_installed is true)
 void variable_item_list_enter_callback(void* context, uint32_t index) {
     UNUSED(context);
     NotificationAppSettings* app = context;
 
-    if(((app->notification->rgb_srv->settings->rgb_backlight_installed) ||
+    if(((app->notification->settings.rgb.rgb_backlight_installed) ||
         (furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug))) &&
        (index == 0)) {
         view_dispatcher_switch_to_view(app->view_dispatcher, RGBViewId);
     }
 }
 
-// switch to main view on exit from rgb_settings_view
+// switch to main view on exit from settings.rgb_view
 static uint32_t notification_app_rgb_settings_exit(void* context) {
     UNUSED(context);
     return MainViewId;
@@ -571,14 +561,14 @@ static void night_shift_changed(VariableItem* item) {
     variable_item_set_current_value_text(item, night_shift_text[index]);
     app->notification->settings.night_shift = night_shift_value[index];
     app->notification->current_night_shift = night_shift_value[index];
-    app->notification->rgb_srv->current_night_shift = night_shift_value[index];
+    app->notification->current_night_shift = night_shift_value[index];
 
     // force demo night_shift brightness ot rgb backlight and stock backlight
     notification_message(app->notification, &sequence_display_backlight_on);
 
     int slide = 0;
     if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug) ||
-       (app->notification->rgb_srv->settings->rgb_backlight_installed)) {
+       (app->notification->settings.rgb.rgb_backlight_installed)) {
         slide = 1;
     }
     for(int i = 4 + slide; i < (6 + slide); i++) {
@@ -646,7 +636,7 @@ static NotificationAppSettings* alloc_settings(void) {
         app->variable_item_list, variable_item_list_enter_callback, app);
 
     // Show RGB settings only when debug_mode or rgb_backlight_installed is active
-    if((app->notification->rgb_srv->settings->rgb_backlight_installed) ||
+    if((app->notification->settings.rgb.rgb_backlight_installed) ||
        (furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug))) {
         item = variable_item_list_add(app->variable_item_list, "RGB settings", 0, NULL, app);
     }
@@ -743,7 +733,7 @@ static NotificationAppSettings* alloc_settings(void) {
     }
 
     item = variable_item_list_add(
-        app->variable_item_list,"LCD inversion",LCD_INVERSION_COUNT,lcd_inversion_changed,app);
+        app->variable_item_list, "LCD inversion", LCD_INVERSION_COUNT, lcd_inversion_changed, app);
     value_index = value_index_bool(
         app->notification->settings.lcd_inversion, lcd_inversion_value, LCD_INVERSION_COUNT);
     variable_item_set_current_value_index(item, value_index);
@@ -754,7 +744,7 @@ static NotificationAppSettings* alloc_settings(void) {
     app->variable_item_list_rgb = variable_item_list_alloc();
     View* view_rgb = variable_item_list_get_view(app->variable_item_list_rgb);
 
-    // set callback for exit from rgb_settings_menu
+    // set callback for exit from settings.rgb_menu
     view_set_previous_callback(view_rgb, notification_app_rgb_settings_exit);
 
     // Show rgb_backlight_installed swith only in Debug mode
@@ -766,7 +756,7 @@ static NotificationAppSettings* alloc_settings(void) {
             rgb_backlight_installed_changed,
             app);
         value_index = value_index_bool(
-            app->notification->rgb_srv->settings->rgb_backlight_installed,
+            app->notification->settings.rgb.rgb_backlight_installed,
             rgb_backlight_installed_value,
             RGB_BACKLIGHT_INSTALLED_COUNT);
         variable_item_set_current_value_index(item, value_index);
@@ -781,13 +771,11 @@ static NotificationAppSettings* alloc_settings(void) {
         rgb_backlight_get_color_count(),
         led_2_color_changed,
         app);
-    value_index = app->notification->rgb_srv->settings->led_2_color_index;
+    value_index = app->notification->settings.rgb.led_2_color_index;
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, rgb_backlight_get_color_text(value_index));
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     // led_2 color
     item = variable_item_list_add(
@@ -796,13 +784,11 @@ static NotificationAppSettings* alloc_settings(void) {
         rgb_backlight_get_color_count(),
         led_1_color_changed,
         app);
-    value_index = app->notification->rgb_srv->settings->led_1_color_index;
+    value_index = app->notification->settings.rgb.led_1_color_index;
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, rgb_backlight_get_color_text(value_index));
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     // led 3 color
     item = variable_item_list_add(
@@ -811,13 +797,11 @@ static NotificationAppSettings* alloc_settings(void) {
         rgb_backlight_get_color_count(),
         led_0_color_changed,
         app);
-    value_index = app->notification->rgb_srv->settings->led_0_color_index;
+    value_index = app->notification->settings.rgb.led_0_color_index;
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, rgb_backlight_get_color_text(value_index));
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     // Efects
     item = variable_item_list_add(
@@ -827,15 +811,13 @@ static NotificationAppSettings* alloc_settings(void) {
         rgb_backlight_rainbow_changed,
         app);
     value_index = value_index_uint32(
-        app->notification->rgb_srv->settings->rainbow_mode,
+        app->notification->settings.rgb.rainbow_mode,
         rgb_backlight_rainbow_mode_value,
         RGB_BACKLIGHT_RAINBOW_MODE_COUNT);
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_mode_text[value_index]);
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     item = variable_item_list_add(
         app->variable_item_list_rgb,
@@ -844,15 +826,13 @@ static NotificationAppSettings* alloc_settings(void) {
         rgb_backlight_rainbow_speed_changed,
         app);
     value_index = value_index_uint32(
-        app->notification->rgb_srv->settings->rainbow_speed_ms,
+        app->notification->settings.rgb.rainbow_speed_ms,
         rgb_backlight_rainbow_speed_value,
         RGB_BACKLIGHT_RAINBOW_SPEED_COUNT);
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_speed_text[value_index]);
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     item = variable_item_list_add(
         app->variable_item_list_rgb,
@@ -861,15 +841,13 @@ static NotificationAppSettings* alloc_settings(void) {
         rgb_backlight_rainbow_step_changed,
         app);
     value_index = value_index_uint32(
-        app->notification->rgb_srv->settings->rainbow_step,
+        app->notification->settings.rgb.rainbow_step,
         rgb_backlight_rainbow_step_value,
         RGB_BACKLIGHT_RAINBOW_STEP_COUNT);
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_step_text[value_index]);
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     item = variable_item_list_add(
         app->variable_item_list_rgb,
@@ -877,15 +855,13 @@ static NotificationAppSettings* alloc_settings(void) {
         255,
         rgb_backlight_rainbow_saturation_changed,
         app);
-    value_index = app->notification->rgb_srv->settings->rainbow_saturation;
+    value_index = app->notification->settings.rgb.rainbow_saturation;
     variable_item_set_current_value_index(item, value_index);
     char valtext[4] = {};
     snprintf(valtext, sizeof(valtext), "%d", value_index);
     variable_item_set_current_value_text(item, valtext);
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     item = variable_item_list_add(
         app->variable_item_list_rgb,
@@ -894,15 +870,13 @@ static NotificationAppSettings* alloc_settings(void) {
         rgb_backlight_rainbow_wide_changed,
         app);
     value_index = value_index_uint32(
-        app->notification->rgb_srv->settings->rainbow_wide,
+        app->notification->settings.rgb.rainbow_wide,
         rgb_backlight_rainbow_wide_value,
         RGB_BACKLIGHT_RAINBOW_WIDE_COUNT);
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_wide_text[value_index]);
     variable_item_set_locked(
-        item,
-        (app->notification->rgb_srv->settings->rgb_backlight_installed == 0),
-        "RGB MOD \nOFF!");
+        item, (app->notification->settings.rgb.rgb_backlight_installed == 0), "RGB MOD \nOFF!");
 
     //--- RGB BACKLIGHT END ---
 

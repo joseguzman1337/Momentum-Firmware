@@ -3,7 +3,8 @@
 #include "notification.h"
 #include "notification_messages.h"
 #include "notification_settings_filename.h"
-#include "applications/services/rgb_backlight/rgb_backlight.h"
+#include <SK6805.h>
+#include <math.h>
 
 #define NOTIFICATION_LED_COUNT      3
 #define NOTIFICATION_EVENT_COMPLETE 0x00000001U
@@ -38,6 +39,23 @@ typedef struct {
 #define NOTIFICATION_SETTINGS_PATH    INT_PATH(NOTIFICATION_SETTINGS_FILE_NAME)
 
 typedef struct {
+    //Common settings
+    uint8_t rgb_backlight_installed;
+
+    // static gradient mode settings
+    uint8_t led_2_color_index;
+    uint8_t led_1_color_index;
+    uint8_t led_0_color_index;
+
+    // rainbow mode setings
+    uint32_t rainbow_mode;
+    uint32_t rainbow_speed_ms;
+    uint16_t rainbow_step;
+    uint8_t rainbow_saturation;
+    uint8_t rainbow_wide;
+} RGBBacklightSettings;
+
+typedef struct {
     uint8_t version;
     float display_brightness;
     float led_brightness;
@@ -49,6 +67,7 @@ typedef struct {
     uint32_t night_shift_start;
     uint32_t night_shift_end;
     bool lcd_inversion;
+    RGBBacklightSettings rgb;
 } NotificationSettings;
 
 struct NotificationApp {
@@ -61,12 +80,24 @@ struct NotificationApp {
     uint8_t display_led_lock;
 
     NotificationSettings settings;
-    RGBBacklightApp* rgb_srv;
 
     FuriTimer* night_shift_timer;
     float current_night_shift;
+
+    FuriTimer* rainbow_timer;
+    uint16_t rainbow_hue;
+    uint8_t rainbow_red;
+    uint8_t rainbow_green;
+    uint8_t rainbow_blue;
 };
 
 void notification_message_save_settings(NotificationApp* app);
 void night_shift_timer_start(NotificationApp* app);
 void night_shift_timer_stop(NotificationApp* app);
+void rgb_backlight_update(float brightness);
+void rgb_backlight_set_led_static_color(uint8_t led, uint8_t index);
+void rainbow_timer_start(NotificationApp* app);
+void rainbow_timer_stop(NotificationApp* app);
+void rainbow_timer_starter(NotificationApp* app);
+const char* rgb_backlight_get_color_text(uint8_t index);
+uint8_t rgb_backlight_get_color_count(void);
