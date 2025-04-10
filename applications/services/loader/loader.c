@@ -505,7 +505,6 @@ static LoaderMessageLoaderStatusResult loader_start_external_app(
     result.value = loader_make_success_status(error_message);
     result.error = LoaderStatusErrorUnknown;
 
-
     do {
         loader->app.fap = flipper_application_alloc(storage, firmware_api_interface);
         size_t start = furi_get_tick();
