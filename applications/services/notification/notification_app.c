@@ -56,10 +56,6 @@ void night_shift_timer_callback(void* context) {
     NotificationApp* app = context;
     DateTime current_date_time;
 
-    // IN DEVELOPMENT
-    // // save current night_shift;
-    // float old_night_shift = app->current_night_shift;
-
     // take system time and convert to minutes
     furi_hal_rtc_get_datetime(&current_date_time);
     uint32_t time = current_date_time.hour * 60 + current_date_time.minute;
@@ -73,12 +69,6 @@ void night_shift_timer_callback(void* context) {
         app->current_night_shift = app->settings.night_shift;
         app->rgb_srv->current_night_shift = app->settings.night_shift;
     }
-
-    // IN DEVELOPMENT
-    // // if night shift was changed then update stock and rgb backlight to new value
-    // if(old_night_shift != app->current_night_shift) {
-    //      notification_message(app, &sequence_display_backlight_on);
-    // }
 }
 
 // --- NIGHT SHIFT END ---
@@ -630,6 +620,12 @@ static NotificationApp* notification_app_alloc(void) {
         furi_timer_alloc(night_shift_timer_callback, FuriTimerTypePeriodic, app);
     // --- NIGHT SHIFT END ---
 
+    Gui* tmp_gui = furi_record_open(RECORD_GUI);
+    Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
+    canvas_set_inverted_lcd(tmp_canvas, false);
+    gui_direct_draw_release(tmp_gui);
+    furi_record_close(RECORD_GUI);
+
     return app;
 }
 
@@ -660,6 +656,13 @@ static void notification_apply_settings(NotificationApp* app) {
         night_shift_timer_start(app);
     }
     // --- NIGHT SHIFT END ---
+
+    //setup canvas variable "inversion" by settings value;
+    Gui* tmp_gui = furi_record_open(RECORD_GUI);
+    Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
+    canvas_set_inverted_lcd(tmp_canvas, app->settings.lcd_inversion);
+    gui_direct_draw_release(tmp_gui);
+    furi_record_close(RECORD_GUI);
 }
 
 static void notification_init_settings(NotificationApp* app) {

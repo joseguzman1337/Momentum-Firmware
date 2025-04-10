@@ -34,7 +34,7 @@ typedef struct {
     Light light;
 } NotificationLedLayer;
 
-#define NOTIFICATION_SETTINGS_VERSION 0x03
+#define NOTIFICATION_SETTINGS_VERSION 0x04
 #define NOTIFICATION_SETTINGS_PATH    INT_PATH(NOTIFICATION_SETTINGS_FILE_NAME)
 
 typedef struct {
@@ -48,6 +48,7 @@ typedef struct {
     float night_shift;
     uint32_t night_shift_start;
     uint32_t night_shift_end;
+    bool lcd_inversion;
 } NotificationSettings;
 
 struct NotificationApp {
