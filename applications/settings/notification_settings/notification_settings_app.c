@@ -5,7 +5,6 @@
 #include <gui/view_dispatcher.h>
 #include <lib/toolbox/value_index.h>
 
-
 #define MAX_NOTIFICATION_SETTINGS 5
 
 typedef struct {
@@ -362,8 +361,8 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
     variable_item_set_current_value_text(item, rgb_backlight_installed_text[index]);
-    app->notification->settings.rgb.rgb_backlight_installed =
-        rgb_backlight_installed_value[index];
+    app->notification->settings.rgb.rgb_backlight_installed = rgb_backlight_installed_value[index];
+    set_rgb_backlight_installed_variable(rgb_backlight_installed_value[index]);
 
     // In case of user playing with rgb_backlight_installed swith:
     // if user swith_off rgb_backlight_installed (but may be he have mod installed)
@@ -470,12 +469,9 @@ static void rgb_backlight_rainbow_changed(VariableItem* item) {
 
     // restore saved rgb backlight settings if we switch_off effects
     if(index == 0) {
-        rgb_backlight_set_led_static_color(
-            2, app->notification->settings.rgb.led_2_color_index);
-        rgb_backlight_set_led_static_color(
-            1, app->notification->settings.rgb.led_1_color_index);
-        rgb_backlight_set_led_static_color(
-            0, app->notification->settings.rgb.led_0_color_index);
+        rgb_backlight_set_led_static_color(2, app->notification->settings.rgb.led_2_color_index);
+        rgb_backlight_set_led_static_color(1, app->notification->settings.rgb.led_1_color_index);
+        rgb_backlight_set_led_static_color(0, app->notification->settings.rgb.led_0_color_index);
         rgb_backlight_update(
             app->notification->settings.display_brightness *
             app->notification->current_night_shift);
@@ -492,8 +488,7 @@ static void rgb_backlight_rainbow_speed_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
 
     variable_item_set_current_value_text(item, rgb_backlight_rainbow_speed_text[index]);
-    app->notification->settings.rgb.rainbow_speed_ms =
-        rgb_backlight_rainbow_speed_value[index];
+    app->notification->settings.rgb.rainbow_speed_ms = rgb_backlight_rainbow_speed_value[index];
 
     // save settings and restart timer with new speed value
     rainbow_timer_starter(app->notification);

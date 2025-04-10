@@ -35,7 +35,7 @@ typedef struct {
     Light light;
 } NotificationLedLayer;
 
-#define NOTIFICATION_SETTINGS_VERSION 0x04
+#define NOTIFICATION_SETTINGS_VERSION 0x05
 #define NOTIFICATION_SETTINGS_PATH    INT_PATH(NOTIFICATION_SETTINGS_FILE_NAME)
 
 typedef struct {
@@ -101,3 +101,4 @@ void rainbow_timer_stop(NotificationApp* app);
 void rainbow_timer_starter(NotificationApp* app);
 const char* rgb_backlight_get_color_text(uint8_t index);
 uint8_t rgb_backlight_get_color_count(void);
+void set_rgb_backlight_installed_variable(uint8_t var);

@@ -10,7 +10,7 @@
 #include "notification_messages.h"
 #include "notification_app.h"
 
-#define TAG "NotificationSrv"
+#define TAG         "NotificationSrv"
 #define COLOR_COUNT (sizeof(colors) / sizeof(RGBBacklightColor))
 
 static const uint8_t minimal_delay = 100;
@@ -33,8 +33,10 @@ static uint8_t notification_settings_get_display_brightness(NotificationApp* app
 static uint8_t notification_settings_get_rgb_led_brightness(NotificationApp* app, uint8_t value);
 static uint32_t notification_settings_display_off_delay_ticks(NotificationApp* app);
 
-
 // --- RGB BACKLIGHT ---
+
+// local variable for local use
+uint8_t rgb_backlight_installed_variable = 0;
 
 typedef struct {
     char* name;
@@ -75,7 +77,12 @@ const char* rgb_backlight_get_color_text(uint8_t index) {
     return colors[index].name;
 }
 
-// use RECORD for acces to rgb service instance and update current colors by static
+// function for changind local variable from outside;
+void set_rgb_backlight_installed_variable(uint8_t var) {
+    rgb_backlight_installed_variable = var;
+}
+
+// update led current colors by static
 void rgb_backlight_set_led_static_color(uint8_t led, uint8_t index) {
     if(led < SK6805_get_led_count()) {
         uint8_t r = colors[index].red;
@@ -138,11 +145,9 @@ void rgb_backlight_set_led_custom_hsv_color(uint8_t led, uint16_t hue, uint8_t s
     current_led[led].blue = b * 255;
 }
 
-// use RECORD for acces to rgb service instance, set current_* colors to led and update backlight
+// set current_* colors to led and update backlight
 void rgb_backlight_update(float brightness) {
-    // RGBBacklightApp* app = furi_record_open(RECORD_RGB_BACKLIGHT);
-
-    // if(app->settings.rgb.rgb_backlight_installed) {
+    if(rgb_backlight_installed_variable > 0) {
         for(uint8_t i = 0; i < SK6805_get_led_count(); i++) {
             uint8_t r = current_led[i].red * brightness * 1.0f;
             uint8_t g = current_led[i].green * brightness * 1.0f;
@@ -150,8 +155,7 @@ void rgb_backlight_update(float brightness) {
             SK6805_set_led_color(i, r, g, b);
         }
         SK6805_update();
-    // }
-    // furi_record_close(RECORD_RGB_BACKLIGHT);
+    }
 }
 
 // start furi timer for rainbow
@@ -213,7 +217,10 @@ static void rainbow_timer_callback(void* context) {
             }
 
             rgb_backlight_set_led_custom_hsv_color(
-                0, app->rainbow_hue, app->settings.rgb.rainbow_saturation, app->settings.display_brightness);
+                0,
+                app->rainbow_hue,
+                app->settings.rgb.rainbow_saturation,
+                app->settings.display_brightness);
             rgb_backlight_set_led_custom_hsv_color(
                 1, j, app->settings.rgb.rainbow_saturation, app->settings.display_brightness);
             rgb_backlight_set_led_custom_hsv_color(
@@ -228,8 +235,7 @@ static void rainbow_timer_callback(void* context) {
     }
 }
 
-// --- RGB BACKLIGHT ENF---
-
+// --- RGB BACKLIGHT END---
 
 // --- NIGHT SHIFT ---
 
@@ -815,6 +821,20 @@ static NotificationApp* notification_app_alloc(void) {
         furi_timer_alloc(night_shift_timer_callback, FuriTimerTypePeriodic, app);
     // --- NIGHT SHIFT END ---
 
+    // init working variables
+    app->rainbow_hue = 1;
+    app->current_night_shift = 1.0f;
+
+    // init rgb.segings values
+    app->settings.rgb.rgb_backlight_installed = 0;
+    app->settings.rgb.led_2_color_index = 0;
+    app->settings.rgb.led_1_color_index = 0;
+    app->settings.rgb.led_0_color_index = 0;
+    app->settings.rgb.rainbow_speed_ms = 100;
+    app->settings.rgb.rainbow_step = 1;
+    app->settings.rgb.rainbow_saturation = 255;
+    app->settings.rgb.rainbow_wide = 50;
+
     // use RECORD for setup init values to canvas lcd_inverted
     Gui* tmp_gui = furi_record_open(RECORD_GUI);
     Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
@@ -847,7 +867,7 @@ static void notification_apply_settings(NotificationApp* app) {
     notification_apply_lcd_contrast(app);
 
     // --- NIGHT SHIFT ---
-    // if night_shift_enabled start timer for controlling current_night_shift multiplicator value depent from current time
+    // if night_shift enabled then start timer for controlling current_night_shift multiplicator value depent from current time
     if(app->settings.night_shift != 1) {
         night_shift_timer_start(app);
     }
@@ -878,14 +898,24 @@ int32_t notification_srv(void* p) {
     UNUSED(p);
     NotificationApp* app = notification_app_alloc();
 
+    notification_init_settings(app);
+
+    notification_vibro_off();
+    notification_sound_off();
+    notification_apply_internal_led_layer(&app->display, 0x00);
+    notification_apply_internal_led_layer(&app->led[0], 0x00);
+    notification_apply_internal_led_layer(&app->led[1], 0x00);
+    notification_apply_internal_led_layer(&app->led[2], 0x00);
+
+    furi_record_create(RECORD_NOTIFICATION, app);
+
     // --- RGB BACKLIGHT SECTION ---
+
+    //setup local variable
+    set_rgb_backlight_installed_variable(app->settings.rgb.rgb_backlight_installed);
 
     // define rainbow_timer and they callback
     app->rainbow_timer = furi_timer_alloc(rainbow_timer_callback, FuriTimerTypePeriodic, app);
-    
-    // init values
-    app->rainbow_hue = 1;
-    app->current_night_shift = 1.0f;
 
     // if rgb_backlight_installed then start rainbow or set leds colors from saved settings (default index = 0)
     if(app->settings.rgb.rgb_backlight_installed) {
@@ -897,7 +927,7 @@ int32_t notification_srv(void* p) {
             rgb_backlight_set_led_static_color(0, app->settings.rgb.led_0_color_index);
             rgb_backlight_update(app->settings.display_brightness * app->current_night_shift);
         }
-        // if rgb_backlight not installed then set default static orange color(index=0) to all leds (0-2) and force light on
+    // if rgb_backlight not installed then set default static orange color(index=0) to all leds (0-2) and force light on
     } else {
         rgb_backlight_set_led_static_color(2, 0);
         rgb_backlight_set_led_static_color(1, 0);
@@ -906,17 +936,6 @@ int32_t notification_srv(void* p) {
     }
 
     // --- RGB BACKLIGHT SECTION END ---
-
-    notification_init_settings(app);
-
-    notification_vibro_off();
-    notification_sound_off();
-    notification_apply_internal_led_layer(&app->display, 0x00);
-    notification_apply_internal_led_layer(&app->led[0], 0x00);
-    notification_apply_internal_led_layer(&app->led[1], 0x00);
-    notification_apply_internal_led_layer(&app->led[2], 0x00);
-
-    furi_record_create(RECORD_NOTIFICATION, app);
 
     NotificationAppMessage message;
     while(1) {
