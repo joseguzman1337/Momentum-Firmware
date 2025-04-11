@@ -21,8 +21,8 @@
 * Apps: Add **FindMyFlipper to system apps and allow autostart** on system boot [app by @MatthewKuKanich](https://github.com/MatthewKuKanich/FindMyFlipper) and autoloader by @Willy-JL - to use app please check how to add keys in [app repo](https://github.com/MatthewKuKanich/FindMyFlipper)
 * README Update: Enhanced Visuals & Navigation (PR #871 #872 | by @m-xim)
 * Docs: Update FAQ.md (PR #865 | by @mi-lrn)
-* Input: Vibro on Button press option (PR #867 | by @Dmitry422)
-* Power: Option to limit battery charging (suppress charging on selected charge level) (PR #867 | by @Dmitry422) (idea and example by @oltenxyz)
+* Input: **Vibro on Button press option** (PR #867 | by @Dmitry422)
+* Power: **Option to limit battery charging** (suppress charging on selected charge level) (PR #867 | by @Dmitry422) (idea and example by @oltenxyz)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
