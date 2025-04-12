@@ -1,5 +1,3 @@
-#include <gui/gui.h>
-#include <gui/view_holder.h>
 #include <gui/modules/menu.h>
 #include <gui/modules/submenu.h>
 #include <assets_icons.h>
@@ -8,6 +6,7 @@
 #include <toolbox/run_parallel.h>
 
 #include "loader.h"
+#include "loader_i.h"
 #include "loader_menu.h"
 #include "loader_menu_storage_i.h"
 
@@ -30,9 +29,6 @@ struct LoaderMenu {
     FuriThread* thread;
     void (*closed_cb)(void*);
     void* context;
-
-    View* dummy;
-    ViewHolder* view_holder;
 
     Loader* loader;
     FuriPubSubSubscription* subscription;
@@ -64,15 +60,6 @@ static void loader_pubsub_callback(const void* message, void* context) {
     }
 }
 
-static void loader_menu_dummy_draw(Canvas* canvas, void* context) {
-    UNUSED(context);
-
-    uint8_t x = canvas_width(canvas) / 2 - 24 / 2;
-    uint8_t y = canvas_height(canvas) / 2 - 24 / 2;
-
-    canvas_draw_icon(canvas, x, y, &I_LoadingHourglass_24x24);
-}
-
 enum {
     LoaderMenuIndexApplications = (uint32_t)-1,
     LoaderMenuIndexLast = (uint32_t)-2,
@@ -87,17 +74,12 @@ LoaderMenu* loader_menu_alloc(void (*closed_cb)(void*), void* context, bool sett
     loader_menu->selected_setting = 0;
     loader_menu->settings_only = settings_only;
     loader_menu->current_view = settings_only ? LoaderMenuViewSettings : LoaderMenuViewPrimary;
-
-    loader_menu->dummy = view_alloc();
-    view_set_draw_callback(loader_menu->dummy, loader_menu_dummy_draw);
-
-    Gui* gui = furi_record_open(RECORD_GUI);
-    loader_menu->view_holder = view_holder_alloc();
-    view_holder_attach_to_gui(loader_menu->view_holder, gui);
-    view_holder_set_back_callback(loader_menu->view_holder, NULL, NULL);
-    view_holder_set_view(loader_menu->view_holder, loader_menu->dummy);
-
     loader_menu->loader = furi_record_open(RECORD_LOADER);
+
+    view_holder_set_back_callback(loader_menu->loader->view_holder, NULL, NULL);
+    view_holder_set_view(
+        loader_menu->loader->view_holder, loading_get_view(loader_menu->loader->loading));
+
     loader_menu->subscription = furi_pubsub_subscribe(
         loader_get_pubsub(loader_menu->loader), loader_pubsub_callback, loader_menu);
 
@@ -117,11 +99,7 @@ void loader_menu_free(LoaderMenu* loader_menu) {
         furi_thread_free(loader_menu->thread);
     }
 
-    view_holder_set_view(loader_menu->view_holder, NULL);
-    view_holder_free(loader_menu->view_holder);
-    furi_record_close(RECORD_GUI);
-
-    view_free(loader_menu->dummy);
+    view_holder_set_view(loader_menu->loader->view_holder, NULL);
 
     free(loader_menu);
 }
@@ -206,7 +184,7 @@ static void
 // input, and inputs are not processed because GUI is processing callbacks
 static void loader_menu_set_view_pending(void* context, uint32_t arg) {
     LoaderMenuApp* app = context;
-    view_holder_set_view(app->loader_menu->view_holder, (View*)arg);
+    view_holder_set_view(app->loader_menu->loader->view_holder, (View*)arg);
 }
 
 static void loader_menu_switch_to_settings(void* context, uint32_t index) {
@@ -395,15 +373,17 @@ static LoaderMenuApp* loader_menu_app_alloc(LoaderMenu* loader_menu) {
     View* view = app->loader_menu->current_view == LoaderMenuViewSettings ?
                      submenu_get_view(app->settings_menu) :
                      menu_get_view(app->primary_menu);
-    view_holder_set_view(app->loader_menu->view_holder, view);
-    view_holder_set_back_callback(app->loader_menu->view_holder, loader_menu_back, app);
+    view_holder_set_view(app->loader_menu->loader->view_holder, view);
+    view_holder_set_back_callback(app->loader_menu->loader->view_holder, loader_menu_back, app);
 
     return app;
 }
 
 static void loader_menu_app_free(LoaderMenuApp* app) {
-    view_holder_set_back_callback(app->loader_menu->view_holder, NULL, NULL);
-    view_holder_set_view(app->loader_menu->view_holder, app->loader_menu->dummy);
+    view_holder_set_back_callback(app->loader_menu->loader->view_holder, NULL, NULL);
+    view_holder_set_view(
+        app->loader_menu->loader->view_holder,
+        loading_get_view(app->loader_menu->loader->loading));
 
     if(!app->loader_menu->settings_only) {
         app->loader_menu->selected_primary = menu_get_selected_item(app->primary_menu);

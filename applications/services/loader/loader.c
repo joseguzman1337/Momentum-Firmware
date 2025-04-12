@@ -828,7 +828,9 @@ static bool loader_do_deferred_launch(Loader* loader, LoaderDeferredLaunchRecord
         loader_do_next_deferred_launch_if_available(loader);
     } while(false);
 
-    view_holder_set_view(loader->view_holder, NULL);
+    if(!loader->loader_menu) {
+        view_holder_set_view(loader->view_holder, NULL);
+    }
     furi_string_free(error_message);
     return is_successful;
 }
