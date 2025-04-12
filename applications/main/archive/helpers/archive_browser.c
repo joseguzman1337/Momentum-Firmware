@@ -489,6 +489,9 @@ void archive_show_file_menu(ArchiveBrowserView* browser, bool show, bool manage)
                         } else {
                             model->menu = false;
                         }
+                    } else if(selected->type == ArchiveFileTypeSetting) {
+                        model->menu_manage = false;
+                        model->menu_can_switch = false;
                     }
                 } else {
                     model->menu_manage = true;
