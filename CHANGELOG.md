@@ -22,14 +22,20 @@
     - APDU Runner: (by @SpenserCai)
     - Passport Reader (by @bettse)
   - USB: Portal Of Flipper (by @Bettse & @sanjay900)
-- UL: Sub-GHz: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
+- Sub-GHz:
+  - UL: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
+  - OFW: Added support for 42-bit Prastel variation (by @pmazzini)
 - RFID:
   - OFW: EM4305 support (by @Astrrra)
   - OFW: Noralsy Format/Brand protocol (by @zinongli)
 - OFW: BadKB: Mouse control (by @jetrp1)
 - OFW: Infrared: Universal IR signal selection (by @portasynthinca3)
-- OFW: NFC: Disney Infinity KDF plugin (by @bettse)
-- Archive: Add item count to directory info scene (#378 by @956MB)
+- NFC:
+  - OFW: Disney Infinity KDF plugin (by @bettse)
+  - OFW: NFC app can now launch MFKey (by @RebornedBrain)
+- Archive:
+  - Add item count to directory info scene (#378 by @956MB)
+  - OFW: Pinning of settings options (by @portasynthinca3)
 - Clock: 12 hour "midnight format" in Momentum Settings (#341 by @956MB)
 - GUI: Add marquee 'Text Scroll' option in Momentum Settings (#363 by @956MB)
 - UL: Input: Vibro on Button press option (by @Dmitry422)
@@ -45,8 +51,9 @@
   - OFW: SDK 0.3
     - Backport of missing features to new `gui/widget` (by @Willy-JL)
     - UART framing data/stop/parity bits options in `serial` module (by @portasynthinca3)
-  - OFW: New JS value destructuring (by @portasynthinca3)
+  - OFW: New JS value destructuring, refactored modules to new method (by @portasynthinca3)
 - OFW: Alarm: Snooze, timeouts, and dismissing from the locked state (by @Astrrra)
+- OFW: Loader: Application chaining (by @portasynthinca3)
 - OFW: BLE: Advertising improvements, 128bit service UUID support, manufacturer scan response data support (by @bettse)
 - OFW: Furi: UART framing mode selection, support for different data/stop/parity bits (by @portasynthinca3)
 - OFW: GUI: Widget elements for line, rect and circle with fill options (by @Willy-JL)
@@ -94,7 +101,7 @@
   - OFW: Add Fujitsu ASTG12LVCC to AC Universal Remote (by @KereruA0i)
   - OFW: Increase max carrier limit to 1000000 (by @skotopes)
 - CLI:
-  - OFW: New CLI architecture, some text formatting, better stability and less RAM usage (by @portasynthinca3)
+  - OFW: New CLI architecture, some text formatting, better stability and less RAM usage, with generic logic in toolbox module (by @portasynthinca3)
   - OFW: Autocomplete and more keyboard shortcuts (by @portasynthinca3)
   - OFW: Improved loading of CLI commands from SD card with fals and threads (by @portasynthinca3)
 - OFW: Power: Added OTG controls to Power service, remembers OTG when unplugging USB (by @Astrrra & @skotopes)
@@ -115,6 +122,7 @@
 - Infrared: Fix universals sending (by @Willy-JL)
 - GUI: Fix widget text scroll with 256+ lines (by @Willy-JL)
 - JS: Fix `Number.toString()` with decimals (by @Willy-JL)
+- Archive: Fix memory leak with Search+Info (by @Willy-JL)
 - Sub-GHz:
   - UL: Fix Hollarm protocol with more verification (by @xMasterX)
   - UL: Fix GangQi protocol (by @DoberBit and @mishamyte)
@@ -126,7 +134,10 @@
   - OFW: Various bug fixes and improvements (by @skotopes)
   - OFW: Clear IRQ status before calling user handler, fixes some interrupt edge cases / weirdness (by @mammothbane)
   - OFW: Ensure that `furi_record_create()` is passed a non-NULL data pointer (by @dcoles)
-- OFW: FBT: Fix DWARF dead code elimination and linking (by @GMMan)
+- FBT:
+  - Fix for Python 3.13 (by @Willy-JL)
+  - OFW: Fix DWARF dead code elimination and linking (by @GMMan)
+  - OFW: Deterministic STARTUP order & additional checks (by @portasynthinca3)
 - OFW: CLI: Fixed repeat in subghz tx_from_file command (by @Jnesselr)
 - OFW: VSCode: Disabled auto-update for clangd since correct version is in the toolchain (by @hedger)
 - OFW: uFBT: Bumped action version in example github workflow for project template (by @hedger)
