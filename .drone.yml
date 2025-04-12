@@ -204,7 +204,7 @@ steps:
       - wget "https://raw.githubusercontent.com/fieu/discord.sh/2253303efc0e7211ac2777d2535054cbb872f1e0/discord.sh"
       - chmod +x ./discord.sh
       - sed -n '/## Main changes/,/## Other changes/p' CHANGELOG.md | sed -e 's/## Main changes//' -e 's/## Other changes//' > changelogcut.txt
-      - head -c 1544 changelogcut.txt > changelogcutfin.txt
+      - head -c 1200 changelogcut.txt > changelogcutfin.txt
       - truncate -s -1 changelogcutfin.txt
       - tail -c +2 changelogcutfin.txt > changelogready.txt
       - rm -f changelogcut.txt
@@ -456,7 +456,7 @@ steps:
       - wget "https://raw.githubusercontent.com/fieu/discord.sh/2253303efc0e7211ac2777d2535054cbb872f1e0/discord.sh"
       - chmod +x ./discord.sh
       - sed -n '/## Main changes/,/## Other changes/p' CHANGELOG.md | sed -e 's/## Main changes//' -e 's/## Other changes//' > changelogcut.txt
-      - head -c 1544 changelogcut.txt > changelogcutfin.txt
+      - head -c 1200 changelogcut.txt > changelogcutfin.txt
       - truncate -s -1 changelogcutfin.txt
       - tail -c +2 changelogcutfin.txt > changelogready.txt
       - rm -f changelogcut.txt
