@@ -1,8 +1,8 @@
 #include "loader.h"
 
 #include <furi.h>
-#include <cli/cli.h>
-#include <cli/cli_commands.h>
+#include <toolbox/cli/cli_command.h>
+#include <cli/cli_main_commands.h>
 #include <applications.h>
 #include <lib/toolbox/args.h>
 #include <lib/toolbox/strint.h>
@@ -143,4 +143,4 @@ static void execute(PipeSide* pipe, FuriString* args, void* context) {
     furi_record_close(RECORD_LOADER);
 }
 
-CLI_COMMAND_INTERFACE(loader, execute, CliCommandFlagParallelSafe, 1024);
+CLI_COMMAND_INTERFACE(loader, execute, CliCommandFlagParallelSafe, 1024, CLI_APPID);

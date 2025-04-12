@@ -4,8 +4,8 @@
 #include "js_app_i.h"
 #include <toolbox/path.h>
 #include <assets_icons.h>
-#include <cli/cli.h>
-#include <cli/cli_commands.h>
+#include <toolbox/cli/cli_command.h>
+#include <cli/cli_main_commands.h>
 #include <toolbox/pipe.h>
 
 #define TAG "JS app"
@@ -208,4 +208,4 @@ void js_cli_execute(PipeSide* pipe, FuriString* args, void* context) {
     furi_record_close(RECORD_STORAGE);
 }
 
-CLI_COMMAND_INTERFACE(js, js_cli_execute, CliCommandFlagDefault, 1024);
+CLI_COMMAND_INTERFACE(js, js_cli_execute, CliCommandFlagDefault, 1024, CLI_APPID);

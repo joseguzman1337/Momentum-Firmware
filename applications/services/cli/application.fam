@@ -4,17 +4,9 @@ App(
     entry_point="cli_on_system_start",
     cdefines=["SRV_CLI"],
     sources=[
-        "cli.c",
-        "shell/cli_shell.c",
-        "shell/cli_shell_completions.c",
-        "shell/cli_shell_line.c",
-        "cli_commands.c",
         "cli_command_gpio.c",
-        "cli_ansi.c",
-    ],
-    sdk_headers=[
-        "cli.h",
-        "cli_ansi.h",
+        "cli_main_commands.c",
+        "cli_main_shell.c",
     ],
     # This STARTUP has to be processed before those that depend on the "cli" record.
     # "cli" used to be a SERVICE, but it's been converted into a STARTUP in order to
@@ -29,8 +21,8 @@ App(
     apptype=FlipperAppType.SERVICE,
     entry_point="cli_vcp_srv",
     stack_size=1024,
-    order=40,
-    sdk_headers=["cli_vcp.h"],
+    order=10,
+    sdk_headers=["cli_vcp.h", "cli.h"],
     sources=["cli_vcp.c"],
 )
 
@@ -51,12 +43,20 @@ App(
 )
 
 App(
+    appid="cli_subshell_demo",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_subshell_demo_ep",
+    requires=["cli"],
+    sources=["commands/subshell_demo.c"],
+)
+
+App(
     appid="cli_src",
     targets=["f7"],
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_src_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -65,7 +65,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_uptime_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -74,7 +74,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_date_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -83,7 +83,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_sysctl_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -92,7 +92,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_top_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -101,7 +101,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_vibro_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -110,7 +110,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_led_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -119,7 +119,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_gpio_ep",
     requires=["cli"],
-    sources=["cli_commands.c", "cli_command_gpio.c"],
+    sources=["cli_main_commands.c", "cli_command_gpio.c"],
 )
 
 App(
@@ -128,7 +128,7 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_i2c_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -137,5 +137,5 @@ App(
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_clear_ep",
     requires=["cli"],
-    sources=["cli_commands.c"],
+    sources=["cli_main_commands.c"],
 )

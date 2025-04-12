@@ -4,7 +4,7 @@ ARRAY_DEF(CommandCompletions, FuriString*, FURI_STRING_OPLIST); // -V524
 #define M_OPL_CommandCompletions_t() ARRAY_OPLIST(CommandCompletions)
 
 struct CliShellCompletions {
-    Cli* cli;
+    CliRegistry* registry;
     CliShell* shell;
     CliShellLine* line;
     CommandCompletions_t variants;
@@ -45,10 +45,11 @@ typedef struct {
 // Public API
 // ==========
 
-CliShellCompletions* cli_shell_completions_alloc(Cli* cli, CliShell* shell, CliShellLine* line) {
+CliShellCompletions*
+    cli_shell_completions_alloc(CliRegistry* registry, CliShell* shell, CliShellLine* line) {
     CliShellCompletions* completions = malloc(sizeof(CliShellCompletions));
 
-    completions->cli = cli;
+    completions->registry = registry;
     completions->shell = shell;
     completions->line = line;
     CommandCompletions_init(completions->variants);
@@ -108,16 +109,17 @@ void cli_shell_completions_fill_variants(CliShellCompletions* completions) {
     furi_string_left(input, segment.length);
 
     if(segment.type == CliShellCompletionSegmentTypeCommand) {
-        cli_lock_commands(completions->cli);
-        CliCommandTree_t* commands = cli_get_commands(completions->cli);
+        CliRegistry* registry = completions->registry;
+        cli_registry_lock(registry);
+        CliCommandDict_t* commands = cli_registry_get_commands(registry);
         for
-            M_EACH(registered_command, *commands, CliCommandTree_t) {
-                FuriString* command_name = *registered_command->key_ptr;
+            M_EACH(registered_command, *commands, CliCommandDict_t) {
+                FuriString* command_name = registered_command->key;
                 if(furi_string_start_with(command_name, input)) {
                     CommandCompletions_push_back(completions->variants, command_name);
                 }
             }
-        cli_unlock_commands(completions->cli);
+        cli_registry_unlock(registry);
 
     } else {
         // support removed, might reimplement in the future
@@ -263,6 +265,7 @@ void cli_shell_completions_render(
         }
 
     } else if(action == CliShellCompletionsActionSelectNoClose) {
+        if(!CommandCompletions_size(completions->variants)) return;
         // insert selection into prompt
         CliShellCompletionSegment segment = cli_shell_completions_segment(completions);
         FuriString* input = cli_shell_line_get_selected(completions->line);

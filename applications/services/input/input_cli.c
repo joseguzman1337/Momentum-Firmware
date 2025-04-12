@@ -1,8 +1,9 @@
 #include "input.h"
 
 #include <furi.h>
-#include <cli/cli.h>
-#include <cli/cli_commands.h>
+#include <cli/cli_main_commands.h>
+#include <toolbox/cli/cli_ansi.h>
+#include <toolbox/cli/cli_command.h>
 #include <toolbox/args.h>
 #include <toolbox/pipe.h>
 
@@ -227,4 +228,4 @@ static void execute(PipeSide* pipe, FuriString* args, void* context) {
     furi_record_close(RECORD_INPUT_EVENTS);
 }
 
-CLI_COMMAND_INTERFACE(input, execute, CliCommandFlagParallelSafe, 1024);
+CLI_COMMAND_INTERFACE(input, execute, CliCommandFlagParallelSafe, 1024, CLI_APPID);

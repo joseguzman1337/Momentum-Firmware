@@ -1,7 +1,6 @@
-#include "cli_commands.h"
+#include "cli_main_commands.h"
 #include "cli_command_gpio.h"
-#include "cli_ansi.h"
-#include "cli.h"
+#include <toolbox/cli/cli_ansi.h>
 
 #include <core/thread.h>
 #include <furi_hal.h>
@@ -54,49 +53,6 @@ void cli_command_info(PipeSide* pipe, FuriString* args, void* context) {
     } else {
         cli_print_usage("info", "<device|power|power_debug>", furi_string_get_cstr(args));
     }
-}
-
-void cli_command_help(PipeSide* pipe, FuriString* args, void* context) {
-    UNUSED(pipe);
-    UNUSED(args);
-    UNUSED(context);
-    printf("Available commands:" ANSI_FG_GREEN);
-
-    // count non-hidden commands
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_lock_commands(cli);
-    CliCommandTree_t* commands = cli_get_commands(cli);
-    size_t commands_count = CliCommandTree_size(*commands);
-
-    // create iterators starting at different positions
-    const size_t columns = 3;
-    const size_t commands_per_column = (commands_count / columns) + (commands_count % columns);
-    CliCommandTree_it_t iterators[columns];
-    for(size_t c = 0; c < columns; c++) {
-        CliCommandTree_it(iterators[c], *commands);
-        for(size_t i = 0; i < c * commands_per_column; i++)
-            CliCommandTree_next(iterators[c]);
-    }
-
-    // print commands
-    for(size_t r = 0; r < commands_per_column; r++) {
-        printf("\r\n");
-
-        for(size_t c = 0; c < columns; c++) {
-            if(!CliCommandTree_end_p(iterators[c])) {
-                const CliCommandTree_itref_t* item = CliCommandTree_cref(iterators[c]);
-                printf("%-30s", furi_string_get_cstr(*item->key_ptr));
-                CliCommandTree_next(iterators[c]);
-            }
-        }
-    }
-
-    printf(ANSI_RESET
-           "\r\nIf you just added a new command and can't see it above, run `reload_ext_cmds`");
-    printf(ANSI_RESET "\r\nFind out more: https://docs.flipper.net/development/cli");
-
-    cli_unlock_commands(cli);
-    furi_record_close(RECORD_CLI);
 }
 
 void cli_command_uptime(PipeSide* pipe, FuriString* args, void* context) {
@@ -567,16 +523,6 @@ void cli_command_i2c(PipeSide* pipe, FuriString* args, void* context) {
     furi_hal_i2c_release(&furi_hal_i2c_handle_external);
 }
 
-void cli_command_reload_external(PipeSide* pipe, FuriString* args, void* context) {
-    UNUSED(pipe);
-    UNUSED(args);
-    UNUSED(context);
-    Cli* cli = furi_record_open(RECORD_CLI);
-    cli_enumerate_external_commands(cli);
-    furi_record_close(RECORD_CLI);
-    printf("OK!");
-}
-
 /**
  * Echoes any bytes it receives except ASCII ETX (0x03, Ctrl+C)
  */
@@ -605,29 +551,33 @@ void cli_command_clear(PipeSide* pipe, FuriString* args, void* context) {
     printf("\e[2J\e[H");
 }
 
-void cli_commands_init(Cli* cli) {
-    cli_add_command(cli, "!", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
-    cli_add_command(cli, "info", CliCommandFlagParallelSafe, cli_command_info, NULL);
-    cli_add_command(cli, "device_info", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
-    cli_add_command(
-        cli, "reload_ext_cmds", CliCommandFlagDefault, cli_command_reload_external, NULL);
+void cli_main_commands_init(CliRegistry* registry) {
+    cli_registry_add_command(
+        registry, "!", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
+    cli_registry_add_command(registry, "info", CliCommandFlagParallelSafe, cli_command_info, NULL);
+    cli_registry_add_command(
+        registry, "device_info", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
 
-    cli_add_command(cli, "?", CliCommandFlagParallelSafe, cli_command_help, NULL);
-    cli_add_command(cli, "help", CliCommandFlagParallelSafe, cli_command_help, NULL);
-
-    cli_add_command(cli, "log", CliCommandFlagParallelSafe, cli_command_log, NULL);
-    cli_add_command(cli, "free", CliCommandFlagParallelSafe, cli_command_free, NULL);
-    cli_add_command(cli, "free_blocks", CliCommandFlagParallelSafe, cli_command_free_blocks, NULL);
-    cli_add_command(cli, "echo", CliCommandFlagParallelSafe, cli_command_echo, NULL);
+    cli_registry_add_command(registry, "log", CliCommandFlagParallelSafe, cli_command_log, NULL);
+    cli_registry_add_command(registry, "free", CliCommandFlagParallelSafe, cli_command_free, NULL);
+    cli_registry_add_command(
+        registry, "free_blocks", CliCommandFlagParallelSafe, cli_command_free_blocks, NULL);
+    cli_registry_add_command(registry, "echo", CliCommandFlagParallelSafe, cli_command_echo, NULL);
 }
 
-CLI_COMMAND_INTERFACE(src, cli_command_src, CliCommandFlagParallelSafe, 768);
-CLI_COMMAND_INTERFACE(uptime, cli_command_uptime, CliCommandFlagDefault, 768);
-CLI_COMMAND_INTERFACE(date, cli_command_date, CliCommandFlagParallelSafe, 768);
-CLI_COMMAND_INTERFACE(sysctl, cli_command_sysctl, CliCommandFlagDefault, 1024);
-CLI_COMMAND_INTERFACE(top, cli_command_top, CliCommandFlagParallelSafe, 1024);
-CLI_COMMAND_INTERFACE(vibro, cli_command_vibro, CliCommandFlagDefault, 1024);
-CLI_COMMAND_INTERFACE(led, cli_command_led, CliCommandFlagDefault, 1024);
-CLI_COMMAND_INTERFACE(gpio, cli_command_gpio, CliCommandFlagDefault, 1024);
-CLI_COMMAND_INTERFACE(i2c, cli_command_i2c, CliCommandFlagDefault, 1024);
-CLI_COMMAND_INTERFACE(clear, cli_command_clear, CliCommandFlagParallelSafe, 768);
+CLI_COMMAND_INTERFACE(src, cli_command_src, CliCommandFlagParallelSafe, 768, CLI_APPID);
+CLI_COMMAND_INTERFACE(uptime, cli_command_uptime, CliCommandFlagDefault, 768, CLI_APPID);
+CLI_COMMAND_INTERFACE(date, cli_command_date, CliCommandFlagParallelSafe, 768, CLI_APPID);
+CLI_COMMAND_INTERFACE(sysctl, cli_command_sysctl, CliCommandFlagDefault, 1024, CLI_APPID);
+CLI_COMMAND_INTERFACE(top, cli_command_top, CliCommandFlagParallelSafe, 1024, CLI_APPID);
+CLI_COMMAND_INTERFACE(vibro, cli_command_vibro, CliCommandFlagDefault, 1024, CLI_APPID);
+CLI_COMMAND_INTERFACE(led, cli_command_led, CliCommandFlagDefault, 1024, CLI_APPID);
+CLI_COMMAND_INTERFACE(gpio, cli_command_gpio, CliCommandFlagDefault, 1024, CLI_APPID);
+CLI_COMMAND_INTERFACE(i2c, cli_command_i2c, CliCommandFlagDefault, 1024, CLI_APPID);
+CLI_COMMAND_INTERFACE(clear, cli_command_clear, CliCommandFlagParallelSafe, 768, CLI_APPID);
+
+void cli_on_system_start(void) {
+    CliRegistry* registry = cli_registry_alloc();
+    cli_main_commands_init(registry);
+    furi_record_create(RECORD_CLI, registry);
+}

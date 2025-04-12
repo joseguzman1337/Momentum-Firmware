@@ -1,9 +1,9 @@
 #include <furi.h>
 #include <furi_hal.h>
-#include <cli/cli.h>
-#include <cli/cli_commands.h>
 #include <lib/toolbox/args.h>
 #include <toolbox/pipe.h>
+#include <cli/cli_main_commands.h>
+#include <toolbox/cli/cli_registry.h>
 
 #include <ble/ble.h>
 #include "bt_service/bt.h"
@@ -229,4 +229,4 @@ static void execute(PipeSide* pipe, FuriString* args, void* context) {
     furi_record_close(RECORD_BT);
 }
 
-CLI_COMMAND_INTERFACE(bt, execute, CliCommandFlagDefault, 1024);
+CLI_COMMAND_INTERFACE(bt, execute, CliCommandFlagDefault, 1024, CLI_APPID);

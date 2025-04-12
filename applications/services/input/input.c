@@ -6,8 +6,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <furi.h>
-#include <cli/cli.h>
 #include <furi_hal_gpio.h>
+#include <toolbox/cli/cli_command.h>
+#include <cli/cli_main_commands.h>
 #include <toolbox/pipe.h>
 #include <furi_hal_vibro.h>
 

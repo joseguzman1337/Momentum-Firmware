@@ -1,6 +1,5 @@
 #include "desktop_i.h"
 
-#include <cli/cli.h>
 #include <cli/cli_vcp.h>
 
 #include <gui/gui_i.h>
@@ -29,9 +28,7 @@ static void desktop_loader_callback(const void* message, void* context) {
     if(event->type == LoaderEventTypeApplicationBeforeLoad) {
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalBeforeAppStarted);
         furi_check(furi_semaphore_acquire(desktop->animation_semaphore, 3000) == FuriStatusOk);
-    } else if(
-        event->type == LoaderEventTypeApplicationLoadFailed ||
-        event->type == LoaderEventTypeApplicationStopped) {
+    } else if(event->type == LoaderEventTypeNoMoreAppsInQueue) {
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopGlobalAfterAppFinished);
     }
 }

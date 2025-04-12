@@ -4,6 +4,7 @@
 #include <gui/modules/submenu.h>
 #include <assets_icons.h>
 #include <applications.h>
+#include <archive/helpers/archive_favorites.h>
 #include <toolbox/run_parallel.h>
 
 #include "loader.h"
@@ -55,9 +56,7 @@ static void loader_pubsub_callback(const void* message, void* context) {
             furi_thread_free(loader_menu->thread);
             loader_menu->thread = NULL;
         }
-    } else if(
-        event->type == LoaderEventTypeApplicationLoadFailed ||
-        event->type == LoaderEventTypeApplicationStopped) {
+    } else if(event->type == LoaderEventTypeNoMoreAppsInQueue) {
         if(!loader_menu->thread) {
             loader_menu->thread = furi_thread_alloc_ex(TAG, 2048, loader_menu_thread, loader_menu);
             furi_thread_start(loader_menu->thread);
@@ -170,25 +169,37 @@ static void loader_menu_applications_callback(void* context, uint32_t index) {
     loader_menu_start(name);
 }
 
-static void loader_menu_settings_menu_callback(void* context, uint32_t index) {
+// Can't do this in GUI callbacks because now ViewHolder waits for ongoing
+// input, and inputs are not processed because GUI is processing callbacks
+static int32_t loader_menu_setting_pin_unpin_parallel(void* context) {
+    const char* name = context;
+    archive_favorites_handle_setting_pin_unpin(name, NULL);
+    return 0;
+}
+
+static void
+    loader_menu_settings_menu_callback(void* context, InputType input_type, uint32_t index) {
     UNUSED(context);
     const char* name = FLIPPER_SETTINGS_APPS[index].name;
 
-    // Workaround for SD format when app can't be opened
-    if(!strcmp(name, "Storage")) {
-        Storage* storage = furi_record_open(RECORD_STORAGE);
-        FS_Error status = storage_sd_status(storage);
-        furi_record_close(RECORD_STORAGE);
-        // If SD card not ready, cannot be formatted, so we want loader to give
-        // normal error message, with function below
-        if(status != FSE_NOT_READY) {
-            // Attempt to launch the app, and if failed offer to format SD card
-            run_parallel(loader_menu_storage_settings, storage, 512);
-            return;
+    if(input_type == InputTypeShort) {
+        // Workaround for SD format when app can't be opened
+        if(!strcmp(name, "Storage")) {
+            Storage* storage = furi_record_open(RECORD_STORAGE);
+            FS_Error status = storage_sd_status(storage);
+            furi_record_close(RECORD_STORAGE);
+            // If SD card not ready, cannot be formatted, so we want loader to give
+            // normal error message, with function below
+            if(status != FSE_NOT_READY) {
+                // Attempt to launch the app, and if failed offer to format SD card
+                run_parallel(loader_menu_storage_settings, storage, 512);
+                return;
+            }
         }
+        loader_menu_start(name);
+    } else if(input_type == InputTypeLong) {
+        run_parallel(loader_menu_setting_pin_unpin_parallel, (void*)name, 512);
     }
-
-    loader_menu_start(name);
 }
 
 // Can't do this in GUI callbacks because now ViewHolder waits for ongoing
@@ -357,7 +368,7 @@ static void loader_menu_build_menu(LoaderMenuApp* app, LoaderMenu* menu) {
 
 static void loader_menu_build_submenu(LoaderMenuApp* app, LoaderMenu* loader_menu) {
     for(size_t i = 0; i < FLIPPER_SETTINGS_APPS_COUNT; i++) {
-        submenu_add_item(
+        submenu_add_item_ex(
             app->settings_menu,
             FLIPPER_SETTINGS_APPS[i].name,
             i,

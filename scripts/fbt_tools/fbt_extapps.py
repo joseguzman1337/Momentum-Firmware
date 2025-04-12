@@ -303,6 +303,8 @@ def _validate_app_imports(target, source, env):
                 "js_flags_set",
                 "js_flags_wait",
                 "js_module_get",
+                "js_value_buffer_size",
+                "js_value_parse",
                 # js_event_loop_api_table
                 "js_event_loop_get_loop",
                 # js_gui_api_table
