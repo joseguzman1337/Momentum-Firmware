@@ -193,7 +193,7 @@ SubGhz* subghz_alloc(bool alloc_for_tx_only) {
     //init TxRx & Protocol & History & KeyBoard
     subghz_unlock(subghz);
 
-    SubGhzSetting* setting = subghz_txrx_get_setting(subghz->txrx);
+    //SubGhzSetting* setting = subghz_txrx_get_setting(subghz->txrx);
 
     //subghz_load_custom_presets(setting);
 
