@@ -927,7 +927,7 @@ int32_t notification_srv(void* p) {
             rgb_backlight_set_led_static_color(0, app->settings.rgb.led_0_color_index);
             rgb_backlight_update(app->settings.display_brightness * app->current_night_shift);
         }
-    // if rgb_backlight not installed then set default static orange color(index=0) to all leds (0-2) and force light on
+        // if rgb_backlight not installed then set default static orange color(index=0) to all leds (0-2) and force light on
     } else {
         rgb_backlight_set_led_static_color(2, 0);
         rgb_backlight_set_led_static_color(1, 0);
