@@ -1,5 +1,5 @@
 ## Main changes
-- Current API: 85.0
+- Current API: 86.0
 **WARNING! After install of this version your Desktop (fav apps) and LCD & Notifications settings will be reset to default values, please configure them again after this update!** (this is required due to big updates on that parts and config struct changes)
 * SubGHz: Add **Revers RB2 / RB2M Protocol** (static 64 bit) **full support** with add manually (by @xMasterX)
 * SubGHz: **Fix Hollarm protocol with more verification**
@@ -10,6 +10,7 @@
 * Display: **LCD Color Inversion** (Settings - LCD and Notifications - LCD inversion.) (PR #887 | by @Dmitry422)
 * Display: **Night Shift Feature** (dimming backlight in selected time interval) (PR #885 | by @Dmitry422)
 * Display: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 #890 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
+* NFC: Use default UL/UL-C pwd/key as default value for key input (PR #891 | by @mishamyte)
 * OFW: LFRFID - **EM4305 support**
 * OFW: **Universal IR signal selection**
 * OFW: **BadUSB: Mouse control**
@@ -25,9 +26,13 @@
 * Power: **Option to limit battery charging** (suppress charging on selected charge level) (PR #867 | by @Dmitry422) (idea and example by @oltenxyz)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* SubGHz: Move hardcoded extra modulations to user config - uncomment them in setting_user.example and remove .example from filename
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW: FBT: Fix for Python 3.13
+* OFW: sdk: bump API to force re-upload for the catalog 
+* OFW: SDK: Fix missing RECORD_CLI define
 * OFW: Fix NULL dereference in CLI completions
 * OFW PR 4181: vcp, cli: Handle Tx/Rx events before Connect/Disconnect + extra fixes (by @portasynthinca3)
 * OFW: BLE: Slightly increase mfg_data size
