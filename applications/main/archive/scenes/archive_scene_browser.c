@@ -425,10 +425,10 @@ bool archive_scene_browser_on_event(void* context, SceneManagerEvent event) {
             bool open =
                 !scene_manager_get_scene_state(archive->scene_manager, ArchiveAppSceneSearch);
             scene_manager_set_scene_state(archive->scene_manager, ArchiveAppSceneSearch, false);
-            if(archive->thread) {
-                furi_thread_join(archive->thread);
-                furi_thread_free(archive->thread);
-                archive->thread = NULL;
+            if(archive->search_thread) {
+                furi_thread_join(archive->search_thread);
+                furi_thread_free(archive->search_thread);
+                archive->search_thread = NULL;
             }
             if(open) scene_manager_next_scene(archive->scene_manager, ArchiveAppSceneSearch);
             consumed = true;

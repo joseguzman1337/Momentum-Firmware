@@ -534,10 +534,10 @@ void archive_switch_tab(ArchiveBrowserView* browser, InputKey key) {
         with_view_model(
             browser->view, ArchiveBrowserViewModel * model, { archive = model->archive; }, false);
         scene_manager_set_scene_state(archive->scene_manager, ArchiveAppSceneSearch, false);
-        if(archive->thread) {
-            furi_thread_join(archive->thread);
-            furi_thread_free(archive->thread);
-            archive->thread = NULL;
+        if(archive->search_thread) {
+            furi_thread_join(archive->search_thread);
+            furi_thread_free(archive->search_thread);
+            archive->search_thread = NULL;
         }
     }
 
