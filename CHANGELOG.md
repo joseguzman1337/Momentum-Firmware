@@ -7,7 +7,7 @@
 * SubGHz: **Came Atomo button hold simulation with full cycle** simulation (to allow proper pairing with receiver)
 * SubGHz: Add **Prastel (42bit static code)** support (OFW PR 4178 by @pmazzini)
 * Desktop: **Add support for Favorite App - Ok Long** (Warning! Old favourites apps list will be reset!) (PR #886 | by @DrEverr)
-* Display: **LCD Color Inversion** (Settings - LCD and Notifications - LCD inversion.) (PR #887 | by @Dmitry422)
+* Display: **LCD Color Inversion** (Settings - LCD and Notifications - LCD inversion.) (PR #887 #893 | by @Dmitry422)
 * Display: **Night Shift Feature** (dimming backlight in selected time interval) (PR #885 | by @Dmitry422)
 * Display: **Сombining RGB Backlight mod** (by @quen0n) and original backlight support **in one firmware** (+ Rainbow/Wave effect (based on @Willy-JL idea)) (PR #877 #881 #890 | by @Dmitry422) - (**To enable RGB Backlight support go into Notifications settings with Debug mode - ON**)
 * NFC: Use default UL/UL-C pwd/key as default value for key input (PR #891 | by @mishamyte)
