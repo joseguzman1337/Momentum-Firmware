@@ -447,9 +447,6 @@ void canvas_draw_icon_bitmap(
     int16_t h,
     const Icon* icon);
 
-bool canvas_is_inverted_lcd(Canvas* canvas);
-
-void canvas_set_inverted_lcd(Canvas* canvas, bool inverted);
 
 #ifdef __cplusplus
 }

@@ -835,12 +835,8 @@ static NotificationApp* notification_app_alloc(void) {
     app->settings.rgb.rainbow_saturation = 255;
     app->settings.rgb.rainbow_wide = 50;
 
-    // use RECORD for setup init values to canvas lcd_inverted
-    Gui* tmp_gui = furi_record_open(RECORD_GUI);
-    Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
-    canvas_set_inverted_lcd(tmp_canvas, false);
-    gui_direct_draw_release(tmp_gui);
-    furi_record_close(RECORD_GUI);
+    // set inital value, later it will be rewriten by loading settings from file
+    app->settings.lcd_inversion = false;
 
     return app;
 }
@@ -873,12 +869,12 @@ static void notification_apply_settings(NotificationApp* app) {
     }
     // --- NIGHT SHIFT END ---
 
-    //setup canvas variable "inversion" by settings value;
-    Gui* tmp_gui = furi_record_open(RECORD_GUI);
-    Canvas* tmp_canvas = gui_direct_draw_acquire(tmp_gui);
-    canvas_set_inverted_lcd(tmp_canvas, app->settings.lcd_inversion);
-    gui_direct_draw_release(tmp_gui);
-    furi_record_close(RECORD_GUI);
+    // check RECORD_GUI is exist (insurance on boot time) then use it to setup lcd inversion mode from loaded settings;
+    if(furi_record_exists(RECORD_GUI)) {
+        Gui* gui = furi_record_open(RECORD_GUI);
+        u8x8_d_st756x_set_inversion(&gui->canvas->fb.u8x8, app->settings.lcd_inversion);
+        furi_record_close(RECORD_GUI);
+    }
 }
 
 static void notification_init_settings(NotificationApp* app) {
