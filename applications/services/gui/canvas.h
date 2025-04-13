@@ -447,7 +447,6 @@ void canvas_draw_icon_bitmap(
     int16_t h,
     const Icon* icon);
 
-
 #ifdef __cplusplus
 }
 #endif
