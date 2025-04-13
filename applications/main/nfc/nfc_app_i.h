@@ -32,6 +32,7 @@
 #include "helpers/mfkey32_logger.h"
 #include "helpers/nfc_emv_parser.h"
 #include "helpers/mf_classic_key_cache.h"
+#include "helpers/protocol_support/nfc_protocol_support.h"
 #include "helpers/nfc_supported_cards.h"
 #include "helpers/felica_auth.h"
 #include "helpers/slix_unlock.h"
@@ -151,6 +152,7 @@ struct NfcApp {
     MfUserDict* mf_user_dict;
     MfClassicKeyCache* mfc_key_cache;
     CompositeApiResolver* api_resolver;
+    NfcProtocolSupport* protocol_support;
     NfcSupportedCards* nfc_supported_cards;
 
     NfcDevice* nfc_device;
@@ -179,6 +181,10 @@ typedef enum {
     NfcSceneSaveConfirmStateDetectReader,
     NfcSceneSaveConfirmStateCrackNonces,
 } NfcSceneSaveConfirmState;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int32_t nfc_task(void* p);
 
@@ -217,3 +223,7 @@ void nfc_make_app_folder(NfcApp* instance);
 void nfc_append_filename_string_when_present(NfcApp* instance, FuriString* string);
 
 void nfc_app_run_external(NfcApp* nfc, const char* app_path);
+
+#ifdef __cplusplus
+}
+#endif

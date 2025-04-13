@@ -155,6 +155,9 @@ void nfc_app_free(NfcApp* instance) {
     slix_unlock_free(instance->slix_unlock);
     mf_classic_key_cache_free(instance->mfc_key_cache);
     nfc_supported_cards_free(instance->nfc_supported_cards);
+    if(instance->protocol_support) {
+        nfc_protocol_support_free(instance);
+    }
 
     // Nfc device
     nfc_device_free(instance->nfc_device);
@@ -471,7 +474,7 @@ static bool nfc_is_hal_ready(void) {
 static void nfc_show_initial_scene_for_device(NfcApp* nfc) {
     NfcProtocol prot = nfc_device_get_protocol(nfc->nfc_device);
     uint32_t scene = nfc_protocol_support_has_feature(
-                         prot, NfcProtocolFeatureEmulateFull | NfcProtocolFeatureEmulateUid) ?
+                         prot, nfc, NfcProtocolFeatureEmulateFull | NfcProtocolFeatureEmulateUid) ?
                          NfcSceneEmulate :
                          NfcSceneSavedMenu;
     // Load plugins (parsers) in case if we are in the saved menu
