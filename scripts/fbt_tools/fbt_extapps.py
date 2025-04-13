@@ -338,6 +338,13 @@ def _validate_app_imports(target, source, env):
                 "GALLAGHER_CARDAX_ASCII",
                 "mosgortrans_parse_transport_block",
                 "render_section_header",
+                "nfc_append_filename_string_when_present",
+                "nfc_protocol_support_common_submenu_callback",
+                "nfc_protocol_support_common_widget_callback",
+                "nfc_protocol_support_common_on_enter_empty",
+                "nfc_protocol_support_common_on_event_empty",
+                "nfc_unlock_helper_setup_from_state",
+                "nfc_unlock_helper_card_detected_handler",
                 # totp app_api_table
                 "totp_",
                 "memset_s",
@@ -369,6 +376,7 @@ def _validate_app_imports(target, source, env):
                 "smartrider_plugin",
                 "troika_plugin",
                 # nfc_app_api_table
+                "nfc_",
                 "gallagher",
                 "social_moscow",
                 "troika",
