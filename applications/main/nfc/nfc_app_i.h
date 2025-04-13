@@ -36,6 +36,7 @@
 #include "helpers/felica_auth.h"
 #include "helpers/slix_unlock.h"
 
+#include <flipper_application/plugins/composite_resolver.h>
 #include <loader/loader.h>
 #include <dialogs/dialogs.h>
 #include <storage/storage.h>
@@ -149,6 +150,7 @@ struct NfcApp {
     Mfkey32Logger* mfkey32_logger;
     MfUserDict* mf_user_dict;
     MfClassicKeyCache* mfc_key_cache;
+    CompositeApiResolver* api_resolver;
     NfcSupportedCards* nfc_supported_cards;
 
     NfcDevice* nfc_device;

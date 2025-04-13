@@ -1,7 +1,9 @@
 #include "nfc_app_i.h"
+#include "api/nfc_app_api_interface.h"
 #include "helpers/protocol_support/nfc_protocol_support.h"
 
 #include <dolphin/dolphin.h>
+#include <loader/firmware_api/firmware_api.h>
 #include <applications/main/archive/helpers/archive_helpers_ext.h>
 
 bool nfc_custom_event_callback(void* context, uint32_t event) {
@@ -50,12 +52,16 @@ NfcApp* nfc_app_alloc(void) {
 
     instance->nfc = nfc_alloc();
 
+    instance->api_resolver = composite_api_resolver_alloc();
+    composite_api_resolver_add(instance->api_resolver, firmware_api_interface);
+    composite_api_resolver_add(instance->api_resolver, nfc_application_api_interface);
+
     instance->detected_protocols = nfc_detected_protocols_alloc();
     instance->felica_auth = felica_auth_alloc();
     instance->mf_ul_auth = mf_ultralight_auth_alloc();
     instance->slix_unlock = slix_unlock_alloc();
     instance->mfc_key_cache = mf_classic_key_cache_alloc();
-    instance->nfc_supported_cards = nfc_supported_cards_alloc();
+    instance->nfc_supported_cards = nfc_supported_cards_alloc(instance->api_resolver);
 
     // Nfc device
     instance->nfc_device = nfc_device_alloc();
