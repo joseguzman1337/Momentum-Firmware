@@ -32,6 +32,7 @@ App(
         "js_app.c",
         "js_modules.c",
         "js_thread.c",
+        "js_value.c",
         "plugin_api/app_api_table.cpp",
         "modules/js_flipper.c",
         "modules/js_tests.c",
