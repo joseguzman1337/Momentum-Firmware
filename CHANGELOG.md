@@ -97,6 +97,8 @@
 - NFC:
   - Support MIFARE DESFire Transaction MAC file type, fixes reading some EV2+ cards (by @Willy-JL)
   - Improve NDEF parser handling and display of raw non-text data (by @Willy-JL)
+  - Split NfcProtocolSupport handlers into plugins for ~23kb less RAM usage (#396 by @Willy-JL)
+  - Enable Asset Packs in NFC app again due to reduced RAM usage (#396 by @Willy-JL)
   - Improve loading of parser plugins (by @Willy-JL)
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
