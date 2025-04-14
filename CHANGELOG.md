@@ -21,6 +21,7 @@
   - NFC:
     - APDU Runner: (by @SpenserCai)
     - Passport Reader (by @bettse)
+    - Seos compatible (by @bettse)
   - USB: Portal Of Flipper (by @Bettse & @sanjay900)
 - Sub-GHz:
   - UL: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
