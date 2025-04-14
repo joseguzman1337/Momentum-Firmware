@@ -117,6 +117,7 @@ App(
     sources=[
         "helpers/protocol_support/mf_classic/*.c",
         "helpers/protocol_support/iso14443_3a/*.c",
+        "helpers/mf_classic_*.c",
     ],
     fal_embedded=True,
 )
