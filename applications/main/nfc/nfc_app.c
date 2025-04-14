@@ -425,6 +425,11 @@ bool nfc_load_from_file_select(NfcApp* instance) {
         if(!dialog_file_browser_show(
                instance->dialogs, instance->file_path, instance->file_path, &browser_options))
             break;
+
+        nfc_show_loading_popup(instance, true);
+        nfc_supported_cards_load_cache(instance->nfc_supported_cards);
+        nfc_show_loading_popup(instance, false);
+
         success = nfc_load_file(instance, instance->file_path, true);
     } while(!success);
 
@@ -535,11 +540,6 @@ int32_t nfc_app(void* p) {
     } else {
         view_dispatcher_attach_to_gui(
             nfc->view_dispatcher, nfc->gui, ViewDispatcherTypeFullscreen);
-        // Load plugins (parsers) one time in case if we running app normally
-        nfc_show_loading_popup(nfc, true);
-        nfc_supported_cards_load_cache(nfc->nfc_supported_cards);
-        nfc_show_loading_popup(nfc, false);
-        // Switch to the initial scene
         scene_manager_next_scene(nfc->scene_manager, NfcSceneStart);
     }
 

@@ -465,6 +465,10 @@ static void nfc_protocol_support_scene_read_saved_menu_on_exit(NfcApp* instance)
 static void nfc_protocol_support_scene_read_success_on_enter(NfcApp* instance) {
     Widget* widget = instance->widget;
 
+    popup_set_header(instance->popup, "Parsing", 85, 27, AlignCenter, AlignTop);
+    popup_set_icon(instance->popup, 12, 23, &A_Loading_24);
+    view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewPopup);
+
     FuriString* temp_str = furi_string_alloc();
     if(nfc_supported_cards_parse(instance->nfc_supported_cards, instance->nfc_device, temp_str)) {
         widget_add_text_scroll_element(
