@@ -70,7 +70,7 @@
   - ESP Flasher: Bump Marauder 1.4.2 (by @justcallmekoko), FlipperHTTP 1.8.2 (by @jblanked)
   - FlipDownloader: Renamed from FlipStore, added VGM firmwares from VGM-Library (by @jblanked)
   - FlipSocial: New server backend (by @jblanked)
-  - FlipWiFi: Update FlipperHTTP, improve handling of connection errors and network names with symbols (by @jblanked)
+  - FlipWiFi: Update FlipperHTTP, added AP mode to host a network with custom HTML, improve handling of connection errors and network names with symbols (by @jblanked)
   - FlipWorld: Added NPCs, multiplayer, tutorial, in-game menu, new controls, weapon option, auto-updating, many bugfixes and improvements (by @jblanked)
   - IR Intervalometer: Add Pentax camera support (by @petrikjp)
   - KeyCopier: Separate Brand and Key Format selection for ease of use, add QR code for TalkingSasquach's video (by @zinongli), improved UI/workflow to select key format (by @Offreds)
