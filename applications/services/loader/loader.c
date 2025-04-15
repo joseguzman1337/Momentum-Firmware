@@ -601,7 +601,7 @@ static LoaderMessageLoaderStatusResult loader_start_external_app(
             if(res != DialogMessageButtonRight) {
                 const char* err_msg = flipper_application_preload_status_to_string(preload_res);
                 result.value = loader_make_status_error(
-                    LoaderStatusErrorAppStarted, // Not LoaderStatusErrorInternal since it would show another popup
+                    LoaderStatusErrorApiMismatchCanceled, // Not LoaderStatusErrorInternal since it would show another popup
                     error_message,
                     "Preload failed, %s: %s",
                     path,
@@ -693,10 +693,6 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
     status.value = loader_make_success_status(error_message);
     status.error = LoaderStatusErrorUnknown;
 
-    LoaderEvent event;
-    event.type = LoaderEventTypeApplicationBeforeLoad;
-    furi_pubsub_publish(loader->pubsub, &event);
-
     do {
         // check lock
         if(loader_do_is_locked(loader)) {
@@ -716,6 +712,17 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
             break;
         }
 
+        // check Applications
+        if(strcmp(name, LOADER_APPLICATIONS_NAME) == 0) {
+            loader_do_applications_show(loader);
+            status.value = loader_make_success_status(error_message);
+            break;
+        }
+
+        LoaderEvent event;
+        event.type = LoaderEventTypeApplicationBeforeLoad;
+        furi_pubsub_publish(loader->pubsub, &event);
+
         // Translate app names (mainly for RPC)
         if(!strncmp(name, "Bad USB", strlen("Bad USB"))) {
             name = "Bad KB";
@@ -729,13 +736,6 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
                 status.value = loader_make_success_status(error_message);
                 break;
             }
-        }
-
-        // check Applications
-        if(strcmp(name, LOADER_APPLICATIONS_NAME) == 0) {
-            loader_do_applications_show(loader);
-            status.value = loader_make_success_status(error_message);
-            break;
         }
 
         // check External Applications
@@ -930,7 +930,8 @@ int32_t loader_srv(void* p) {
                 LoaderMessageLoaderStatusResult status = loader_do_start_by_name(
                     loader, message.start.name, message.start.args, message.start.error_message);
                 *(message.status_value) = status;
-                if(status.value != LoaderStatusOk) loader_do_emit_queue_empty_event(loader);
+                if(status.value != LoaderStatusOk && status.value != LoaderStatusErrorAppStarted)
+                    loader_do_emit_queue_empty_event(loader);
                 api_lock_unlock(message.api_lock);
                 break;
             }
@@ -939,7 +940,8 @@ int32_t loader_srv(void* p) {
                 LoaderMessageLoaderStatusResult status = loader_do_start_by_name(
                     loader, message.start.name, message.start.args, error_message);
                 loader_show_gui_error(status, message.start.name, error_message);
-                if(status.value != LoaderStatusOk) loader_do_emit_queue_empty_event(loader);
+                if(status.value != LoaderStatusOk && status.value != LoaderStatusErrorAppStarted)
+                    loader_do_emit_queue_empty_event(loader);
                 if(message.start.name) free((void*)message.start.name);
                 if(message.start.args) free((void*)message.start.args);
                 furi_string_free(error_message);
