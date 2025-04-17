@@ -18,9 +18,7 @@ Follow this link for [details](https://github.com/DarkFlippers/unleashed-firmwar
 You’ve enabled RGB backlight mod in settings made for custom RGB modded flippers. <br />
 
 Please, do not use that version if your flipper isn’t modded!
-Disable in Settings -> Notifications -> RGB mod settings
-
-Make sure to have System -> Debug = ON before, otherwise first option (is mod installed) will not appear
+Disable in Settings -> LCD & Notifications -> RGB mod settings
 
 If you have RGB backlight mod do the same but enable the mod instead
   
