@@ -393,10 +393,8 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
     }
 
     // Lock/Unlock all rgb settings depent from rgb_backlight_installed switch
-    int slide = 0;
-    if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
-        slide = 1;
-    }
+    int slide = 1;
+
     for(int i = slide; i < (slide + 8); i++) {
         VariableItem* t_item = variable_item_list_get(app->variable_item_list_rgb, i);
         if(index == 0) {
@@ -535,9 +533,7 @@ void variable_item_list_enter_callback(void* context, uint32_t index) {
     UNUSED(context);
     NotificationAppSettings* app = context;
 
-    if(((app->notification->settings.rgb.rgb_backlight_installed) ||
-        (furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug))) &&
-       (index == 0)) {
+    if(index == 0) {
         view_dispatcher_switch_to_view(app->view_dispatcher, RGBViewId);
     }
 }
@@ -563,17 +559,14 @@ static void night_shift_changed(VariableItem* item) {
     // force demo night_shift brightness ot rgb backlight and stock backlight
     notification_message(app->notification, &sequence_display_backlight_on);
 
-    int slide = 0;
-    if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug) ||
-       (app->notification->settings.rgb.rgb_backlight_installed)) {
-        slide = 1;
-    }
+    int slide = 1;
+
     for(int i = 4 + slide; i < (6 + slide); i++) {
         VariableItem* t_item = variable_item_list_get(app->variable_item_list, i);
         if(index == 0) {
-            variable_item_set_locked(t_item, true, "Night shift\nOFF!");
+            variable_item_set_locked(t_item, true, "Night Shift\nOFF!");
         } else {
-            variable_item_set_locked(t_item, false, "Night shift\nOFF!");
+            variable_item_set_locked(t_item, false, "Night Shift\nOFF!");
         }
     }
 
@@ -633,10 +626,7 @@ static NotificationAppSettings* alloc_settings(void) {
         app->variable_item_list, variable_item_list_enter_callback, app);
 
     // Show RGB settings only when debug_mode or rgb_backlight_installed is active
-    if((app->notification->settings.rgb.rgb_backlight_installed) ||
-       (furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug))) {
-        item = variable_item_list_add(app->variable_item_list, "RGB settings", 0, NULL, app);
-    }
+    item = variable_item_list_add(app->variable_item_list, "RGB Mod Settings", 0, NULL, app);
     //--- RGB BACKLIGHT END ---
 
     item = variable_item_list_add(
@@ -662,7 +652,7 @@ static NotificationAppSettings* alloc_settings(void) {
 
     // --- NIGHT SHIFT ---
     item = variable_item_list_add(
-        app->variable_item_list, "Night shift", NIGHT_SHIFT_COUNT, night_shift_changed, app);
+        app->variable_item_list, "Night Shift", NIGHT_SHIFT_COUNT, night_shift_changed, app);
     value_index = value_index_float(
         app->notification->settings.night_shift, night_shift_value, NIGHT_SHIFT_COUNT);
     variable_item_set_current_value_index(item, value_index);
@@ -681,7 +671,7 @@ static NotificationAppSettings* alloc_settings(void) {
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, night_shift_start_text[value_index]);
     variable_item_set_locked(
-        item, (app->notification->settings.night_shift == 1), "Night shift \nOFF!");
+        item, (app->notification->settings.night_shift == 1), "Night Shift \nOFF!");
 
     item = variable_item_list_add(
         app->variable_item_list, " . End", NIGHT_SHIFT_END_COUNT, night_shift_end_changed, app);
@@ -690,7 +680,7 @@ static NotificationAppSettings* alloc_settings(void) {
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, night_shift_end_text[value_index]);
     variable_item_set_locked(
-        item, (app->notification->settings.night_shift == 1), "Night shift \nOFF!");
+        item, (app->notification->settings.night_shift == 1), "Night Shift \nOFF!");
 
     // --- NIGHT SHIFT END---
 
@@ -730,7 +720,7 @@ static NotificationAppSettings* alloc_settings(void) {
     }
 
     item = variable_item_list_add(
-        app->variable_item_list, "LCD inversion", LCD_INVERSION_COUNT, lcd_inversion_changed, app);
+        app->variable_item_list, "LCD Inversion", LCD_INVERSION_COUNT, lcd_inversion_changed, app);
     value_index = value_index_bool(
         app->notification->settings.lcd_inversion, lcd_inversion_value, LCD_INVERSION_COUNT);
     variable_item_set_current_value_index(item, value_index);
@@ -745,26 +735,25 @@ static NotificationAppSettings* alloc_settings(void) {
     view_set_previous_callback(view_rgb, notification_app_rgb_settings_exit);
 
     // Show rgb_backlight_installed swith only in Debug mode
-    if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
-        item = variable_item_list_add(
-            app->variable_item_list_rgb,
-            "RGB backlight installed",
-            RGB_BACKLIGHT_INSTALLED_COUNT,
-            rgb_backlight_installed_changed,
-            app);
-        value_index = value_index_bool(
-            app->notification->settings.rgb.rgb_backlight_installed,
-            rgb_backlight_installed_value,
-            RGB_BACKLIGHT_INSTALLED_COUNT);
-        variable_item_set_current_value_index(item, value_index);
-        variable_item_set_current_value_text(item, rgb_backlight_installed_text[value_index]);
-    }
+
+    item = variable_item_list_add(
+        app->variable_item_list_rgb,
+        "RGB backlight installed",
+        RGB_BACKLIGHT_INSTALLED_COUNT,
+        rgb_backlight_installed_changed,
+        app);
+    value_index = value_index_bool(
+        app->notification->settings.rgb.rgb_backlight_installed,
+        rgb_backlight_installed_value,
+        RGB_BACKLIGHT_INSTALLED_COUNT);
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, rgb_backlight_installed_text[value_index]);
 
     // We (humans) are numbering LEDs from left to right as 1..3, but hardware have another order from right to left 2..0
     // led_1 color
     item = variable_item_list_add(
         app->variable_item_list_rgb,
-        "Led 1 Color",
+        "LED 1 Color",
         rgb_backlight_get_color_count(),
         led_2_color_changed,
         app);
@@ -777,7 +766,7 @@ static NotificationAppSettings* alloc_settings(void) {
     // led_2 color
     item = variable_item_list_add(
         app->variable_item_list_rgb,
-        "Led 2 Color",
+        "LED 2 Color",
         rgb_backlight_get_color_count(),
         led_1_color_changed,
         app);
@@ -790,7 +779,7 @@ static NotificationAppSettings* alloc_settings(void) {
     // led 3 color
     item = variable_item_list_add(
         app->variable_item_list_rgb,
-        "Led 3 Color",
+        "LED 3 Color",
         rgb_backlight_get_color_count(),
         led_0_color_changed,
         app);
