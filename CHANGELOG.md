@@ -30,6 +30,8 @@
 * SubGHz: Various bugfixes and experimental options (rolling counter overflow) (by @xMasterX)
 * Anims: Disable winter anims
 * NFC: mfclassic poller fix early key reuse in dictionary attack state machine (by @noproto)
+* OFW: RC fixes
+* OFW: Desktop: Fix freeze on boot if PIN set
 * OFW PR 4189: USB-UART bridge fix (by @portasynthinca3)
 * OFW: FBT: Fix for Python 3.13
 * OFW: sdk: bump API to force re-upload for the catalog 
