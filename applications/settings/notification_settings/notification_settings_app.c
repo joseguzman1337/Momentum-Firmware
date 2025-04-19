@@ -533,7 +533,7 @@ void variable_item_list_enter_callback(void* context, uint32_t index) {
     UNUSED(context);
     NotificationAppSettings* app = context;
 
-    if(index == 0) {
+    if(index == 10) {
         view_dispatcher_switch_to_view(app->view_dispatcher, RGBViewId);
     }
 }
@@ -624,10 +624,6 @@ static NotificationAppSettings* alloc_settings(void) {
     // set callback for OK pressed in notification settings menu
     variable_item_list_set_enter_callback(
         app->variable_item_list, variable_item_list_enter_callback, app);
-
-    // Show RGB settings only when debug_mode or rgb_backlight_installed is active
-    item = variable_item_list_add(app->variable_item_list, "RGB Mod Settings", 0, NULL, app);
-    //--- RGB BACKLIGHT END ---
 
     item = variable_item_list_add(
         app->variable_item_list, "LCD Contrast", CONTRAST_COUNT, contrast_changed, app);
@@ -727,6 +723,9 @@ static NotificationAppSettings* alloc_settings(void) {
     variable_item_set_current_value_text(item, lcd_inversion_text[value_index]);
 
     //--- RGB BACKLIGHT ---
+    // Show RGB settings only when debug_mode or rgb_backlight_installed is active
+    item = variable_item_list_add(app->variable_item_list, "RGB Mod Settings", 0, NULL, app);
+    //--- RGB BACKLIGHT END ---
 
     app->variable_item_list_rgb = variable_item_list_alloc();
     View* view_rgb = variable_item_list_get_view(app->variable_item_list_rgb);
