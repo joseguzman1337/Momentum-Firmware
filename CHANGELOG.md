@@ -17,6 +17,7 @@
   - Games: Quadrastic (by @ivanbarsukov)
   - GPIO:
     - A33 Flipper Blackhat (by @o7-machinehum)
+    - AS7331 UV Meter (by @michaelbaisch)
     - Longwave Clock (by @m7i-org)
   - NFC:
     - APDU Runner: (by @SpenserCai)
