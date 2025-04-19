@@ -783,6 +783,7 @@ static void loader_do_unlock(Loader* loader) {
 }
 
 static void loader_do_emit_queue_empty_event(Loader* loader) {
+    if(loader_do_is_locked(loader)) return;
     FURI_LOG_I(TAG, "Launch queue empty");
     LoaderEvent event;
     event.type = LoaderEventTypeNoMoreAppsInQueue;
@@ -930,8 +931,7 @@ int32_t loader_srv(void* p) {
                 LoaderMessageLoaderStatusResult status = loader_do_start_by_name(
                     loader, message.start.name, message.start.args, message.start.error_message);
                 *(message.status_value) = status;
-                if(status.value != LoaderStatusOk && status.value != LoaderStatusErrorAppStarted)
-                    loader_do_emit_queue_empty_event(loader);
+                if(status.value != LoaderStatusOk) loader_do_emit_queue_empty_event(loader);
                 api_lock_unlock(message.api_lock);
                 break;
             }
@@ -940,8 +940,7 @@ int32_t loader_srv(void* p) {
                 LoaderMessageLoaderStatusResult status = loader_do_start_by_name(
                     loader, message.start.name, message.start.args, error_message);
                 loader_show_gui_error(status, message.start.name, error_message);
-                if(status.value != LoaderStatusOk && status.value != LoaderStatusErrorAppStarted)
-                    loader_do_emit_queue_empty_event(loader);
+                if(status.value != LoaderStatusOk) loader_do_emit_queue_empty_event(loader);
                 if(message.start.name) free((void*)message.start.name);
                 if(message.start.args) free((void*)message.start.args);
                 furi_string_free(error_message);
