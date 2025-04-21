@@ -165,6 +165,7 @@ Thanks to Official team (to their SubGHz Developer, Skorp) for implementing supp
 <summary><code><strong>Decoders/Encoders or emulation (+ programming mode) support made by @xMasterX</strong></code></summary>
 <br/>
 
+- Feron (static 32 bit)
 - ReversRB2 / RB2M (static 64 bit) with add manually support
 - Marantec24 (static 24 bit) with add manually support
 - GangQi (static 34 bit) with button parsing and add manually support (thanks to @mishamyte for captures and testing, thanks @Skorpionm for help)

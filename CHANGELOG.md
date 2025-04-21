@@ -1,6 +1,7 @@
 ## Main changes
 - Current API: 86.0
 **WARNING! After install of this version your Desktop (fav apps) and LCD & Notifications settings will be reset to default values, please configure them again after this update!** (this is required due to big updates on that parts and config struct changes)
+* SubGHz: Add **Feron** protocol (static 32 bit) **full support** (by @xMasterX)
 * SubGHz: Add **Revers RB2 / RB2M Protocol** (static 64 bit) **full support** with add manually (by @xMasterX)
 * SubGHz: **Fix Hollarm protocol with more verification**
 * SubGHz: **Fix GangQi protocol** (by @DoberBit and @mishamyte (who spent 2 weeks on this))
