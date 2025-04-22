@@ -393,9 +393,7 @@ static void rgb_backlight_installed_changed(VariableItem* item) {
     }
 
     // Lock/Unlock all rgb settings depent from rgb_backlight_installed switch
-    int slide = 1;
-
-    for(int i = slide; i < (slide + 8); i++) {
+    for(int i = 1; i < 9; i++) {
         VariableItem* t_item = variable_item_list_get(app->variable_item_list_rgb, i);
         if(index == 0) {
             variable_item_set_locked(t_item, true, "RGB\nOFF!");
@@ -528,7 +526,7 @@ static void rgb_backlight_rainbow_wide_changed(VariableItem* item) {
     notification_message_save_settings(app->notification);
 }
 
-// open settings.rgb_view if user press OK on first (index=0) menu string and (debug mode or rgb_backlight_installed is true)
+// open settings.rgb_view if user press OK on last (index=10) menu string
 void variable_item_list_enter_callback(void* context, uint32_t index) {
     UNUSED(context);
     NotificationAppSettings* app = context;
@@ -556,12 +554,10 @@ static void night_shift_changed(VariableItem* item) {
     app->notification->current_night_shift = night_shift_value[index];
     app->notification->current_night_shift = night_shift_value[index];
 
-    // force demo night_shift brightness ot rgb backlight and stock backlight
+    // force demo night_shift brightness to rgb backlight and stock backlight
     notification_message(app->notification, &sequence_display_backlight_on);
-
-    int slide = 0;
-
-    for(int i = 4 + slide; i < (6 + slide); i++) {
+    
+    for(int i = 4; i < 6; i++) {
         VariableItem* t_item = variable_item_list_get(app->variable_item_list, i);
         if(index == 0) {
             variable_item_set_locked(t_item, true, "Night Shift\nOFF!");
@@ -723,17 +719,14 @@ static NotificationAppSettings* alloc_settings(void) {
     variable_item_set_current_value_text(item, lcd_inversion_text[value_index]);
 
     //--- RGB BACKLIGHT ---
-    // Show RGB settings only when debug_mode or rgb_backlight_installed is active
     item = variable_item_list_add(app->variable_item_list, "RGB Mod Settings", 0, NULL, app);
     //--- RGB BACKLIGHT END ---
 
     app->variable_item_list_rgb = variable_item_list_alloc();
     View* view_rgb = variable_item_list_get_view(app->variable_item_list_rgb);
 
-    // set callback for exit from settings.rgb_menu
+    // set callback for exit from rgb settings menu
     view_set_previous_callback(view_rgb, notification_app_rgb_settings_exit);
-
-    // Show rgb_backlight_installed swith only in Debug mode
 
     item = variable_item_list_add(
         app->variable_item_list_rgb,
