@@ -186,14 +186,13 @@ Iso14443_4LayerResult iso14443_4_layer_decode_command(
         } else if(instance->cid != ISO14443_4_LAYER_CID_NOT_SUPPORTED && instance->cid != 0) {
             return Iso14443_4LayerResultSkip;
         }
+        // TODO: properly handle block chaining
         if(instance->pcb & ISO14443_4_BLOCK_PCB_I_NAD_MASK) {
             if(instance->nad == ISO14443_4_LAYER_NAD_NOT_SUPPORTED) {
                 return Iso14443_4LayerResultSkip;
             }
             instance->nad = bit_buffer_get_byte(input_data, prologue_len++);
-            // FIXME: unset NAD when chaining after first block
         }
-        // FIXME: chaining
         bit_buffer_copy_right(block_data, input_data, prologue_len);
         iso14443_4_layer_update_pcb(instance, false);
         return Iso14443_4LayerResultData;
@@ -218,7 +217,7 @@ Iso14443_4LayerResult iso14443_4_layer_decode_command(
         }
 
     } else if(ISO14443_4_BLOCK_PCB_IS_R_BLOCK(instance->pcb)) {
-        // FIXME: R blocks
+        // TODO: properly handle R blocks while chaining
         iso14443_4_layer_update_pcb(instance, true);
         instance->pcb |= ISO14443_4_BLOCK_PCB_R_NACK_MASK;
         bit_buffer_reset(block_data);
@@ -240,22 +239,19 @@ bool iso14443_4_layer_encode_response(
         if(instance->pcb_prev & ISO14443_4_BLOCK_PCB_I_CID_MASK) {
             bit_buffer_append_byte(block_data, instance->cid);
         }
+        // TODO: properly handle block chaining and related R block responses
         if(instance->pcb_prev & ISO14443_4_BLOCK_PCB_I_NAD_MASK &&
            instance->nad != ISO14443_4_LAYER_NAD_NOT_SET) {
             bit_buffer_append_byte(block_data, instance->nad);
             instance->nad = ISO14443_4_LAYER_NAD_NOT_SET;
-            // FIXME: unset NAD when chaining after first block
         } else {
             instance->pcb &= ~ISO14443_4_BLOCK_PCB_I_NAD_MASK;
         }
-        // FIXME: chaining
         instance->pcb &= ~ISO14443_4_BLOCK_PCB_I_CHAIN_MASK;
         bit_buffer_set_byte(block_data, 0, instance->pcb);
         bit_buffer_append(block_data, input_data);
         iso14443_4_layer_update_pcb(instance, false);
         return true;
-
-        // FIXME: R blocks
     }
     return false;
 }
