@@ -136,6 +136,18 @@ dist_env = env.Clone(
     ],
 )
 
+
+enable_debug_target = dist_env.PhonyTarget(
+    "enable_debug",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/enable_debug.py",
+        ],
+    ],
+)
+env.AlwaysBuild(enable_debug_target)
+
 flash_target = dist_env.FwFlash(
     dist_env["UFBT_STATE_DIR"].File("flash"),
     dist_env["FW_ELF"],
@@ -144,6 +156,7 @@ dist_env.Alias("firmware_flash", flash_target)
 dist_env.Alias("flash", flash_target)
 if env["FORCE"]:
     env.AlwaysBuild(flash_target)
+dist_env.Depends(flash_target, enable_debug_target)
 
 
 firmware_jflash = dist_env.JFlash(
@@ -165,13 +178,14 @@ firmware_debug = dist_env.PhonyTarget(
     GDBREMOTE="${OPENOCD_GDB_PIPE}",
 )
 
-dist_env.PhonyTarget(
+blackmagic_target = dist_env.PhonyTarget(
     "blackmagic",
     "${GDBPYCOM}",
     source=dist_env["FW_ELF"],
     GDBOPTS="${GDBOPTS_BASE} ${GDBOPTS_BLACKMAGIC}",
     GDBREMOTE="${BLACKMAGIC_ADDR}",
 )
+dist_env.Depends(blackmagic_target, enable_debug_target)
 
 # Debug alien elf
 debug_other_opts = [
@@ -461,10 +475,11 @@ dist_env.Precious(app_template_dist)
 dist_env.NoClean(app_template_dist)
 dist_env.Alias("create", app_template_dist)
 
-dist_env.PhonyTarget(
+get_blackmagic_target = dist_env.PhonyTarget(
     "get_blackmagic",
     "@echo $( ${BLACKMAGIC_ADDR} $)",
 )
+dist_env.Depends(get_blackmagic_target, enable_debug_target)
 
 dist_env.PhonyTarget(
     "get_apiversion",

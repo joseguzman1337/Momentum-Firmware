@@ -8,21 +8,20 @@ def main():
         if len(flippers) != 1:
             return
 
-        port = serial.Serial()
-        port.port = flippers[0].device
-        port.timeout = 0.1
-        port.write_timeout = 0.1
-        port.baudrate = 115200  # Doesn't matter for VCP
-        port.open()
+        port = serial.Serial(flippers[0].device, 230400)
+        port.timeout = 2
     except Exception:
         return
 
     try:
-        port.write(
-            b"sysctl debug 1\r"
-            b"sysctl sleep_mode legacy\r"
-            b"sysctl log_level debug\r"
-        )
+        port.read_until(b">: ")
+        for cmd in (
+            b"sysctl debug 1\r",
+            b"sysctl sleep_mode legacy\r",
+            b"sysctl log_level debug\r",
+        ):
+            port.write(cmd)
+            port.read_until(b">: ")
     except Exception:
         pass
     finally:

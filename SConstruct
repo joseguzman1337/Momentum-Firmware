@@ -202,8 +202,21 @@ distenv.AlwaysBuild(copro_dist)
 distenv.Alias("copro_dist", copro_dist)
 
 
+enable_debug_target = distenv.PhonyTarget(
+    "enable_debug",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/enable_debug.py",
+        ],
+    ],
+)
+coreenv.AlwaysBuild(enable_debug_target)
+
+
 firmware_flash = distenv.AddFwFlashTarget(firmware_env)
 distenv.Alias("flash", firmware_flash)
+distenv.Depends(firmware_flash, enable_debug_target)
 
 # To be implemented in fwflash.py
 firmware_jflash = distenv.AddJFlashTarget(firmware_env)
@@ -242,7 +255,7 @@ firmware_blackmagic = distenv.PhonyTarget(
     GDBREMOTE="${BLACKMAGIC_ADDR}",
     FBT_FAP_DEBUG_ELF_ROOT=firmware_env["FBT_FAP_DEBUG_ELF_ROOT"],
 )
-distenv.Depends(firmware_blackmagic, firmware_flash)
+distenv.Depends(firmware_blackmagic, enable_debug_target)
 
 # Debug alien elf
 debug_other_opts = [
@@ -446,16 +459,11 @@ distenv.PhonyTarget(
 
 
 # Find blackmagic probe
-distenv.PhonyTarget(
+get_blackmagic_target = distenv.PhonyTarget(
     "get_blackmagic",
-    [
-        [
-            "${PYTHON3}",
-            "${FBT_SCRIPT_DIR}/enable_debug.py",
-        ],
-        "@echo $( ${BLACKMAGIC_ADDR} $)",
-    ],
+    "@echo $( ${BLACKMAGIC_ADDR} $)",
 )
+distenv.Depends(get_blackmagic_target, enable_debug_target)
 
 
 # Find STLink probe ids
