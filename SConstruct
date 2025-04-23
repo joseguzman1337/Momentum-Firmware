@@ -222,7 +222,7 @@ distenv.Depends(firmware_flash, enable_debug_target)
 firmware_jflash = distenv.AddJFlashTarget(firmware_env)
 distenv.Alias("jflash", firmware_jflash)
 
-distenv.PhonyTarget(
+gdb_trace_all_target = distenv.PhonyTarget(
     "gdb_trace_all",
     [["${GDB}", "${GDBOPTS}", "${SOURCES}", "${GDBFLASH}"]],
     source=firmware_env["FW_ELF"],
@@ -235,6 +235,7 @@ distenv.PhonyTarget(
         "quit",
     ],
 )
+distenv.Depends(gdb_trace_all_target, enable_debug_target)
 
 # Debugging firmware
 firmware_debug = distenv.PhonyTarget(
@@ -245,7 +246,7 @@ firmware_debug = distenv.PhonyTarget(
     GDBREMOTE="${OPENOCD_GDB_PIPE}",
     FBT_FAP_DEBUG_ELF_ROOT=firmware_env["FBT_FAP_DEBUG_ELF_ROOT"],
 )
-distenv.Depends(firmware_debug, firmware_flash)
+distenv.Depends(firmware_debug, enable_debug_target)
 
 firmware_blackmagic = distenv.PhonyTarget(
     "blackmagic",
@@ -269,21 +270,23 @@ debug_other_opts = [
     "fw-version",
 ]
 
-distenv.PhonyTarget(
+debug_other_target = distenv.PhonyTarget(
     "debug_other",
     "${GDBPYCOM}",
     GDBOPTS="${GDBOPTS_BASE}",
     GDBREMOTE="${OPENOCD_GDB_PIPE}",
     GDBPYOPTS=debug_other_opts,
 )
+distenv.Depends(debug_other_target, enable_debug_target)
 
-distenv.PhonyTarget(
+debug_other_blackmagic_target = distenv.PhonyTarget(
     "debug_other_blackmagic",
     "${GDBPYCOM}",
     GDBOPTS="${GDBOPTS_BASE} ${GDBOPTS_BLACKMAGIC}",
     GDBREMOTE="${BLACKMAGIC_ADDR}",
     GDBPYOPTS=debug_other_opts,
 )
+distenv.Depends(debug_other_blackmagic_target, enable_debug_target)
 
 
 # Just start OpenOCD
@@ -467,13 +470,14 @@ distenv.Depends(get_blackmagic_target, enable_debug_target)
 
 
 # Find STLink probe ids
-distenv.PhonyTarget(
+get_stlink_target = distenv.PhonyTarget(
     "get_stlink",
     distenv.Action(
         lambda **_: distenv.GetDevices(),
         None,
     ),
 )
+distenv.Depends(get_stlink_target, enable_debug_target)
 
 # Prepare vscode environment
 vscode_dist = distenv.Install(
