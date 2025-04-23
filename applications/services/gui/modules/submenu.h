@@ -54,22 +54,6 @@ void submenu_add_item(
     SubmenuItemCallback callback,
     void* callback_context);
 
-/** Add item to submenu with extended press events
- *
- * @param      submenu           Submenu instance
- * @param      label             menu item label
- * @param      index             menu item index, used for callback, may be
- *                               the same with other items
- * @param      callback          menu item extended callback
- * @param      callback_context  menu item callback context
- */
-void submenu_add_item_ex(
-    Submenu* submenu,
-    const char* label,
-    uint32_t index,
-    SubmenuItemCallbackEx callback,
-    void* callback_context);
-
 /** Add lockable item to submenu
  *
  * @param      submenu           Submenu instance
@@ -89,6 +73,22 @@ void submenu_add_lockable_item(
     void* callback_context,
     bool locked,
     const char* locked_message);
+
+/** Add item to submenu with extended press events
+ *
+ * @param      submenu           Submenu instance
+ * @param      label             menu item label
+ * @param      index             menu item index, used for callback, may be
+ *                               the same with other items
+ * @param      callback          menu item extended callback
+ * @param      callback_context  menu item callback context
+ */
+void submenu_add_item_ex(
+    Submenu* submenu,
+    const char* label,
+    uint32_t index,
+    SubmenuItemCallbackEx callback,
+    void* callback_context);
 
 /** Change label of an existing item
  * 

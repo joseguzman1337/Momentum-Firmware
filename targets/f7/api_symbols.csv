@@ -1749,7 +1749,7 @@ Function,+,furi_hal_subghz_flush_rx,void,
 Function,+,furi_hal_subghz_flush_tx,void,
 Function,+,furi_hal_subghz_get_data_gpio,const GpioPin*,
 Function,+,furi_hal_subghz_get_lqi,uint8_t,
-Function,+,furi_hal_subghz_get_rolling_counter_mult,int8_t,
+Function,+,furi_hal_subghz_get_rolling_counter_mult,int32_t,
 Function,+,furi_hal_subghz_get_rssi,float,
 Function,+,furi_hal_subghz_idle,void,
 Function,-,furi_hal_subghz_init,void,
@@ -1768,7 +1768,7 @@ Function,+,furi_hal_subghz_set_async_mirror_pin,void,const GpioPin*
 Function,+,furi_hal_subghz_set_frequency,uint32_t,uint32_t
 Function,+,furi_hal_subghz_set_frequency_and_path,uint32_t,uint32_t
 Function,+,furi_hal_subghz_set_path,void,FuriHalSubGhzPath
-Function,+,furi_hal_subghz_set_rolling_counter_mult,void,int8_t
+Function,+,furi_hal_subghz_set_rolling_counter_mult,void,int32_t
 Function,+,furi_hal_subghz_shutdown,void,
 Function,+,furi_hal_subghz_sleep,void,
 Function,+,furi_hal_subghz_start_async_rx,void,"FuriHalSubGhzCaptureCallback, void*"
@@ -3586,7 +3586,7 @@ Function,+,subghz_keystore_get_data,SubGhzKeyArray_t*,SubGhzKeystore*
 Function,+,subghz_keystore_load,_Bool,"SubGhzKeystore*, const char*"
 Function,+,subghz_keystore_raw_encrypted_save,_Bool,"const char*, const char*, uint8_t*"
 Function,+,subghz_keystore_raw_get_data,_Bool,"const char*, size_t, uint8_t*, size_t"
-Function,-,subghz_keystore_reset_kl,void,SubGhzKeystore*
+Function,+,subghz_keystore_reset_kl,void,SubGhzKeystore*
 Function,+,subghz_keystore_save,_Bool,"SubGhzKeystore*, const char*, uint8_t*"
 Function,+,subghz_protocol_alutech_at_4n_create_data,_Bool,"void*, FlipperFormat*, uint32_t, uint8_t, uint16_t, SubGhzRadioPreset*"
 Function,+,subghz_protocol_blocks_add_bit,void,"SubGhzBlockDecoder*, uint8_t"

@@ -81,6 +81,7 @@ const SubGhzProtocol* const subghz_protocol_registry_items[] = {
     &subghz_protocol_hollarm,
     &subghz_protocol_hay21,
     &subghz_protocol_revers_rb2,
+    &subghz_protocol_feron,
 };
 
 const SubGhzProtocolRegistry subghz_protocol_registry = {

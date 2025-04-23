@@ -26,6 +26,8 @@
   - USB: Portal Of Flipper (by @Bettse & @sanjay900)
 - Sub-GHz:
   - UL: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
+  - UL: Add Feron static 32-bit protocol full support (by @xMasterX)
+  - UL: Various bugfixes and experimental options, rolling counter overflow (by @xMasterX)
   - OFW: Added support for 42-bit Prastel variation (by @pmazzini)
 - RFID:
   - OFW: EM4305 support (by @Astrrra)
@@ -102,6 +104,7 @@
   - Split NfcProtocolSupport handlers into plugins for ~23kb less RAM usage (#396 by @Willy-JL)
   - Enable Asset Packs in NFC app again due to reduced RAM usage (#396 by @Willy-JL)
   - Improve loading of parser plugins (by @Willy-JL)
+  - UL: Use default UL/UL-C pwd/key as default value for key input (by @mishamyte)
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)

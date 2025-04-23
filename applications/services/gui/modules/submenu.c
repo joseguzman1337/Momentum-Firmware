@@ -501,7 +501,10 @@ void submenu_process_ok(Submenu* submenu, InputType input_type) {
         },
         true);
 
-    if(!item || item->locked) return;
+    if(!item) return;
+    if(item->locked) {
+        return;
+    }
 
     if(!item->has_extended_events && input_type == InputTypeShort && item->callback) {
         item->callback(item->callback_context, item->index);

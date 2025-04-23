@@ -453,7 +453,7 @@ static int32_t bad_usb_worker(void* context) {
                     if(bad_usb->hid->is_connected(bad_usb->hid_inst)) {
                         worker_state = BadUsbStateIdle; // Ready to run
                     } else {
-                        worker_state = BadUsbStateNotConnected; // USB not connected
+                        worker_state = BadUsbStateNotConnected; // Not connected
                     }
                 } else {
                     worker_state = BadUsbStateScriptError; // Script preload error

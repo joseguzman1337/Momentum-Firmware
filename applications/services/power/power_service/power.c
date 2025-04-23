@@ -388,13 +388,18 @@ static void power_handle_reboot(PowerBootMode mode) {
 
 //start furi timer for autopoweroff
 static void power_start_auto_poweroff_timer(Power* power) {
+    if(furi_timer_is_running(power->auto_poweroff_timer)) {
+        furi_timer_stop(power->auto_poweroff_timer);
+    }
     furi_timer_start(
         power->auto_poweroff_timer, furi_ms_to_ticks(power->settings.auto_poweroff_delay_ms));
 }
 
 //stop furi timer for autopoweroff
 static void power_stop_auto_poweroff_timer(Power* power) {
-    furi_timer_stop(power->auto_poweroff_timer);
+    if(furi_timer_is_running(power->auto_poweroff_timer)) {
+        furi_timer_stop(power->auto_poweroff_timer);
+    }
 }
 
 static uint32_t power_is_running_auto_poweroff_timer(Power* power) {

@@ -816,7 +816,6 @@ void subghz_cli_command_tx_from_file(PipeSide* pipe, FuriString* args, void* con
     subghz_devices_deinit();
     // Reset custom settings
     subghz_environment_reset_keeloq(environment);
-    faac_slh_reset_prog_mode();
     subghz_custom_btns_reset();
     // Free environment
     subghz_environment_free(environment);
@@ -1117,7 +1116,8 @@ static void subghz_cli_command_chat(PipeSide* pipe, FuriString* args) {
 }
 
 static void execute(PipeSide* pipe, FuriString* args, void* context) {
-    FuriString* cmd = furi_string_alloc();
+    FuriString* cmd;
+    cmd = furi_string_alloc();
 
     do {
         if(!args_read_string_and_trim(args, cmd)) {
