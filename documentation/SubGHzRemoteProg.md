@@ -122,14 +122,24 @@ How to get seed to make full clone of your remote (**will conflict with original
 
 1. Open `Read` in SubGHz on your flipper
 2. (ONLY FOR ORIGINAL REMOTES) Hold all buttons on your remote at same time, example -> for 2 button remote - press them both at same time and hold OR press hidden button on back of remote with a pin or paper clip
+For 4 buttons remote press & hold two buttons at upper row
 3. You will receive signal on your flipper, open that signal and see `Fix:` value, it should start from `F` like `F00F1C9B`
-4. If `Fix:` is showing first `F` see `Hop:` value -> This is your remote Seed
-5. Write down Hop value
+4. If `Fix:` is showing first `F` see `Hop:` value -> This is your remote Seed (except first digit `F` (this is the button code, aka programming button pressed means `F`))
+5. Write down Hop value and replace first digit - `F` with `0`
 6. Press button on your remote that you want to clone and receive its signal on your flipper
 7. Open and write down `Fix:` value where first digit will be same as your button ID `Btn:`
 8. Create new remote using BFT Mitto [Manual] - Enter FIX from step 7, enter counter `FF F9`, enter seed from step 5
 9. Using counter values like `FF F9` can help bypassing current original remote counter value, and in result it also can fully desync original remote, only one remote can work at same time using this method
-10. Throw away your original remote since now it needs to be re-added into receiver board :C
+10. Also you can do this: Save your signal of the original remote (will say KL: Unknown),
+then copy file to the PC and edit it and insert/replace those values after the `Key: 01 23 45 67 89 AB CD EF` (your key will have different value)
+```
+Seed: 0X XX XX XX
+Manufacture: BFT
+``` 
+Replace `X`'s with digits from your Seed that you obtained by reading two button hold at the first steps, 
+Save and copy that file back to the flipper
+Now you will have exact clone of your remote that will have same counter, by making couple presses you will make it higher than original and receiver will work with it, but original remote will reguire same amount of presses to work again, and vice versa.
+11. Also your original remote may become non working since it needs to be re-added into receiver board if you made counter much higher than original :C
 
 ## CAME Atomo
 
