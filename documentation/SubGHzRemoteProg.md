@@ -73,6 +73,7 @@ Watch this video to learn more and see how different boards can be programmed (v
 
 ## Doorhan
 
+With access to the receiver box:
 1. Create new remote with randomly generated serial: Go to SubGHz -> Add Manually -> KL: Doorhan 433Mhz or 315Mhz depends on your receiver (find out by reading your existing remote)
 2. Open your new remote file
 3. Push `P` button for ~2 sec, led will start flashing
@@ -80,7 +81,29 @@ Watch this video to learn more and see how different boards can be programmed (v
 5. Led on the receiver board will flash and turn off
 6. Done!
 
-Also you can program new remote using old remote on newer boards! See first video below:
+
+With existing remote:
+1. Create new remote with randomly generated serial: Go to SubGHz -> Add Manually -> KL: Doorhan 433Mhz or 315Mhz depends on your receiver (find out by reading your existing remote)
+2. Open your new remote file
+3. For next steps be close to the receiver board, around 1-2 meters
+4. Press second button (lowest one) on the old remote, do not release second button and press 1st (upper) button, hold buttons for 1 sec and release them
+5. Press working button on the old remote (the button you use for operating the receiver, aka opening the gate, etc) hold for 1 sec and release 
+6. Actions with old remote must be done in 5 seconds time, do not hold buttons for too long, and do not make it very fast
+7. Receiver will beep, you will have 10 seconds to add new remote, now press Send on new remote on flipper two times holding for at least 1 sec
+8. Receiver will beep again telling that new remote is added sucessfuly!
+9. Done!
+
+With copy of existing remote on flipper:
+1. Create new remote with randomly generated serial: Go to SubGHz -> Add Manually -> KL: Doorhan 433Mhz or 315Mhz depends on your receiver (find out by reading your existing remote)
+2. Open your existing remote (original) file
+3. For next steps be close to the receiver board, around 1-2 meters
+4. Press left button (0x8) on the flipper, hold for 1 sec and release the button and press right (0xA) button, hold button for 1 sec and release
+5. Press working button on the flipper, should be center one aka Send (the button you use for operating the receiver, aka opening the gate, etc) hold for 1 sec and release 
+6. Actions with original remote copy must be done in 5 seconds time, do not hold buttons for too long, and do not make it very fast
+7. Receiver will beep, now hold back and open new remote file, you will have 10 seconds to add new remote, press Send on new remote on flipper two times holding for at least 1 sec
+8. Receiver will beep again telling that new remote is added sucessfuly!
+9. Done!
+
 Watch this videos to learn more (videos in Russian language): https://www.youtube.com/watch?v=wZ5121HYv50 / https://www.youtube.com/watch?v=1ucrDKF3vWc
 
 ## Somfy Telis
