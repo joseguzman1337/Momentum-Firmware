@@ -453,29 +453,11 @@ static NfcCommand mf_ultralight_poller_handler_auth_ultralight_c(MfUltralightPol
         if(!instance->mfu_event.data->auth_context.skip_auth) {
             FURI_LOG_D(TAG, "Trying to authenticate with 3des key");
             instance->auth_context.tdes_key = instance->mfu_event.data->auth_context.tdes_key;
-            do {
-                uint8_t output[MF_ULTRALIGHT_C_AUTH_DATA_SIZE];
-                uint8_t RndA[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE] = {0};
-                furi_hal_random_fill_buf(RndA, sizeof(RndA));
-                instance->error = mf_ultralight_poller_authenticate_start(instance, RndA, output);
-                if(instance->error != MfUltralightErrorNone) break;
+            instance->error = mf_ultralight_poller_auth_tdes(instance, &instance->auth_context);
 
-                uint8_t decoded_shifted_RndA[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE] = {0};
-                const uint8_t* RndB = output + MF_ULTRALIGHT_C_AUTH_RND_B_BLOCK_OFFSET;
-                instance->error = mf_ultralight_poller_authenticate_end(
-                    instance, RndB, output, decoded_shifted_RndA);
-                if(instance->error != MfUltralightErrorNone) break;
-
-                mf_ultralight_3des_shift_data(RndA);
-                instance->auth_context.auth_success =
-                    (memcmp(RndA, decoded_shifted_RndA, sizeof(decoded_shifted_RndA)) == 0);
-
-                if(instance->auth_context.auth_success) {
-                    FURI_LOG_D(TAG, "Auth success");
-                }
-            } while(false);
-
-            if(instance->error != MfUltralightErrorNone || !instance->auth_context.auth_success) {
+            if(instance->error == MfUltralightErrorNone && instance->auth_context.auth_success) {
+                FURI_LOG_D(TAG, "Auth success");
+            } else {
                 FURI_LOG_D(TAG, "Auth failed");
                 iso14443_3a_poller_halt(instance->iso14443_3a_poller);
             }
