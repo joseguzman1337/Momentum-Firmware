@@ -556,7 +556,7 @@ static void night_shift_changed(VariableItem* item) {
 
     // force demo night_shift brightness to rgb backlight and stock backlight
     notification_message(app->notification, &sequence_display_backlight_on);
-    
+
     for(int i = 4; i < 6; i++) {
         VariableItem* t_item = variable_item_list_get(app->variable_item_list, i);
         if(index == 0) {
