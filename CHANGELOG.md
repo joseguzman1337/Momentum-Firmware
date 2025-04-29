@@ -1,5 +1,6 @@
 ## Main changes
 - Current API: 86.0
+* OFW PR 4205: fix sample durations when using external CC1101 (by @Aerosnail)
 * OFW PR 4206: Stop JS PWM on exit (by @portasynthinca3)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
