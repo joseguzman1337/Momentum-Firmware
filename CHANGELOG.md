@@ -19,6 +19,7 @@
     - A33 Flipper Blackhat (by @o7-machinehum)
     - AS7331 UV Meter (by @michaelbaisch)
     - Longwave Clock (by @m7i-org)
+  - Infrared: Flipper Flame RNG (by @OrionW06)
   - NFC:
     - APDU Runner: (by @SpenserCai)
     - Passport Reader (by @bettse)
