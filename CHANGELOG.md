@@ -25,6 +25,7 @@
     - Passport Reader (by @bettse)
     - Seos compatible (by @bettse)
     - Weebo (by @bettse)
+  - Tools: Combo Cracker (by @CharlesTheGreat77)
   - USB: Portal Of Flipper (by @Bettse & @sanjay900)
 - Sub-GHz:
   - UL: Add ReversRB2/RB2M Protocol full support with add manually (by @xMasterX)
