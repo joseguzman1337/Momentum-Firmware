@@ -105,6 +105,7 @@
   - Enable Asset Packs in NFC app again due to reduced RAM usage (#396 by @Willy-JL)
   - Improve loading of parser plugins (by @Willy-JL)
   - UL: Use default UL/UL-C pwd/key as default value for key input (by @mishamyte)
+  - UL: Attempt Ultralight C authentication with default key (by @mishamyte)
   - OFW: Added naming for DESFire cards + fix MF3ICD40 cards unable to be read (by @Demae)
   - OFW: FeliCa Protocol Expose Read Block API and Allow Specifying Service (by @zinongli)
   - OFW: Enable MFUL sync poller to be provided with passwords (by @GMMan)
@@ -140,6 +141,7 @@
   - UL: Fix Hollarm protocol with more verification (by @xMasterX)
   - UL: Fix GangQi protocol (by @DoberBit and @mishamyte)
   - UL: Came Atomo button hold simulation with full cycle to allow proper pairing with receiver (by @xMasterX)
+  - OFW: Fix sample durations when using external CC1101 (by @Aerosnail)
 - OFW: NFC: ST25TB poller mode check (by @RebornedBrain)
 - OFW: RFID: Fix Detection Conflict Between Securakey and Noralsy Format (by @zinongli)
 - Furi:
