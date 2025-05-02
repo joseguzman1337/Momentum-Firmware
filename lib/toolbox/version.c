@@ -23,10 +23,11 @@ struct Version {
     // v 1.1
     const char* firmware_origin;
     const char* git_origin;
+    const char* custom_flipper_name;
 };
 
 /* version of current running firmware (bootloader/flipper) */
-static const Version version = {
+static Version version = {
     .magic = VERSION_MAGIC,
     .major = VERSION_MAJOR,
     .minor = VERSION_MINOR,
@@ -42,6 +43,7 @@ static const Version version = {
     .build_is_dirty = BUILD_DIRTY,
     .firmware_origin = FIRMWARE_ORIGIN,
     .git_origin = GIT_ORIGIN,
+    .custom_flipper_name = NULL,
 };
 
 const Version* version_get(void) {
@@ -67,6 +69,16 @@ const char* version_get_builddate(const Version* v) {
 
 const char* version_get_version(const Version* v) {
     return v ? v->version : version.version;
+}
+
+const char* version_get_custom_name(const Version* v) {
+    return v ? v->custom_flipper_name : version.custom_flipper_name;
+}
+
+void version_set_custom_name(Version* v, const char* name) {
+    Version* ver = v ? v : &version;
+    ver->custom_flipper_name = name;
+    return;
 }
 
 uint8_t version_get_target(const Version* v) {

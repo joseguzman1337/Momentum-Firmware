@@ -2,6 +2,7 @@
 #include <gui/modules/popup.h>
 #include <gui/modules/dialog_ex.h>
 #include <gui/scene_manager.h>
+#include <namechanger/namechanger.h>
 
 #include <desktop/desktop.h>
 #include <desktop/views/desktop_view_pin_input.h>
