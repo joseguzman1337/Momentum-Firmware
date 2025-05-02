@@ -5,6 +5,7 @@
 * OFW PR 4206: Stop JS PWM on exit (by @portasynthinca3)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* System: log level none after update
 * Docs: Some updates on subghz remotes programming
 <br><br>
 #### Known NFC post-refactor regressions list: 
