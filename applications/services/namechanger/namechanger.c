@@ -5,8 +5,12 @@
 #include <bt/bt_service/bt.h>
 #include <storage/storage.h>
 #include <flipper_format/flipper_format.h>
+#include <furi_hal_random.h>
 
 #define TAG "NameChanger"
+
+#define NUMCATS 3
+char* catnames[] = {"Tabby", "Siberian", "Tortoise"};
 
 static bool namechanger_init() {
     Storage* storage = furi_record_open(RECORD_STORAGE);
@@ -62,6 +66,14 @@ static bool namechanger_init() {
 
         res = true;
     } while(false);
+
+    if(!res) {
+        //Custom name is not set, so make a random one
+        furi_hal_random_init();
+        uint32_t lucky_cat = furi_hal_random_get() % NUMCATS;
+        version_set_custom_name(NULL, catnames[lucky_cat]);
+        furi_hal_version_set_name(version_get_custom_name(NULL));
+    }
 
     flipper_format_free(file);
     furi_record_close(RECORD_STORAGE);
