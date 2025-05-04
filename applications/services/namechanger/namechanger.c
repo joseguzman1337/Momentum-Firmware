@@ -9,8 +9,7 @@
 
 #define TAG "NameChanger"
 
-#define NUMCATS 3
-char* catnames[] = {"Tabby", "Siberian", "Tortoise"};
+const char* const cat_names[] = {"Manx", "York", "Dwelf", "Korat", "Lykoi", "Asian", "Devon", "Aegean", "Bengal", "Birman", "Bombay", "Cymric", "Cyprus", "LaPerm", "Ocicat", "Sokoke", "Somali", "Sphynx", "Toyger", "Havana", "Angora", "Levkoy", "Bambino", "Burmese", "Chausie", "Cheetoh", "Donskoy", "Elf cat", "Minskin", "Persian", "Ragdoll", "Siamese", "Arabian", "Cornish", "Selkirk", "Turkish", "Bobtail", "Balinese", "Burmilla", "Javanese", "Munchkin", "Nebelung", "Oriental", "Savannah", "Siberian", "Snowshoe", "Thai cat", "Pixiebob", "Egyptian", "Napoleon", "Scottish"};
 
 static bool namechanger_init() {
     Storage* storage = furi_record_open(RECORD_STORAGE);
@@ -70,8 +69,8 @@ static bool namechanger_init() {
     if(!res) {
         //Custom name is not set, so make a random one
         furi_hal_random_init();
-        uint32_t lucky_cat = furi_hal_random_get() % NUMCATS;
-        version_set_custom_name(NULL, catnames[lucky_cat]);
+        uint32_t lucky_cat = furi_hal_random_get() % COUNT_OF(cat_names);
+        version_set_custom_name(NULL, cat_names[lucky_cat]);
         furi_hal_version_set_name(version_get_custom_name(NULL));
     }
 
