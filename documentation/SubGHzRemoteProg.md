@@ -165,9 +165,34 @@ Now you will have exact clone of your remote that will have same counter, by mak
 11. Also your original remote may become non working since it needs to be re-added into receiver board if you made counter much higher than original :C
 
 ## CAME Atomo
+Known names are: TOP42R / TOP44R - TOP44RGR (806TS-0130)
 
-1. Use google to find instructions - `how to program new CAME Atomo remote into receiver`
-2. Watch this video to learn more (video in Russian language): https://www.youtube.com/watch?v=XeHUwfcSS30
+How to create new remote and bind it to receiver (will not conflict with original remotes):
+
+With original remote (or copy of the original remote):
+
+1. Create new remote with randomly generated serial: Go to SubGHz -> Add Manually -> CAME Atomo 433MHz or 868MHz
+2. Open your new remote file
+3. You need to be in minimum 3 meters to receiver
+4. Original Remote: Press and hold button that is bound with that receiver (the one you use with it), and hold it for about 10 seconds.
+5. You will have about 20 seconds to add new remote
+6. Long press Send on Flipper in new remote for like 3-4 sec and release - this will add new remote to the receiver
+7. Press and hold Send again after waiting 20 seconds - this will trigger the receiver
+8. Done, when using CAME Atomo from flipper please hold Send button for at least 2 seconds to allow code to be fully transmit, flipper transmits only while button is held
+
+Note: Static 24/12 bit or TWEE remotes cannot trigger programming mode in the receiver and cannot be bound if programming mode was triggered by Atomo type remote, only Atomo remotes can be added if remote programming was done by Atomo remote, Static remotes have option to clone from one remote to another, but it requires first remote to be added to the receiver via button on the receiver board
+
+With access to receiver box:
+
+1. Create new remote with randomly generated serial: Go to SubGHz -> Add Manually -> CAME Atomo 433MHz or 868MHz
+2. Open your new remote file
+3. Open the receiver box and find programming button related to the used channel, for example RE432M/RE862M receiver has two independent channels which can have different remotes / buttons on them, when you found connected channel press "1" or "2" button on the receiver board to enter programming mode
+4. Long press Send on Flipper new remote for like 3-4 sec and release - this will add new remote to the receiver
+5. Click CLEAR button one time on the receiver board to exit programming mode, or wait about 20 seconds it will exit from programming mode automatically
+6. Done, when using CAME Atomo from flipper please hold Send button for at least 2 seconds to allow code to be fully transmit, flipper transmits only while button is held
+
+
+Watch this video to learn more (video in Russian language): https://www.youtube.com/watch?v=XeHUwfcSS30
 
 ## Nice Flor S
 
