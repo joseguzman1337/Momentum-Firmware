@@ -2,6 +2,7 @@
 - Current API: 86.0
 * SubGHz: Fix CAME 24bit decoder
 * SubGHz: Tune holtek ht12x to decode holtek only and not conflict with came 12bit
+* SubGHz: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again
 * NFC: Ultralight C - Attempt of authentication with default key (PR #898 | by @mishamyte)
 * OFW PR 4205: fix sample durations when using external CC1101 (by @Aerosnail)
 * OFW PR 4206: Stop JS PWM on exit (by @portasynthinca3)
