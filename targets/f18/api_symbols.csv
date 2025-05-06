@@ -43,12 +43,16 @@ Header,+,applications/services/storage/storage.h,,
 Header,+,lib/ble_profile/extra_profiles/hid_profile.h,,
 Header,+,lib/ble_profile/extra_services/hid_service.h,,
 Header,+,lib/cli/args.h,,
-Header,+,lib/containers/pipe.h,,
+Header,+,lib/cli/cli_ansi.h,,
+Header,+,lib/cli/cli_command.h,,
+Header,+,lib/cli/cli_registry.h,,
+Header,+,lib/cli/shell/cli_shell.h,,
 Header,+,lib/compress/compress.h,,
 Header,+,lib/compress/tar/tar_archive.h,,
 Header,+,lib/containers/bit_buffer.h,,
 Header,+,lib/containers/buffer_stream.h,,
 Header,+,lib/containers/m_cstr_dup.h,,
+Header,+,lib/containers/pipe.h,,
 Header,+,lib/containers/simple_array.h,,
 Header,+,lib/datetime/datetime.h,,
 Header,+,lib/debug/pretty_format.h,,
@@ -66,9 +70,9 @@ Header,+,lib/flipper_application/plugins/plugin_manager.h,,
 Header,+,lib/flipper_format/flipper_format.h,,
 Header,+,lib/flipper_format/flipper_format_i.h,,
 Header,+,lib/flipper_format/flipper_format_stream.h,,
-Header,+,lib/ieee754_parse_wrap/wrappers.h,,
 Header,+,lib/flipper_metadata/property.h,,
 Header,+,lib/flipper_metadata/version.h,,
+Header,+,lib/ieee754_parse_wrap/wrappers.h,,
 Header,+,lib/libusb_stm32/inc/hid_usage_button.h,,
 Header,+,lib/libusb_stm32/inc/hid_usage_consumer.h,,
 Header,+,lib/libusb_stm32/inc/hid_usage_desktop.h,,
@@ -138,6 +142,7 @@ Header,+,lib/pure/hex.h,,
 Header,+,lib/pure/strint.h,,
 Header,+,lib/pure/value_index.h,,
 Header,+,lib/pure/varint.h,,
+Header,+,lib/settings_helpers/submenu_based.h,,
 Header,+,lib/signal_common/level_duration.h,,
 Header,+,lib/signal_common/manchester_decoder.h,,
 Header,+,lib/signal_common/manchester_encoder.h,,
@@ -2755,6 +2760,13 @@ Function,+,submenu_get_view,View*,Submenu*
 Function,+,submenu_reset,void,Submenu*
 Function,+,submenu_set_header,void,"Submenu*, const char*"
 Function,+,submenu_set_selected_item,void,"Submenu*, uint32_t"
+Function,+,submenu_settings_helpers_alloc,SubmenuSettingsHelper*,const SubmenuSettingsHelperDescriptor*
+Function,+,submenu_settings_helpers_app_start,_Bool,"SubmenuSettingsHelper*, void*"
+Function,+,submenu_settings_helpers_assign_objects,void,"SubmenuSettingsHelper*, ViewDispatcher*, SceneManager*, Submenu*, uint32_t, uint32_t"
+Function,+,submenu_settings_helpers_free,void,SubmenuSettingsHelper*
+Function,+,submenu_settings_helpers_scene_enter,void,SubmenuSettingsHelper*
+Function,+,submenu_settings_helpers_scene_event,_Bool,"SubmenuSettingsHelper*, SceneManagerEvent"
+Function,+,submenu_settings_helpers_scene_exit,void,SubmenuSettingsHelper*
 Function,-,system,int,const char*
 Function,-,tan,double,double
 Function,-,tanf,float,float
