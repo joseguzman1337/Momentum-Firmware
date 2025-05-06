@@ -30,6 +30,7 @@
 - `print`               - Tiny printf implementation
 - `pulse_reader`        - Pulse Reader library used by NFC for software implemented protocols
 - `pure`                - Algorithms that don't cause any side effects except `furi_check`s
+- `settings_helpers`    - Helpers for settings type applications
 - `signal_common`       - Signal encoding/decoding that's not specific to a transmission medium
 - `signal_reader`       - Signal reader
 - `srv_util`            - Utilities for service threads
