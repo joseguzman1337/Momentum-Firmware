@@ -1,8 +1,10 @@
 #include <furi_hal.h>
 #include <furi.h>
 
-#include <lib/cli_util/args.h>
+#include <lib/cli/args.h>
 #include <cli/cli.h>
+#include <cli/cli_command.h>
+#include <cli/cli_ansi.h>
 
 void crypto_cli_print_usage(void) {
     printf("Usage:\r\n");

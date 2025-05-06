@@ -2,18 +2,21 @@ Import("env")
 
 env.Append(
     CPPPATH=[
-        "#/lib/cli_util",
+        "#/lib/cli",
     ],
     LINT_SOURCES=[
         Dir("."),
     ],
     SDK_HEADERS=[
         File("args.h"),
-        File("pipe.h"),
+        File("cli_ansi.h"),
+        File("cli_command.h"),
+        File("cli_registry.h"),
+        File("shell/cli_shell.h"),
     ],
 )
 
-libenv = env.Clone(FW_LIB_NAME="cli_util")
+libenv = env.Clone(FW_LIB_NAME="cli")
 libenv.ApplyLibFlags()
 
 sources = libenv.GlobRecursive("*.c")

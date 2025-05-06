@@ -4,7 +4,7 @@
 #include <flipper_format/flipper_format.h>
 #include <stream/file_stream.h>
 #include <stream/buffered_file_stream.h>
-#include <cli_util/args.h>
+#include <cli/args.h>
 
 #define TAG "KeysDict"
 

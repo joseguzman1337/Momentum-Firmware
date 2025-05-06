@@ -2,7 +2,7 @@
 #include <notification/notification.h>
 #include <music_worker/music_worker.h>
 #include <cli/cli.h>
-#include <cli_util/args.h>
+#include <cli/args.h>
 
 #define TAG "SpeakerDebug"
 

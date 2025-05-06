@@ -3,7 +3,7 @@
 #include <infrared_worker.h>
 #include <furi_hal_infrared.h>
 #include <flipper_format.h>
-#include <cli_util/args.h>
+#include <cli/args.h>
 #include <strint.h>
 #include <m-dict.h>
 

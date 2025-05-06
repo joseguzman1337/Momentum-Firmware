@@ -1,6 +1,6 @@
 #include "cli_main_commands.h"
 #include "cli_command_gpio.h"
-#include <toolbox/cli/cli_ansi.h>
+#include <cli/cli_ansi.h>
 
 #include <core/thread.h>
 #include <furi_hal.h>
@@ -10,7 +10,7 @@
 #include <notification/notification_messages.h>
 #include <notification/notification_app.h>
 #include <loader/loader.h>
-#include <lib/cli_util/args.h>
+#include <lib/cli/args.h>
 #include <pure/strint.h>
 
 // Close to ISO, `date +'%Y-%m-%d %H:%M:%S %u'`

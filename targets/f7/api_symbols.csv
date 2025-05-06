@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,86.0,,
+Version,+,87.0,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
@@ -43,13 +43,17 @@ Header,+,applications/services/rpc/rpc_app.h,,
 Header,+,applications/services/storage/storage.h,,
 Header,+,lib/ble_profile/extra_profiles/hid_profile.h,,
 Header,+,lib/ble_profile/extra_services/hid_service.h,,
-Header,+,lib/cli_util/args.h,,
-Header,+,lib/cli_util/pipe.h,,
+Header,+,lib/cli/args.h,,
+Header,+,lib/cli/cli_ansi.h,,
+Header,+,lib/cli/cli_command.h,,
+Header,+,lib/cli/cli_registry.h,,
+Header,+,lib/cli/shell/cli_shell.h,,
 Header,+,lib/compress/compress.h,,
 Header,+,lib/compress/tar/tar_archive.h,,
 Header,+,lib/containers/bit_buffer.h,,
 Header,+,lib/containers/buffer_stream.h,,
 Header,+,lib/containers/m_cstr_dup.h,,
+Header,+,lib/containers/pipe.h,,
 Header,+,lib/containers/simple_array.h,,
 Header,+,lib/datetime/datetime.h,,
 Header,+,lib/debug/pretty_format.h,,
@@ -193,6 +197,7 @@ Header,+,lib/pure/hex.h,,
 Header,+,lib/pure/strint.h,,
 Header,+,lib/pure/value_index.h,,
 Header,+,lib/pure/varint.h,,
+Header,+,lib/settings_helpers/submenu_based.h,,
 Header,+,lib/signal_common/level_duration.h,,
 Header,+,lib/signal_common/manchester_decoder.h,,
 Header,+,lib/signal_common/manchester_encoder.h,,
@@ -3614,6 +3619,13 @@ Function,+,submenu_get_view,View*,Submenu*
 Function,+,submenu_reset,void,Submenu*
 Function,+,submenu_set_header,void,"Submenu*, const char*"
 Function,+,submenu_set_selected_item,void,"Submenu*, uint32_t"
+Function,+,submenu_settings_helpers_alloc,SubmenuSettingsHelper*,const SubmenuSettingsHelperDescriptor*
+Function,+,submenu_settings_helpers_app_start,_Bool,"SubmenuSettingsHelper*, void*"
+Function,+,submenu_settings_helpers_assign_objects,void,"SubmenuSettingsHelper*, ViewDispatcher*, SceneManager*, Submenu*, uint32_t, uint32_t"
+Function,+,submenu_settings_helpers_free,void,SubmenuSettingsHelper*
+Function,+,submenu_settings_helpers_scene_enter,void,SubmenuSettingsHelper*
+Function,+,submenu_settings_helpers_scene_event,_Bool,"SubmenuSettingsHelper*, SceneManagerEvent"
+Function,+,submenu_settings_helpers_scene_exit,void,SubmenuSettingsHelper*
 Function,-,system,int,const char*
 Function,+,t5577_write,void,LFRFIDT5577*
 Function,+,t5577_write_with_mask,void,"LFRFIDT5577*, uint8_t, _Bool, uint32_t"

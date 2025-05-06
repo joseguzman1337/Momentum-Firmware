@@ -2,7 +2,8 @@
 #include <furi_hal.h>
 
 #include <cli/cli.h>
-#include <lib/cli_util/args.h>
+#include <cli/args.h>
+#include <cli/cli_ansi.h>
 #include <storage_util/dir_walk.h>
 #include <storage_util/md5_calc.h>
 #include <pure/strint.h>
@@ -10,7 +11,7 @@
 #include <storage/storage.h>
 #include <storage/storage_sd_api.h>
 #include <power/power_service/power.h>
-#include <toolbox/pipe.h>
+#include <containers/pipe.h>
 
 #define MAX_NAME_LENGTH 255
 

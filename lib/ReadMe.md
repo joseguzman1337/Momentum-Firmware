@@ -1,7 +1,7 @@
 # Structure
 
 - `ble_profile`         - BLE Profiles source code
-- `cli_util`            - Utilities for the Command Line Interface
+- `cli`                 - Generic command line interface and its utilities
 - `cmsis_core`          - CMSIS Core package, contains Cortex-M core headers
 - `compress`            - Compression algorithms and archive helpers
 - `containers`          - Various data structures such as arrays

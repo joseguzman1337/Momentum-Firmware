@@ -2,7 +2,8 @@
 #include <furi_hal.h>
 #include <stdarg.h>
 #include <cli/cli.h>
-#include <lib/cli_util/args.h>
+#include <lib/cli/args.h>
+#include <cli/cli_main_commands.h>
 #include <lib/lfrfid/lfrfid_worker.h>
 #include <storage/storage.h>
 #include <stream/file_stream.h>

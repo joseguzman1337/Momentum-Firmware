@@ -2,21 +2,17 @@ Import("env")
 
 env.Append(
     CPPPATH=[
-        "#/lib/containers",
+        "#/lib/settings_helpers",
     ],
     LINT_SOURCES=[
         Dir("."),
     ],
     SDK_HEADERS=[
-        File("bit_buffer.h"),
-        File("buffer_stream.h"),
-        File("m_cstr_dup.h"),
-        File("pipe.h"),
-        File("simple_array.h"),
+        File("submenu_based.h"),
     ],
 )
 
-libenv = env.Clone(FW_LIB_NAME="containers")
+libenv = env.Clone(FW_LIB_NAME="settings_helpers")
 libenv.ApplyLibFlags()
 
 sources = libenv.GlobRecursive("*.c")

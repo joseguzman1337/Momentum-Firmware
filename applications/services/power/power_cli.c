@@ -2,9 +2,9 @@
 
 #include <furi_hal.h>
 #include <cli/cli.h>
-#include <lib/cli_util/args.h>
+#include <lib/cli/args.h>
 #include <power/power_service/power.h>
-#include <toolbox/pipe.h>
+#include <containers/pipe.h>
 
 void power_cli_off(PipeSide* pipe, FuriString* args) {
     UNUSED(pipe);

@@ -17,7 +17,8 @@
         "stm32wb",
         "hwdrivers",
         "fatfs",
-        "cli_util",
+        "cli",
+        "settings_helpers",
         "compress",
         "containers",
         "debug",
@@ -42,7 +43,8 @@
         "heatshrink",
         "flipperformat",
         "flipper18",
-        "datetime"
+        "datetime",
+        "ieee754_parse_wrap"
     ],
     "excluded_sources": [
         "furi_hal_infrared.c",

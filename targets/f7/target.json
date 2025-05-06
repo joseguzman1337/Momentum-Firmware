@@ -26,7 +26,8 @@
         "hwdrivers",
         "fatfs",
         "subghz",
-        "cli_util",
+        "cli",
+        "settings_helpers",
         "compress",
         "containers",
         "debug",
@@ -56,6 +57,7 @@
         "heatshrink",
         "flipperformat",
         "flipper7",
-        "datetime"
+        "datetime",
+        "ieee754_parse_wrap"
     ]
 }

@@ -2,7 +2,9 @@
 #include <furi_hal.h>
 
 #include <cli/cli.h>
-#include <cli_util/args.h>
+#include <cli/args.h>
+#include <cli/cli_command.h>
+#include <cli/cli_main_commands.h>
 
 #include <ibutton/ibutton_key.h>
 #include <ibutton/ibutton_worker.h>
