@@ -2,7 +2,14 @@
 - Nothing
 
 ### Updated:
-- Nothing
+- Apps:
+  - Authenticator: New options to have space between groups of digits (by @akopachov)
+  - ESP Flasher: Bump Marauder 1.5.0 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
+  - Flame RNG: New App Icon (by @Kuronons), Improved the RNG using the hardware RNG and some bit mixing (by @OrionW06)
+  - FlipWiFi: Added Deauthentication mode (by @jblanked)
+  - Portal Of Flipper: Implement auth for the xbox 360 (by @sanjay900)
+  - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
+  - UL: Sub-GHz Playlist: Add support for custom modulation presets (by @xMasterX)
 
 ### Fixed:
 - CLI:
