@@ -8,6 +8,7 @@
 - CLI:
   - Fix crash when opening CLI/qFlipper/WebUpdater if some unexpected files are present in `/ext/apps_data/cli/plugins` (by @WillyJL)
   - FIx crash with `ir universal` command (by @WillyJL)
+  - Fix crash with `date` command (by @WillyJL)
   - OFW: Fix subghz chat command (by @GameLord2011)
 - Sub-GHz:
   - UL: Fix CAME 24bit decoder (by @xMasterX)
