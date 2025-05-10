@@ -16,6 +16,7 @@
   - Fix crash when opening CLI/qFlipper/WebUpdater if some unexpected files are present in `/ext/apps_data/cli/plugins` (by @WillyJL)
   - FIx crash with `ir universal` command (by @WillyJL)
   - Fix crash with `date` command (by @WillyJL)
+  - Fix temporary `nfc apdu` command (by @WillyJL)
   - OFW: Fix subghz chat command (by @GameLord2011)
 - BadKB: Fix key combos main keys being case sensitive (by @WillyJL)
 - Sub-GHz:
