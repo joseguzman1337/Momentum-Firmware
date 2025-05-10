@@ -1,5 +1,5 @@
 ### Added:
-- Nothing
+- UL: Sub-GHz: Add keeloq ironlogic aka il100 smart clone cloners support (by @xMasterX & Vitaly)
 
 ### Updated:
 - Apps:
