@@ -10,6 +10,7 @@
 * OFW PR 4212: Remove stupid "!" that broke subghz chat cli (by @GameLord2011)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* Desktop: DEBUG - fix desktop anim switch override by favourite apps
 * CLI: Various fixes (by @WillyJL)
 * BadUSB: Fix key combos main keys being case sensitive (by @WillyJL)
 * System: log level none after update
