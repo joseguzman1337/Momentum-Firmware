@@ -2,6 +2,7 @@
 - Current API: 86.0
 * SubGHz: Add keeloq ironlogic (aka il100) smart clone cloners support (thanks to Vitaly for RAWs)
 * SubGHz: Fix CAME 24bit decoder
+* SubGHz: Add 462.750 MHz to default subghz freqs list
 * SubGHz: Tune holtek ht12x to decode holtek only and not conflict with came 12bit
 * SubGHz: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again
 * NFC: Ultralight C - Attempt of authentication with default key (PR #898 | by @mishamyte)
