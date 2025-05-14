@@ -1,5 +1,6 @@
 ## Main changes
 - Current API: 86.0
+* iButton: TM01x Dallas write support (PR #899 | by @Leptopt1los)
 * SubGHz: Add keeloq ironlogic (aka il100) smart clone cloners support (thanks to Vitaly for RAWs)
 * SubGHz: Fix CAME 24bit decoder
 * SubGHz: Add 462.750 MHz to default subghz freqs list
