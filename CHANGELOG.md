@@ -7,6 +7,7 @@
 * SubGHz: Tune holtek ht12x to decode holtek only and not conflict with came 12bit
 * SubGHz: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again
 * NFC: Ultralight C - Attempt of authentication with default key (PR #898 | by @mishamyte)
+* OFW PR 4210: Infrared: Add text scroll to remote buttons (by @956MB)
 * OFW PR 4205: fix sample durations when using external CC1101 (by @Aerosnail)
 * OFW PR 4206: Stop JS PWM on exit (by @portasynthinca3)
 * OFW PR 4212: Remove stupid "!" that broke subghz chat cli (by @GameLord2011)
