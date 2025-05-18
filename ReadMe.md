@@ -155,7 +155,7 @@ Thanks to Official team (to their SubGHz Developer, Skorp) for implementing supp
 > | Came_Space        | FAAC_RC,XT   | Kingates_Stylo4k | Pantera           | Tomahawk_TZ-9030       |
 > | Cenmax            | FAAC_SLH     | KGB/Subaru       | Pantera_CLK       | Tomahawk_Z,X_3-5       |
 > | Cenmax_St-5       | Faraon       | Leopard          | Pantera_XS/Jaguar | ZX-730-750-1055        |
-> | Cenmax_St-7       | Genius_Bravo | Magic_1          | Partisan_RX       |                        |
+> | Cenmax_St-7       | Genius_Bravo | Magic_1          | Partisan_RX       | IL-100(Smart)          |
 > | Centurion         | Gibidi       | Magic_2          | Reff              |                        |
 > | Monarch           | Jolly Motors | Magic_3          | Sheriff           |                        |
 > </details>
@@ -173,7 +173,7 @@ Thanks to Official team (to their SubGHz Developer, Skorp) for implementing supp
 - Hay21 (dynamic 21 bit) with button parsing
 - Nero Radio 57bit (+ 56bit support)
 - CAME 12bit/24bit encoder fixes (Fixes are now merged in OFW)
-- Keeloq: Dea Mio, Genius Bravo, GSN, HCS101, AN-Motors, JCM Tech, MHouse, Nice Smilo, DTM Neo, FAAC RC,XT, Mutancode, Normstahl, Beninca + Allmatic, Stilmatic, CAME Space, Aprimatic (model TR and similar), Centurion Nova (thanks Carlos !), Hormann EcoStar, Novoferm, Sommer, Monarch (thanks @ashphx !), Jolly Motors (thanks @pkooiman !)
+- Keeloq: Dea Mio, Genius Bravo, GSN, HCS101, AN-Motors, JCM Tech, MHouse, Nice Smilo, DTM Neo, FAAC RC,XT, Mutancode, Normstahl, Beninca + Allmatic, Stilmatic, CAME Space, Aprimatic (model TR and similar), Centurion Nova (thanks Carlos !), Hormann EcoStar, Novoferm, Sommer, Monarch (thanks @ashphx !), Jolly Motors (thanks @pkooiman !), IL-100(Smart) (thx Vitaly for RAWs)
 </details>
 
 <details>
