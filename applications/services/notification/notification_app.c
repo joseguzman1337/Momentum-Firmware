@@ -231,7 +231,7 @@ static void rainbow_timer_callback(void* context) {
             break;
         }
 
-        rgb_backlight_update(app->settings.led_brightness * app->current_night_shift);
+        rgb_backlight_update(app->settings.display_brightness * app->current_night_shift);
     }
 }
 
