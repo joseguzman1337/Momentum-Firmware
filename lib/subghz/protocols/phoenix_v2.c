@@ -321,11 +321,12 @@ void subghz_protocol_decoder_phoenix_v2_get_string(void* context, FuriString* ou
         "%s %dbit\r\n"
         "Key:%02lX%08lX\r\n"
         "Sn:0x%07lX \r\n"
-        "Btn:%X\r\n",
+        "Btn:%X  Cnt: 0x%04lX\r\n",
         instance->generic.protocol_name,
         instance->generic.data_count_bit,
         (uint32_t)(instance->generic.data >> 32) & 0xFFFFFFFF,
         (uint32_t)(instance->generic.data & 0xFFFFFFFF),
         instance->generic.serial,
-        instance->generic.btn);
+        instance->generic.btn,
+        instance->generic.cnt);
 }
