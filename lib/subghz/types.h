@@ -126,7 +126,7 @@ typedef enum {
     SubGhzProtocolFlag_Send = (1 << 9),
     SubGhzProtocolFlag_BinRAW = (1 << 10),
     SubGhzProtocolFlag_StarLine = (1 << 11),
-    SubGhzProtocolFlag_AutoAlarms = (1 << 12),
+    SubGhzProtocolFlag_Alarms = (1 << 12),
     SubGhzProtocolFlag_Magellan = (1 << 13),
     SubGhzProtocolFlag_Princeton = (1 << 14),
     SubGhzProtocolFlag_NiceFlorS = (1 << 15),
