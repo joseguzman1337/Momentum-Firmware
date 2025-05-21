@@ -319,7 +319,7 @@ void subghz_protocol_decoder_phoenix_v2_get_string(void* context, FuriString* ou
     furi_string_cat_printf(
         output,
         "%s %dbit\r\n"
-        "Key:%02lX%08lX\r\n"
+        "Key:%05lX%08lX\r\n"
         "Sn:0x%07lX \r\n"
         "Btn:%X  Cnt: 0x%04lX\r\n",
         instance->generic.protocol_name,
