@@ -10,6 +10,7 @@
   - Portal Of Flipper: Implement auth for the xbox 360 (by @sanjay900)
   - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
   - UL: Sub-GHz Playlist: Add support for custom modulation presets (by @xMasterX)
+- OFW: Infrared: Add text scroll to remote buttons (by @956MB)
 
 ### Fixed:
 - CLI:
