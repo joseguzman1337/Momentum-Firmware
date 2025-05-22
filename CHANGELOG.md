@@ -6,12 +6,17 @@
 ### Updated:
 - Apps:
   - Authenticator: New options to have space between groups of digits (by @akopachov)
-  - ESP Flasher: Bump Marauder 1.5.0 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
+  - Camera Suite: Handle 128x128 image, fix image rotation bug (by @rnadyrshin)
+  - Combo Cracker: Many usability improvements (by @CharlesTheGreat77)
+  - ESP Flasher: Bump Marauder 1.5.1 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
   - Flame RNG: New App Icon (by @Kuronons), Improved the RNG using the hardware RNG and some bit mixing (by @OrionW06)
   - FlipWiFi: Added Deauthentication mode (by @jblanked)
+  - Passy: Capitalize document number (by @bettse)
+  - Picopass: Bugfixes and refactoring (by @bettse)
   - Portal Of Flipper: Implement auth for the xbox 360 (by @sanjay900)
+  - Quac: Fix link imports not working, fix RAW Sub-GHz files (by @xMasterX & @WillyJL)
   - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
-  - UL: Sub-GHz Playlist: Add support for custom modulation presets (by @xMasterX)
+  - UL: Sub-GHz Playlist: Add support for custom modulation presets, remake with txrx library and support for dynamic signals, cleanup code (by @xMasterX)
 - OFW: Infrared: Add text scroll to remote buttons (by @956MB)
 - Sub-GHz:
   - UL: Rename and extend Alarms ignore option with Hollarm & GangQi (by @xMasterX)
