@@ -25,7 +25,9 @@
   - Fix crash with `date` command (by @WillyJL)
   - Fix temporary `nfc apdu` command (by @WillyJL)
   - OFW: Fix subghz chat command (by @GameLord2011)
-- NFC: Fix card info not being parsed when using Extra Actions > Read Specific Card Type (by @WillyJL)
+- NFC:
+  - Fix card info not being parsed when using Extra Actions > Read Specific Card Type (by @WillyJL)
+  - UL: Fix clipper date timestamp (by @luu176)
 - BadKB: Fix key combos main keys being case sensitive (by @WillyJL)
 - Sub-GHz:
   - UL: Fix CAME 24bit decoder (by @xMasterX)
