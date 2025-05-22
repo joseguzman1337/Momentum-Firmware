@@ -1,5 +1,7 @@
 ### Added:
 - UL: Sub-GHz: Add keeloq ironlogic aka il100 smart clone cloners support (by @xMasterX & Vitaly)
+- UL: iButton: Add TM01x Dallas write support (by @Leptopt1los)
+- UL: Display: Backlight option "Always ON" (by @Dmitry422)
 
 ### Updated:
 - Apps:
@@ -11,6 +13,10 @@
   - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
   - UL: Sub-GHz Playlist: Add support for custom modulation presets (by @xMasterX)
 - OFW: Infrared: Add text scroll to remote buttons (by @956MB)
+- Sub-GHz:
+  - UL: Rename and extend Alarms ignore option with Hollarm & GangQi (by @xMasterX)
+  - UL: Add 462.750 MHz to default subghz freqs list (by @xMasterX)
+  - UL: V2 Phoenix show counter value (by @xMasterX)
 
 ### Fixed:
 - CLI:
