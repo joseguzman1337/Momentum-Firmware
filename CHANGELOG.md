@@ -1,7 +1,7 @@
 ## Main changes
 - Current API: 86.0
 * iButton: TM01x Dallas write support (PR #899 | by @Leptopt1los)
-* SubGHz: Rename and extend Alarms ignore option (add Hollarm & GangQi)
+* SubGHz: Rename and extend Alarms, Sensors, Cars ignore options (Alarms: Hollarm, GangQi | Cars: Kia, Starline, ScherKhan | Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights))
 * SubGHz: V2 Phoenix show counter value
 * SubGHz: Add keeloq ironlogic (aka il100) smart clone cloners support (thanks to Vitaly for RAWs)
 * SubGHz: Fix CAME 24bit decoder
