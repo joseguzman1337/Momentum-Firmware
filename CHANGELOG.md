@@ -16,6 +16,7 @@
   - Portal Of Flipper: Implement auth for the xbox 360 (by @sanjay900)
   - Quac: Fix link imports not working, fix RAW Sub-GHz files (by @xMasterX & @WillyJL)
   - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
+  - VGM Tool: Fixed RGB firmware UART regression (by @WillyJL)
   - UL: Sub-GHz Playlist: Add support for custom modulation presets, remake with txrx library and support for dynamic signals, cleanup code (by @xMasterX)
 - OFW: Infrared: Add text scroll to remote buttons (by @956MB)
 - Sub-GHz:
