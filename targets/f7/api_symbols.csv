@@ -2141,6 +2141,7 @@ Function,+,infrared_worker_get_decoded_signal,const InfraredMessage*,const Infra
 Function,+,infrared_worker_get_raw_signal,void,"const InfraredWorkerSignal*, const uint32_t**, size_t*"
 Function,+,infrared_worker_rx_enable_blink_on_receiving,void,"InfraredWorker*, _Bool"
 Function,+,infrared_worker_rx_enable_signal_decoding,void,"InfraredWorker*, _Bool"
+Function,+,infrared_worker_rx_force_signal_decoding,void,"InfraredWorker*, _Bool"
 Function,+,infrared_worker_rx_set_received_signal_callback,void,"InfraredWorker*, InfraredWorkerReceivedSignalCallback, void*"
 Function,+,infrared_worker_rx_start,void,InfraredWorker*
 Function,+,infrared_worker_rx_stop,void,InfraredWorker*
