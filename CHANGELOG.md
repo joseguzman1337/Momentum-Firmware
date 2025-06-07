@@ -2,6 +2,7 @@
 - Apps:
   - Sub-GHz: Sub-GHz Playlist Creator (by @coolerUA)
 - NFC: Ventra ULEV1 parser (by @hazardousvoltage)
+- Infrared: "Decode only" mode to ignore RAW signals, make buttons in learn scene more intuitive (by @WillyJL)
 - UL: Sub-GHz: Add keeloq ironlogic aka il100 smart clone cloners support (by @xMasterX & Vitaly)
 - UL: iButton: Add TM01x Dallas write support (by @Leptopt1los)
 - UL: Display: Backlight option "Always ON" (by @Dmitry422)
