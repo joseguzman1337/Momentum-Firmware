@@ -10,6 +10,7 @@
 * SubGHz: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again
 * Display: Backlight option "always on" and RGB bug removed (PR #900 | by @Dmitry422)
 * NFC: Ultralight C - Attempt of authentication with default key (PR #898 | by @mishamyte)
+* System: Loader - Fix misplaced ApplicationBeforeLoad events (PR #905 | by @WillyJL)
 * OFW PR 4210: Infrared: Add text scroll to remote buttons (by @956MB)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
