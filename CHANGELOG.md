@@ -10,7 +10,7 @@
 ### Updated:
 - Apps:
   - Authenticator: New options to have space between groups of digits (by @akopachov)
-  - Blackhat: Fix NULL ptr scrolling menu suboptions, more wlan selectors and stop options (by @WillyJL)
+  - Blackhat: Fix Run Script command (by @o7-machinehum), fix NULL ptr scrolling menu suboptions, more wlan selectors and stop options (by @WillyJL)
   - Camera Suite: Handle 128x128 image, fix image rotation bug (by @rnadyrshin)
   - Combo Cracker: Many usability improvements (by @CharlesTheGreat77)
   - ESP Flasher: Bump Marauder 1.7.0 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
