@@ -44,6 +44,7 @@
   - UL: Fix clipper date timestamp (by @luu176)
 - BadKB: Fix key combos main keys being case sensitive (by @WillyJL)
 - Sub-GHz:
+  - Fix frequency analyzer deadlock when holding Ok (by @WillyJL)
   - UL: Fix CAME 24bit decoder (by @xMasterX)
   - UL: Tune holtek ht12x to decode holtek only and not conflict with came 12bit (by @xMasterX)
   - UL: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again (by @xMasterX)
