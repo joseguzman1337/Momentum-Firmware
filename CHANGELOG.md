@@ -14,6 +14,8 @@
 * OFW PR 4210: Infrared: Add text scroll to remote buttons (by @956MB)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* SubGHz: Fix possible frequency analyzer deadlock when holding Ok (by @WillyJL)
+* RFID: Add DEZ10 representation to EM410X (by @realcatgirly)
 * OFW PR 4205: fix sample durations when using external CC1101 (by @Aerosnail)
 * OFW PR 4206: Stop JS PWM on exit (by @portasynthinca3)
 * OFW PR 4212: Fixed inverted logic condition in subghz chat cli (by @GameLord2011)
