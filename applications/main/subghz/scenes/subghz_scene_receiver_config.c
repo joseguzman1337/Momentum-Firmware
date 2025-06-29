@@ -419,7 +419,7 @@ static void subghz_scene_receiver_config_set_alarms(VariableItem* item) {
     subghz_scene_receiver_config_set_ignore_filter(item, SubGhzProtocolFilter_Alarms);
 }
 
-static void subghz_scene_receiver_config_set_Sensors(VariableItem* item) {
+static void subghz_scene_receiver_config_set_sensors(VariableItem* item) {
     subghz_scene_receiver_config_set_ignore_filter(item, SubGhzProtocolFilter_Sensors);
 }
 
