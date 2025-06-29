@@ -13,8 +13,27 @@
   - Sub-GHz: Weather Station (by @Skorpionm)
   - Sub-GHz: POCSAG Pager (by @xMasterX)
   - Sub-GHz: TPMS Reader (by @wosk)
-- NFC: Ventra ULEV1 parser (by @hazardousvoltage)
+- NFC:
+  - NFC Type 4 support + many other improvements (by @WillyJL)
+    - New Type 4 Tag (NDEF on NTAG4xx / MIFARE DESFire) protocol, full support
+    - New NTAG4xx (NTAG413 DNA / NTAG424 DNA) protocol, only detection and basic info support
+    - NDEF parsing plugin supports Type 4 Tag protocol
+    - Show more version info for MIFARE Plus cards
+    - Improve detection/verification of MIFARE DESFire and MIFARE Plus SE
+    - Improve navigation for MIFARE Classic Update from / Write to Initial Card
+    - Refactor Write code for MIFARE Ultralight/Classic in NFC app helpers
+    - Cleanup event handling in NFC app
+    - NFC app uses a bit less RAM because of previous 2 points
+    - Refactor NXP Native Commands to share between protocols (used by MIFARE DESFire, MIFARE Plus, NTAG4xx)
+    - MIFARE DESFire poller API can now switch between native and ISO7816-wrapped commands
+    - Expand ISO14443-4A API with listener (emulation) support for sending responses to reader (except I-block chaining)
+    - Exposed some APIs for apps to use that were meant to be public:
+      - ISO14443-3A listener (emulation)
+      - ISO15693-3 device (data), poller (reading), listener (emulation)
+    - Cleanup/reorder protocol definitions for tidyness
+  - Ventra ULEV1 parser (by @hazardousvoltage)
 - Infrared: "Decode only" mode to ignore RAW signals, make buttons in learn scene more intuitive (by @WillyJL)
+- GUI: Added `submenu_remove_item()` to API, was needed for NFC Type 4 related changes (by @WillyJL)
 - UL: Sub-GHz: Add keeloq ironlogic aka il100 smart clone cloners support (by @xMasterX & Vitaly)
 - UL: iButton: Add TM01x Dallas write support (by @Leptopt1los)
 - UL: Display: Backlight option "Always ON" (by @Dmitry422)
