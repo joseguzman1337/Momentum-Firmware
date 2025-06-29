@@ -53,6 +53,7 @@
   - Portal Of Flipper: Implement auth for the xbox 360 (by @sanjay900)
   - Quac: Fix link imports not working, fix RAW Sub-GHz files (by @xMasterX & @WillyJL), add Sub-GHz duration setting (by @rdefeo)
   - Metroflip: Added 80+ card AIDs, more AIDs for DESFire, Calypso card saving, fixed DESFire parsing, Navigo crash, Clipper timestamp (by @luu176)
+  - NFC Maker: Type 4 Tag support, options for saving as NTAG413 DNA, NTAG424 DNA, MIFARE DESFire, Generic Type 4 Tag (by @WillyJL)
   - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
   - WiFi Marauder: Support for new commands from ESP32Marauder 1.6.x (by @justcallmekoko)
   - VGM Tool: Fixed RGB firmware UART regression (by @WillyJL)
