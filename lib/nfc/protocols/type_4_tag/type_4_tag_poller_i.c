@@ -72,7 +72,7 @@ Type4TagError type_4_tag_apdu_trx(Type4TagPoller* instance, BitBuffer* tx_buf, B
     }
 }
 
-static Type4TagError type_5_tag_poller_iso_select_name(
+static Type4TagError type_4_tag_poller_iso_select_name(
     Type4TagPoller* instance,
     const uint8_t* name,
     uint8_t name_len) {
@@ -96,7 +96,7 @@ static Type4TagError type_5_tag_poller_iso_select_name(
 }
 
 static Type4TagError
-    type_5_tag_poller_iso_select_file(Type4TagPoller* instance, uint16_t file_id) {
+    type_4_tag_poller_iso_select_file(Type4TagPoller* instance, uint16_t file_id) {
     static const uint8_t type_4_tag_iso_select_file_apdu[] = {
         TYPE_4_TAG_ISO_SELECT_CMD,
         TYPE_4_TAG_ISO_SELECT_P1_BY_EF_ID,
@@ -118,7 +118,7 @@ static Type4TagError
     return error;
 }
 
-static Type4TagError type_5_tag_poller_iso_read(
+static Type4TagError type_4_tag_poller_iso_read(
     Type4TagPoller* instance,
     uint16_t offset,
     uint16_t length,
@@ -168,7 +168,7 @@ static Type4TagError type_5_tag_poller_iso_read(
     return Type4TagErrorNone;
 }
 
-static Type4TagError type_5_tag_poller_iso_write(
+static Type4TagError type_4_tag_poller_iso_write(
     Type4TagPoller* instance,
     uint16_t offset,
     uint16_t length,
@@ -268,7 +268,7 @@ Type4TagError type_4_tag_poller_select_app(Type4TagPoller* instance) {
     furi_check(instance);
 
     FURI_LOG_D(TAG, "Select application");
-    return type_5_tag_poller_iso_select_name(
+    return type_4_tag_poller_iso_select_name(
         instance, type_4_tag_iso_df_name, sizeof(type_4_tag_iso_df_name));
 }
 
@@ -279,19 +279,19 @@ Type4TagError type_4_tag_poller_read_cc(Type4TagPoller* instance) {
 
     do {
         FURI_LOG_D(TAG, "Select CC");
-        error = type_5_tag_poller_iso_select_file(instance, TYPE_4_TAG_T4T_CC_EF_ID);
+        error = type_4_tag_poller_iso_select_file(instance, TYPE_4_TAG_T4T_CC_EF_ID);
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(TAG, "Read CC len");
         uint16_t cc_len;
         uint8_t cc_len_be[sizeof(cc_len)];
-        error = type_5_tag_poller_iso_read(instance, 0, sizeof(cc_len_be), cc_len_be);
+        error = type_4_tag_poller_iso_read(instance, 0, sizeof(cc_len_be), cc_len_be);
         if(error != Type4TagErrorNone) break;
         cc_len = bit_lib_bytes_to_num_be(cc_len_be, sizeof(cc_len_be));
 
         FURI_LOG_D(TAG, "Read CC");
         uint8_t cc_buf[cc_len];
-        error = type_5_tag_poller_iso_read(instance, 0, sizeof(cc_buf), cc_buf);
+        error = type_4_tag_poller_iso_read(instance, 0, sizeof(cc_buf), cc_buf);
         if(error != Type4TagErrorNone) break;
 
         error = type_4_tag_cc_parse(instance->data, cc_buf, sizeof(cc_buf));
@@ -311,13 +311,13 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
 
     do {
         FURI_LOG_D(TAG, "Select NDEF");
-        error = type_5_tag_poller_iso_select_file(instance, instance->data->ndef_file_id);
+        error = type_4_tag_poller_iso_select_file(instance, instance->data->ndef_file_id);
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(TAG, "Read NDEF len");
         uint16_t ndef_len;
         uint8_t ndef_len_be[sizeof(ndef_len)];
-        error = type_5_tag_poller_iso_read(instance, 0, sizeof(ndef_len_be), ndef_len_be);
+        error = type_4_tag_poller_iso_read(instance, 0, sizeof(ndef_len_be), ndef_len_be);
         if(error != Type4TagErrorNone) break;
         ndef_len = bit_lib_bytes_to_num_be(ndef_len_be, sizeof(ndef_len_be));
 
@@ -329,7 +329,7 @@ Type4TagError type_4_tag_poller_read_ndef(Type4TagPoller* instance) {
         FURI_LOG_D(TAG, "Read NDEF");
         simple_array_init(instance->data->ndef_data, ndef_len);
         uint8_t* ndef_buf = simple_array_get_data(instance->data->ndef_data);
-        error = type_5_tag_poller_iso_read(instance, sizeof(ndef_len), ndef_len, ndef_buf);
+        error = type_4_tag_poller_iso_read(instance, sizeof(ndef_len), ndef_len, ndef_buf);
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(
@@ -405,7 +405,7 @@ Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance) {
             }
 
             FURI_LOG_D(TAG, "Select CC");
-            error = type_5_tag_poller_iso_select_file(instance, TYPE_4_TAG_T4T_CC_EF_ID);
+            error = type_4_tag_poller_iso_select_file(instance, TYPE_4_TAG_T4T_CC_EF_ID);
             if(error != Type4TagErrorNone) break;
 
             FURI_LOG_D(TAG, "Write DESFire CC");
@@ -419,7 +419,7 @@ Type4TagError type_4_tag_poller_create_cc(Type4TagPoller* instance) {
             instance->data->is_tag_specific = true;
             uint8_t cc_buf[TYPE_4_TAG_T4T_CC_MIN_SIZE];
             type_4_tag_cc_dump(instance->data, cc_buf, sizeof(cc_buf));
-            error = type_5_tag_poller_iso_write(instance, 0, sizeof(cc_buf), cc_buf);
+            error = type_4_tag_poller_iso_write(instance, 0, sizeof(cc_buf), cc_buf);
             if(error != Type4TagErrorNone) break;
 
             error = Type4TagErrorNone;
@@ -473,14 +473,14 @@ Type4TagError type_4_tag_poller_write_ndef(Type4TagPoller* instance) {
 
     do {
         FURI_LOG_D(TAG, "Select NDEF");
-        error = type_5_tag_poller_iso_select_file(instance, instance->data->ndef_file_id);
+        error = type_4_tag_poller_iso_select_file(instance, instance->data->ndef_file_id);
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(TAG, "Write NDEF len");
         uint16_t ndef_len = simple_array_get_count(instance->data->ndef_data);
         uint8_t ndef_len_be[sizeof(ndef_len)];
         bit_lib_num_to_bytes_be(ndef_len, sizeof(ndef_len_be), ndef_len_be);
-        error = type_5_tag_poller_iso_write(instance, 0, sizeof(ndef_len_be), ndef_len_be);
+        error = type_4_tag_poller_iso_write(instance, 0, sizeof(ndef_len_be), ndef_len_be);
         if(error != Type4TagErrorNone) break;
 
         if(ndef_len == 0) {
@@ -490,7 +490,7 @@ Type4TagError type_4_tag_poller_write_ndef(Type4TagPoller* instance) {
 
         FURI_LOG_D(TAG, "Write NDEF");
         uint8_t* ndef_buf = simple_array_get_data(instance->data->ndef_data);
-        error = type_5_tag_poller_iso_write(instance, sizeof(ndef_len), ndef_len, ndef_buf);
+        error = type_4_tag_poller_iso_write(instance, sizeof(ndef_len), ndef_len, ndef_buf);
         if(error != Type4TagErrorNone) break;
 
         FURI_LOG_D(
