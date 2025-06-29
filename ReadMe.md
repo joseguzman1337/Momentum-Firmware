@@ -122,7 +122,6 @@ Note that this repo is always updated with the great work from our friends at [U
 - Advanced and optimized Level System (Up to 30 levels)
 - Desktop Keybind system for full key and press/hold remapping
 - Storage backend with instant rename and virtual mounting for disk images
-- Weather Station, POCSAG, TPMS protocols and more integrated into Sub-GHz
 - Expanded Sub-GHz App (Duplicate detection & Ignore, Autosave, History improvements)
 - Improved Error Messages (Showing source file paths)
 ```

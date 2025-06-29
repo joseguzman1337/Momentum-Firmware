@@ -1,8 +1,39 @@
+### Breaking Changes:
+- Sub-GHz: Removed Weather Station, POCSAG and TPMS protocols from main app, now found in external apps (by @WillyJL)
+  - Momentum previously supported these external app's protocols in the main Sub-GHz app
+  - However, with more protocols added over time to the main app, they are now too many
+  - The Flipper CPU cannot keep up with all the data received with this number of protocols in some modulations
+  - This caused some signals to not be received when they should, and in some cases could freeze the device
+  - Since Weather Station, POCSAG and TPMS are available as external apps, they're now removed from the main Sub-GHz app
+  - You can now find this functionality in `Apps > Sub-GHz`, where there are dedicated apps for these 3 functions
+
 ### Added:
 - Apps:
   - Sub-GHz: Sub-GHz Playlist Creator (by @coolerUA)
-- NFC: Ventra ULEV1 parser (by @hazardousvoltage)
+  - Sub-GHz: Weather Station (by @Skorpionm)
+  - Sub-GHz: POCSAG Pager (by @xMasterX)
+  - Sub-GHz: TPMS Reader (by @wosk)
+- NFC:
+  - NFC Type 4 support + many other improvements (by @WillyJL)
+    - New Type 4 Tag (NDEF on NTAG4xx / MIFARE DESFire) protocol, full support
+    - New NTAG4xx (NTAG413 DNA / NTAG424 DNA) protocol, only detection and basic info support
+    - NDEF parsing plugin supports Type 4 Tag protocol
+    - Show more version info for MIFARE Plus cards
+    - Improve detection/verification of MIFARE DESFire and MIFARE Plus SE
+    - Improve navigation for MIFARE Classic Update from / Write to Initial Card
+    - Refactor Write code for MIFARE Ultralight/Classic in NFC app helpers
+    - Cleanup event handling in NFC app
+    - NFC app uses a bit less RAM because of previous 2 points
+    - Refactor NXP Native Commands to share between protocols (used by MIFARE DESFire, MIFARE Plus, NTAG4xx)
+    - MIFARE DESFire poller API can now switch between native and ISO7816-wrapped commands
+    - Expand ISO14443-4A API with listener (emulation) support for sending responses to reader (except I-block chaining)
+    - Exposed some APIs for apps to use that were meant to be public:
+      - ISO14443-3A listener (emulation)
+      - ISO15693-3 device (data), poller (reading), listener (emulation)
+    - Cleanup/reorder protocol definitions for tidiness
+  - Ventra ULEV1 parser (by @hazardousvoltage)
 - Infrared: "Decode only" mode to ignore RAW signals, make buttons in learn scene more intuitive (by @WillyJL)
+- GUI: Added `submenu_remove_item()` to API, was needed for NFC Type 4 related changes (by @WillyJL)
 - UL: Sub-GHz: Add keeloq ironlogic aka il100 smart clone cloners support (by @xMasterX & Vitaly)
 - UL: iButton: Add TM01x Dallas write support (by @Leptopt1los)
 - UL: Display: Backlight option "Always ON" (by @Dmitry422)
@@ -13,22 +44,29 @@
   - Blackhat: Fix Run Script command (by @o7-machinehum), fix NULL ptr scrolling menu suboptions, more wlan selectors and stop options (by @WillyJL)
   - Camera Suite: Handle 128x128 image, fix image rotation bug (by @rnadyrshin)
   - Combo Cracker: Many usability improvements (by @CharlesTheGreat77)
-  - ESP Flasher: Bump Marauder 1.7.0 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
+  - ESP Flasher: Bump Marauder 1.7.1 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
   - Flame RNG: New App Icon (by @Kuronons), Improved the RNG using the hardware RNG and some bit mixing (by @OrionW06)
   - FlipDownloader: Add Picoware (by @jblanked)
   - FlipWiFi: Added Deauthentication mode (by @jblanked)
+  - Metroflip: Added 80+ card AIDs, more AIDs for DESFire, Calypso card saving, fixed DESFire parsing, Navigo crash, Clipper timestamp (by @luu176)
+  - NFC Magic: Fix Ultimate Magic Gen4 Max Block Number Set Incorrectly for the NTAG Protocol (by @alfie65536)
+  - NFC Maker: Type 4 Tag support, options for saving as NTAG413 DNA, NTAG424 DNA, MIFARE DESFire, Generic Type 4 Tag (by @WillyJL)
   - Passy: Capitalize document number (by @bettse)
   - Picopass: Bugfixes and refactoring (by @bettse)
   - Portal Of Flipper: Implement auth for the xbox 360 (by @sanjay900)
   - Quac: Fix link imports not working, fix RAW Sub-GHz files (by @xMasterX & @WillyJL), add Sub-GHz duration setting (by @rdefeo)
   - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
-  - WiFi Marauder: Support for new commands from ESP32Marauder 1.6.x (by @justcallmekoko)
   - VGM Tool: Fixed RGB firmware UART regression (by @WillyJL)
+  - WiFi Marauder: Support for new commands from ESP32Marauder 1.6.x (by @justcallmekoko)
   - UL: Sub-GHz Playlist: Add support for custom modulation presets, remake with txrx library and support for dynamic signals, cleanup code (by @xMasterX)
 - RFID: Add DEZ10 representation to EM410X (by @realcatgirly)
+- Furi: Re-enabled file paths in furi_check crash messages (by @WillyJL)
 - OFW: Infrared: Add text scroll to remote buttons (by @956MB)
 - Sub-GHz:
-  - UL: Rename and extend Alarms ignore option with Hollarm & GangQi (by @xMasterX)
+  - UL: Rename and extend Alarms, Sensors, Cars ignore options (by @xMasterX)
+    - Alarms: Hollarm, GangQi
+    - Cars: Kia, Starline, ScherKhan
+    - Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights)
   - UL: Add 462.750 MHz to default subghz freqs list (by @xMasterX)
   - UL: V2 Phoenix show counter value (by @xMasterX)
 
@@ -44,10 +82,12 @@
   - UL: Fix clipper date timestamp (by @luu176)
 - BadKB: Fix key combos main keys being case sensitive (by @WillyJL)
 - Sub-GHz:
-  - Fix frequency analyzer deadlock when holding Ok (by @WillyJL)
+  - Fix possible frequency analyzer deadlock when holding Ok (by @WillyJL)
   - UL: Fix CAME 24bit decoder (by @xMasterX)
   - UL: Tune holtek ht12x to decode holtek only and not conflict with came 12bit (by @xMasterX)
   - UL: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again (by @xMasterX)
+- UL: RFID: Fix strange bug with LCD backlight going off after doing "Write" (by @xMasterX)
 
 ### Removed:
-- Nothing
+- Sub-GHz: Removed Weather Station, POCSAG and TPMS protocols from main app, now found in external apps (by @WillyJL)
+  - See breaking changes notice above
