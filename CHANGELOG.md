@@ -42,7 +42,10 @@
 - Furi: Re-enabled file paths in furi_check crash messages (by @WillyJL)
 - OFW: Infrared: Add text scroll to remote buttons (by @956MB)
 - Sub-GHz:
-  - UL: Rename and extend Alarms ignore option with Hollarm & GangQi (by @xMasterX)
+  - UL: Rename and extend Alarms, Sensors, Cars ignore options (by @xMasterX)
+    - Alarms: Hollarm, GangQi
+    - Cars: Kia, Starline, ScherKhan
+    - Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights)
   - UL: Add 462.750 MHz to default subghz freqs list (by @xMasterX)
   - UL: V2 Phoenix show counter value (by @xMasterX)
 
@@ -58,10 +61,11 @@
   - UL: Fix clipper date timestamp (by @luu176)
 - BadKB: Fix key combos main keys being case sensitive (by @WillyJL)
 - Sub-GHz:
-  - Fix frequency analyzer deadlock when holding Ok (by @WillyJL)
+  - Fix possible frequency analyzer deadlock when holding Ok (by @WillyJL)
   - UL: Fix CAME 24bit decoder (by @xMasterX)
   - UL: Tune holtek ht12x to decode holtek only and not conflict with came 12bit (by @xMasterX)
   - UL: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again (by @xMasterX)
+- RFID: Fix strange bug with LCD backlight going off after doing "Write" (by @xMasterX)
 
 ### Removed:
 - Sub-GHz: Removed Weather Station, POCSAG and TPMS protocols from main app, now found in external apps (by @WillyJL)
