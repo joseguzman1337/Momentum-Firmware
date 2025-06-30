@@ -12,9 +12,32 @@
 * NFC: Ultralight C - Attempt of authentication with default key (PR #898 | by @mishamyte)
 * System: Loader - Fix misplaced ApplicationBeforeLoad events (PR #905 | by @WillyJL)
 * OFW PR 4210: Infrared: Add text scroll to remote buttons (by @956MB)
+* NFC:
+  - NFC Type 4 support + many other improvements (by @WillyJL)
+    - New Type 4 Tag (NDEF on NTAG4xx / MIFARE DESFire) protocol, full support
+    - New NTAG4xx (NTAG413 DNA / NTAG424 DNA) protocol, only detection and basic info support
+    - NDEF parsing plugin supports Type 4 Tag protocol
+    - Show more version info for MIFARE Plus cards
+    - Improve detection/verification of MIFARE DESFire and MIFARE Plus SE
+    - Improve navigation for MIFARE Classic Update from / Write to Initial Card
+    - Refactor Write code for MIFARE Ultralight/Classic in NFC app helpers
+    - Cleanup event handling in NFC app
+    - NFC app uses a bit less RAM because of previous 2 points
+    - Refactor NXP Native Commands to share between protocols (used by MIFARE DESFire, MIFARE Plus, NTAG4xx)
+    - MIFARE DESFire poller API can now switch between native and ISO7816-wrapped commands
+    - Expand ISO14443-4A API with listener (emulation) support for sending responses to reader (except I-block chaining)
+    - Exposed some APIs for apps to use that were meant to be public:
+      - ISO14443-3A listener (emulation)
+      - ISO15693-3 device (data), poller (reading), listener (emulation)
+    - Cleanup/reorder protocol definitions for tidyness
+  - Ventra ULEV1 parser (by @hazardousvoltage)
+  - CSC Service Works parser (by @zinongli)
+  - Philips Sonicare parser (by @Sil333033)
+  - SmartRider parser (by @jaylikesbunda)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
 * RFID 125khz: Fix strange bug with LCD backlight going off after doing "Write"
+* GUI: Added `submenu_remove_item()` to API, was needed for NFC Type 4 related changes (by @WillyJL)
 * SubGHz: Fix possible frequency analyzer deadlock when holding Ok (by @WillyJL)
 * RFID 125khz: Add DEZ10 representation to EM410X (by @realcatgirly)
 * OFW PR 4205: fix sample durations when using external CC1101 (by @Aerosnail)
