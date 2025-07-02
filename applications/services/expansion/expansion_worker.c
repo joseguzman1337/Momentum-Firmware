@@ -361,6 +361,8 @@ static int32_t expansion_worker(void* context) {
         expansion_worker_state_machine(instance);
     }
 
+    furi_hal_serial_async_rx_stop(instance->serial_handle);
+
     if(instance->state == ExpansionWorkerStateRpcActive) {
         expansion_worker_rpc_session_close(instance);
     }
