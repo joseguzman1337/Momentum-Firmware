@@ -81,6 +81,7 @@
   - Fix card info not being parsed when using Extra Actions > Read Specific Card Type (by @WillyJL)
   - UL: Fix clipper date timestamp (by @luu176)
 - BadKB: Fix key combos main keys being case sensitive (by @WillyJL)
+- FuriHalSerial: Fix RXFNE interrupt hang, aka freezing with UART output when Expansion Modules are enabled (by @WillyJL)
 - Sub-GHz:
   - Fix possible frequency analyzer deadlock when holding Ok (by @WillyJL)
   - UL: Fix CAME 24bit decoder (by @xMasterX)
