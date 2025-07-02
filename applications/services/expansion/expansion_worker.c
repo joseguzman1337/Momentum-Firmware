@@ -35,7 +35,8 @@ typedef enum {
     ExpansionWorkerFlagError = 1 << 2,
 } ExpansionWorkerFlag;
 
-#define EXPANSION_ALL_FLAGS (ExpansionWorkerFlagData | ExpansionWorkerFlagStop)
+#define EXPANSION_ALL_FLAGS \
+    (ExpansionWorkerFlagData | ExpansionWorkerFlagStop | ExpansionWorkerFlagError)
 
 struct ExpansionWorker {
     FuriThread* thread;
