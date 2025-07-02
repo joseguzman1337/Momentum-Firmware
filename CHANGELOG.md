@@ -46,7 +46,7 @@
   - Combo Cracker: Many usability improvements (by @CharlesTheGreat77)
   - ESP Flasher: Bump Marauder 1.7.1 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
   - Flame RNG: New App Icon (by @Kuronons), Improved the RNG using the hardware RNG and some bit mixing (by @OrionW06)
-  - FlipDownloader: Add Picoware (by @jblanked)
+  - FlipDownloader: Add Picoware, rewrite in C++, new downloading screen (by @jblanked)
   - FlipWiFi: Added Deauthentication mode (by @jblanked)
   - Metroflip: Added 80+ card AIDs, more AIDs for DESFire, Calypso card saving, fixed DESFire parsing, Navigo crash, Clipper timestamp (by @luu176)
   - NFC Magic: Fix Ultimate Magic Gen4 Max Block Number Set Incorrectly for the NTAG Protocol (by @alfie65536)
