@@ -9,11 +9,11 @@ env:
 
 jobs:
   compact:
-    runs-on: [self-hosted, FlipperZeroShell]
+    runs-on: [self-hosted]
     strategy:
       fail-fast: false
       matrix:
-        target: [f7, f18]
+        target: [f7]
     steps:
       - name: 'Wipe workspace'
         run: find ./ -mount -maxdepth 1 -exec rm -rf {} \;

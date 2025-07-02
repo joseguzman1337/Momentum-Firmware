@@ -1,7 +1,6 @@
 name: 'Lint sources & check submodule integrity'
 
-on:
-  pull_request:
+on: workflow_dispatch
 
 env:
   TARGETS: f7

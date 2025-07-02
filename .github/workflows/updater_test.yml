@@ -1,6 +1,6 @@
 name: 'Updater test'
-on:
-  pull_request:
+
+on: workflow_dispatch
 
 env:
   TARGETS: f7
