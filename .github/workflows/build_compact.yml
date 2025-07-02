@@ -1,8 +1,5 @@
 name: 'Compact build'
 
-on:
-  pull_request:
-
 env:
   FBT_TOOLCHAIN_PATH: /runner/_work
   FBT_GIT_SUBMODULE_SHALLOW: 1
