@@ -1,12 +1,6 @@
 name: 'Build'
 
-on:
-  push:
-    branches:
-      - dev
-    tags:
-      - '*'
-  pull_request:
+on: workflow_dispatch
 
 env:
   DEFAULT_TARGET: f7
