@@ -1,80 +1,94 @@
 ### Breaking Changes:
-- Lockscreen: Separate 'Allow RPC While Locked' settings for USB/BLE (#343 by @956MB)
-  - Both default to OFF like before
-  - If you had enabled this option before, you will need to re-enable
+- Sub-GHz: Removed Weather Station, POCSAG and TPMS protocols from main app, now found in external apps (by @WillyJL)
+  - Momentum previously supported these external app's protocols in the main Sub-GHz app
+  - However, with more protocols added over time to the main app, they are now too many
+  - The Flipper CPU cannot keep up with all the data received with this number of protocols in some modulations
+  - This caused some signals to not be received when they should, and in some cases could freeze the device
+  - Since Weather Station, POCSAG and TPMS are available as external apps, they're now removed from the main Sub-GHz app
+  - You can now find this functionality in `Apps > Sub-GHz`, where there are dedicated apps for these 3 functions
 
 ### Added:
 - Apps:
-  - Games: Pinball0 (by @rdefeo)
-  - GPIO: FlipperHTTP: FlipWorld (by @jblanked)
-  - NFC: Metroflip (by @luu176)
-  - USB: USB Game Controller (by @expected-ingot)
-- Archive: Setting to show dynamic path in file browser statusbar (#322 by @956MB)
-- CLI: Add `clear` and `cls` commands, add `did you mean ...?` command suggestion (#342 by @dexvleads)
-- Main Menu: Add coverflow menu style (#314 by @CodyTolene)
-- BadKB: Added german Mac keyboard Layout (#325 by @Cloudy261)
-- UL: Sub-GHz: Jolly Motors support with add manually (by @pkooiman & @xMasterX)
-- OFW: Desktop: Add winter animations (by @Astrrra)
-- API:
-  - Added `canvas_draw_icon_animation_ex()` to draw animated icons resized (#314 by @CodyTolene)
-  - OFW: Added `flipper_format_write_empty_line()` (by @janwiesemann)
-- OFW: Furi: Pipe support (by @portasynthinca3)
-- OFW: Furi: Thread stdin support (by @portasynthinca3)
-- OFW: RPC: Command to send a signal once (by @Astrrra)
-- OFW: Add VCP break support (by @gsurkov)
+  - Sub-GHz: Sub-GHz Playlist Creator (by @coolerUA)
+  - Sub-GHz: Weather Station (by @Skorpionm)
+  - Sub-GHz: POCSAG Pager (by @xMasterX)
+  - Sub-GHz: TPMS Reader (by @wosk)
+- NFC:
+  - NFC Type 4 support + many other improvements (by @WillyJL)
+    - New Type 4 Tag (NDEF on NTAG4xx / MIFARE DESFire) protocol, full support
+    - New NTAG4xx (NTAG413 DNA / NTAG424 DNA) protocol, only detection and basic info support
+    - NDEF parsing plugin supports Type 4 Tag protocol
+    - Show more version info for MIFARE Plus cards
+    - Improve detection/verification of MIFARE DESFire and MIFARE Plus SE
+    - Improve navigation for MIFARE Classic Update from / Write to Initial Card
+    - Refactor Write code for MIFARE Ultralight/Classic in NFC app helpers
+    - Cleanup event handling in NFC app
+    - NFC app uses a bit less RAM because of previous 2 points
+    - Refactor NXP Native Commands to share between protocols (used by MIFARE DESFire, MIFARE Plus, NTAG4xx)
+    - MIFARE DESFire poller API can now switch between native and ISO7816-wrapped commands
+    - Expand ISO14443-4A API with listener (emulation) support for sending responses to reader (except I-block chaining)
+    - Exposed some APIs for apps to use that were meant to be public:
+      - ISO14443-3A listener (emulation)
+      - ISO15693-3 device (data), poller (reading), listener (emulation)
+    - Cleanup/reorder protocol definitions for tidiness
+  - Ventra ULEV1 parser (by @hazardousvoltage)
+- Infrared: "Decode only" mode to ignore RAW signals, make buttons in learn scene more intuitive (by @WillyJL)
+- GUI: Added `submenu_remove_item()` to API, was needed for NFC Type 4 related changes (by @WillyJL)
+- UL: Sub-GHz: Add keeloq ironlogic aka il100 smart clone cloners support (by @xMasterX & Vitaly)
+- UL: iButton: Add TM01x Dallas write support (by @Leptopt1los)
+- UL: Display: Backlight option "Always ON" (by @Dmitry422)
 
 ### Updated:
 - Apps:
-  - BT/USB Remote: Add PTT support for Gather (by @SapphicCode)
-  - Chess: Fix illegal move bug (by @956MB)
-  - Color Guess: Simplify app code (by @leedave)
-  - Countdown Timer: Default to 60 seconds on open (by @andrejka27)
-  - Cross Remote: Fix Sub-GHz actions rolling code support, animations for transmit, allow interrupting chain (by @leedave), loop transmit feature (by @miccayo)
-  - ESP Flasher: Add c3 and c6 to s3 option (by @jaylikesbunda), update bins for Marauder to 1.2.0 (by @justcallmekoko) and FlipperHTTP to 1.6.1 (by @jblanked)
-  - FlipBIP: Refactor to make adding coins easier (by @xtruan)
-  - FlipLibrary: Wikipedia, dog facts, random quotes, weather, asset price, predictions, trivia, advice, uuid and many more, bug fixes (by @jblanked), holidays, improvements to connectivity and progress (by @jamisonderek)
-  - FlipSocial: Improved authentication, loading screens, many bug fixes, bio and friend counts, new feed screen with posted time, search users and contacts, home announcements and notifications, private feed option, endless feed (by @jblanked), RPC_KEYBOARD support (by @jamisonderek)
-  - FlipStore: Many bugfixes, support downloading ESP32 and VGM firmwares and Github repos, allow deleting apps, memory fixes, update Marauder, use Flipper catalog API (by @jblanked), more improvements (by @jamisonderek)
-  - FlipTrader: Improved progress display, added connectivity check on startup (by @jamisonderek)
-  - FlipWeather: Stability improvements (by @jblanked), improved progress display, added connectivity check on startup (by @jamisonderek)
-  - FlipWiFi: Improve error handling, update scan loading and parsing, many bug/crash fixes, max 100 network scan, add some fast commands (by @jblanked), add connectivity check on startup (by @jamisonderek)
-  - KeyCopier: Support for formats AR4, M1, AM7, Y2, Y11, S22, NA25, CO88, LW4, LW5, NA12, RU45, H75, B102, Y159, KA14, YM63, SFIC, RV (by @HonestLocksmith)
-  - NFC Maker: Allow setting custom UID, code cleanup (by @Willy-JL), show extra symbols for WiFi SSID/Password and Emails (by @956MB)
-  - Nightstand: Show battery percentage and show AM/PM in timer mode (by @956MB)
-  - Oscilloscope: Add simple spectrum analyser and basic software scaling support (by @anfractuosity)
-  - Picopass: Handle write key retry when a different card is presented, save SR as legacy from saved menu (by @bettse)
-  - Pokemon Trade Tool: Update to gblink v0.63 which includes saving/loading of pin configurations for the EXT link interface, bug fixes (by @kbembedded)
-  - Snake 2.0: Progress saving, endless mode, game timer, fruit positioning bugfixes (by @Willzvul)
-  - uPython: Enabled extra functions for the `random` module, optimized speaker note constants to save space (by @ofabel)
-  - WebCrawler: New BROWSE option to read HTML pages, many bugfixes (by @jblanked), improved progress display, added connectivity check on startup (by @jamisonderek)
-  - WiFi Marauder: AirTag Spoof, flipper blespam, sniff airtag and flipper, list airtag (by @0xchocolate)
-  - UL: NFC Magic: Added possibility to write 7b MFC to Gen1 tags (by @mishamyte)
-  - UL: Unitemp: Fixed handling of hPa units (by @shininghero)
-  - UL: Fixed apps for firmware USB CDC callback changes (by @xMasterX)
-- Infrared: Update universal bluray remote (#348 by @jaylikesbunda)
-- NFC:
-  - OFW: Replace mf_classic_dict.nfc with Proxmark3 version (by @onovy)
-  - OFW: More station IDs for Clipper plugin (by @ted-logan)
-- OFW: Infrared: Add IR command for NAD DR2 D7050 D3020 (by @nikos9742)
+  - Authenticator: New options to have space between groups of digits (by @akopachov)
+  - Blackhat: Fix Run Script command (by @o7-machinehum), fix NULL ptr scrolling menu suboptions, more wlan selectors and stop options (by @WillyJL)
+  - Camera Suite: Handle 128x128 image, fix image rotation bug (by @rnadyrshin)
+  - Combo Cracker: Many usability improvements (by @CharlesTheGreat77)
+  - ESP Flasher: Bump Marauder 1.7.1 (by @justcallmekoko), FlipperHTTP 2.0 (by @jblanked)
+  - Flame RNG: New App Icon (by @Kuronons), Improved the RNG using the hardware RNG and some bit mixing (by @OrionW06)
+  - FlipDownloader: Add Picoware, rewrite in C++, new downloading screen (by @jblanked)
+  - FlipWiFi: Added Deauthentication mode (by @jblanked)
+  - Metroflip: Added 80+ card AIDs, more AIDs for DESFire, Calypso card saving, fixed DESFire parsing, Navigo crash, Clipper timestamp (by @luu176)
+  - NFC Magic: Fix Ultimate Magic Gen4 Max Block Number Set Incorrectly for the NTAG Protocol (by @alfie65536)
+  - NFC Maker: Type 4 Tag support, options for saving as NTAG413 DNA, NTAG424 DNA, MIFARE DESFire, Generic Type 4 Tag (by @WillyJL)
+  - Passy: Capitalize document number (by @bettse)
+  - Picopass: Bugfixes and refactoring (by @bettse)
+  - Portal Of Flipper: Implement auth for the xbox 360 (by @sanjay900)
+  - Quac: Fix link imports not working, fix RAW Sub-GHz files (by @xMasterX & @WillyJL), add Sub-GHz duration setting (by @rdefeo)
+  - Seos Compatible: Add support for reading Seader files that have SIO, Add custom zero key ADF OID (by @bettse)
+  - VGM Tool: Fixed RGB firmware UART regression (by @WillyJL)
+  - WiFi Marauder: Support for new commands from ESP32Marauder 1.6.x (by @justcallmekoko)
+  - UL: Sub-GHz Playlist: Add support for custom modulation presets, remake with txrx library and support for dynamic signals, cleanup code (by @xMasterX)
+- RFID: Add DEZ10 representation to EM410X (by @realcatgirly)
+- Furi: Re-enabled file paths in furi_check crash messages (by @WillyJL)
+- OFW: Infrared: Add text scroll to remote buttons (by @956MB)
+- Sub-GHz:
+  - UL: Rename and extend Alarms, Sensors, Cars ignore options (by @xMasterX)
+    - Alarms: Hollarm, GangQi
+    - Cars: Kia, Starline, ScherKhan
+    - Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights)
+  - UL: Add 462.750 MHz to default subghz freqs list (by @xMasterX)
+  - UL: V2 Phoenix show counter value (by @xMasterX)
 
 ### Fixed:
-- Desktop: Fixed Wardriving animation design (by @Davim09)
-- Main Menu: Fix MNTM style battery percent off by 1 (#339 by @956MB)
-- OFW: Fix lost BadBLE keystrokes (by @Astrrra)
-- OFW: GPIO: Fix USB UART Bridge Crash by increasing system stack size (by @Astrrra)
-- OFW: Loader: Fix BusFault in handling of OOM (by @Willy-JL)
+- CLI:
+  - Fix crash when opening CLI/qFlipper/WebUpdater if some unexpected files are present in `/ext/apps_data/cli/plugins` (by @WillyJL)
+  - Fix crash with `ir universal` command (by @WillyJL)
+  - Fix crash with `date` command (by @WillyJL)
+  - Fix temporary `nfc apdu` command (by @WillyJL)
+  - OFW: Fix subghz chat command (by @GameLord2011)
 - NFC:
-  - XERO: Fix issue with MFC key recovery state machine performing key reuse early (by @noproto)
-  - OFW: Plantain parser Last payment amount fix (by @mxcdoam)
-  - OFW: Fix skylander ID reading (by @bettse)
-  - OFW: Fix MIFARE Plus detection (by @GMMan)
-  - OFW: Fix ISO15693 stuck in wrong mode (by @RebornedBrain)
-  - OFW: Fix MFUL PWD_AUTH command creation when 0x00 in password (by @GMMan)
-  - OFW: Fix typo for `mf_classic_key_cahce_get_next_key()` function (by @luu176)
-- OFW: U2F: Fix message digest memory leak (by @GMMan)
-- OFW: JS: SDK workaround incorrect serial port handling by OS (by @portasynthinca3)
-- OFW: FBT: Fix invalid path errors on Windows with UTF8 paths (by @Alex4386)
+  - Fix card info not being parsed when using Extra Actions > Read Specific Card Type (by @WillyJL)
+  - UL: Fix clipper date timestamp (by @luu176)
+- BadKB: Fix key combos main keys being case sensitive (by @WillyJL)
+- FuriHalSerial: Fix RXFNE interrupt hang, aka freezing with UART output when Expansion Modules are enabled (by @WillyJL)
+- Sub-GHz:
+  - Fix possible frequency analyzer deadlock when holding Ok (by @WillyJL)
+  - UL: Fix CAME 24bit decoder (by @xMasterX)
+  - UL: Tune holtek ht12x to decode holtek only and not conflict with came 12bit (by @xMasterX)
+  - UL: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again (by @xMasterX)
+- UL: RFID: Fix strange bug with LCD backlight going off after doing "Write" (by @xMasterX)
 
 ### Removed:
-- NFC: Previous fix for ISO15693 stuck in wrong mode (#225)
-  - Removes APIs `nfc_iso15693_detect_mode()`, `nfc_iso15693_force_1outof4()`, `nfc_iso15693_force_1outof256()`
+- Sub-GHz: Removed Weather Station, POCSAG and TPMS protocols from main app, now found in external apps (by @WillyJL)
+  - See breaking changes notice above

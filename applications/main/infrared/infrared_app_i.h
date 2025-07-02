@@ -54,6 +54,10 @@
 #define INFRARED_DEFAULT_REMOTE_NAME "Remote"
 #define INFRARED_LOG_TAG             "InfraredApp"
 
+/* Button names for easy mode */
+extern const char* const easy_mode_button_names[];
+extern const size_t easy_mode_button_count; // Number of buttons in the array
+
 /**
  * @brief Enumeration of invalid remote button indices.
  */
@@ -95,9 +99,13 @@ typedef struct {
     bool is_otg_enabled; /**< Whether OTG power (external 5V) is enabled. */
     bool is_contributing_remote; /**< Whether we're in the contribute flow */
     bool is_processing_contribute_exit; /**< Guard flag for contribute exit */
+    bool is_easy_mode; /**< Whether easy learning mode is enabled. */
+    bool is_decode_enabled; /**< Whether signal decoding is enabled. */
+    bool is_decode_forced; /**< Whether signal decoding is forced. */
     InfraredEditTarget edit_target : 8; /**< Selected editing target (a remote or a button). */
     InfraredEditMode edit_mode     : 8; /**< Selected editing operation (rename or delete). */
     int32_t current_button_index; /**< Selected button index (move destination). */
+    int32_t existing_remote_button_index; /**< Existing remote's current button index (easy mode). */
     int32_t prev_button_index; /**< Previous button index (move source). */
     uint32_t last_transmit_time; /**< Lat time a signal was transmitted. */
     FuriHalInfraredTxPin tx_pin;
