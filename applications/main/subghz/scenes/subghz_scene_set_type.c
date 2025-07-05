@@ -25,6 +25,8 @@ static const char* submenu_names[SetTypeMAX] = {
     [SetTypeDoorHan_433_92] = "KL: DoorHan 433MHz",
     [SetTypeBeninca433] = "KL: Beninca 433MHz",
     [SetTypeBeninca868] = "KL: Beninca 868MHz",
+    [SetTypeComunello433] = "KL: Comunello 433MHz",
+    [SetTypeComunello868] = "KL: Comunello 868MHz",
     [SetTypeAllmatic433] = "KL: Allmatic 433MHz",
     [SetTypeAllmatic868] = "KL: Allmatic 868MHz",
     [SetTypeCenturion433] = "KL: Centurion 433MHz",
@@ -399,6 +401,26 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 .keeloq.btn = 0x01,
                 .keeloq.cnt = 0x05,
                 .keeloq.manuf = "Beninca"};
+            break;
+        case SetTypeComunello433:
+            gen_info = (GenInfo){
+                .type = GenKeeloq,
+                .mod = "AM650",
+                .freq = 433920000,
+                .keeloq.serial = key & 0x00FFFFFF,
+                .keeloq.btn = 0x08,
+                .keeloq.cnt = 0x05,
+                .keeloq.manuf = "Comunello"};
+            break;
+        case SetTypeComunello868:
+            gen_info = (GenInfo){
+                .type = GenKeeloq,
+                .mod = "AM650",
+                .freq = 868460000,
+                .keeloq.serial = key & 0x00FFFFFF,
+                .keeloq.btn = 0x08,
+                .keeloq.cnt = 0x05,
+                .keeloq.manuf = "Comunello"};
             break;
         case SetTypeAllmatic433:
             gen_info = (GenInfo){
