@@ -36,6 +36,8 @@
   - SmartRider parser (by @jaylikesbunda)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* FuriHalSerial: Fix RXFNE interrupt hang, aka freezing with UART output when Expansion Modules are enabled (by @WillyJL)
+* Expansion: add is_connected api (by @HaxSam & @WillyJL)
 * RFID 125khz: Fix strange bug with LCD backlight going off after doing "Write"
 * GUI: Added `submenu_remove_item()` to API, was needed for NFC Type 4 related changes (by @WillyJL)
 * SubGHz: Fix possible frequency analyzer deadlock when holding Ok (by @WillyJL)
