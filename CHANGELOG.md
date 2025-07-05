@@ -36,6 +36,7 @@
   - SmartRider parser (by @jaylikesbunda)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* Docs: Update doorhan programming instructions (by @li0ard)
 * FuriHalSerial: Fix RXFNE interrupt hang, aka freezing with UART output when Expansion Modules are enabled (by @WillyJL)
 * Expansion: add is_connected api (by @HaxSam & @WillyJL)
 * RFID 125khz: Fix strange bug with LCD backlight going off after doing "Write"
