@@ -5,7 +5,7 @@
 * SubGHz: V2 Phoenix show counter value
 * SubGHz: Add keeloq ironlogic (aka il100) smart clone cloners support (thanks to Vitaly for RAWs)
 * SubGHz: Fix CAME 24bit decoder
-* SubGHz: Add 462.750 MHz to default subghz freqs list
+* SubGHz: Add 462.750 MHz & 868.46 MHz to default subghz freqs list
 * SubGHz: Tune holtek ht12x to decode holtek only and not conflict with came 12bit
 * SubGHz: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again
 * Display: Backlight option "always on" and RGB bug removed (PR #900 | by @Dmitry422)
