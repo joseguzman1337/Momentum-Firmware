@@ -71,6 +71,8 @@ static const char* submenu_names[SetTypeMAX] = {
     [SetTypeHollarm_433] = "Hollarm 433MHz",
     [SetTypeReversRB2_433] = "Revers RB2 433MHz",
     [SetTypeMarantec24_868] = "Marantec24 868MHz",
+    [SetTypeMarantec_433] = "Marantec 433MHz",
+    [SetTypeMarantec_868] = "Marantec 868MHz",
     [SetTypeBETT_433] = "BETT 433MHz",
     [SetTypeLinear_300_00] = "Linear 300MHz",
     // [SetTypeNeroSketch] = "Nero Sketch", // Deleted in OFW
@@ -191,6 +193,9 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
 
         uint64_t gangqi_key;
         subghz_txrx_gen_serial_gangqi(&gangqi_key);
+
+        uint64_t marantec_key;
+        subghz_txrx_gen_key_marantec(&marantec_key);
 
         GenInfo gen_info = {0};
         switch(event.event) {
@@ -358,6 +363,28 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 .data.name = SUBGHZ_PROTOCOL_MARANTEC24_NAME, // Add button code 0x8 to the end
                 .data.key = (key & 0xFFFFF0) | 0x000008,
                 .data.bits = 24,
+                .data.te = 0};
+            break;
+        case SetTypeMarantec_433:
+            gen_info = (GenInfo){
+                .type = GenData,
+                .mod = "AM650",
+                .freq = 433920000,
+                .data.name =
+                    SUBGHZ_PROTOCOL_MARANTEC_NAME, // Button code is 0x4 and crc sum to the end
+                .data.key = marantec_key,
+                .data.bits = 49,
+                .data.te = 0};
+            break;
+        case SetTypeMarantec_868:
+            gen_info = (GenInfo){
+                .type = GenData,
+                .mod = "AM650",
+                .freq = 868350000,
+                .data.name =
+                    SUBGHZ_PROTOCOL_MARANTEC_NAME, // Button code is 0x4 and crc sum to the end
+                .data.key = marantec_key,
+                .data.bits = 49,
                 .data.te = 0};
             break;
         case SetTypeFaacSLH_433:

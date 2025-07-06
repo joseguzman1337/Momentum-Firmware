@@ -153,3 +153,10 @@ bool subghz_txrx_gen_secplus_v1_protocol(
  * @return uint64_t if success
  */
 void subghz_txrx_gen_serial_gangqi(uint64_t* result_key);
+
+/**
+ * Generate key for Marantec protocol
+ * 
+ * @param result_key Pointer to a uint64_t where the key will be stored
+ */
+void subghz_txrx_gen_key_marantec(uint64_t* result_key);

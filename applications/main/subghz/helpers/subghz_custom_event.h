@@ -126,6 +126,8 @@ typedef enum {
     SetTypeHollarm_433,
     SetTypeReversRB2_433,
     SetTypeMarantec24_868,
+    SetTypeMarantec_433,
+    SetTypeMarantec_868,
     SetTypeLinear_300_00,
     // SetTypeNeroSketch, //Deleted in OFW
     // SetTypeNeroRadio, //Deleted in OFW
