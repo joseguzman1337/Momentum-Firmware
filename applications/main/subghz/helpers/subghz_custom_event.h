@@ -75,7 +75,6 @@ typedef enum {
     SetTypeANMotorsAT4,
     SetTypeAlutechAT4N,
     SetTypePhoenix_V2_433,
-    SetTypeMotorline433,
     SetTypeHCS101_433_92,
     SetTypeDoorHan_315_00,
     SetTypeDoorHan_433_92,
@@ -88,6 +87,7 @@ typedef enum {
     SetTypeCenturion433,
     SetTypeMonarch433,
     SetTypeJollyMotors433,
+    SetTypeMotorline433,
     SetTypeSommer_FM_434,
     SetTypeSommer_FM_868,
     SetTypeSommer_FM238_434,
@@ -130,6 +130,7 @@ typedef enum {
     SetTypeMarantec24_868,
     SetTypeMarantec_433,
     SetTypeMarantec_868,
+    SetTypeRoger_433,
     SetTypeLinear_300_00,
     // SetTypeNeroSketch, //Deleted in OFW
     // SetTypeNeroRadio, //Deleted in OFW

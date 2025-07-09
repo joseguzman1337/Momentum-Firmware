@@ -20,6 +20,7 @@ static const char* submenu_names[SetTypeMAX] = {
     [SetTypeSomfyTelis] = "Somfy Telis 433MHz",
     [SetTypeANMotorsAT4] = "AN-Motors AT4 433MHz",
     [SetTypeAlutechAT4N] = "Alutech AT4N 433MHz",
+    [SetTypeRoger_433] = "Roger 433MHz",
     [SetTypePhoenix_V2_433] = "V2 Phoenix 433MHz",
     [SetTypeHCS101_433_92] = "KL: HCS101 433MHz",
     [SetTypeDoorHan_315_00] = "KL: DoorHan 315MHz",
@@ -284,6 +285,16 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 .data.name = SUBGHZ_PROTOCOL_CAME_NAME,
                 .data.key = (key & 0x00FFFFF0) | 0x4, // btn 0x1, 0x2, 0x4, 0x8
                 .data.bits = 24,
+                .data.te = 0};
+            break;
+        case SetTypeRoger_433:
+            gen_info = (GenInfo){
+                .type = GenData,
+                .mod = "AM650",
+                .freq = 433920000,
+                .data.name = SUBGHZ_PROTOCOL_ROGER_NAME,
+                .data.key = (key & 0xFFFF000) | 0x0000101, // button code 0x1 and (crc?) is 0x01
+                .data.bits = 28,
                 .data.te = 0};
             break;
         case SetTypeLinear_300_00:
