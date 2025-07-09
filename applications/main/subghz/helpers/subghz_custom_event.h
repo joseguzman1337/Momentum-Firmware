@@ -74,6 +74,7 @@ typedef enum {
     SetTypeSomfyTelis,
     SetTypeANMotorsAT4,
     SetTypeAlutechAT4N,
+    SetTypePhoenix_V2_433,
     SetTypeHCS101_433_92,
     SetTypeDoorHan_315_00,
     SetTypeDoorHan_433_92,

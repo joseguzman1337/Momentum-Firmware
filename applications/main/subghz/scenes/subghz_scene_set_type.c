@@ -20,6 +20,7 @@ static const char* submenu_names[SetTypeMAX] = {
     [SetTypeSomfyTelis] = "Somfy Telis 433MHz",
     [SetTypeANMotorsAT4] = "AN-Motors AT4 433MHz",
     [SetTypeAlutechAT4N] = "Alutech AT4N 433MHz",
+    [SetTypePhoenix_V2_433] = "V2 Phoenix 433MHz",
     [SetTypeHCS101_433_92] = "KL: HCS101 433MHz",
     [SetTypeDoorHan_315_00] = "KL: DoorHan 315MHz",
     [SetTypeDoorHan_433_92] = "KL: DoorHan 433MHz",
@@ -112,6 +113,7 @@ typedef enum {
     GenNiceFlorS,
     GenSecPlus1,
     GenSecPlus2,
+    GenPhoenixV2,
 } GenType;
 
 typedef struct {
@@ -170,6 +172,10 @@ typedef struct {
             uint8_t btn;
             uint32_t cnt;
         } sec_plus_2;
+        struct {
+            uint32_t serial;
+            uint16_t cnt;
+        } phoenix_v2;
     };
 } GenInfo;
 
@@ -634,16 +640,16 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 .type = GenCameAtomo,
                 .mod = "AM650",
                 .freq = 433920000,
-                .keeloq.serial = (key & 0x0FFFFFFF) | 0x10000000,
-                .keeloq.cnt = 0x03};
+                .came_atomo.serial = (key & 0x0FFFFFFF) | 0x10000000,
+                .came_atomo.cnt = 0x03};
             break;
         case SetTypeCameAtomo868:
             gen_info = (GenInfo){
                 .type = GenCameAtomo,
                 .mod = "AM650",
                 .freq = 868350000,
-                .keeloq.serial = (key & 0x0FFFFFFF) | 0x10000000,
-                .keeloq.cnt = 0x03};
+                .came_atomo.serial = (key & 0x0FFFFFFF) | 0x10000000,
+                .came_atomo.cnt = 0x03};
             break;
         case SetTypeBFTMitto:
             gen_info = (GenInfo){
@@ -869,6 +875,14 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 .sec_plus_2.btn = 0x68,
                 .sec_plus_2.cnt = 0xE500000};
             break;
+        case SetTypePhoenix_V2_433:
+            gen_info = (GenInfo){
+                .type = GenPhoenixV2,
+                .mod = "AM650",
+                .freq = 433920000,
+                .phoenix_v2.serial = (key & 0x0FFFFFFF) | 0xB0000000,
+                .phoenix_v2.cnt = 0x025D};
+            break;
         default:
             furi_crash("Not implemented");
             break;
@@ -975,6 +989,14 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 gen_info.sec_plus_2.serial,
                 gen_info.sec_plus_2.btn,
                 gen_info.sec_plus_2.cnt);
+            break;
+        case GenPhoenixV2:
+            generated_protocol = subghz_txrx_gen_phoenix_v2_protocol(
+                subghz->txrx,
+                gen_info.mod,
+                gen_info.freq,
+                gen_info.phoenix_v2.serial,
+                gen_info.phoenix_v2.cnt);
             break;
         default:
             furi_crash("Not implemented");
