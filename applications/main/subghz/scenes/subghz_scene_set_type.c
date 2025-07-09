@@ -30,6 +30,7 @@ static const char* submenu_names[SetTypeMAX] = {
     [SetTypeComunello868] = "KL: Comunello 868MHz",
     [SetTypeAllmatic433] = "KL: Allmatic 433MHz",
     [SetTypeAllmatic868] = "KL: Allmatic 868MHz",
+    [SetTypeMotorline433] = "KL: Motorline 433MHz",
     [SetTypeCenturion433] = "KL: Centurion 433MHz",
     [SetTypeMonarch433] = "KL: Monarch 433MHz",
     [SetTypeJollyMotors433] = "KL: Jolly Mot. 433MHz",
@@ -679,6 +680,16 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 .somfy_telis.serial = key & 0x00FFFFFF,
                 .somfy_telis.btn = 0x02,
                 .somfy_telis.cnt = 0x03};
+            break;
+        case SetTypeMotorline433:
+            gen_info = (GenInfo){
+                .type = GenKeeloq,
+                .mod = "AM650",
+                .freq = 433920000,
+                .keeloq.serial = key & 0x0FFFFFFF,
+                .keeloq.btn = 0x01,
+                .keeloq.cnt = 0x03,
+                .keeloq.manuf = "Motorline"};
             break;
         case SetTypeDoorHan_433_92:
             gen_info = (GenInfo){

@@ -1,23 +1,25 @@
 ## Main changes
 - Current API: 86.0
-* SubGHz: V2 Phoenix full support (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
-* SubGHz: Reduce less popular freqs in default hopper preset, make it faster
-* SubGHz: Marantec protocol implement crc verification display and add manually support (by @xMasterX & @li0ard, original code by @Skorpionm)
-* SubGHz: Keeloq: Comunello - add manually support
-* iButton: TM01x Dallas write support (PR #899 | by @Leptopt1los)
-* SubGHz: Rename and extend Alarms, Sensors, Cars ignore options (Alarms: Hollarm, GangQi | Cars: Kia, Starline, ScherKhan | Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights))
+* SubGHz: **Roger (static 28 bit) with add manually support** (by @xMasterX & @mishamyte)
+* SubGHz: **V2 Phoenix full support** (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
+* SubGHz: **Keeloq: Add support for - Motorline (with add manually support), Rosh, Pecinin, Rossi, Merlin, Steelmate** (by @xMasterX & @RocketGod-git)
+* SubGHz: Reduce less popular freqs in default hopper preset, **make it faster**
+* SubGHz: **Marantec protocol implement crc verification display and add manually support** (by @xMasterX & @li0ard, original code by @Skorpionm)
+* SubGHz: **Keeloq: Comunello - add manually support**
+* iButton: **TM01x Dallas write support** (PR #899 | by @Leptopt1los)
+* SubGHz: Rename and **extend Alarms, Sensors, Cars ignore options** (Alarms: Hollarm, GangQi | Cars: Kia, Starline, ScherKhan | Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights))
 * SubGHz: V2 Phoenix show counter value
-* SubGHz: Add keeloq ironlogic (aka il100) smart clone cloners support (thanks to Vitaly for RAWs)
-* SubGHz: Fix CAME 24bit decoder
+* SubGHz: **Add keeloq ironlogic (aka il100) smart clone cloners support** (thanks to Vitaly for RAWs)
+* SubGHz: **Fix CAME 24bit decoder**
 * SubGHz: Add 462.750 MHz & 868.46 MHz to default subghz freqs list
-* SubGHz: Tune holtek ht12x to decode holtek only and not conflict with came 12bit
+* SubGHz: **Tune holtek ht12x to decode holtek only** and not conflict with came 12bit
 * SubGHz: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again
 * Display: Backlight option "always on" and RGB bug removed (PR #900 | by @Dmitry422)
 * NFC: Ultralight C - Attempt of authentication with default key (PR #898 | by @mishamyte)
 * System: Loader - Fix misplaced ApplicationBeforeLoad events (PR #905 | by @WillyJL)
 * OFW PR 4210: Infrared: Add text scroll to remote buttons (by @956MB)
 * NFC:
-  - NFC Type 4 support + many other improvements (by @WillyJL)
+  - **NFC Type 4 support + many other improvements** (by @WillyJL)
     - New Type 4 Tag (NDEF on NTAG4xx / MIFARE DESFire) protocol, full support
     - New NTAG4xx (NTAG413 DNA / NTAG424 DNA) protocol, only detection and basic info support
     - NDEF parsing plugin supports Type 4 Tag protocol
