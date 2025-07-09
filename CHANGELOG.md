@@ -3,6 +3,7 @@
 * SubGHz: **Roger (static 28 bit) with add manually support** (by @xMasterX & @mishamyte)
 * SubGHz: **V2 Phoenix full support** (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
 * SubGHz: **Keeloq: Add support for - Motorline (with add manually support), Rosh, Pecinin, Rossi, Merlin, Steelmate** (by @xMasterX & @RocketGod-git)
+* SubGHz: Nero Radio static parse and display more data
 * SubGHz: Reduce less popular freqs in default hopper preset, **make it faster**
 * SubGHz: **Marantec protocol implement crc verification display and add manually support** (by @xMasterX & @li0ard, original code by @Skorpionm)
 * SubGHz: **Keeloq: Comunello - add manually support**
