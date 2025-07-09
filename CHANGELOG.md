@@ -1,5 +1,9 @@
 ## Main changes
 - Current API: 86.0
+* SubGHz: V2 Phoenix full support (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
+* SubGHz: Reduce less popular freqs in default hopper preset, make it faster
+* SubGHz: Marantec protocol implement crc verification display and add manually support (by @xMasterX & @li0ard, original code by @Skorpionm)
+* SubGHz: Keeloq: Comunello - add manually support
 * iButton: TM01x Dallas write support (PR #899 | by @Leptopt1los)
 * SubGHz: Rename and extend Alarms, Sensors, Cars ignore options (Alarms: Hollarm, GangQi | Cars: Kia, Starline, ScherKhan | Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights))
 * SubGHz: V2 Phoenix show counter value
