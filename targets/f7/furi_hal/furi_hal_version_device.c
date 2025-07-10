@@ -5,11 +5,11 @@ bool furi_hal_version_do_i_belong_here(void) {
 }
 
 const char* furi_hal_version_get_model_name(void) {
-    return "Kiisu 4a";
+    return "Kiisu 4";
 }
 
 const char* furi_hal_version_get_model_code(void) {
-    return "K4.A";
+    return "K4.AB";
 }
 
 const char* furi_hal_version_get_fcc_id(void) {
