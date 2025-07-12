@@ -178,10 +178,17 @@ static void subghz_protocol_encoder_roger_get_upload(SubGhzProtocolEncoderRoger*
     // This will override the btn variable if a custom button is set
     btn = subghz_protocol_roger_get_btn_code();
 
-    // If CRC is not == button - transmit as is, no custom button allowed
+    // If End is not == button - transmit as is, no custom button allowed
+    // For "End" values 23 and 20 - transmit correct ending used for their buttons
     if((instance->generic.data & 0xFF) == instance->generic.btn) {
         instance->generic.data = (uint64_t)instance->generic.serial << 12 | ((uint64_t)btn << 8) |
                                  btn;
+    } else if(((instance->generic.data & 0xFF) == 0x23) && btn == 0x1) {
+        instance->generic.data = (uint64_t)instance->generic.serial << 12 | ((uint64_t)btn << 8) |
+                                 0x20;
+    } else if(((instance->generic.data & 0xFF) == 0x20) && btn == 0x2) {
+        instance->generic.data = (uint64_t)instance->generic.serial << 12 | ((uint64_t)btn << 8) |
+                                 0x23;
     }
 
     // Send key and GAP
@@ -226,14 +233,14 @@ static void subghz_protocol_roger_check_remote_controller(SubGhzBlockGeneric* in
     // 2025.07 - @xMasterX (MMX)
 
     // Key samples
-    // 0010001111111001 0001 00100000 // S/N: 0x23F9 Btn: 0x1 CRC: 0x20
-    // 0010001111111001 0010 00100011 // S/N: 0x23F9 Btn: 0x2 CRC: 0x23
-    // 0101011001010110 0001 00000001 // S/N: 0x5656 Btn: 0x1 CRC: 0x01
-    // 0101011001010110 0010 00000010 // S/N: 0x5656 Btn: 0x2 CRC: 0x02
-    // 0000110111111110 0001 00000001 // S/N: 0x0DFE Btn: 0x1 CRC: 0x01
-    // 0000110111111110 0100 00000100 // S/N: 0x0DFE Btn: 0x4 CRC: 0x04
-    // 0000110111111110 0010 00000010 // S/N: 0x0DFE Btn: 0x2 CRC: 0x02
-    // 0000110111111110 1000 00001000 // S/N: 0x0DFE Btn: 0x8 CRC: 0x08
+    // 0010001111111001 0001 00100000 // S/N: 0x23F9 Btn: 0x1 End: 0x20
+    // 0010001111111001 0010 00100011 // S/N: 0x23F9 Btn: 0x2 End: 0x23
+    // 0101011001010110 0001 00000001 // S/N: 0x5656 Btn: 0x1 End: 0x01
+    // 0101011001010110 0010 00000010 // S/N: 0x5656 Btn: 0x2 End: 0x02
+    // 0000110111111110 0001 00000001 // S/N: 0x0DFE Btn: 0x1 End: 0x01
+    // 0000110111111110 0100 00000100 // S/N: 0x0DFE Btn: 0x4 End: 0x04
+    // 0000110111111110 0010 00000010 // S/N: 0x0DFE Btn: 0x2 End: 0x02
+    // 0000110111111110 1000 00001000 // S/N: 0x0DFE Btn: 0x8 End: 0x08
 
     instance->serial = instance->data >> 12;
     instance->btn = (instance->data >> 8) & 0xF;
@@ -330,7 +337,7 @@ void subghz_protocol_decoder_roger_feed(void* context, bool level, volatile uint
     switch(instance->decoder.parser_step) {
     case RogerDecoderStepReset:
         if((!level) && (DURATION_DIFF(duration, subghz_protocol_roger_const.te_short * 19) <
-                        subghz_protocol_roger_const.te_delta * 3)) {
+                        subghz_protocol_roger_const.te_delta * 5)) {
             //Found GAP
             instance->decoder.decode_data = 0;
             instance->decoder.decode_count_bit = 0;
@@ -365,7 +372,7 @@ void subghz_protocol_decoder_roger_feed(void* context, bool level, volatile uint
             } else if(
                 // End of the key
                 DURATION_DIFF(duration, subghz_protocol_roger_const.te_short * 19) <
-                subghz_protocol_roger_const.te_delta * 3) {
+                subghz_protocol_roger_const.te_delta * 5) {
                 //Found next GAP and add bit 1 or 0
                 if((DURATION_DIFF(instance->decoder.te_last, subghz_protocol_roger_const.te_long) <
                     subghz_protocol_roger_const.te_delta)) {
@@ -431,7 +438,7 @@ void subghz_protocol_decoder_roger_get_string(void* context, FuriString* output)
         "%s %db\r\n"
         "Key: 0x%07lX\r\n"
         "Serial: 0x%04lX\r\n"
-        "CRC: 0x%02lX\r\n"
+        "End: 0x%02lX\r\n"
         "Btn: %01X",
         instance->generic.protocol_name,
         instance->generic.data_count_bit,
