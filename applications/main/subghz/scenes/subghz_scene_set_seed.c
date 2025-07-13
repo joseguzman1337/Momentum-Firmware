@@ -108,10 +108,11 @@ bool subghz_scene_set_seed_on_event(void* context, SceneManagerEvent event) {
             }
         }
 
-        // Reset Seed, Fix, Cnt in secure data after successful or unsuccessful generation
+        // Reset Seed, Fix, Cnt, Btn in secure data after successful or unsuccessful generation
         memset(subghz->secure_data->seed, 0, sizeof(subghz->secure_data->seed));
         memset(subghz->secure_data->cnt, 0, sizeof(subghz->secure_data->cnt));
         memset(subghz->secure_data->fix, 0, sizeof(subghz->secure_data->fix));
+        subghz->secure_data->btn = 0x01;
 
         if(generated_protocol) {
             subghz_file_name_clear(subghz);

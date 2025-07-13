@@ -112,7 +112,6 @@ typedef enum {
     GenKeeloqBFT,
     GenAlutechAt4n,
     GenSomfyTelis,
-    GenNiceFlorS,
     GenSecPlus1,
     GenSecPlus2,
     GenPhoenixV2,
@@ -194,6 +193,11 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
         if(event.event == SetTypeFaacSLH_Manual_868 || event.event == SetTypeFaacSLH_Manual_433 ||
            event.event == SetTypeBFTClone) {
             scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetFix);
+            return true;
+        }
+
+        if (event.event == SetTypeNiceFlorS_433_92 || event.event == SetTypeNiceOne_433_92) {
+            scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetButton);
             return true;
         }
 
@@ -722,26 +726,6 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 .keeloq.cnt = 0x03,
                 .keeloq.manuf = "DoorHan"};
             break;
-        case SetTypeNiceFlorS_433_92:
-            gen_info = (GenInfo){
-                .type = GenNiceFlorS,
-                .mod = "AM650",
-                .freq = 433920000,
-                .nice_flor_s.serial = key & 0x0FFFFFFF,
-                .nice_flor_s.btn = 0x01,
-                .nice_flor_s.cnt = 0x03,
-                .nice_flor_s.nice_one = false};
-            break;
-        case SetTypeNiceOne_433_92:
-            gen_info = (GenInfo){
-                .type = GenNiceFlorS,
-                .mod = "AM650",
-                .freq = 433920000,
-                .nice_flor_s.serial = key & 0x0FFFFFFF,
-                .nice_flor_s.btn = 0x01,
-                .nice_flor_s.cnt = 0x03,
-                .nice_flor_s.nice_one = true};
-            break;
         case SetTypeNiceSmilo_433_92:
             gen_info = (GenInfo){
                 .type = GenKeeloq,
@@ -988,16 +972,6 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 gen_info.somfy_telis.serial,
                 gen_info.somfy_telis.btn,
                 gen_info.somfy_telis.cnt);
-            break;
-        case GenNiceFlorS:
-            generated_protocol = subghz_txrx_gen_nice_flor_s_protocol(
-                subghz->txrx,
-                gen_info.mod,
-                gen_info.freq,
-                gen_info.nice_flor_s.serial,
-                gen_info.nice_flor_s.btn,
-                gen_info.nice_flor_s.cnt,
-                gen_info.nice_flor_s.nice_one);
             break;
         case GenSecPlus1:
             generated_protocol =
