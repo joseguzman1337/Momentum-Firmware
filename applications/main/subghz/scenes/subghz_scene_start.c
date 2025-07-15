@@ -42,6 +42,12 @@ void subghz_scene_start_on_enter(void* context) {
         subghz);
     submenu_add_item(
         subghz->submenu,
+        "Add Manually [Advanced]",
+        SubmenuIndexAddManually,
+        subghz_scene_start_submenu_callback,
+        subghz);
+    submenu_add_item(
+        subghz->submenu,
         "Frequency Analyzer",
         SubmenuIndexFrequencyAnalyzer,
         subghz_scene_start_submenu_callback,
