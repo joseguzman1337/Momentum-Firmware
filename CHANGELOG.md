@@ -3,17 +3,17 @@
 * SubGHz: **Roger (static 28 bit) with add manually support** (by @xMasterX & @mishamyte)
 * SubGHz: **V2 Phoenix full support** (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
 * SubGHz: **Keeloq: Add support for - Motorline (with add manually support), Rosh, Pecinin, Rossi, Merlin, Steelmate** (by @xMasterX & @RocketGod-git)
-* SubGHz: Nero Radio static parse and display more data
+* SubGHz: **Nero Radio static parse** and display more data
 * SubGHz: Reduce less popular freqs in default hopper preset, **make it faster**
-* SubGHz: **Marantec protocol implement crc verification display and add manually support** (by @xMasterX & @li0ard, original code by @Skorpionm)
+* SubGHz: **Marantec protocol implement CRC verification display and Add manually support** (by @xMasterX & @li0ard, original code by @Skorpionm)
 * SubGHz: **Keeloq: Comunello - add manually support**
 * iButton: **TM01x Dallas write support** (PR #899 | by @Leptopt1los)
 * SubGHz: Rename and **extend Alarms, Sensors, Cars ignore options** (Alarms: Hollarm, GangQi | Cars: Kia, Starline, ScherKhan | Sensors: Magellan, Honeywell, Honeywell WDB (doorbells), Legrand (doorbells), Feron (RGB lights))
-* SubGHz: V2 Phoenix show counter value
-* SubGHz: **Add keeloq ironlogic (aka il100) smart clone cloners support** (thanks to Vitaly for RAWs)
+* SubGHz: V2 Phoenix show counter value (upd: see above, now decrypted)
+* SubGHz: **Add Keeloq IronLogic (aka IL100) smart clone remote copiers support** (thanks to Vitaly for RAWs)
 * SubGHz: **Fix CAME 24bit decoder**
 * SubGHz: Add 462.750 MHz & 868.46 MHz to default subghz freqs list
-* SubGHz: **Tune holtek ht12x to decode holtek only** and not conflict with came 12bit
+* SubGHz: **Tune Holtek HT12x to decode Holtek only** and not conflict with came 12bit
 * SubGHz: Fix Rename scene bug, that was replacing file name with random name when Rename is opened then closed then opened again
 * Display: Backlight option "always on" and RGB bug removed (PR #900 | by @Dmitry422)
 * NFC: Ultralight C - Attempt of authentication with default key (PR #898 | by @mishamyte)
