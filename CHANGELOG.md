@@ -11,9 +11,13 @@
 
 ### Updated:
 - Apps:
-  - Combo Cracker: Allow press and hold to change values (by @TAxelAnderson)
+  - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
+  - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson)
   - FlipDownloader: Added a new option to download GitHub repositories (by @jblanked)
+  - Flipper Blackhat: Add Deauth Broadcast command (by @o7-machinehum)
   - KeyCopier: Added Weiser WR3 key format (by @lightos)
+  - NFC Playlist: Refactor playlist worker, new settings layout, loop setting, controls to move between items (by @acegoal07)
+  - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
 - Sub-GHz:
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
   - UL: Reduce less popular freqs in default hopper preset, make it faster (by @xMasterX)
