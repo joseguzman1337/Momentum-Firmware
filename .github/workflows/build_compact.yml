@@ -81,6 +81,6 @@ jobs:
 #    name: Report status
 #    needs: [compact]
 #    if: always() && !contains(needs.*.result, 'failure')
-#    runs-on: [self-hosted, FlipperZeroShell]
+#    runs-on: [self-hosted]
 #    steps:
 #      - run: echo "All good ✨" ;

@@ -10,11 +10,11 @@ env:
 
 jobs:
   main:
-    runs-on: [self-hosted, FlipperZeroShell]
+    runs-on: [self-hosted]
     strategy:
       fail-fast: false
       matrix:
-        target: [f7, f18]
+        target: [f7]
     steps:
       - name: 'Wipe workspace'
         run: find ./ -mount -maxdepth 1 -exec rm -rf {} \;
@@ -70,18 +70,18 @@ jobs:
           rm -rf artifacts map_analyser_files || true
           mkdir artifacts map_analyser_files
           cp dist/${TARGET}-*/* artifacts/ || true
-          tar czpf "artifacts/flipper-z-${TARGET}-resources-${SUFFIX}.tgz" \
+          tar czpf "artifacts/kiisu-z-${TARGET}-resources-${SUFFIX}.tgz" \
             -C build/latest resources
-          tar czpf "artifacts/flipper-z-${TARGET}-debugapps-${SUFFIX}.tgz" \
+          tar czpf "artifacts/kiisu-z-${TARGET}-debugapps-${SUFFIX}.tgz" \
             -C dist/${TARGET}-*/apps/Debug .
-          tar czpf "artifacts/flipper-z-${TARGET}-appsymbols-${SUFFIX}.tgz" \
+          tar czpf "artifacts/kiisu-z-${TARGET}-appsymbols-${SUFFIX}.tgz" \
             -C dist/${TARGET}-*/debug_elf .
 
       - name: 'Copy universal artifacts'
         if: ${{ !github.event.pull_request.head.repo.fork && matrix.target == env.DEFAULT_TARGET }}
         run: |
-          tar czpf "artifacts/flipper-z-any-scripts-${SUFFIX}.tgz" scripts
-          cp build/core2_firmware.tgz "artifacts/flipper-z-any-core2_firmware-${SUFFIX}.tgz"
+          tar czpf "artifacts/kiisu-z-any-scripts-${SUFFIX}.tgz" scripts
+          cp build/core2_firmware.tgz "artifacts/kiisu-z-any-core2_firmware-${SUFFIX}.tgz"
 
       - name: 'Upload artifacts to update server'
         if: ${{ !github.event.pull_request.head.repo.fork }}
@@ -122,10 +122,10 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             **Compiled ${{ matrix.target }} firmware for commit `${{steps.names.outputs.commit_sha}}`:**
-            - [📦 Update package](https://update.flipperzero.one/builds/firmware/${{steps.names.outputs.branch_name}}/flipper-z-${{steps.names.outputs.default_target}}-update-${{steps.names.outputs.suffix}}.tgz)
-            - [📥 DFU file](https://update.flipperzero.one/builds/firmware/${{steps.names.outputs.branch_name}}/flipper-z-${{steps.names.outputs.default_target}}-full-${{steps.names.outputs.suffix}}.dfu)
-            - [☁️ Web/App updater](https://lab.flipper.net/?url=https://update.flipperzero.one/builds/firmware/${{steps.names.outputs.branch_name}}/flipper-z-${{steps.names.outputs.default_target}}-update-${{steps.names.outputs.suffix}}.tgz&channel=${{steps.names.outputs.branch_name}}&version=${{steps.names.outputs.commit_sha}})
-            - [📊 Size report](https://fw-reports.flipp.dev/?branch=${{steps.names.outputs.branch_name}})
+            - [📦 Update package](https://update.kiisu.io/builds/firmware/${{steps.names.outputs.branch_name}}/kiisu-z-${{steps.names.outputs.default_target}}-update-${{steps.names.outputs.suffix}}.tgz)
+            - [📥 DFU file](https://update.kiisu.io/builds/firmware/${{steps.names.outputs.branch_name}}/kiisu-z-${{steps.names.outputs.default_target}}-full-${{steps.names.outputs.suffix}}.dfu)
+            - [☁️ Web/App updater](https://lab.flipper.net/?url=https://update.kiisu.io/builds/firmware/${{steps.names.outputs.branch_name}}/kiisu-z-${{steps.names.outputs.default_target}}-update-${{steps.names.outputs.suffix}}.tgz&channel=${{steps.names.outputs.branch_name}}&version=${{steps.names.outputs.commit_sha}})
+            - [📊 Size report](https://fw-reports.kiisu.io/?branch=${{steps.names.outputs.branch_name}})
           edit-mode: replace
 
       - name: 'SDK submission to staging catalog'

@@ -1,13 +1,11 @@
 name: 'Post-release hooks'
 
-on:
-  release:
-    types: [prereleased, released]
+on: workflow_dispatch
 
 jobs:
   reindex:
     name: 'Post-release hooks'
-    runs-on: [self-hosted, FlipperZeroShell]
+    runs-on: [self-hosted]
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v4

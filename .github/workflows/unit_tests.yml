@@ -10,7 +10,7 @@ env:
 
 jobs:
   run_units_on_bench:
-    runs-on: [ self-hosted, FlipperZeroTest ]
+    runs-on: [ self-hosted]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
