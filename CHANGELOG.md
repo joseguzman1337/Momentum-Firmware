@@ -7,8 +7,8 @@
   - UL: Marantec protocol implement CRC verification display and add manually support (by @xMasterX & @li0ard, original code by @Skorpionm)
   - UL: Keeloq Comunello add manually support (by @xMasterX)
 - RFID: Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
-- BT Remote: Add Rename Option, simplify Bad KB BLE profile (by @aaronjamt & @WillyJL)
-- MNTM Settings: Add Skip Sliding Animations option for Lockscreen (by @aaronjamt)
+- BT Remote: Add Rename Option, simplify Bad KB BLE profile (#439 by @aaronjamt & @WillyJL)
+- MNTM Settings: Add Skip Sliding Animations option for Lockscreen (#436 by @aaronjamt)
 
 ### Updated:
 - Apps:
