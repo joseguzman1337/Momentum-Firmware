@@ -423,11 +423,16 @@ static int32_t cli_shell_thread(void* context) {
     cli_shell_init(shell);
     FURI_LOG_D(TAG, "Started");
 
+    if(pipe_state(shell->pipe) == PipeStateBroken) goto bail;
+
     shell->motd(shell->callback_context);
     cli_shell_line_prompt(shell->components[CliShellComponentLine]);
 
+    if(pipe_state(shell->pipe) == PipeStateBroken) goto bail;
+
     furi_event_loop_run(shell->event_loop);
 
+bail:
     FURI_LOG_D(TAG, "Stopped");
     cli_shell_deinit(shell);
     return 0;
