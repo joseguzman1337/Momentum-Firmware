@@ -30,6 +30,7 @@
 - UL: Docs: Update Sub-GHz DoorHan programming instructions (by @li0ard)
 
 ### Fixed:
+- CLI: Fix long delay with quick connect/disconnect, qFlipper should connect faster as expected again (by @WillyJL)
 - Bad KB: Fix modifier keys with HOLD/RELEASE commands (by @WillyJL)
 - Desktop: Fix lock screen hang (#438 by @aaronjamt)
 - NFC: Fix incorrect Saflok year formula (#433 by @Eltrick)
