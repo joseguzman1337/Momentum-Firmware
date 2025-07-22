@@ -415,6 +415,9 @@ static void cli_shell_deinit(CliShell* shell) {
 static int32_t cli_shell_thread(void* context) {
     CliShell* shell = context;
 
+    // Give qFlipper a chance to close and re-open the session
+    furi_delay_ms(100);
+
     // Sometimes, the other side closes the pipe even before our thread is started. Although the
     // rest of the code will eventually find this out if this check is removed, there's no point in
     // wasting time.
@@ -423,16 +426,11 @@ static int32_t cli_shell_thread(void* context) {
     cli_shell_init(shell);
     FURI_LOG_D(TAG, "Started");
 
-    if(pipe_state(shell->pipe) == PipeStateBroken) goto bail;
-
     shell->motd(shell->callback_context);
     cli_shell_line_prompt(shell->components[CliShellComponentLine]);
 
-    if(pipe_state(shell->pipe) == PipeStateBroken) goto bail;
-
     furi_event_loop_run(shell->event_loop);
 
-bail:
     FURI_LOG_D(TAG, "Stopped");
     cli_shell_deinit(shell);
     return 0;
