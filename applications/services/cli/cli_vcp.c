@@ -217,6 +217,7 @@ static void cli_vcp_internal_event_happened(FuriEventLoopObject* object, void* c
         // disconnect our side of the pipe
         pipe_detach_from_event_loop(cli_vcp->own_pipe);
         pipe_free(cli_vcp->own_pipe);
+        cli_vcp->own_pipe = NULL;
 
         // wait for shell to stop
         cli_shell_join(cli_vcp->shell);
