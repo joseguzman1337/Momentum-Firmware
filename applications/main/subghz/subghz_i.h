@@ -1,6 +1,7 @@
 #pragma once
 
 #include "helpers/subghz_types.h"
+#include "helpers/subghz_gen_info.h"
 #include <lib/subghz/types.h>
 #include "subghz.h"
 #include "views/receiver.h"
@@ -44,13 +45,6 @@
 #define SUBGHZ_RAW_THRESHOLD_MIN (-90.0f)
 #define SUBGHZ_MEASURE_LOADING   false
 
-typedef struct {
-    uint8_t fix[4];
-    uint8_t cnt[4];
-    uint8_t seed[4];
-    uint8_t btn;
-} SecureData;
-
 struct SubGhz {
     Gui* gui;
     NotificationApp* notifications;
@@ -89,7 +83,7 @@ struct SubGhz {
     FuriString* error_str;
     SubGhzLock lock;
 
-    SecureData* secure_data;
+    GenInfo* gen_info;
 
     SubGhzFileEncoderWorker* decode_raw_file_worker_encoder;
 

@@ -11,8 +11,51 @@ void subghz_scene_set_button_byte_input_callback(void* context) {
 
 void subghz_scene_set_button_on_enter(void* context) {
     SubGhz* subghz = context;
-    // Set default value (button 1) for first use
-    subghz->secure_data->btn = 0x01;
+
+    uint8_t* byte_ptr = NULL;
+    uint8_t byte_count = 0;
+
+    switch(subghz->gen_info->type) {
+        case GenFaacSLH:
+            byte_ptr = &subghz->gen_info->faac_slh.btn;
+            byte_count = sizeof(subghz->gen_info->faac_slh.btn);
+            break;
+        case GenKeeloq:
+            byte_ptr = &subghz->gen_info->keeloq.btn;
+            byte_count = sizeof(subghz->gen_info->keeloq.btn);
+            break;
+        case GenKeeloqBFT:
+            byte_ptr = &subghz->gen_info->keeloq_bft.btn;
+            byte_count = sizeof(subghz->gen_info->keeloq_bft.btn);
+            break;
+        case GenAlutechAt4n:
+            byte_ptr = &subghz->gen_info->alutech_at_4n.btn;
+            byte_count = sizeof(subghz->gen_info->alutech_at_4n.btn);
+            break;
+        case GenSomfyTelis:
+            byte_ptr = &subghz->gen_info->somfy_telis.btn;
+            byte_count = sizeof(subghz->gen_info->somfy_telis.btn);
+            break;
+        case GenNiceFlorS:
+            byte_ptr = &subghz->gen_info->nice_flor_s.btn;
+            byte_count = sizeof(subghz->gen_info->nice_flor_s.btn);
+            break;
+        case GenSecPlus2:
+            byte_ptr = &subghz->gen_info->sec_plus_2.btn;
+            byte_count = sizeof(subghz->gen_info->sec_plus_2.btn);
+            break;
+        // Not needed for these types
+        case GenPhoenixV2:
+        case GenData:
+        case GenSecPlus1:
+        case GenCameAtomo:
+        default:
+            furi_crash("Not implemented");
+            break;
+    }
+
+    furi_assert(byte_ptr);
+    furi_assert(byte_count > 0);
 
     // Setup view
     ByteInput* byte_input = subghz->byte_input;
@@ -22,58 +65,38 @@ void subghz_scene_set_button_on_enter(void* context) {
         subghz_scene_set_button_byte_input_callback,
         NULL,
         subghz,
-        &subghz->secure_data->btn,
-        1);
+        byte_ptr,
+        byte_count);
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdByteInput);
 }
 
 bool subghz_scene_set_button_on_event(void* context, SceneManagerEvent event) {
     SubGhz* subghz = context;
     bool consumed = false;
-    bool generated_protocol = false;
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
-            SetType state =
-                scene_manager_get_scene_state(subghz->scene_manager, SubGhzSceneSetType);
-
-            if (state == SetTypeNiceFlorS_433_92 || state == SetTypeNiceOne_433_92) {
-                uint64_t key = (uint64_t)rand();
-
-                generated_protocol = subghz_txrx_gen_nice_flor_s_protocol(
-                    subghz->txrx,
-                    "AM650",
-                    433920000,
-                    key & 0x0FFFFFFF,
-                    subghz->secure_data->btn,
-                    0x03,
-                    state == SetTypeNiceOne_433_92
-                );
-
-                if(!generated_protocol) {
-                    furi_string_set(
-                        subghz->error_str, "Function requires\nan SD card with\nfresh databases.");
-                    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
-                }
-
-                consumed = true;
+            switch(subghz->gen_info->type) {
+            case GenFaacSLH:
+            case GenKeeloq:
+            case GenKeeloqBFT:
+            case GenAlutechAt4n:
+            case GenSomfyTelis:
+            case GenNiceFlorS:
+            case GenSecPlus2:
+                scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetCounter);
+                break;
+            // Not needed for these types
+            case GenCameAtomo:
+            case GenPhoenixV2:
+            case GenData:
+            case GenSecPlus1:
+            default:
+                furi_crash("Not implemented");
+                break;
             }
-        }
 
-        // Reset Seed, Fix, Cnt, Btn in secure data after successful or unsuccessful generation
-        memset(subghz->secure_data->seed, 0, sizeof(subghz->secure_data->seed));
-        memset(subghz->secure_data->cnt, 0, sizeof(subghz->secure_data->cnt));
-        memset(subghz->secure_data->fix, 0, sizeof(subghz->secure_data->fix));
-        subghz->secure_data->btn = 0x01;
-
-
-        if(generated_protocol) {
-            subghz_file_name_clear(subghz);
-
-            scene_manager_set_scene_state(
-                subghz->scene_manager, SubGhzSceneSetType, SubGhzCustomEventManagerSet);
-            scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSaveName);
-            return true;
+            consumed = true;
         }
     }
     return consumed;
