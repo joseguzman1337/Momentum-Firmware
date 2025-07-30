@@ -29,12 +29,7 @@ void subghz_scene_set_key_on_enter(void* context) {
     ByteInput* byte_input = subghz->byte_input;
     byte_input_set_header_text(byte_input, "Enter KEY in hex");
     byte_input_set_result_callback(
-        byte_input,
-        subghz_scene_set_key_byte_input_callback,
-        NULL,
-        subghz,
-        byte_ptr,
-        byte_count);
+        byte_input, subghz_scene_set_key_byte_input_callback, NULL, subghz, byte_ptr, byte_count);
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdByteInput);
 }
 

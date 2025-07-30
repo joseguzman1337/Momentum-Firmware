@@ -79,6 +79,6 @@ typedef struct {
     };
 } GenInfo;
 
-void subghz_gen_info_reset(GenInfo *gen_info);
+void subghz_gen_info_reset(GenInfo* gen_info);
 
 void subghz_scene_set_type_fill_generation_infos(GenInfo* infos_dest, SetType type);

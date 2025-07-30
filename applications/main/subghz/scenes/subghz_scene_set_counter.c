@@ -16,48 +16,48 @@ void subghz_scene_set_counter_on_enter(void* context) {
     uint8_t byte_count = 0;
 
     switch(subghz->gen_info->type) {
-        case GenFaacSLH:
-            byte_ptr = &subghz->gen_info->faac_slh.cnt;
-            byte_count = sizeof(subghz->gen_info->faac_slh.cnt);
-            break;
-        case GenKeeloq:
-            byte_ptr = &subghz->gen_info->keeloq.cnt;
-            byte_count = sizeof(subghz->gen_info->keeloq.cnt);
-            break;
-        case GenCameAtomo:
-            byte_ptr = &subghz->gen_info->came_atomo.cnt;
-            byte_count = sizeof(subghz->gen_info->came_atomo.cnt);
-            break;
-        case GenKeeloqBFT:
-            byte_ptr = &subghz->gen_info->keeloq_bft.cnt;
-            byte_count = sizeof(subghz->gen_info->keeloq_bft.cnt);
-            break;
-        case GenAlutechAt4n:
-            byte_ptr = &subghz->gen_info->alutech_at_4n.cnt;
-            byte_count = sizeof(subghz->gen_info->alutech_at_4n.cnt);
-            break;
-        case GenSomfyTelis:
-            byte_ptr = &subghz->gen_info->somfy_telis.cnt;
-            byte_count = sizeof(subghz->gen_info->somfy_telis.cnt);
-            break;
-        case GenNiceFlorS:
-            byte_ptr = &subghz->gen_info->nice_flor_s.cnt;
-            byte_count = sizeof(subghz->gen_info->nice_flor_s.cnt);
-            break;
-        case GenSecPlus2:
-            byte_ptr = (uint8_t*)&subghz->gen_info->sec_plus_2.cnt;
-            byte_count = sizeof(subghz->gen_info->sec_plus_2.cnt);
-            break;
-        case GenPhoenixV2:
-            byte_ptr = (uint8_t*)&subghz->gen_info->phoenix_v2.cnt;
-            byte_count = sizeof(subghz->gen_info->phoenix_v2.cnt);
-            break;
-        // Not needed for these types
-        case GenData:
-        case GenSecPlus1:
-        default:
-            furi_crash("Not implemented");
-            break;
+    case GenFaacSLH:
+        byte_ptr = &subghz->gen_info->faac_slh.cnt;
+        byte_count = sizeof(subghz->gen_info->faac_slh.cnt);
+        break;
+    case GenKeeloq:
+        byte_ptr = &subghz->gen_info->keeloq.cnt;
+        byte_count = sizeof(subghz->gen_info->keeloq.cnt);
+        break;
+    case GenCameAtomo:
+        byte_ptr = &subghz->gen_info->came_atomo.cnt;
+        byte_count = sizeof(subghz->gen_info->came_atomo.cnt);
+        break;
+    case GenKeeloqBFT:
+        byte_ptr = &subghz->gen_info->keeloq_bft.cnt;
+        byte_count = sizeof(subghz->gen_info->keeloq_bft.cnt);
+        break;
+    case GenAlutechAt4n:
+        byte_ptr = &subghz->gen_info->alutech_at_4n.cnt;
+        byte_count = sizeof(subghz->gen_info->alutech_at_4n.cnt);
+        break;
+    case GenSomfyTelis:
+        byte_ptr = &subghz->gen_info->somfy_telis.cnt;
+        byte_count = sizeof(subghz->gen_info->somfy_telis.cnt);
+        break;
+    case GenNiceFlorS:
+        byte_ptr = &subghz->gen_info->nice_flor_s.cnt;
+        byte_count = sizeof(subghz->gen_info->nice_flor_s.cnt);
+        break;
+    case GenSecPlus2:
+        byte_ptr = (uint8_t*)&subghz->gen_info->sec_plus_2.cnt;
+        byte_count = sizeof(subghz->gen_info->sec_plus_2.cnt);
+        break;
+    case GenPhoenixV2:
+        byte_ptr = (uint8_t*)&subghz->gen_info->phoenix_v2.cnt;
+        byte_count = sizeof(subghz->gen_info->phoenix_v2.cnt);
+        break;
+    // Not needed for these types
+    case GenData:
+    case GenSecPlus1:
+    default:
+        furi_crash("Not implemented");
+        break;
     }
 
     furi_assert(byte_ptr);
@@ -87,79 +87,79 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
             GenInfo gen_info = *subghz->gen_info;
 
             switch(gen_info.type) {
-                case GenFaacSLH:
-                case GenKeeloqBFT:
-                    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetSeed);
-                    return true;
-                case GenKeeloq:
-                    generated_protocol = subghz_txrx_gen_keeloq_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.keeloq.serial,
-                        gen_info.keeloq.btn,
-                        gen_info.keeloq.cnt,
-                        gen_info.keeloq.manuf);
-                    break;
-                case GenCameAtomo:
-                    generated_protocol = subghz_txrx_gen_came_atomo_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.came_atomo.serial,
-                        gen_info.came_atomo.cnt);
-                    break;
-                case GenAlutechAt4n:
-                    generated_protocol = subghz_txrx_gen_alutech_at_4n_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.alutech_at_4n.serial,
-                        gen_info.alutech_at_4n.btn,
-                        gen_info.alutech_at_4n.cnt);
-                    break;
-                case GenSomfyTelis:
-                    generated_protocol = subghz_txrx_gen_somfy_telis_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.somfy_telis.serial,
-                        gen_info.somfy_telis.btn,
-                        gen_info.somfy_telis.cnt);
-                    break;
-                case GenNiceFlorS:
-                    generated_protocol = subghz_txrx_gen_nice_flor_s_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.nice_flor_s.serial,
-                        gen_info.nice_flor_s.btn,
-                        gen_info.nice_flor_s.cnt,
-                        gen_info.nice_flor_s.nice_one);
-                    break;
-                case GenSecPlus2:
-                    generated_protocol = subghz_txrx_gen_secplus_v2_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.sec_plus_2.serial,
-                        gen_info.sec_plus_2.btn,
-                        gen_info.sec_plus_2.cnt);
-                    break;
-                case GenPhoenixV2:
-                    generated_protocol = subghz_txrx_gen_phoenix_v2_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.phoenix_v2.serial,
-                        gen_info.phoenix_v2.cnt);
-                    break;
-                // Not needed for these types
-                case GenData:
-                case GenSecPlus1:
-                default:
-                    furi_crash("Not implemented");
-                    break;
+            case GenFaacSLH:
+            case GenKeeloqBFT:
+                scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetSeed);
+                return true;
+            case GenKeeloq:
+                generated_protocol = subghz_txrx_gen_keeloq_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.keeloq.serial,
+                    gen_info.keeloq.btn,
+                    gen_info.keeloq.cnt,
+                    gen_info.keeloq.manuf);
+                break;
+            case GenCameAtomo:
+                generated_protocol = subghz_txrx_gen_came_atomo_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.came_atomo.serial,
+                    gen_info.came_atomo.cnt);
+                break;
+            case GenAlutechAt4n:
+                generated_protocol = subghz_txrx_gen_alutech_at_4n_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.alutech_at_4n.serial,
+                    gen_info.alutech_at_4n.btn,
+                    gen_info.alutech_at_4n.cnt);
+                break;
+            case GenSomfyTelis:
+                generated_protocol = subghz_txrx_gen_somfy_telis_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.somfy_telis.serial,
+                    gen_info.somfy_telis.btn,
+                    gen_info.somfy_telis.cnt);
+                break;
+            case GenNiceFlorS:
+                generated_protocol = subghz_txrx_gen_nice_flor_s_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.nice_flor_s.serial,
+                    gen_info.nice_flor_s.btn,
+                    gen_info.nice_flor_s.cnt,
+                    gen_info.nice_flor_s.nice_one);
+                break;
+            case GenSecPlus2:
+                generated_protocol = subghz_txrx_gen_secplus_v2_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.sec_plus_2.serial,
+                    gen_info.sec_plus_2.btn,
+                    gen_info.sec_plus_2.cnt);
+                break;
+            case GenPhoenixV2:
+                generated_protocol = subghz_txrx_gen_phoenix_v2_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.phoenix_v2.serial,
+                    gen_info.phoenix_v2.cnt);
+                break;
+            // Not needed for these types
+            case GenData:
+            case GenSecPlus1:
+            default:
+                furi_crash("Not implemented");
+                break;
             }
 
             consumed = true;

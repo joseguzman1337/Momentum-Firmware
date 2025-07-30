@@ -16,42 +16,42 @@ void subghz_scene_set_button_on_enter(void* context) {
     uint8_t byte_count = 0;
 
     switch(subghz->gen_info->type) {
-        case GenFaacSLH:
-            byte_ptr = &subghz->gen_info->faac_slh.btn;
-            byte_count = sizeof(subghz->gen_info->faac_slh.btn);
-            break;
-        case GenKeeloq:
-            byte_ptr = &subghz->gen_info->keeloq.btn;
-            byte_count = sizeof(subghz->gen_info->keeloq.btn);
-            break;
-        case GenKeeloqBFT:
-            byte_ptr = &subghz->gen_info->keeloq_bft.btn;
-            byte_count = sizeof(subghz->gen_info->keeloq_bft.btn);
-            break;
-        case GenAlutechAt4n:
-            byte_ptr = &subghz->gen_info->alutech_at_4n.btn;
-            byte_count = sizeof(subghz->gen_info->alutech_at_4n.btn);
-            break;
-        case GenSomfyTelis:
-            byte_ptr = &subghz->gen_info->somfy_telis.btn;
-            byte_count = sizeof(subghz->gen_info->somfy_telis.btn);
-            break;
-        case GenNiceFlorS:
-            byte_ptr = &subghz->gen_info->nice_flor_s.btn;
-            byte_count = sizeof(subghz->gen_info->nice_flor_s.btn);
-            break;
-        case GenSecPlus2:
-            byte_ptr = &subghz->gen_info->sec_plus_2.btn;
-            byte_count = sizeof(subghz->gen_info->sec_plus_2.btn);
-            break;
-        // Not needed for these types
-        case GenPhoenixV2:
-        case GenData:
-        case GenSecPlus1:
-        case GenCameAtomo:
-        default:
-            furi_crash("Not implemented");
-            break;
+    case GenFaacSLH:
+        byte_ptr = &subghz->gen_info->faac_slh.btn;
+        byte_count = sizeof(subghz->gen_info->faac_slh.btn);
+        break;
+    case GenKeeloq:
+        byte_ptr = &subghz->gen_info->keeloq.btn;
+        byte_count = sizeof(subghz->gen_info->keeloq.btn);
+        break;
+    case GenKeeloqBFT:
+        byte_ptr = &subghz->gen_info->keeloq_bft.btn;
+        byte_count = sizeof(subghz->gen_info->keeloq_bft.btn);
+        break;
+    case GenAlutechAt4n:
+        byte_ptr = &subghz->gen_info->alutech_at_4n.btn;
+        byte_count = sizeof(subghz->gen_info->alutech_at_4n.btn);
+        break;
+    case GenSomfyTelis:
+        byte_ptr = &subghz->gen_info->somfy_telis.btn;
+        byte_count = sizeof(subghz->gen_info->somfy_telis.btn);
+        break;
+    case GenNiceFlorS:
+        byte_ptr = &subghz->gen_info->nice_flor_s.btn;
+        byte_count = sizeof(subghz->gen_info->nice_flor_s.btn);
+        break;
+    case GenSecPlus2:
+        byte_ptr = &subghz->gen_info->sec_plus_2.btn;
+        byte_count = sizeof(subghz->gen_info->sec_plus_2.btn);
+        break;
+    // Not needed for these types
+    case GenPhoenixV2:
+    case GenData:
+    case GenSecPlus1:
+    case GenCameAtomo:
+    default:
+        furi_crash("Not implemented");
+        break;
     }
 
     furi_assert(byte_ptr);

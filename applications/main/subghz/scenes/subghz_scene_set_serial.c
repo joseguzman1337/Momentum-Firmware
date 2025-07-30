@@ -16,48 +16,48 @@ void subghz_scene_set_serial_on_enter(void* context) {
     uint8_t byte_count = 0;
 
     switch(subghz->gen_info->type) {
-        case GenFaacSLH:
-            byte_ptr = (uint8_t*)&subghz->gen_info->faac_slh.serial;
-            byte_count = sizeof(subghz->gen_info->faac_slh.serial);
-            break;
-        case GenKeeloq:
-            byte_ptr = (uint8_t*)&subghz->gen_info->keeloq.serial;
-            byte_count = sizeof(subghz->gen_info->keeloq.serial);
-            break;
-        case GenCameAtomo:
-            byte_ptr = (uint8_t*)&subghz->gen_info->came_atomo.serial;
-            byte_count = sizeof(subghz->gen_info->came_atomo.serial);
-            break;
-        case GenKeeloqBFT:
-            byte_ptr = (uint8_t*)&subghz->gen_info->keeloq_bft.serial;
-            byte_count = sizeof(subghz->gen_info->keeloq_bft.serial);
-            break;
-        case GenAlutechAt4n:
-            byte_ptr = (uint8_t*)&subghz->gen_info->alutech_at_4n.serial;
-            byte_count = sizeof(subghz->gen_info->alutech_at_4n.serial);
-            break;
-        case GenSomfyTelis:
-            byte_ptr = (uint8_t*)&subghz->gen_info->somfy_telis.serial;
-            byte_count = sizeof(subghz->gen_info->somfy_telis.serial);
-            break;
-        case GenNiceFlorS:
-            byte_ptr = (uint8_t*)&subghz->gen_info->nice_flor_s.serial;
-            byte_count = sizeof(subghz->gen_info->nice_flor_s.serial);
-            break;
-        case GenSecPlus2:
-            byte_ptr = (uint8_t*)&subghz->gen_info->sec_plus_2.serial;
-            byte_count = sizeof(subghz->gen_info->sec_plus_2.serial);
-            break;
-        case GenPhoenixV2:
-            byte_ptr = (uint8_t*)&subghz->gen_info->phoenix_v2.serial;
-            byte_count = sizeof(subghz->gen_info->phoenix_v2.serial);
-            break;
-        // Not needed for these types
-        case GenData:
-        case GenSecPlus1:
-        default:
-            furi_crash("Not implemented");
-            break;
+    case GenFaacSLH:
+        byte_ptr = (uint8_t*)&subghz->gen_info->faac_slh.serial;
+        byte_count = sizeof(subghz->gen_info->faac_slh.serial);
+        break;
+    case GenKeeloq:
+        byte_ptr = (uint8_t*)&subghz->gen_info->keeloq.serial;
+        byte_count = sizeof(subghz->gen_info->keeloq.serial);
+        break;
+    case GenCameAtomo:
+        byte_ptr = (uint8_t*)&subghz->gen_info->came_atomo.serial;
+        byte_count = sizeof(subghz->gen_info->came_atomo.serial);
+        break;
+    case GenKeeloqBFT:
+        byte_ptr = (uint8_t*)&subghz->gen_info->keeloq_bft.serial;
+        byte_count = sizeof(subghz->gen_info->keeloq_bft.serial);
+        break;
+    case GenAlutechAt4n:
+        byte_ptr = (uint8_t*)&subghz->gen_info->alutech_at_4n.serial;
+        byte_count = sizeof(subghz->gen_info->alutech_at_4n.serial);
+        break;
+    case GenSomfyTelis:
+        byte_ptr = (uint8_t*)&subghz->gen_info->somfy_telis.serial;
+        byte_count = sizeof(subghz->gen_info->somfy_telis.serial);
+        break;
+    case GenNiceFlorS:
+        byte_ptr = (uint8_t*)&subghz->gen_info->nice_flor_s.serial;
+        byte_count = sizeof(subghz->gen_info->nice_flor_s.serial);
+        break;
+    case GenSecPlus2:
+        byte_ptr = (uint8_t*)&subghz->gen_info->sec_plus_2.serial;
+        byte_count = sizeof(subghz->gen_info->sec_plus_2.serial);
+        break;
+    case GenPhoenixV2:
+        byte_ptr = (uint8_t*)&subghz->gen_info->phoenix_v2.serial;
+        byte_count = sizeof(subghz->gen_info->phoenix_v2.serial);
+        break;
+    // Not needed for these types
+    case GenData:
+    case GenSecPlus1:
+    default:
+        furi_crash("Not implemented");
+        break;
     }
 
     furi_assert(byte_ptr);
@@ -83,25 +83,25 @@ bool subghz_scene_set_serial_on_event(void* context, SceneManagerEvent event) {
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
             switch(subghz->gen_info->type) {
-                case GenFaacSLH:
-                case GenKeeloq:
-                case GenKeeloqBFT:
-                case GenAlutechAt4n:
-                case GenSomfyTelis:
-                case GenNiceFlorS:
-                case GenSecPlus2:
-                    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetButton);
-                    break;
-                case GenCameAtomo:
-                case GenPhoenixV2:
-                    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetCounter);
-                    break;
-                // Not needed for these types
-                case GenData:
-                case GenSecPlus1:
-                default:
-                    furi_crash("Not implemented");
-                    break;
+            case GenFaacSLH:
+            case GenKeeloq:
+            case GenKeeloqBFT:
+            case GenAlutechAt4n:
+            case GenSomfyTelis:
+            case GenNiceFlorS:
+            case GenSecPlus2:
+                scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetButton);
+                break;
+            case GenCameAtomo:
+            case GenPhoenixV2:
+                scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetCounter);
+                break;
+            // Not needed for these types
+            case GenData:
+            case GenSecPlus1:
+            default:
+                furi_crash("Not implemented");
+                break;
             }
 
             consumed = true;

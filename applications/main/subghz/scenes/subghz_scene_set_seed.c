@@ -16,27 +16,27 @@ void subghz_scene_set_seed_on_enter(void* context) {
     uint8_t byte_count = 0;
 
     switch(subghz->gen_info->type) {
-        case GenFaacSLH:
-            byte_ptr = (uint8_t*)&subghz->gen_info->faac_slh.seed;
-            byte_count = sizeof(subghz->gen_info->faac_slh.seed);
-            break;
-        case GenKeeloqBFT:
-            byte_ptr = (uint8_t*)&subghz->gen_info->keeloq_bft.seed;
-            byte_count = sizeof(subghz->gen_info->keeloq_bft.seed);
-            break;
-        // Not needed for these types
-        case GenKeeloq:
-        case GenAlutechAt4n:
-        case GenSomfyTelis:
-        case GenNiceFlorS:
-        case GenSecPlus2:
-        case GenPhoenixV2:
-        case GenData:
-        case GenSecPlus1:
-        case GenCameAtomo:
-        default:
-            furi_crash("Not implemented");
-            break;
+    case GenFaacSLH:
+        byte_ptr = (uint8_t*)&subghz->gen_info->faac_slh.seed;
+        byte_count = sizeof(subghz->gen_info->faac_slh.seed);
+        break;
+    case GenKeeloqBFT:
+        byte_ptr = (uint8_t*)&subghz->gen_info->keeloq_bft.seed;
+        byte_count = sizeof(subghz->gen_info->keeloq_bft.seed);
+        break;
+    // Not needed for these types
+    case GenKeeloq:
+    case GenAlutechAt4n:
+    case GenSomfyTelis:
+    case GenNiceFlorS:
+    case GenSecPlus2:
+    case GenPhoenixV2:
+    case GenData:
+    case GenSecPlus1:
+    case GenCameAtomo:
+    default:
+        furi_crash("Not implemented");
+        break;
     }
 
     furi_assert(byte_ptr);
@@ -46,12 +46,7 @@ void subghz_scene_set_seed_on_enter(void* context) {
     ByteInput* byte_input = subghz->byte_input;
     byte_input_set_header_text(byte_input, "Enter SEED in hex");
     byte_input_set_result_callback(
-        byte_input,
-        subghz_scene_set_seed_byte_input_callback,
-        NULL,
-        subghz,
-        byte_ptr,
-        byte_count);
+        byte_input, subghz_scene_set_seed_byte_input_callback, NULL, subghz, byte_ptr, byte_count);
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdByteInput);
 }
 
@@ -64,41 +59,41 @@ bool subghz_scene_set_seed_on_event(void* context, SceneManagerEvent event) {
             GenInfo gen_info = *subghz->gen_info;
 
             switch(gen_info.type) {
-                case GenFaacSLH:
-                    generated_protocol = subghz_txrx_gen_faac_slh_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.faac_slh.serial,
-                        gen_info.faac_slh.btn,
-                        gen_info.faac_slh.cnt,
-                        gen_info.faac_slh.seed,
-                        gen_info.faac_slh.manuf);
-                    break;
-                case GenKeeloqBFT:
-                    generated_protocol = subghz_txrx_gen_keeloq_bft_protocol(
-                        subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.keeloq_bft.serial,
-                        gen_info.keeloq_bft.btn,
-                        gen_info.keeloq_bft.cnt,
-                        gen_info.keeloq_bft.seed,
-                        gen_info.keeloq_bft.manuf);
-                    break;
-                // Not needed for these types
-                case GenKeeloq:
-                case GenAlutechAt4n:
-                case GenSomfyTelis:
-                case GenNiceFlorS:
-                case GenSecPlus2:
-                case GenPhoenixV2:
-                case GenData:
-                case GenSecPlus1:
-                case GenCameAtomo:
-                default:
-                    furi_crash("Not implemented");
-                    break;
+            case GenFaacSLH:
+                generated_protocol = subghz_txrx_gen_faac_slh_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.faac_slh.serial,
+                    gen_info.faac_slh.btn,
+                    gen_info.faac_slh.cnt,
+                    gen_info.faac_slh.seed,
+                    gen_info.faac_slh.manuf);
+                break;
+            case GenKeeloqBFT:
+                generated_protocol = subghz_txrx_gen_keeloq_bft_protocol(
+                    subghz->txrx,
+                    gen_info.mod,
+                    gen_info.freq,
+                    gen_info.keeloq_bft.serial,
+                    gen_info.keeloq_bft.btn,
+                    gen_info.keeloq_bft.cnt,
+                    gen_info.keeloq_bft.seed,
+                    gen_info.keeloq_bft.manuf);
+                break;
+            // Not needed for these types
+            case GenKeeloq:
+            case GenAlutechAt4n:
+            case GenSomfyTelis:
+            case GenNiceFlorS:
+            case GenSecPlus2:
+            case GenPhoenixV2:
+            case GenData:
+            case GenSecPlus1:
+            case GenCameAtomo:
+            default:
+                furi_crash("Not implemented");
+                break;
             }
 
             consumed = true;
