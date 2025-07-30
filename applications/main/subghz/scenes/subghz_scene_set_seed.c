@@ -12,6 +12,36 @@ void subghz_scene_set_seed_byte_input_callback(void* context) {
 void subghz_scene_set_seed_on_enter(void* context) {
     SubGhz* subghz = context;
 
+    uint8_t* byte_ptr = NULL;
+    uint8_t byte_count = 0;
+
+    switch(subghz->gen_info->type) {
+        case GenFaacSLH:
+            byte_ptr = (uint8_t*)&subghz->gen_info->faac_slh.seed;
+            byte_count = sizeof(subghz->gen_info->faac_slh.seed);
+            break;
+        case GenKeeloqBFT:
+            byte_ptr = (uint8_t*)&subghz->gen_info->keeloq_bft.seed;
+            byte_count = sizeof(subghz->gen_info->keeloq_bft.seed);
+            break;
+        // Not needed for these types
+        case GenKeeloq:
+        case GenAlutechAt4n:
+        case GenSomfyTelis:
+        case GenNiceFlorS:
+        case GenSecPlus2:
+        case GenPhoenixV2:
+        case GenData:
+        case GenSecPlus1:
+        case GenCameAtomo:
+        default:
+            furi_crash("Not implemented");
+            break;
+    }
+
+    furi_assert(byte_ptr);
+    furi_assert(byte_count > 0);
+
     // Setup view
     ByteInput* byte_input = subghz->byte_input;
     byte_input_set_header_text(byte_input, "Enter SEED in hex");
@@ -20,8 +50,8 @@ void subghz_scene_set_seed_on_enter(void* context) {
         subghz_scene_set_seed_byte_input_callback,
         NULL,
         subghz,
-        subghz->secure_data->seed,
-        4);
+        byte_ptr,
+        byte_count);
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdByteInput);
 }
 
@@ -29,97 +59,61 @@ bool subghz_scene_set_seed_on_event(void* context, SceneManagerEvent event) {
     SubGhz* subghz = context;
     bool consumed = false;
     bool generated_protocol = false;
-    uint32_t fix_part, cnt, seed;
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
-            SetType state =
-                scene_manager_get_scene_state(subghz->scene_manager, SubGhzSceneSetType);
+            GenInfo gen_info = *subghz->gen_info;
 
-            switch(state) {
-            case SetTypeBFTClone:
-                fix_part = subghz->secure_data->fix[0] << 24 | subghz->secure_data->fix[1] << 16 |
-                           subghz->secure_data->fix[2] << 8 | subghz->secure_data->fix[3];
-
-                cnt = subghz->secure_data->cnt[0] << 8 | subghz->secure_data->cnt[1];
-
-                seed = subghz->secure_data->seed[0] << 24 | subghz->secure_data->seed[1] << 16 |
-                       subghz->secure_data->seed[2] << 8 | subghz->secure_data->seed[3];
-
-                generated_protocol = subghz_txrx_gen_keeloq_bft_protocol(
-                    subghz->txrx,
-                    "AM650",
-                    433920000,
-                    fix_part & 0x0FFFFFFF,
-                    fix_part >> 28,
-                    cnt,
-                    seed,
-                    "BFT");
-
-                if(!generated_protocol) {
-                    furi_string_set(
-                        subghz->error_str, "Function requires\nan SD card with\nfresh databases.");
-                    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
-                }
-                consumed = true;
-                break;
-            case SetTypeFaacSLH_Manual_433:
-            case SetTypeFaacSLH_Manual_868:
-                fix_part = subghz->secure_data->fix[0] << 24 | subghz->secure_data->fix[1] << 16 |
-                           subghz->secure_data->fix[2] << 8 | subghz->secure_data->fix[3];
-
-                cnt = subghz->secure_data->cnt[0] << 16 | subghz->secure_data->cnt[1] << 8 |
-                      subghz->secure_data->cnt[2];
-
-                seed = subghz->secure_data->seed[0] << 24 | subghz->secure_data->seed[1] << 16 |
-                       subghz->secure_data->seed[2] << 8 | subghz->secure_data->seed[3];
-
-                if(state == SetTypeFaacSLH_Manual_433) {
+            switch(gen_info.type) {
+                case GenFaacSLH:
                     generated_protocol = subghz_txrx_gen_faac_slh_protocol(
                         subghz->txrx,
-                        "AM650",
-                        433920000,
-                        fix_part >> 4,
-                        fix_part & 0xf,
-                        (cnt & 0xFFFFF),
-                        seed,
-                        "FAAC_SLH");
-                } else if(state == SetTypeFaacSLH_Manual_868) {
-                    generated_protocol = subghz_txrx_gen_faac_slh_protocol(
+                        gen_info.mod,
+                        gen_info.freq,
+                        gen_info.faac_slh.serial,
+                        gen_info.faac_slh.btn,
+                        gen_info.faac_slh.cnt,
+                        gen_info.faac_slh.seed,
+                        gen_info.faac_slh.manuf);
+                    break;
+                case GenKeeloqBFT:
+                    generated_protocol = subghz_txrx_gen_keeloq_bft_protocol(
                         subghz->txrx,
-                        "AM650",
-                        868350000,
-                        fix_part >> 4,
-                        fix_part & 0xf,
-                        (cnt & 0xFFFFF),
-                        seed,
-                        "FAAC_SLH");
-                }
-
-                if(!generated_protocol) {
-                    furi_string_set(
-                        subghz->error_str, "Function requires\nan SD card with\nfresh databases.");
-                    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
-                }
-                consumed = true;
-                break;
-
-            default:
-                break;
+                        gen_info.mod,
+                        gen_info.freq,
+                        gen_info.keeloq_bft.serial,
+                        gen_info.keeloq_bft.btn,
+                        gen_info.keeloq_bft.cnt,
+                        gen_info.keeloq_bft.seed,
+                        gen_info.keeloq_bft.manuf);
+                    break;
+                // Not needed for these types
+                case GenKeeloq:
+                case GenAlutechAt4n:
+                case GenSomfyTelis:
+                case GenNiceFlorS:
+                case GenSecPlus2:
+                case GenPhoenixV2:
+                case GenData:
+                case GenSecPlus1:
+                case GenCameAtomo:
+                default:
+                    furi_crash("Not implemented");
+                    break;
             }
-        }
 
-        // Reset Seed, Fix, Cnt in secure data after successful or unsuccessful generation
-        memset(subghz->secure_data->seed, 0, sizeof(subghz->secure_data->seed));
-        memset(subghz->secure_data->cnt, 0, sizeof(subghz->secure_data->cnt));
-        memset(subghz->secure_data->fix, 0, sizeof(subghz->secure_data->fix));
+            consumed = true;
 
-        if(generated_protocol) {
-            subghz_file_name_clear(subghz);
+            if(!generated_protocol) {
+                furi_string_set(
+                    subghz->error_str, "Function requires\nan SD card with\nfresh databases.");
+                scene_manager_next_scene(subghz->scene_manager, SubGhzSceneShowError);
+            } else {
+                subghz_file_name_clear(subghz);
 
-            scene_manager_set_scene_state(
-                subghz->scene_manager, SubGhzSceneSetType, SubGhzCustomEventManagerSet);
-            scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSaveName);
-            return true;
+                scene_manager_set_scene_state(
+                    subghz->scene_manager, SubGhzSceneSetType, SubGhzCustomEventManagerSet);
+                scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSaveName);
+            }
         }
     }
     return consumed;
