@@ -62,6 +62,12 @@ let views = {
     }),
 };
 
+// Enable illegal filename symbols since we're not choosing filenames, gives more flexibility
+// Not available in all firmwares, good idea to check if it is supported
+if (doesSdkSupport(["gui-textinput-illegalsymbols"])) {
+    views.keyboard.set("illegalSymbols", true);
+}
+
 // demo selector
 eventLoop.subscribe(views.demos.chosen, function (_sub, index, gui, eventLoop, views) {
     if (index === 0) {
@@ -131,8 +137,8 @@ eventLoop.subscribe(gui.viewDispatcher.navigation, function (_sub, _, gui, views
 }, gui, views, eventLoop);
 
 // go to the demo chooser screen when the right key is pressed on the widget screen
-eventLoop.subscribe(views.stopwatchWidget.button, function (_sub, buttonId, gui, views) {
-    if (buttonId === "right")
+eventLoop.subscribe(views.stopwatchWidget.button, function (_sub, buttonEvent, gui, views) {
+    if (buttonEvent.key === "right" && buttonEvent.type === "short")
         gui.viewDispatcher.switchTo(views.demos);
 }, gui, views);
 
