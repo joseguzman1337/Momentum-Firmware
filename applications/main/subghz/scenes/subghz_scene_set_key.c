@@ -1,6 +1,8 @@
 #include "../subghz_i.h"
 #include "../helpers/subghz_txrx_create_protocol_key.h"
 
+#include <machine/endian.h>
+
 #define TAG "SubGhzSetKey"
 
 void subghz_scene_set_key_byte_input_callback(void* context) {
@@ -24,6 +26,8 @@ void subghz_scene_set_key_on_enter(void* context) {
 
     furi_assert(byte_ptr);
     furi_assert(byte_count > 0);
+
+    *((uint64_t*)byte_ptr) = __bswap64(*((uint64_t*)byte_ptr)); // Convert
 
     // Setup view
     ByteInput* byte_input = subghz->byte_input;
@@ -49,7 +53,7 @@ bool subghz_scene_set_key_on_event(void* context, SceneManagerEvent event) {
                         gen_info.mod,
                         gen_info.freq,
                         gen_info.data.name,
-                        gen_info.data.key,
+                        __bswap64(gen_info.data.key),
                         gen_info.data.bits,
                         gen_info.data.te);
                 } else {
@@ -58,7 +62,7 @@ bool subghz_scene_set_key_on_event(void* context, SceneManagerEvent event) {
                         gen_info.mod,
                         gen_info.freq,
                         gen_info.data.name,
-                        gen_info.data.key,
+                        __bswap64(gen_info.data.key),
                         gen_info.data.bits);
                 }
             }

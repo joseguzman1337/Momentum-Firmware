@@ -1,6 +1,8 @@
 #include "../subghz_i.h"
 #include "../helpers/subghz_txrx_create_protocol_key.h"
 
+#include <machine/endian.h>
+
 #define TAG "SubGhzSetCounter"
 
 void subghz_scene_set_counter_byte_input_callback(void* context) {
@@ -63,6 +65,12 @@ void subghz_scene_set_counter_on_enter(void* context) {
     furi_assert(byte_ptr);
     furi_assert(byte_count > 0);
 
+    if(byte_count == 2) {
+        *((uint16_t*)byte_ptr) = __bswap16(*((uint16_t*)byte_ptr)); // Convert
+    } else if(byte_count == 4) {
+        *((uint32_t*)byte_ptr) = __bswap32(*((uint32_t*)byte_ptr)); // Convert
+    }
+
     // Setup view
     ByteInput* byte_input = subghz->byte_input;
     byte_input_set_header_text(byte_input, "Enter COUNTER in hex");
@@ -96,7 +104,7 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.keeloq.serial,
+                    __bswap32(gen_info.keeloq.serial),
                     gen_info.keeloq.btn,
                     gen_info.keeloq.cnt,
                     gen_info.keeloq.manuf);
@@ -106,7 +114,7 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.came_atomo.serial,
+                    __bswap32(gen_info.came_atomo.serial),
                     gen_info.came_atomo.cnt);
                 break;
             case GenAlutechAt4n:
@@ -114,7 +122,7 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.alutech_at_4n.serial,
+                    __bswap32(gen_info.alutech_at_4n.serial),
                     gen_info.alutech_at_4n.btn,
                     gen_info.alutech_at_4n.cnt);
                 break;
@@ -123,7 +131,7 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.somfy_telis.serial,
+                    __bswap32(gen_info.somfy_telis.serial),
                     gen_info.somfy_telis.btn,
                     gen_info.somfy_telis.cnt);
                 break;
@@ -132,7 +140,7 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.nice_flor_s.serial,
+                    __bswap32(gen_info.nice_flor_s.serial),
                     gen_info.nice_flor_s.btn,
                     gen_info.nice_flor_s.cnt,
                     gen_info.nice_flor_s.nice_one);
@@ -142,17 +150,17 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.sec_plus_2.serial,
+                    __bswap32(gen_info.sec_plus_2.serial),
                     gen_info.sec_plus_2.btn,
-                    gen_info.sec_plus_2.cnt);
+                    __bswap32(gen_info.sec_plus_2.cnt));
                 break;
             case GenPhoenixV2:
                 generated_protocol = subghz_txrx_gen_phoenix_v2_protocol(
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.phoenix_v2.serial,
-                    gen_info.phoenix_v2.cnt);
+                    __bswap32(gen_info.phoenix_v2.serial),
+                    __bswap16(gen_info.phoenix_v2.cnt));
                 break;
             // Not needed for these types
             case GenData:

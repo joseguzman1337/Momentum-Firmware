@@ -254,8 +254,8 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetKey);
                 break;
             case GenSecPlus1: // None
-                return subghz_txrx_gen_secplus_v1_protocol(
-                    subghz->txrx, subghz->gen_info->mod, subghz->gen_info->freq);
+                generated_protocol = subghz_scene_set_type_generate_protocol_from_infos(subghz);
+                break;
             case GenFaacSLH: // Serial (u32), Button (u8), Counter (u8), Seed (u32)
             case GenKeeloq: // Serial (u32), Button (u8), Counter (u8)
             case GenCameAtomo: // Serial (u32), Counter (u8)

@@ -1,6 +1,8 @@
 #include "../subghz_i.h"
 #include "../helpers/subghz_txrx_create_protocol_key.h"
 
+#include <machine/endian.h>
+
 #define TAG "SubGhzSetSeed"
 
 void subghz_scene_set_seed_byte_input_callback(void* context) {
@@ -42,6 +44,8 @@ void subghz_scene_set_seed_on_enter(void* context) {
     furi_assert(byte_ptr);
     furi_assert(byte_count > 0);
 
+    *((uint32_t*)byte_ptr) = __bswap32(*((uint32_t*)byte_ptr)); // Convert
+
     // Setup view
     ByteInput* byte_input = subghz->byte_input;
     byte_input_set_header_text(byte_input, "Enter SEED in hex");
@@ -64,10 +68,10 @@ bool subghz_scene_set_seed_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.faac_slh.serial,
+                    __bswap32(gen_info.faac_slh.serial),
                     gen_info.faac_slh.btn,
                     gen_info.faac_slh.cnt,
-                    gen_info.faac_slh.seed,
+                    __bswap32(gen_info.faac_slh.seed),
                     gen_info.faac_slh.manuf);
                 break;
             case GenKeeloqBFT:
@@ -75,10 +79,10 @@ bool subghz_scene_set_seed_on_event(void* context, SceneManagerEvent event) {
                     subghz->txrx,
                     gen_info.mod,
                     gen_info.freq,
-                    gen_info.keeloq_bft.serial,
+                    __bswap32(gen_info.keeloq_bft.serial),
                     gen_info.keeloq_bft.btn,
                     gen_info.keeloq_bft.cnt,
-                    gen_info.keeloq_bft.seed,
+                    __bswap32(gen_info.keeloq_bft.seed),
                     gen_info.keeloq_bft.manuf);
                 break;
             // Not needed for these types

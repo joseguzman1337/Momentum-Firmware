@@ -1,6 +1,8 @@
 #include "../subghz_i.h"
 #include "../helpers/subghz_txrx_create_protocol_key.h"
 
+#include <machine/endian.h>
+
 #define TAG "SubGhzSetSerial"
 
 void subghz_scene_set_serial_byte_input_callback(void* context) {
@@ -62,6 +64,8 @@ void subghz_scene_set_serial_on_enter(void* context) {
 
     furi_assert(byte_ptr);
     furi_assert(byte_count > 0);
+
+    *((uint32_t*)byte_ptr) = __bswap32(*((uint32_t*)byte_ptr)); // Convert
 
     // Setup view
     ByteInput* byte_input = subghz->byte_input;
