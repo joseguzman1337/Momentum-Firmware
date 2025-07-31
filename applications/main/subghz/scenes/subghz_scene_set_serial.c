@@ -86,6 +86,43 @@ bool subghz_scene_set_serial_on_event(void* context, SceneManagerEvent event) {
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
+            // Swap bytes
+            switch(subghz->gen_info->type) {
+            case GenFaacSLH:
+                subghz->gen_info->faac_slh.serial = __bswap32(subghz->gen_info->faac_slh.serial);
+                break;
+            case GenKeeloq:
+                subghz->gen_info->keeloq.serial = __bswap32(subghz->gen_info->keeloq.serial);
+                break;
+            case GenCameAtomo:
+                subghz->gen_info->came_atomo.serial = __bswap32(subghz->gen_info->came_atomo.serial);
+                break;
+            case GenKeeloqBFT:
+                subghz->gen_info->keeloq_bft.serial = __bswap32(subghz->gen_info->keeloq_bft.serial);
+                break;
+            case GenAlutechAt4n:
+                subghz->gen_info->alutech_at_4n.serial = __bswap32(subghz->gen_info->alutech_at_4n.serial);
+                break;
+            case GenSomfyTelis:
+                subghz->gen_info->somfy_telis.serial = __bswap32(subghz->gen_info->somfy_telis.serial);
+                break;
+            case GenNiceFlorS:
+                subghz->gen_info->nice_flor_s.serial = __bswap32(subghz->gen_info->nice_flor_s.serial);
+                break;
+            case GenSecPlus2:
+                subghz->gen_info->sec_plus_2.serial = __bswap32(subghz->gen_info->sec_plus_2.serial);
+                break;
+            case GenPhoenixV2:
+                subghz->gen_info->phoenix_v2.serial = __bswap32(subghz->gen_info->phoenix_v2.serial);
+                break;
+            // Not needed for these types
+            case GenData:
+            case GenSecPlus1:
+            default:
+                furi_crash("Not implemented");
+                break;
+            }
+
             switch(subghz->gen_info->type) {
             case GenFaacSLH:
             case GenKeeloq:
