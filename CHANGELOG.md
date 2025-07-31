@@ -1,6 +1,6 @@
 ## Main changes
 - Current API: 86.0
-* SubGHz: Add variant of 'Add Manually' menu with manual editing for each value (PR #909 | by @MrLego8-9)
+* SubGHz: Add variant of 'Add Manually' menu with manual editing for each value (PR #909 #911 | by @MrLego8-9)
 * OFW PR 4251: CLI: Fix long delay with quick connect/disconnect (by @WillyJL)
 * LFRFID: Add additional procotols supported by EM4305 chipset (by @jamisonderek)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
