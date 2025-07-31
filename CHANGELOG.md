@@ -1,5 +1,6 @@
 ### Added:
 - Apps:
+  - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - Sub-GHz: Sub Analyzer (by @RocketGod-git)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
