@@ -92,9 +92,7 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
-            GenInfo gen_info = *subghz->gen_info;
-
-            switch(gen_info.type) {
+            switch(subghz->gen_info->type) {
             case GenFaacSLH:
             case GenKeeloqBFT:
                 scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetSeed);
@@ -102,65 +100,67 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
             case GenKeeloq:
                 generated_protocol = subghz_txrx_gen_keeloq_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.keeloq.serial),
-                    gen_info.keeloq.btn,
-                    gen_info.keeloq.cnt,
-                    gen_info.keeloq.manuf);
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->keeloq.serial,
+                    subghz->gen_info->keeloq.btn,
+                    subghz->gen_info->keeloq.cnt,
+                    subghz->gen_info->keeloq.manuf);
                 break;
             case GenCameAtomo:
                 generated_protocol = subghz_txrx_gen_came_atomo_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.came_atomo.serial),
-                    gen_info.came_atomo.cnt);
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->came_atomo.serial,
+                    subghz->gen_info->came_atomo.cnt);
                 break;
             case GenAlutechAt4n:
                 generated_protocol = subghz_txrx_gen_alutech_at_4n_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.alutech_at_4n.serial),
-                    gen_info.alutech_at_4n.btn,
-                    gen_info.alutech_at_4n.cnt);
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->alutech_at_4n.serial,
+                    subghz->gen_info->alutech_at_4n.btn,
+                    subghz->gen_info->alutech_at_4n.cnt);
                 break;
             case GenSomfyTelis:
                 generated_protocol = subghz_txrx_gen_somfy_telis_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.somfy_telis.serial),
-                    gen_info.somfy_telis.btn,
-                    gen_info.somfy_telis.cnt);
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->somfy_telis.serial,
+                    subghz->gen_info->somfy_telis.btn,
+                    subghz->gen_info->somfy_telis.cnt);
                 break;
             case GenNiceFlorS:
                 generated_protocol = subghz_txrx_gen_nice_flor_s_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.nice_flor_s.serial),
-                    gen_info.nice_flor_s.btn,
-                    gen_info.nice_flor_s.cnt,
-                    gen_info.nice_flor_s.nice_one);
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->nice_flor_s.serial,
+                    subghz->gen_info->nice_flor_s.btn,
+                    subghz->gen_info->nice_flor_s.cnt,
+                    subghz->gen_info->nice_flor_s.nice_one);
                 break;
             case GenSecPlus2:
+                subghz->gen_info->sec_plus_2.cnt = __bswap32(subghz->gen_info->sec_plus_2.cnt);
                 generated_protocol = subghz_txrx_gen_secplus_v2_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.sec_plus_2.serial),
-                    gen_info.sec_plus_2.btn,
-                    __bswap32(gen_info.sec_plus_2.cnt));
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->sec_plus_2.serial,
+                    subghz->gen_info->sec_plus_2.btn,
+                    subghz->gen_info->sec_plus_2.cnt);
                 break;
             case GenPhoenixV2:
+                subghz->gen_info->phoenix_v2.cnt = __bswap16(subghz->gen_info->phoenix_v2.cnt);
                 generated_protocol = subghz_txrx_gen_phoenix_v2_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.phoenix_v2.serial),
-                    __bswap16(gen_info.phoenix_v2.cnt));
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->phoenix_v2.serial,
+                    subghz->gen_info->phoenix_v2.cnt);
                 break;
             // Not needed for these types
             case GenData:
