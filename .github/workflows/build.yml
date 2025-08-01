@@ -84,7 +84,7 @@ jobs:
           if ${{ github.event_name == 'push' }} ; then
             if ${{ github.ref_name == 'dev' }} ; then
               SHOULD_DEVBUILD=${{ !contains(github.event.head_commit.message, '--nobuild') }}
-              SHOULD_UPLOAD=SHOULD_DEVBUILD
+              SHOULD_UPLOAD=$SHOULD_DEVBUILD
             elif ${{ startsWith(github.ref, 'refs/tags/') }} ; then
               SHOULD_UPLOAD=true
             fi
