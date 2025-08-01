@@ -254,15 +254,14 @@ bool subghz_scene_set_type_on_event(void* context, SceneManagerEvent event) {
                 scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetKey);
                 break;
             case GenSecPlus1: // None
-                generated_protocol = subghz_scene_set_type_generate_protocol_from_infos(subghz);
-                break;
-            case GenFaacSLH: // Serial (u32), Button (u8), Counter (u8), Seed (u32)
-            case GenKeeloq: // Serial (u32), Button (u8), Counter (u8)
-            case GenCameAtomo: // Serial (u32), Counter (u8)
-            case GenKeeloqBFT: // Serial (u32), Button (u8), Counter (u8), Seed (u32)
-            case GenAlutechAt4n: // Serial (u32), Button (u8), Counter (u8)
-            case GenSomfyTelis: // Serial (u32), Button (u8), Counter (u8)
-            case GenNiceFlorS: // Serial (u32), Button (u8), Counter (u8)
+                return subghz_scene_set_type_generate_protocol_from_infos(subghz);
+            case GenFaacSLH: // Serial (u32), Button (u8), Counter (u32), Seed (u32)
+            case GenKeeloq: // Serial (u32), Button (u8), Counter (u16)
+            case GenCameAtomo: // Serial (u32), Counter (u16)
+            case GenKeeloqBFT: // Serial (u32), Button (u8), Counter (u16), Seed (u32)
+            case GenAlutechAt4n: // Serial (u32), Button (u8), Counter (u16)
+            case GenSomfyTelis: // Serial (u32), Button (u8), Counter (u16)
+            case GenNiceFlorS: // Serial (u32), Button (u8), Counter (u16)
             case GenSecPlus2: // Serial (u32), Button (u8), Counter (u32)
             case GenPhoenixV2: // Serial (u32), Counter (u16)
                 scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSetSerial);

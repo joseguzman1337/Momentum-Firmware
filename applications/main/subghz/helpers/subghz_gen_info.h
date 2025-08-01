@@ -25,46 +25,46 @@ typedef struct {
             const char* name;
             uint64_t key;
             uint8_t bits;
-            uint16_t te;
+            uint32_t te;
         } data;
         struct {
             uint32_t serial;
             uint8_t btn;
-            uint8_t cnt;
+            uint32_t cnt;
             uint32_t seed;
             const char* manuf;
         } faac_slh;
         struct {
             uint32_t serial;
             uint8_t btn;
-            uint8_t cnt;
+            uint16_t cnt;
             const char* manuf;
         } keeloq;
         struct {
             uint32_t serial;
-            uint8_t cnt;
+            uint16_t cnt;
         } came_atomo;
         struct {
             uint32_t serial;
             uint8_t btn;
-            uint8_t cnt;
+            uint16_t cnt;
             uint32_t seed;
             const char* manuf;
         } keeloq_bft;
         struct {
             uint32_t serial;
             uint8_t btn;
-            uint8_t cnt;
+            uint16_t cnt;
         } alutech_at_4n;
         struct {
             uint32_t serial;
             uint8_t btn;
-            uint8_t cnt;
+            uint16_t cnt;
         } somfy_telis;
         struct {
             uint32_t serial;
             uint8_t btn;
-            uint8_t cnt;
+            uint16_t cnt;
             bool nice_one;
         } nice_flor_s;
         struct {
