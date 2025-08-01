@@ -172,6 +172,14 @@ jobs:
               ${FILES[@]} \
               "${{ secrets.INDEXER_URL }}"/firmware/uploadfiles
 
+      - name: "Force deploy website to refresh devbuilds"
+        if: ${{ env.SHOULD_DEVBUILD == 'true' }}
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
+          repository: Next-Flip/v2.momentum-fw.dev
+          event-type: force-deploy
+
       - name: "Find previous comment"
         if: ${{ env.SHOULD_PRCOMMENT == 'true' }}
         uses: peter-evans/find-comment@v3
@@ -195,7 +203,7 @@ jobs:
             - Free Flash: `${{ env.FLASH_FREE }}` (`${{ env.FLASH_USABLE }}` usable)
           edit-mode: replace
 
-      - name: Send devbuild webhook
+      - name: "Send devbuild webhook"
         env:
           INDEXER_URL: ${{ secrets.INDEXER_URL }}
           BUILD_WEBHOOK: ${{ secrets.BUILD_WEBHOOK }}
