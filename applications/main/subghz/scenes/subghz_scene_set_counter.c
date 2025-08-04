@@ -107,7 +107,8 @@ bool subghz_scene_set_counter_on_event(void* context, SceneManagerEvent event) {
                 subghz->gen_info->keeloq_bft.cnt = __bswap16(subghz->gen_info->keeloq_bft.cnt);
                 break;
             case GenAlutechAt4n:
-                subghz->gen_info->alutech_at_4n.cnt = __bswap16(subghz->gen_info->alutech_at_4n.cnt);
+                subghz->gen_info->alutech_at_4n.cnt =
+                    __bswap16(subghz->gen_info->alutech_at_4n.cnt);
                 break;
             case GenSomfyTelis:
                 subghz->gen_info->somfy_telis.cnt = __bswap16(subghz->gen_info->somfy_telis.cnt);

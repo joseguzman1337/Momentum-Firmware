@@ -44,7 +44,6 @@ bool subghz_scene_set_key_on_event(void* context, SceneManagerEvent event) {
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
-
             if(subghz->gen_info->type == GenData) {
                 subghz->gen_info->data.key = __bswap64(subghz->gen_info->data.key);
 
