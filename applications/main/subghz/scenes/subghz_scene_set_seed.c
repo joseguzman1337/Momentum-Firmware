@@ -60,30 +60,31 @@ bool subghz_scene_set_seed_on_event(void* context, SceneManagerEvent event) {
     bool generated_protocol = false;
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
-            GenInfo gen_info = *subghz->gen_info;
 
-            switch(gen_info.type) {
+            switch(subghz->gen_info->type) {
             case GenFaacSLH:
+                subghz->gen_info->faac_slh.seed = __bswap32(subghz->gen_info->faac_slh.seed);
                 generated_protocol = subghz_txrx_gen_faac_slh_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.faac_slh.serial),
-                    gen_info.faac_slh.btn,
-                    gen_info.faac_slh.cnt,
-                    __bswap32(gen_info.faac_slh.seed),
-                    gen_info.faac_slh.manuf);
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->faac_slh.serial,
+                    subghz->gen_info->faac_slh.btn,
+                    subghz->gen_info->faac_slh.cnt,
+                    subghz->gen_info->faac_slh.seed,
+                    subghz->gen_info->faac_slh.manuf);
                 break;
             case GenKeeloqBFT:
+                subghz->gen_info->keeloq_bft.seed = __bswap32(subghz->gen_info->keeloq_bft.seed);
                 generated_protocol = subghz_txrx_gen_keeloq_bft_protocol(
                     subghz->txrx,
-                    gen_info.mod,
-                    gen_info.freq,
-                    __bswap32(gen_info.keeloq_bft.serial),
-                    gen_info.keeloq_bft.btn,
-                    gen_info.keeloq_bft.cnt,
-                    __bswap32(gen_info.keeloq_bft.seed),
-                    gen_info.keeloq_bft.manuf);
+                    subghz->gen_info->mod,
+                    subghz->gen_info->freq,
+                    subghz->gen_info->keeloq_bft.serial,
+                    subghz->gen_info->keeloq_bft.btn,
+                    subghz->gen_info->keeloq_bft.cnt,
+                    subghz->gen_info->keeloq_bft.seed,
+                    subghz->gen_info->keeloq_bft.manuf);
                 break;
             // Not needed for these types
             case GenKeeloq:

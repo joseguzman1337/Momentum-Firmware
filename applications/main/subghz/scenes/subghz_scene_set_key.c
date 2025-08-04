@@ -44,26 +44,27 @@ bool subghz_scene_set_key_on_event(void* context, SceneManagerEvent event) {
 
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
-            GenInfo gen_info = *subghz->gen_info;
 
-            if(gen_info.type == GenData) {
-                if(gen_info.data.te) {
+            if(subghz->gen_info->type == GenData) {
+                subghz->gen_info->data.key = __bswap64(subghz->gen_info->data.key);
+
+                if(subghz->gen_info->data.te) {
                     generated_protocol = subghz_txrx_gen_data_protocol_and_te(
                         subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.data.name,
-                        __bswap64(gen_info.data.key),
-                        gen_info.data.bits,
-                        gen_info.data.te);
+                        subghz->gen_info->mod,
+                        subghz->gen_info->freq,
+                        subghz->gen_info->data.name,
+                        subghz->gen_info->data.key,
+                        subghz->gen_info->data.bits,
+                        subghz->gen_info->data.te);
                 } else {
                     generated_protocol = subghz_txrx_gen_data_protocol(
                         subghz->txrx,
-                        gen_info.mod,
-                        gen_info.freq,
-                        gen_info.data.name,
-                        __bswap64(gen_info.data.key),
-                        gen_info.data.bits);
+                        subghz->gen_info->mod,
+                        subghz->gen_info->freq,
+                        subghz->gen_info->data.name,
+                        subghz->gen_info->data.key,
+                        subghz->gen_info->data.bits);
                 }
             }
 
