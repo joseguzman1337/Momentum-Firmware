@@ -54,7 +54,7 @@ void input_settings_load(InputSettings* settings) {
         FURI_LOG_W(TAG, "Failed to load file, using defaults");
         memset(settings, 0, sizeof(InputSettings));
         settings->vibro_touch_trigger_mask = INPUT_SETTINGS_VIBRO_TOUCH_TRIGGER_MASK_DEFAULT;
-        // input_settings_save(settings);
+        //input_settings_save(settings);
     }
 }
 

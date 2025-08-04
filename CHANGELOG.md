@@ -1,4 +1,8 @@
 ### Added:
+- Apps:
+  - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
+  - NFC: NFC-Eink (by @RebornedBrain)
+  - Sub-GHz: Sub Analyzer (by @RocketGod-git)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
   - UL: V2 Phoenix full support (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
@@ -6,6 +10,7 @@
   - UL: Nero Radio static parse and display more data (by @xMasterX)
   - UL: Marantec protocol implement CRC verification display and add manually support (by @xMasterX & @li0ard, original code by @Skorpionm)
   - UL: Keeloq Comunello add manually support (by @xMasterX)
+  - UL: Add variant of 'Add Manually' menu with manual editing for each value (by @MrLego8-9)
 - RFID: Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
 - BT Remote: Add Rename Option, simplify Bad KB BLE profile (#439 by @aaronjamt & @WillyJL)
 - MNTM Settings:
@@ -13,16 +18,21 @@
   - Add Skip Sliding Animations option for Lockscreen (#436 by @aaronjamt)
 - Desktop: Add Keybinds support for directories (#331 by @956MB & @WillyJL)
 - Input Settings: Add Vibro Trigger option (#429 by @956MB)
+- Archive: Support opening and favoriting Picopass files (by @WillyJL)
 
 ### Updated:
 - Apps:
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
   - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson)
+  - ESP Flasher: Bump Marauder 1.8.3 (by @justcallmekoko)
   - FlipDownloader: Added a new option to download GitHub repositories (by @jblanked)
+  - FlipSocial: C++ rewrite, comments on feed posts, simpler logic and registration (by @jblanked)
   - Flipper Blackhat: Add Deauth Broadcast command (by @o7-machinehum)
   - KeyCopier: Added Weiser WR3 key format (by @lightos)
+  - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
   - NFC Playlist: Refactor playlist worker, new settings layout, loop setting, controls to move between items (by @acegoal07)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
+  - WiFi Marauder: Support for ESP32Marauder 1.8.x (by @justcallmekoko)
 - Sub-GHz:
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
   - UL: Reduce less popular freqs in default hopper preset, make it faster (by @xMasterX)
@@ -34,6 +44,7 @@
 - Bad KB: Fix modifier keys with HOLD/RELEASE commands (by @WillyJL)
 - Desktop: Fix lock screen hang (#438 by @aaronjamt)
 - NFC: Fix incorrect Saflok year formula (#433 by @Eltrick)
+- FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
 
 ### Removed:
 - Nothing
