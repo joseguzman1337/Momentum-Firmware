@@ -26,6 +26,7 @@
   - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson)
   - ESP Flasher: Bump Marauder 1.8.3 (by @justcallmekoko)
   - FlipDownloader: Added a new option to download GitHub repositories (by @jblanked)
+  - FlipSocial: C++ rewrite, comments on feed posts, simpler logic and registration (by @jblanked)
   - Flipper Blackhat: Add Deauth Broadcast command (by @o7-machinehum)
   - KeyCopier: Added Weiser WR3 key format (by @lightos)
   - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
