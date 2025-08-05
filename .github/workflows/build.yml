@@ -138,6 +138,30 @@ jobs:
           tar czpf "artifacts/flipper-z-any-scripts-${SUFFIX}.tgz" scripts
           cp build/core2_firmware.tgz "artifacts/flipper-z-any-core2_firmware-${SUFFIX}.tgz"
 
+      - name: "Upload artifacts to update server"
+        if: ${{ env.SHOULD_UPLOAD == 'true' }}
+        run: |
+          curl "${{ secrets.INDEXER_URL }}"/firmware/directory.json > previndex.json
+          FILES=$(for ARTIFACT in $(find artifacts -maxdepth 1 -not -type d); do echo "-F files=@${ARTIFACT}"; done)
+          curl --fail -L -H "Token: ${{ secrets.INDEXER_TOKEN }}" \
+              -F "branch=${BRANCH_NAME}" \
+              -F "version_token=${COMMIT_SHA}" \
+              ${FILES[@]} \
+              "${{ secrets.INDEXER_URL }}"/firmware/uploadfiles
+
+      - name: "Force deploy website to refresh devbuilds"
+        if: ${{ env.SHOULD_DEVBUILD == 'true' }}
+        uses: Codex-/return-dispatch@v2
+        id: force-deploy
+        with:
+          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
+          ref: dev
+          repo: v2.momentum-fw.dev
+          owner: Next-Flip
+          workflow: force-deploy.yml
+          workflow_timeout_seconds: 300
+          workflow_job_steps_retry_seconds: 5
+
       - name: "Calculate DFU sizes"
         if: ${{ env.SHOULD_PRCOMMENT == 'true' }}
         run: |
@@ -161,25 +185,6 @@ jobs:
           echo "FLASH_FREE=$FLASH_FREE" >> $GITHUB_ENV
           echo "FLASH_USABLE=$FLASH_USABLE" >> $GITHUB_ENV
 
-      - name: "Upload artifacts to update server"
-        if: ${{ env.SHOULD_UPLOAD == 'true' }}
-        run: |
-          curl "${{ secrets.INDEXER_URL }}"/firmware/directory.json > previndex.json
-          FILES=$(for ARTIFACT in $(find artifacts -maxdepth 1 -not -type d); do echo "-F files=@${ARTIFACT}"; done)
-          curl --fail -L -H "Token: ${{ secrets.INDEXER_TOKEN }}" \
-              -F "branch=${BRANCH_NAME}" \
-              -F "version_token=${COMMIT_SHA}" \
-              ${FILES[@]} \
-              "${{ secrets.INDEXER_URL }}"/firmware/uploadfiles
-
-      - name: "Force deploy website to refresh devbuilds"
-        if: ${{ env.SHOULD_DEVBUILD == 'true' }}
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
-          repository: Next-Flip/v2.momentum-fw.dev
-          event-type: force-deploy
-
       - name: "Find previous comment"
         if: ${{ env.SHOULD_PRCOMMENT == 'true' }}
         uses: peter-evans/find-comment@v3
@@ -202,6 +207,17 @@ jobs:
             - DFU Size: `${{ env.DFU_SIZE }}` (`${{ env.DFU_DIFF }}` from dev)
             - Free Flash: `${{ env.FLASH_FREE }}` (`${{ env.FLASH_USABLE }}` usable)
           edit-mode: replace
+
+      - name: "Wait for deploy (Run ID ${{ steps.force-deploy.outputs.run_id }})"
+        if: ${{ env.SHOULD_DEVBUILD == 'true' }}
+        uses: Codex-/await-remote-run@v1
+        with:
+          token: ${{ github.token }}
+          repo: v2.momentum-fw.dev
+          owner: Next-Flip
+          run_id: ${{ steps.force-deploy.outputs.run_id }}
+          run_timeout_seconds: 300
+          poll_interval_ms: 5000
 
       - name: "Send devbuild webhook"
         env:
