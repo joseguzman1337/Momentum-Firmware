@@ -68,6 +68,7 @@ static const char* submenu_names[SetTypeMAX] = {
     [SetTypeCAMESpace] = "KL: CAME Space 433MHz",
     [SetTypePricenton315] = "Princeton 315MHz",
     [SetTypePricenton433] = "Princeton 433MHz",
+    [SetTypeZKTeco430] = "ZKTeco 430MHz",
     [SetTypeGangQi_433] = "GangQi 433MHz",
     [SetTypeHollarm_433] = "Hollarm 433MHz",
     [SetTypeReversRB2_433] = "Revers RB2 433MHz",
