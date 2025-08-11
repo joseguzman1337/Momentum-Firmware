@@ -5,6 +5,7 @@
 * LFRFID: Add additional procotols supported by EM4305 chipset (by @jamisonderek)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* Add possibility to use custom buttons when using the SubGHz remote app (by @MrLego8-9)
 * Input Settings: Add Vibro Trigger option (by @956MB & @WillyJL)
 * BT Remote: Add Rename Option (by @aaronjamt & @WillyJL)
 * Simplify Bad USB BLE profile (by @aaronjamt & @WillyJL)
