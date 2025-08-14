@@ -1,5 +1,6 @@
 ## Main changes
 - Current API: 86.0
+* SubGHz: Tune Linear (add better EZCode support), Dickert MAHS decoders
 * SubGHz: Add ZKTeco 430.5 MHz add manually support
 * SubGHz: Add variant of 'Add Manually' menu with manual editing for each value (PR #909 #911 #914 | by @MrLego8-9)
 * OFW PR 4251: CLI: Fix long delay with quick connect/disconnect (by @WillyJL)
