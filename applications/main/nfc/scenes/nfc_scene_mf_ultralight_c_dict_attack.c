@@ -116,6 +116,8 @@ void nfc_scene_mf_ultralight_c_dict_attack_on_enter(void* context) {
     instance->poller = nfc_poller_alloc(instance->nfc, NfcProtocolMfUltralight);
     nfc_poller_start(instance->poller, nfc_mf_ultralight_c_dict_attack_worker_callback, instance);
 
+    dict_attack_set_card_state(instance->dict_attack, true);
+    view_dispatcher_switch_to_view(instance->view_dispatcher, NfcViewDictAttack);
     nfc_blink_read_start(instance);
 }
 
