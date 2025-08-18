@@ -39,6 +39,7 @@ NfcCommand nfc_mf_ultralight_c_dict_attack_worker_callback(NfcGenericEvent event
     } else if(poller_event->type == MfUltralightPollerEventTypeReadSuccess) {
         nfc_device_set_data(
             instance->nfc_device, NfcProtocolMfUltralight, nfc_poller_get_data(instance->poller));
+        instance->mf_ultralight_c_dict_context.auth_success = true;
         view_dispatcher_send_custom_event(
             instance->view_dispatcher, NfcCustomEventDictAttackComplete);
         command = NfcCommandStop;
@@ -130,18 +131,25 @@ bool nfc_scene_mf_ultralight_c_dict_attack_on_event(void* context, SceneManagerE
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == NfcCustomEventDictAttackComplete) {
             if(state == DictAttackStateUserDictInProgress) {
-                nfc_poller_stop(instance->poller);
-                nfc_poller_free(instance->poller);
-                keys_dict_free(instance->mf_ultralight_c_dict_context.dict);
-                scene_manager_set_scene_state(
-                    instance->scene_manager,
-                    NfcSceneMfUltralightCDictAttack,
-                    DictAttackStateSystemDictInProgress);
-                nfc_scene_mf_ultralight_c_dict_attack_prepare_view(instance);
-                instance->poller = nfc_poller_alloc(instance->nfc, NfcProtocolMfUltralight);
-                nfc_poller_start(
-                    instance->poller, nfc_mf_ultralight_c_dict_attack_worker_callback, instance);
-                consumed = true;
+                if(instance->mf_ultralight_c_dict_context.auth_success) {
+                    notification_message(instance->notifications, &sequence_success);
+                    scene_manager_next_scene(instance->scene_manager, NfcSceneReadSuccess);
+                    dolphin_deed(DolphinDeedNfcReadSuccess);
+                    consumed = true;
+                } else {
+                    nfc_poller_stop(instance->poller);
+                    nfc_poller_free(instance->poller);
+                    keys_dict_free(instance->mf_ultralight_c_dict_context.dict);
+                    scene_manager_set_scene_state(
+                        instance->scene_manager,
+                        NfcSceneMfUltralightCDictAttack,
+                        DictAttackStateSystemDictInProgress);
+                    nfc_scene_mf_ultralight_c_dict_attack_prepare_view(instance);
+                    instance->poller = nfc_poller_alloc(instance->nfc, NfcProtocolMfUltralight);
+                    nfc_poller_start(
+                        instance->poller, nfc_mf_ultralight_c_dict_attack_worker_callback, instance);
+                    consumed = true;
+                }
             } else {
                 notification_message(instance->notifications, &sequence_success);
                 scene_manager_next_scene(instance->scene_manager, NfcSceneReadSuccess);
