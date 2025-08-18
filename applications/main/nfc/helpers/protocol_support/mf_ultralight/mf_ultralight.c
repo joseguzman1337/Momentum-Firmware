@@ -183,8 +183,9 @@ bool nfc_scene_read_on_event_mf_ultralight(NfcApp* instance, SceneManagerEvent e
         } else if(event.event == NfcCustomEventPollerIncomplete) {
             const MfUltralightData* data =
                 nfc_device_get_data(instance->nfc_device, NfcProtocolMfUltralight);
-            if(data->type == MfUltralightTypeMfulC) {
-                // Start dict attack for MFUL C cards
+            if(data->type == MfUltralightTypeMfulC && 
+               instance->mf_ul_auth->type == MfUltralightAuthTypeNone) {
+                // Start dict attack for MFUL C cards only if no specific auth was attempted
                 scene_manager_next_scene(instance->scene_manager, NfcSceneMfUltralightCDictAttack);
             } else {
                 notification_message(instance->notifications, &sequence_success);

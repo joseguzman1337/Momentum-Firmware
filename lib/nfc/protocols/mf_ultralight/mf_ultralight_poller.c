@@ -516,9 +516,8 @@ static NfcCommand mf_ultralight_poller_handler_auth_ultralight_c(MfUltralightPol
                             &instance->data->page[44],
                             instance->auth_context.tdes_key.data,
                             MF_ULTRALIGHT_C_AUTH_DES_KEY_SIZE);
-                        instance->data->pages_read = instance->pages_total;
-                        instance->pages_read = instance->pages_total;
-                        instance->state = MfUltralightPollerStateReadSuccess;
+                        // Continue to read pages after successful authentication
+                        instance->state = MfUltralightPollerStateReadPages;
                     }
                 }
             } while(false);
