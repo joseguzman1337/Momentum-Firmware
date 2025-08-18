@@ -188,7 +188,11 @@ bool nfc_scene_read_on_event_mf_ultralight(NfcApp* instance, SceneManagerEvent e
                 // Start dict attack for MFUL C cards only if no specific auth was attempted
                 scene_manager_next_scene(instance->scene_manager, NfcSceneMfUltralightCDictAttack);
             } else {
-                notification_message(instance->notifications, &sequence_success);
+                if(data->pages_read == data->pages_total) {
+                    notification_message(instance->notifications, &sequence_success);
+                } else {
+                    notification_message(instance->notifications, &sequence_semi_success);
+                }
                 scene_manager_next_scene(instance->scene_manager, NfcSceneReadSuccess);
                 dolphin_deed(DolphinDeedNfcReadSuccess);
             }

@@ -156,7 +156,12 @@ bool nfc_scene_mf_ultralight_c_dict_attack_on_event(void* context, SceneManagerE
                     consumed = true;
                 }
             } else {
-                notification_message(instance->notifications, &sequence_success);
+                // TODO: Could check if card is fully read here like MFC dict attack, but found key means fully read
+                if(instance->mf_ultralight_c_dict_context.auth_success) {
+                    notification_message(instance->notifications, &sequence_success);
+                } else {
+                    notification_message(instance->notifications, &sequence_semi_success);
+                }
                 scene_manager_next_scene(instance->scene_manager, NfcSceneReadSuccess);
                 dolphin_deed(DolphinDeedNfcReadSuccess);
                 consumed = true;
@@ -184,7 +189,7 @@ bool nfc_scene_mf_ultralight_c_dict_attack_on_event(void* context, SceneManagerE
                 } else {
                     nfc_poller_stop(instance->poller);
                     nfc_poller_free(instance->poller);
-                    notification_message(instance->notifications, &sequence_success);
+                    notification_message(instance->notifications, &sequence_semi_success);
                     scene_manager_next_scene(instance->scene_manager, NfcSceneReadSuccess);
                     dolphin_deed(DolphinDeedNfcReadSuccess);
                 }
