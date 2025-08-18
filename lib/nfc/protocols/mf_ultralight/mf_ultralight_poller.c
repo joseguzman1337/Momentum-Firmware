@@ -452,7 +452,26 @@ static NfcCommand mf_ultralight_poller_handler_auth_ultralight_c(MfUltralightPol
         command = instance->callback(instance->general_event, instance->context);
         if(!instance->mfu_event.data->auth_context.skip_auth) {
             FURI_LOG_D(TAG, "Trying to authenticate with 3des key");
-            instance->auth_context.tdes_key = instance->mfu_event.data->key_request_data.key;
+            // Only use the key if it was actually provided
+            if(instance->mfu_event.data->key_request_data.key_provided) {
+                instance->auth_context.tdes_key = instance->mfu_event.data->key_request_data.key;
+            } else if(instance->mode == MfUltralightPollerModeDictAttack) {
+                // TODO: Can logic be rearranged to request this key before reaching mf_ultralight_poller_handler_auth_ultralight_c in poller?
+                FURI_LOG_D(TAG, "No initial key provided, requesting key from dictionary");
+                // Trigger dictionary key request
+                instance->mfu_event.type = MfUltralightPollerEventTypeRequestKey;
+                command = instance->callback(instance->general_event, instance->context);
+                if(!instance->mfu_event.data->key_request_data.key_provided) {
+                    instance->state = MfUltralightPollerStateReadPages;
+                    return command;
+                } else {
+                    instance->auth_context.tdes_key = instance->mfu_event.data->key_request_data.key;
+                }
+            } else {
+                FURI_LOG_D(TAG, "No key provided, skipping auth");
+                instance->state = MfUltralightPollerStateReadPages;
+                return command;
+            }
             instance->auth_context.auth_success = false;
             // For debugging
             FURI_LOG_D(
