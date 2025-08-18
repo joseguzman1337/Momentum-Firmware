@@ -39,7 +39,12 @@ NfcCommand nfc_mf_ultralight_c_dict_attack_worker_callback(NfcGenericEvent event
     } else if(poller_event->type == MfUltralightPollerEventTypeReadSuccess) {
         nfc_device_set_data(
             instance->nfc_device, NfcProtocolMfUltralight, nfc_poller_get_data(instance->poller));
-        instance->mf_ultralight_c_dict_context.auth_success = true;
+        // Check if this is a successful authentication by looking at the poller's auth context
+        const MfUltralightData* data = nfc_poller_get_data(instance->poller);
+        if(data->pages_read == data->pages_total) {
+            // Full read indicates successful authentication in dict attack mode
+            instance->mf_ultralight_c_dict_context.auth_success = true;
+        }
         view_dispatcher_send_custom_event(
             instance->view_dispatcher, NfcCustomEventDictAttackComplete);
         command = NfcCommandStop;
