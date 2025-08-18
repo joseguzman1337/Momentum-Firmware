@@ -96,6 +96,8 @@ void nfc_scene_mf_ultralight_c_dict_attack_prepare_view(NfcApp* instance) {
     dict_attack_set_total_dict_keys(
         instance->dict_attack, instance->mf_ultralight_c_dict_context.dict_keys_total);
     instance->mf_ultralight_c_dict_context.dict_keys_current = 0;
+    dict_attack_set_current_dict_key(
+        instance->dict_attack, instance->mf_ultralight_c_dict_context.dict_keys_current);
     dict_attack_set_callback(
         instance->dict_attack,
         nfc_scene_mf_ultralight_c_dict_attack_dict_attack_result_callback,
