@@ -175,30 +175,26 @@ bool nfc_scene_mf_ultralight_c_dict_attack_on_event(void* context, SceneManagerE
                 instance->dict_attack, instance->mf_ultralight_c_dict_context.dict_keys_current);
             consumed = true;
         } else if(event.event == NfcCustomEventDictAttackSkip) {
-            if(instance->mf_ultralight_c_dict_context.is_card_present) {
-                if(state == DictAttackStateUserDictInProgress) {
-                    nfc_poller_stop(instance->poller);
-                    nfc_poller_free(instance->poller);
-                    keys_dict_free(instance->mf_ultralight_c_dict_context.dict);
-                    scene_manager_set_scene_state(
-                        instance->scene_manager,
-                        NfcSceneMfUltralightCDictAttack,
-                        DictAttackStateSystemDictInProgress);
-                    nfc_scene_mf_ultralight_c_dict_attack_prepare_view(instance);
-                    instance->poller = nfc_poller_alloc(instance->nfc, NfcProtocolMfUltralight);
-                    nfc_poller_start(
-                        instance->poller,
-                        nfc_mf_ultralight_c_dict_attack_worker_callback,
-                        instance);
-                } else {
-                    nfc_poller_stop(instance->poller);
-                    nfc_poller_free(instance->poller);
-                    notification_message(instance->notifications, &sequence_semi_success);
-                    scene_manager_next_scene(instance->scene_manager, NfcSceneReadSuccess);
-                    dolphin_deed(DolphinDeedNfcReadSuccess);
-                }
-                consumed = true;
+            if(state == DictAttackStateUserDictInProgress) {
+                nfc_poller_stop(instance->poller);
+                nfc_poller_free(instance->poller);
+                keys_dict_free(instance->mf_ultralight_c_dict_context.dict);
+                scene_manager_set_scene_state(
+                    instance->scene_manager,
+                    NfcSceneMfUltralightCDictAttack,
+                    DictAttackStateSystemDictInProgress);
+                nfc_scene_mf_ultralight_c_dict_attack_prepare_view(instance);
+                instance->poller = nfc_poller_alloc(instance->nfc, NfcProtocolMfUltralight);
+                nfc_poller_start(
+                    instance->poller,
+                    nfc_mf_ultralight_c_dict_attack_worker_callback,
+                    instance);
+            } else {
+                notification_message(instance->notifications, &sequence_semi_success);
+                scene_manager_next_scene(instance->scene_manager, NfcSceneReadSuccess);
+                dolphin_deed(DolphinDeedNfcReadSuccess);
             }
+            consumed = true;
         }
     } else if(event.type == SceneManagerEventTypeBack) {
         scene_manager_next_scene(instance->scene_manager, NfcSceneExitConfirm);
