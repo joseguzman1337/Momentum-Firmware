@@ -3,6 +3,8 @@
 
 #define TAG "NfcMfUlCDictAttack"
 
+// TODO: Support card_detected properly
+
 enum {
     DictAttackStateUserDictInProgress,
     DictAttackStateSystemDictInProgress,
@@ -41,9 +43,15 @@ NfcCommand nfc_mf_ultralight_c_dict_attack_worker_callback(NfcGenericEvent event
             instance->nfc_device, NfcProtocolMfUltralight, nfc_poller_get_data(instance->poller));
         // Check if this is a successful authentication by looking at the poller's auth context
         const MfUltralightData* data = nfc_poller_get_data(instance->poller);
+        
+        // Update page information
+        dict_attack_set_pages_read(instance->dict_attack, data->pages_read);
+        dict_attack_set_pages_total(instance->dict_attack, data->pages_total);
+        
         if(data->pages_read == data->pages_total) {
             // Full read indicates successful authentication in dict attack mode
             instance->mf_ultralight_c_dict_context.auth_success = true;
+            dict_attack_set_key_found(instance->dict_attack, true);
         }
         view_dispatcher_send_custom_event(
             instance->view_dispatcher, NfcCustomEventDictAttackComplete);
@@ -65,6 +73,10 @@ void nfc_scene_mf_ultralight_c_dict_attack_dict_attack_result_callback(
 void nfc_scene_mf_ultralight_c_dict_attack_prepare_view(NfcApp* instance) {
     uint32_t state =
         scene_manager_get_scene_state(instance->scene_manager, NfcSceneMfUltralightCDictAttack);
+        
+    // Set attack type to Ultralight C
+    dict_attack_set_type(instance->dict_attack, DictAttackTypeMfUltralightC);
+    
     if(state == DictAttackStateUserDictInProgress) {
         do {
             if(!keys_dict_check_presence(NFC_APP_MF_ULTRALIGHT_C_DICT_USER_PATH)) {
@@ -98,6 +110,12 @@ void nfc_scene_mf_ultralight_c_dict_attack_prepare_view(NfcApp* instance) {
     instance->mf_ultralight_c_dict_context.dict_keys_current = 0;
     dict_attack_set_current_dict_key(
         instance->dict_attack, instance->mf_ultralight_c_dict_context.dict_keys_current);
+    
+    // Set initial Ultralight C specific values
+    dict_attack_set_key_found(instance->dict_attack, false);
+    dict_attack_set_pages_total(instance->dict_attack, 48); // Ultralight C page count
+    dict_attack_set_pages_read(instance->dict_attack, 0);
+    
     dict_attack_set_callback(
         instance->dict_attack,
         nfc_scene_mf_ultralight_c_dict_attack_dict_attack_result_callback,
@@ -160,7 +178,7 @@ bool nfc_scene_mf_ultralight_c_dict_attack_on_event(void* context, SceneManagerE
                     consumed = true;
                 }
             } else {
-                // TODO: Could check if card is fully read here like MFC dict attack, but found key means fully read
+                // Could check if card is fully read here like MFC dict attack, but found key means fully read
                 if(instance->mf_ultralight_c_dict_context.auth_success) {
                     notification_message(instance->notifications, &sequence_success);
                 } else {
