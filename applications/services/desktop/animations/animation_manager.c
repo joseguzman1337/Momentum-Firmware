@@ -370,7 +370,6 @@ static bool animation_manager_is_valid_idle_animation(
 
         result = !battery_is_well;
     }
-
     if(!strcmp(info->name, NO_SD_ANIMATION_NAME)) {
         Storage* storage = furi_record_open(RECORD_STORAGE);
         FS_Error sd_status = storage_sd_status(storage);
