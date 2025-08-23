@@ -38,6 +38,16 @@ void subghz_scene_set_type_fill_generation_infos(GenInfo* infos_dest, SetType ty
             .data.bits = 24,
             .data.te = 400};
         break;
+    case SetTypeZKTeco430:
+        gen_info = (GenInfo){
+            .type = GenData,
+            .mod = "AM650",
+            .freq = 430500000,
+            .data.name = SUBGHZ_PROTOCOL_PRINCETON_NAME,
+            .data.key = (key & 0x00FFFF00) | 0x30, // btn 0x30(UP), 0x03(STOP), 0x0C(DOWN)
+            .data.bits = 24,
+            .data.te = 357};
+        break;
     case SetTypeNiceFlo12bit:
         gen_info = (GenInfo){
             .type = GenData,

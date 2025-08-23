@@ -128,6 +128,7 @@ typedef enum {
     SetTypeCAMESpace,
     SetTypePricenton315,
     SetTypePricenton433,
+    SetTypeZKTeco430,
     SetTypeBETT_433,
     SetTypeGangQi_433,
     SetTypeHollarm_433,

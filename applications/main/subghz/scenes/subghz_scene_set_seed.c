@@ -60,7 +60,6 @@ bool subghz_scene_set_seed_on_event(void* context, SceneManagerEvent event) {
     bool generated_protocol = false;
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == SubGhzCustomEventByteInputDone) {
-
             switch(subghz->gen_info->type) {
             case GenFaacSLH:
                 subghz->gen_info->faac_slh.seed = __bswap32(subghz->gen_info->faac_slh.seed);

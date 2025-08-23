@@ -1,7 +1,9 @@
 ### Added:
 - Apps:
+  - GPIO/ESP: [ESP32] Ghost ESP (by @jaylikesbunda)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - NFC: NFC-Eink (by @RebornedBrain)
+  - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
   - Sub-GHz: Sub Analyzer (by @RocketGod-git)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
@@ -11,6 +13,7 @@
   - UL: Marantec protocol implement CRC verification display and add manually support (by @xMasterX & @li0ard, original code by @Skorpionm)
   - UL: Keeloq Comunello add manually support (by @xMasterX)
   - UL: Add variant of 'Add Manually' menu with manual editing for each value (by @MrLego8-9)
+  - UL: Add ZKTeco 430.5 MHz add manually support (by @xMasterX)
 - RFID: Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
 - BT Remote: Add Rename Option, simplify Bad KB BLE profile (#439 by @aaronjamt & @WillyJL)
 - MNTM Settings:
@@ -23,19 +26,28 @@
 ### Updated:
 - Apps:
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
-  - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson)
-  - ESP Flasher: Bump Marauder 1.8.3 (by @justcallmekoko)
-  - FlipDownloader: Added a new option to download GitHub repositories (by @jblanked)
+  - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson), support alphabetic combination locks (by @henrygab)
+  - ESP Flasher: Bump Marauder 1.8.4 (by @justcallmekoko), add C5 support (by @Play2BReal)
+  - FlipDownloader: Added a new option to download GitHub repositories with dedicated keyboard, add auto updating (by @jblanked)
   - FlipSocial: C++ rewrite, comments on feed posts, simpler logic and registration (by @jblanked)
+  - FlipWiFi: Minor bugfixes (by @jblanked)
   - Flipper Blackhat: Add Deauth Broadcast command (by @o7-machinehum)
-  - KeyCopier: Added Weiser WR3 key format (by @lightos)
+  - KeyCopier: Added Weiser WR3 key format (by @lightos), added Suzuki SUZ18 key format (by @RIcePatrol)
   - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
+  - NFC Maker: Support making empty/blank NDEF payloads (by @WillyJL)
   - NFC Playlist: Refactor playlist worker, new settings layout, loop setting, controls to move between items (by @acegoal07)
+  - Passy: Misc memory management bugfixes (by @qistoph)
+  - Seader: Fix ATS handling (by @NVX), reset SAM on error (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
-  - WiFi Marauder: Support for ESP32Marauder 1.8.x (by @justcallmekoko)
+  - Seos Compatible: Add keys v2 support with per-device encryption (by @bettse)
+  - Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
+  - Weather Station: Added support for solight TE44 (by @fersingb)
+  - Weebo: Prevent 0x88 in UID[3] (by @bettse)
+  - WiFi Marauder: Support for ESP32Marauder 1.8.4 (by @justcallmekoko)
 - Sub-GHz:
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
   - UL: Reduce less popular freqs in default hopper preset, make it faster (by @xMasterX)
+  - UL: Tune Linear (add better EZCode support), Dickert MAHS decoders (by @xMasterX)
 - JS: Expose button event type in `gui/widget` button callback (by @WillyJL)
 - UL: Docs: Update Sub-GHz DoorHan programming instructions (by @li0ard)
 
@@ -43,7 +55,9 @@
 - CLI: Fix long delay with quick connect/disconnect, qFlipper should connect faster as expected again (by @WillyJL)
 - Bad KB: Fix modifier keys with HOLD/RELEASE commands (by @WillyJL)
 - Desktop: Fix lock screen hang (#438 by @aaronjamt)
-- NFC: Fix incorrect Saflok year formula (#433 by @Eltrick)
+- NFC:
+  - Fix incorrect Saflok year formula (#433 by @Eltrick)
+  - Fix read crash with unexpectedly large MFC AUTH(0) response, eg with Chameleon Ultra NTAG emualtion (by @WillyJL)
 - FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
 
 ### Removed:
