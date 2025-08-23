@@ -43,26 +43,7 @@ static void
         FuriString* temp_path = furi_string_alloc_set_str(browser_options.base_path);
 
         if(dialog_file_browser_show(app->dialogs, temp_path, temp_path, &browser_options)) {
-            CharList_push_back(app->mainmenu_app_exes, strdup(furi_string_get_cstr(temp_path)));
-            if(is_file_dir) {
-                const char* path = furi_string_get_cstr(temp_path);
-                const char* end = strrchr(path, '/');
-                furi_string_set_str(temp_path, end ? end + 1 : path);
-            } else {
-                Storage* storage = furi_record_open(RECORD_STORAGE);
-                uint8_t* unused_icon = malloc(FAP_MANIFEST_MAX_ICON_SIZE);
-                flipper_application_load_name_and_icon(
-                    temp_path, storage, &unused_icon, temp_path);
-                free(unused_icon);
-                furi_record_close(RECORD_STORAGE);
-                if(furi_string_start_with_str(temp_path, "[")) {
-                    size_t trim = furi_string_search_str(temp_path, "] ", 1);
-                    if(trim != FURI_STRING_FAILURE) {
-                        furi_string_right(temp_path, trim + 2);
-                    }
-                }
-            }
-            CharList_push_back(app->mainmenu_app_labels, strdup(furi_string_get_cstr(temp_path)));
+            momentum_app_push_mainmenu_app(app, temp_path);
             app->mainmenu_app_index = CharList_size(app->mainmenu_app_labels) - 1;
             app->save_mainmenu_apps = true;
             scene_manager_search_and_switch_to_previous_scene(
