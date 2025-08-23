@@ -1,5 +1,6 @@
 ### Added:
 - Apps:
+  - GPIO/ESP: [ESP32] Ghost ESP (by @jaylikesbunda)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - NFC: NFC-Eink (by @RebornedBrain)
   - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
