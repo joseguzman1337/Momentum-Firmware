@@ -2,6 +2,7 @@
 - Apps:
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - NFC: NFC-Eink (by @RebornedBrain)
+  - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
   - Sub-GHz: Sub Analyzer (by @RocketGod-git)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
