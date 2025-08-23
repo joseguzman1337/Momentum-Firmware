@@ -13,6 +13,7 @@
   - UL: Marantec protocol implement CRC verification display and add manually support (by @xMasterX & @li0ard, original code by @Skorpionm)
   - UL: Keeloq Comunello add manually support (by @xMasterX)
   - UL: Add variant of 'Add Manually' menu with manual editing for each value (by @MrLego8-9)
+  - UL: Add ZKTeco 430.5 MHz add manually support (by @xMasterX)
 - RFID: Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
 - BT Remote: Add Rename Option, simplify Bad KB BLE profile (#439 by @aaronjamt & @WillyJL)
 - MNTM Settings:
@@ -46,6 +47,7 @@
 - Sub-GHz:
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
   - UL: Reduce less popular freqs in default hopper preset, make it faster (by @xMasterX)
+  - UL: Tune Linear (add better EZCode support), Dickert MAHS decoders (by @xMasterX)
 - JS: Expose button event type in `gui/widget` button callback (by @WillyJL)
 - UL: Docs: Update Sub-GHz DoorHan programming instructions (by @li0ard)
 

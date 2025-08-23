@@ -18,7 +18,7 @@
 static const SubGhzBlockConst subghz_protocol_linear_const = {
     .te_short = 500,
     .te_long = 1500,
-    .te_delta = 150,
+    .te_delta = 350,
     .min_count_bit_for_found = 10,
 };
 
@@ -118,32 +118,32 @@ static bool subghz_protocol_encoder_linear_get_upload(SubGhzProtocolEncoderLinea
         if(bit_read(instance->generic.data, i - 1)) {
             //send bit 1
             instance->encoder.upload[index++] =
-                level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_short * 3);
+                level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_short);
             instance->encoder.upload[index++] =
-                level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_short);
+                level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_long);
         } else {
             //send bit 0
             instance->encoder.upload[index++] =
-                level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_short);
+                level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_long);
             instance->encoder.upload[index++] =
-                level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_short * 3);
+                level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_short);
         }
     }
     //Send end bit
     if(bit_read(instance->generic.data, 0)) {
         //send bit 1
         instance->encoder.upload[index++] =
-            level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_short * 3);
-        //Send PT_GUARD
+            level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_short);
+        //Send gap
         instance->encoder.upload[index++] =
-            level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_short * 42);
+            level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_short * 44);
     } else {
         //send bit 0
         instance->encoder.upload[index++] =
-            level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_short);
-        //Send PT_GUARD
+            level_duration_make(true, (uint32_t)subghz_protocol_linear_const.te_long);
+        //Send gap
         instance->encoder.upload[index++] =
-            level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_short * 44);
+            level_duration_make(false, (uint32_t)subghz_protocol_linear_const.te_short * 42);
     }
 
     return true;
@@ -225,7 +225,7 @@ void subghz_protocol_decoder_linear_feed(void* context, bool level, uint32_t dur
     switch(instance->decoder.parser_step) {
     case LinearDecoderStepReset:
         if((!level) && (DURATION_DIFF(duration, subghz_protocol_linear_const.te_short * 42) <
-                        subghz_protocol_linear_const.te_delta * 20)) {
+                        subghz_protocol_linear_const.te_delta * 15)) {
             //Found header Linear
             instance->decoder.decode_data = 0;
             instance->decoder.decode_count_bit = 0;
@@ -246,16 +246,16 @@ void subghz_protocol_decoder_linear_feed(void* context, bool level, uint32_t dur
                 instance->decoder.parser_step = LinearDecoderStepReset;
                 //checking that the duration matches the guardtime
                 if(DURATION_DIFF(duration, subghz_protocol_linear_const.te_short * 42) >
-                   subghz_protocol_linear_const.te_delta * 20) {
+                   subghz_protocol_linear_const.te_delta * 15) {
                     break;
                 }
                 if(DURATION_DIFF(instance->decoder.te_last, subghz_protocol_linear_const.te_short) <
                    subghz_protocol_linear_const.te_delta) {
-                    subghz_protocol_blocks_add_bit(&instance->decoder, 0);
+                    subghz_protocol_blocks_add_bit(&instance->decoder, 1);
                 } else if(
                     DURATION_DIFF(instance->decoder.te_last, subghz_protocol_linear_const.te_long) <
                     subghz_protocol_linear_const.te_delta) {
-                    subghz_protocol_blocks_add_bit(&instance->decoder, 1);
+                    subghz_protocol_blocks_add_bit(&instance->decoder, 0);
                 }
                 if(instance->decoder.decode_count_bit ==
                    subghz_protocol_linear_const.min_count_bit_for_found) {
@@ -275,14 +275,14 @@ void subghz_protocol_decoder_linear_feed(void* context, bool level, uint32_t dur
                 subghz_protocol_linear_const.te_delta) &&
                (DURATION_DIFF(duration, subghz_protocol_linear_const.te_long) <
                 subghz_protocol_linear_const.te_delta)) {
-                subghz_protocol_blocks_add_bit(&instance->decoder, 0);
+                subghz_protocol_blocks_add_bit(&instance->decoder, 1);
                 instance->decoder.parser_step = LinearDecoderStepSaveDuration;
             } else if(
                 (DURATION_DIFF(instance->decoder.te_last, subghz_protocol_linear_const.te_long) <
                  subghz_protocol_linear_const.te_delta) &&
                 (DURATION_DIFF(duration, subghz_protocol_linear_const.te_short) <
                  subghz_protocol_linear_const.te_delta)) {
-                subghz_protocol_blocks_add_bit(&instance->decoder, 1);
+                subghz_protocol_blocks_add_bit(&instance->decoder, 0);
                 instance->decoder.parser_step = LinearDecoderStepSaveDuration;
             } else {
                 instance->decoder.parser_step = LinearDecoderStepReset;
@@ -333,8 +333,8 @@ void subghz_protocol_decoder_linear_get_string(void* context, FuriString* output
     furi_string_cat_printf(
         output,
         "%s %dbit\r\n"
-        "Key:0x%08lX\r\n"
-        "Yek:0x%08lX\r\n"
+        "Key:0x%03lX\r\n"
+        "Yek:0x%03lX\r\n"
         "DIP:" DIP_PATTERN "\r\n",
         instance->generic.protocol_name,
         instance->generic.data_count_bit,
