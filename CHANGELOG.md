@@ -45,7 +45,9 @@
 - CLI: Fix long delay with quick connect/disconnect, qFlipper should connect faster as expected again (by @WillyJL)
 - Bad KB: Fix modifier keys with HOLD/RELEASE commands (by @WillyJL)
 - Desktop: Fix lock screen hang (#438 by @aaronjamt)
-- NFC: Fix incorrect Saflok year formula (#433 by @Eltrick)
+- NFC:
+  - Fix incorrect Saflok year formula (#433 by @Eltrick)
+  - Fix read crash with unexpectedly large MFC AUTH(0) response, eg with Chameleon Ultra NTAG emualtion (by @WillyJL)
 - FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
 
 ### Removed:
