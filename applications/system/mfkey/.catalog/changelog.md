@@ -1,3 +1,5 @@
+## 3.1
+ - Key recovery is 20% faster, added write buffering of Static Encrypted Nested key candidates
 ## 3.0
  - Added Static Encrypted Nested key recovery, added NFC app support, dropped FlipperNested support
 ## 2.7
