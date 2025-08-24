@@ -5,5 +5,5 @@ App(
     entry_point="kiisu_light_adc_main",
     requires=["gui"],
     stack_size=1 * 1024,
-    fap_category="System",
+    fap_category="Tools",
 )
