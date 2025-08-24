@@ -147,13 +147,14 @@ int32_t archive_app(void* p) {
     if(path && !furi_string_empty(path)) {
         archive_set_tab(archive->browser, ArchiveTabBrowser);
         furi_string_set(archive->browser->path, path);
-        archive->browser->is_root = false;
+        archive->browser->is_root = true;
         archive_file_browser_set_path(
             archive->browser,
             archive->browser->path,
             archive_get_tab_ext(ArchiveTabBrowser),
             false,
-            !momentum_settings.show_hidden_files);
+            !momentum_settings.show_hidden_files,
+            furi_string_get_cstr(path));
     }
 
     scene_manager_next_scene(archive->scene_manager, ArchiveAppSceneBrowser);

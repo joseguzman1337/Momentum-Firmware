@@ -1,10 +1,21 @@
 ### Added:
 - Apps:
+  - Games: Geometry Flip (by @goosedev72-projects)
+  - GPIO: [KT0803] FM Transmitter (by @goosedev72-projects)
   - GPIO/ESP: [ESP32] Ghost ESP (by @jaylikesbunda)
+  - GPIO/FlipBoard:
+    - FlipBoard Blinky (by @jamisonderek)
+    - FlipBoard Keyboard (by @jamisonderek)
+    - FlipBoard Signal (by @jamisonderek)
+    - FlipBoard Simon (by @jamisonderek)
+  - GPIO/FlipperHTTP: Free Roam (by @jblanked)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
+  - Media: Video Player (by @LTVA1)
   - NFC: NFC-Eink (by @RebornedBrain)
   - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
-  - Sub-GHz: Sub Analyzer (by @RocketGod-git)
+  - Sub-GHz:
+    - Chief Cooker (by @denr01)
+    - Sub Analyzer (by @RocketGod-git)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
   - UL: V2 Phoenix full support (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
@@ -36,7 +47,7 @@
   - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
   - NFC Maker: Support making empty/blank NDEF payloads (by @WillyJL)
   - NFC Playlist: Refactor playlist worker, new settings layout, loop setting, controls to move between items (by @acegoal07)
-  - Passy: Misc memory management bugfixes (by @qistoph)
+  - Passy: Misc memory management bugfixes, misc UI improvements (by @qistoph)
   - Seader: Fix ATS handling (by @NVX), reset SAM on error (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
   - Seos Compatible: Add keys v2 support with per-device encryption (by @bettse)
@@ -58,6 +69,7 @@
 - NFC:
   - Fix incorrect Saflok year formula (#433 by @Eltrick)
   - Fix read crash with unexpectedly large MFC AUTH(0) response, eg with Chameleon Ultra NTAG emualtion (by @WillyJL)
+  - Fix slashes in prefilled filename (by @WillyJL)
 - FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
 
 ### Removed:

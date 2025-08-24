@@ -88,7 +88,8 @@ void archive_file_browser_set_path(
     FuriString* path,
     const char* filter_ext,
     bool skip_assets,
-    bool hide_dot_files);
+    bool hide_dot_files,
+    const char* override_home_path);
 bool archive_is_item_in_array(ArchiveBrowserViewModel* model, uint32_t idx);
 bool archive_is_file_list_load_required(ArchiveBrowserViewModel* model);
 void archive_update_offset(ArchiveBrowserView* browser);
