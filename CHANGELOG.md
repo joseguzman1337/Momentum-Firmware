@@ -3,6 +3,11 @@
   - Games: Geometry Flip (by @goosedev72-projects)
   - GPIO: [KT0803] FM Transmitter (by @goosedev72-projects)
   - GPIO/ESP: [ESP32] Ghost ESP (by @jaylikesbunda)
+  - GPIO/FlipBoard:
+    - FlipBoard Blinky (by @jamisonderek)
+    - FlipBoard Keyboard (by @jamisonderek)
+    - FlipBoard Signal (by @jamisonderek)
+    - FlipBoard Simon (by @jamisonderek)
   - GPIO/FlipperHTTP: Free Roam (by @jblanked)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - NFC: NFC-Eink (by @RebornedBrain)
