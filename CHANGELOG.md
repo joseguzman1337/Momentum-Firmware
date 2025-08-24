@@ -58,6 +58,7 @@
 - NFC:
   - Fix incorrect Saflok year formula (#433 by @Eltrick)
   - Fix read crash with unexpectedly large MFC AUTH(0) response, eg with Chameleon Ultra NTAG emualtion (by @WillyJL)
+  - Fix slashes in prefilled filename (by @WillyJL)
 - FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
 
 ### Removed:
