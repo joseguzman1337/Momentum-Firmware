@@ -13,6 +13,7 @@
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - iButton: iButton Converter (by @Leptopt1los)
   - Media:
+    - Image Viewer (by @polioan)
     - Space Playground (by @alanfortlink)
     - Video Player (by @LTVA1)
   - NFC: NFC-Eink (by @RebornedBrain)
