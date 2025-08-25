@@ -19,6 +19,7 @@
   - iButton: iButton Converter (by @Leptopt1los)
   - Infrared:
     - Hitachi AC Remote (by @dogtopus)
+    - LIDAR Emulator (by @regaly)
     - Midea AC Remote (by @xakep666)
     - Mitsubishi AC Remote (by @achistyakov)
     - Xbox Controller (by @gebeto)
