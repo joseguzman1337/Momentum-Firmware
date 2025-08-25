@@ -52,10 +52,11 @@
   - Seader: Fix ATS handling (by @NVX), reset SAM on error (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
   - Seos Compatible: Add keys v2 support with per-device encryption (by @bettse)
-  - Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
+  - Sub-GHz Playlist: Fix crash on disallowed frequencies (by @WillyJL)
   - Weather Station: Added support for solight TE44 (by @fersingb)
   - Weebo: Prevent 0x88 in UID[3] (by @bettse)
   - WiFi Marauder: Support for ESP32Marauder 1.8.4 (by @justcallmekoko)
+  - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
 - Sub-GHz:
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
   - UL: Reduce less popular freqs in default hopper preset, make it faster (by @xMasterX)
