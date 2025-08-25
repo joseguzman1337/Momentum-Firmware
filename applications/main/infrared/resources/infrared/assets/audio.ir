@@ -4689,6 +4689,8 @@ protocol: NECext
 address: 87 7C 00 00
 command: 1D E2 00 00
 #
+# Model: HP's Windows Media Center remotes (HP Media Remote Control, HP Mobile Remote Control, etc.)
+#
 name: Power
 type: raw
 frequency: 38000
