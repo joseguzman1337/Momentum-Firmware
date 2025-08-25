@@ -24,6 +24,7 @@
     - Mitsubishi AC Remote (by @achistyakov)
     - Xbox Controller (by @gebeto)
   - Media:
+    - Fmatrix (by @misterwaztaken)
     - Image Viewer (by @polioan)
     - Space Playground (by @alanfortlink)
     - Video Player (by @LTVA1)
