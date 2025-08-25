@@ -13,6 +13,7 @@
     - FlipBoard Simon (by @jamisonderek)
   - GPIO/FlipperHTTP: Free Roam (by @jblanked)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
+  - GPIO/Sensors: [MH-Z19] CO2 Logger (by @harryob2)
   - iButton: iButton Converter (by @Leptopt1los)
   - Infrared:
     - Hitachi AC Remote (by @dogtopus)
