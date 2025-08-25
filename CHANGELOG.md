@@ -14,6 +14,7 @@
   - iButton: iButton Converter (by @Leptopt1los)
   - Infrared:
     - Hitachi AC Remote (by @dogtopus)
+    - Midea AC Remote (by @xakep666)
     - Mitsubishi AC Remote (by @achistyakov)
   - Media:
     - Image Viewer (by @polioan)
