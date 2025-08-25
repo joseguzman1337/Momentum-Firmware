@@ -4,7 +4,9 @@
   - GPIO:
     - [KT0803] FM Transmitter (by @goosedev72-projects)
     - [GPIO] Explorer (by @EvgeniGenchev07)
-  - GPIO/Debug: [FTDI232H] FlipTDI (by @Skorpionm)
+  - GPIO/Debug:
+    - [FTDI232H] FlipTDI (by @Skorpionm)
+    - [INA2xx] INA Meter (by @cepetr)
   - GPIO/ESP: [ESP32] Ghost ESP (by @jaylikesbunda)
   - GPIO/FlipBoard:
     - FlipBoard Blinky (by @jamisonderek)
