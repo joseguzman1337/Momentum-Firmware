@@ -15,6 +15,7 @@
   - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
   - Sub-GHz:
     - Chief Cooker (by @denr01)
+    - Flipper Share (by @lomalkin)
     - Sub Analyzer (by @RocketGod-git)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
