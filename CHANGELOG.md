@@ -10,6 +10,7 @@
     - FlipBoard Simon (by @jamisonderek)
   - GPIO/FlipperHTTP: Free Roam (by @jblanked)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
+  - iButton: iButton Converter (by @Leptopt1los)
   - Media: Video Player (by @LTVA1)
   - NFC: NFC-Eink (by @RebornedBrain)
   - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
