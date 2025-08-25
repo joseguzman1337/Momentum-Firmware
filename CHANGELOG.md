@@ -26,6 +26,7 @@
   - Sub-GHz:
     - Chief Cooker (by @denr01)
     - Flipper Share (by @lomalkin)
+    - HC-11 Modem (by @Giraut)
     - Sub Analyzer (by @RocketGod-git)
     - Sub-GHz Scheduler (by @shalebridge, fixes by @xMasterX)
   - Tools:
