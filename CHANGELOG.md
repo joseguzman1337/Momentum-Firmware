@@ -12,6 +12,7 @@
   - GPIO/FlipperHTTP: Free Roam (by @jblanked)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - iButton: iButton Converter (by @Leptopt1los)
+  - Infrared: Mitsubishi AC Remote (by @achistyakov)
   - Media:
     - Image Viewer (by @polioan)
     - Space Playground (by @alanfortlink)
