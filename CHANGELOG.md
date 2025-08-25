@@ -2,6 +2,7 @@
 - Apps:
   - Games: Geometry Flip (by @goosedev72-projects)
   - GPIO: [KT0803] FM Transmitter (by @goosedev72-projects)
+  - GPIO/Debug: [FTDI232H] FlipTDI (by @Skorpionm)
   - GPIO/ESP: [ESP32] Ghost ESP (by @jaylikesbunda)
   - GPIO/FlipBoard:
     - FlipBoard Blinky (by @jamisonderek)
