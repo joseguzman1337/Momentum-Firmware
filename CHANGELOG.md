@@ -2,8 +2,9 @@
 - Apps:
   - Games: Geometry Flip (by @goosedev72-projects)
   - GPIO:
-    - [KT0803] FM Transmitter (by @goosedev72-projects)
     - [GPIO] Explorer (by @EvgeniGenchev07)
+    - [KT0803] FM Transmitter (by @goosedev72-projects)
+    - [SPI] Terminal (by @janwiesemann)
   - GPIO/Debug:
     - [FTDI232H] FlipTDI (by @Skorpionm)
     - [INA2xx] INA Meter (by @cepetr)
