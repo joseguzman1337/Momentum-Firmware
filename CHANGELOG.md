@@ -28,7 +28,9 @@
     - Flipper Share (by @lomalkin)
     - Sub Analyzer (by @RocketGod-git)
     - Sub-GHz Scheduler (by @shalebridge, fixes by @xMasterX)
-  - Tools: Tasks (by @MadLadSquad)
+  - Tools:
+    - Resistance calculator (by @instantiator)
+    - Tasks (by @MadLadSquad)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
   - UL: V2 Phoenix full support (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
