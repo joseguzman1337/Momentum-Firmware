@@ -37,6 +37,7 @@
     - Resistance Calculator (by @instantiator)
     - Tasks (by @MadLadSquad)
     - Voltage Calculator (by @HappyAmos)
+  - USB: LEGO Dimensions Toy Pad (by @SegerEnd)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
   - UL: V2 Phoenix full support (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
