@@ -29,6 +29,7 @@
     - Sub Analyzer (by @RocketGod-git)
     - Sub-GHz Scheduler (by @shalebridge, fixes by @xMasterX)
   - Tools:
+    - Programmer Calculator (by @armixz)
     - Resistance Calculator (by @instantiator)
     - Tasks (by @MadLadSquad)
     - Voltage Calculator (by @HappyAmos)
