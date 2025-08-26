@@ -1,7 +1,13 @@
 ### Added:
 - Apps:
   - Games: Geometry Flip (by @goosedev72-projects)
-  - GPIO: [KT0803] FM Transmitter (by @goosedev72-projects)
+  - GPIO:
+    - [GPIO] Explorer (by @EvgeniGenchev07)
+    - [KT0803] FM Transmitter (by @goosedev72-projects)
+    - [SPI] Terminal (by @janwiesemann)
+  - GPIO/Debug:
+    - [FTDI232H] FlipTDI (by @Skorpionm)
+    - [INA2xx] INA Meter (by @cepetr)
   - GPIO/ESP: [ESP32] Ghost ESP (by @jaylikesbunda)
   - GPIO/FlipBoard:
     - FlipBoard Blinky (by @jamisonderek)
@@ -10,12 +16,36 @@
     - FlipBoard Simon (by @jamisonderek)
   - GPIO/FlipperHTTP: Free Roam (by @jblanked)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
-  - Media: Video Player (by @LTVA1)
+  - GPIO/Sensors: [MH-Z19] CO2 Logger (by @harryob2)
+  - iButton: iButton Converter (by @Leptopt1los)
+  - Infrared:
+    - Hitachi AC Remote (by @dogtopus)
+    - LIDAR Emulator (by @regaly)
+    - Midea AC Remote (by @xakep666)
+    - Mitsubishi AC Remote (by @achistyakov)
+    - Xbox Controller (by @gebeto)
+  - Media:
+    - Fmatrix (by @misterwaztaken)
+    - Image Viewer (by @polioan)
+    - Space Playground (by @alanfortlink)
+    - Video Player (by @LTVA1)
   - NFC: NFC-Eink (by @RebornedBrain)
   - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
   - Sub-GHz:
     - Chief Cooker (by @denr01)
+    - Flipper Share (by @lomalkin)
+    - HC-11 Modem (by @Giraut)
     - Sub Analyzer (by @RocketGod-git)
+    - Sub-GHz Scheduler (by @shalebridge, fixes by @xMasterX)
+  - Tools:
+    - FlipCrypt (by @Tyl3rA)
+    - Programmer Calculator (by @armixz)
+    - Resistance Calculator (by @instantiator)
+    - Tasks (by @MadLadSquad)
+    - Voltage Calculator (by @HappyAmos)
+  - USB:
+    - LEGO Dimensions Toy Pad (by @SegerEnd)
+    - USB-MIDI (by @kribesk, original by @DrZlo13)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
   - UL: V2 Phoenix full support (button switch, add manually, counter decrypt/encrypt) (by @xMasterX & @RocketGod-git, original code by @Skorpionm)
@@ -51,10 +81,11 @@
   - Seader: Fix ATS handling (by @NVX), reset SAM on error (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
   - Seos Compatible: Add keys v2 support with per-device encryption (by @bettse)
-  - Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
+  - Sub-GHz Playlist: Fix crash on disallowed frequencies (by @WillyJL)
   - Weather Station: Added support for solight TE44 (by @fersingb)
   - Weebo: Prevent 0x88 in UID[3] (by @bettse)
   - WiFi Marauder: Support for ESP32Marauder 1.8.4 (by @justcallmekoko)
+  - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
 - Sub-GHz:
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
   - UL: Reduce less popular freqs in default hopper preset, make it faster (by @xMasterX)
