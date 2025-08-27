@@ -3,6 +3,7 @@
 * SubGHz: Tune Linear (edited by @WillyJL in PR #919) (add better EZCode support), Dickert MAHS decoders
 * SubGHz: Add ZKTeco 430.5 MHz add manually support
 * SubGHz: Add variant of 'Add Manually' menu with manual editing for each value (PR #909 #911 #914 | by @MrLego8-9)
+* OFW PR 4265: NFC: Fix read crash with unexpectedly large MFC AUTH(0) response (by @WillyJL)
 * OFW PR 4251: CLI: Fix long delay with quick connect/disconnect (by @WillyJL)
 * LFRFID: Add additional procotols supported by EM4305 chipset (by @jamisonderek)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
