@@ -1,0 +1,36 @@
+App(
+    appid="crypto_cli_tools",
+    name="Crypto CLI Tools Enhanced",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="crypto_cli_tools_app_main",
+    stack_size=8 * 1024,
+    fap_category="Tools",
+    fap_version="2.0.0",
+    fap_icon="icon.png",
+    fap_description="Enhanced cryptographic toolkit with 113+ migrated functions: HD wallets, ESP32 WiFi, CLI bridge, and comprehensive crypto suite",
+    fap_author="d3c0d3r",
+    fap_weburl="https://github.com/Next-Flip/Momentum-Firmware",
+    sources=[
+        "crypto_cli_tools.c",
+        "cli_bridge.c",
+        "crypto_wallet.c",
+        "ssh_tunnel.c",
+        "crypto_toolkit.c",
+        # Migrated crypto core functions
+        "crypto_libs/crypto_core.c",
+        # Migrated HD wallet functions
+        "wallet_core/hd_wallet.c",
+        # Migrated ESP32 WiFi functions
+        "esp32_wifi/esp32_wifi_module.c",
+        # Migrated test functions
+        "tests/test_crypto_core.c",
+    ],
+    fap_libs=[],
+    requires=[
+        "gui",
+        "input",
+        "cli",
+        "storage",
+        "toolbox",
+    ],
+)
