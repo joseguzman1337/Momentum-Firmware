@@ -68,6 +68,7 @@
 - Desktop: Add Keybinds support for directories (#331 by @956MB & @WillyJL)
 - Input Settings: Add Vibro Trigger option (#429 by @956MB)
 - Archive: Support opening and favoriting Picopass files (by @WillyJL)
+- OFW: GUI: Add date/time input module (by @aaronjamt)
 
 ### Updated:
 - Apps:
