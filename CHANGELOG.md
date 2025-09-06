@@ -77,6 +77,7 @@
   - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
   - NFC Maker: Support making empty/blank NDEF payloads (by @WillyJL)
   - NFC Playlist: Refactor playlist worker, new settings layout, loop setting, controls to move between items (by @acegoal07)
+  - NMEA GPS: Moved to GPIO/GPS subfolder (by @WillyJL)
   - Passy: Misc memory management bugfixes, misc UI improvements (by @qistoph)
   - Seader: Fix ATS handling (by @NVX), reset SAM on error (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
