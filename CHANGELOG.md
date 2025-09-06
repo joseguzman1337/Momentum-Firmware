@@ -84,7 +84,7 @@
   - KeyCopier: Added Weiser WR3 key format (by @lightos), added Suzuki SUZ18 key format (by @RIcePatrol)
   - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
   - NFC Maker: Support making empty/blank NDEF payloads (by @WillyJL)
-  - NFC Playlist: Refactor playlist worker, new settings layout, loop setting, controls to move between items (by @acegoal07)
+  - NFC Playlist: Refactor playlist worker, new settings layout and management, loop setting, controls to move between items (by @acegoal07)
   - NMEA GPS: Moved to GPIO/GPS subfolder (by @WillyJL)
   - Passy: Misc memory management bugfixes, misc UI improvements (by @qistoph)
   - Seader: Fix ATS handling (by @NVX), reset SAM on error (by @bettse)
@@ -92,7 +92,7 @@
   - Seos Compatible: Add keys v2 support with per-device encryption (by @bettse)
   - Sub-GHz Playlist: Fix crash on disallowed frequencies (by @WillyJL)
   - Weather Station: Added support for solight TE44 (by @fersingb)
-  - Weebo: Prevent 0x88 in UID[3] (by @bettse)
+  - Weebo: Prevent 0x88 in UID[3], add more figures to the database (by @bettse)
   - WiFi Marauder: Support for ESP32Marauder 1.8.4 (by @justcallmekoko)
 - Sub-GHz:
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
