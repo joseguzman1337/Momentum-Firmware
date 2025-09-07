@@ -82,6 +82,7 @@
   - FlipWiFi: Minor bugfixes (by @jblanked)
   - Flipper Blackhat: Add Deauth Broadcast command (by @o7-machinehum)
   - KeyCopier: Added Weiser WR3 key format (by @lightos), added Suzuki SUZ18 key format (by @RIcePatrol)
+  - Mass Storage: Add ability to spoof USB identity values (by @xtruan)
   - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
   - NFC Maker: Support making empty/blank NDEF payloads (by @WillyJL)
   - NFC Playlist: Refactor playlist worker, new settings layout and management, loop setting, controls to move between items (by @acegoal07)
