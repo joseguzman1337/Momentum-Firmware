@@ -11,7 +11,7 @@ extern "C" {
 
 #define FELICA_POLLER_POLLING_FWT (200000U)
 
-#define FELICA_POLLER_CMD_POLLING_REQ_CODE (0x00U)
+#define FELICA_POLLER_CMD_POLLING_REQ_CODE  (0x00U)
 #define FELICA_POLLER_CMD_POLLING_RESP_CODE (0x01U)
 
 typedef enum {
@@ -55,41 +55,6 @@ typedef struct {
     uint8_t request_data[2];
 } FelicaPollerPollingResponse;
 
-typedef struct {
-    uint8_t service_code : 4;
-    uint8_t access_mode : 3;
-    uint8_t length : 1;
-    uint8_t block_number;
-} FelicaBlockListElement;
-
-#pragma pack(push, 1)
-typedef struct {
-    uint8_t code;
-    FelicaIDm idm;
-    uint8_t service_num;
-    uint16_t service_code;
-    uint8_t block_count;
-} FelicaCommandHeader;
-#pragma pack(pop)
-
-typedef struct {
-    uint8_t length;
-    uint8_t response_code;
-    FelicaIDm idm;
-    uint8_t SF1;
-    uint8_t SF2;
-    uint8_t block_count;
-    uint8_t data[];
-} FelicaPollerReadCommandResponse;
-
-typedef struct {
-    uint8_t length;
-    uint8_t response_code;
-    FelicaIDm idm;
-    uint8_t SF1;
-    uint8_t SF2;
-} FelicaPollerWriteCommandResponse;
-
 const FelicaData* felica_poller_get_data(FelicaPoller* instance);
 
 /**
@@ -104,21 +69,6 @@ FelicaError felica_poller_polling(
     FelicaPoller* instance,
     const FelicaPollerPollingCommand* cmd,
     FelicaPollerPollingResponse* resp);
-
-/**
- * @brief Performs felica read operation for blocks provided as parameters
- * 
- * @param[in, out] instance pointer to the instance to be used in the transaction.
- * @param[in] block_count Amount of blocks involved in reading procedure
- * @param[in] block_numbers Array with block indexes according to felica docs
- * @param[out] response_ptr Pointer to the response structure
- * @return FelicaErrorNone on success, an error code on failure.
-*/
-FelicaError felica_poller_read_blocks(
-    FelicaPoller* instance,
-    const uint8_t block_count,
-    const uint8_t* const block_numbers,
-    FelicaPollerReadCommandResponse** const response_ptr);
 
 /**
  * @brief Performs felica write operation with data provided as parameters

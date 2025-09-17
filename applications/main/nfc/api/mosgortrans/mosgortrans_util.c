@@ -2,6 +2,20 @@
 
 #define TAG "Mosgortrans"
 
+void render_section_header(
+    FuriString* str,
+    const char* name,
+    uint8_t prefix_separator_cnt,
+    uint8_t suffix_separator_cnt) {
+    for(uint8_t i = 0; i < prefix_separator_cnt; i++) {
+        furi_string_cat_printf(str, ":");
+    }
+    furi_string_cat_printf(str, "[ %s ]", name);
+    for(uint8_t i = 0; i < suffix_separator_cnt; i++) {
+        furi_string_cat_printf(str, ":");
+    }
+}
+
 void from_days_to_datetime(uint32_t days, DateTime* datetime, uint16_t start_year) {
     uint32_t timestamp = days * 24 * 60 * 60;
     DateTime start_datetime = {0};
@@ -506,7 +520,7 @@ bool mosgortrans_parse_transport_block(const MfClassicBlock* block, FuriString* 
 
         if(data_block.valid_from_date == 0 || data_block.valid_to_date == 0) {
             furi_string_cat(result, "\e#No ticket");
-            return true;
+            return false;
         }
         //remaining_trips
         furi_string_cat_printf(result, "Trips: %d\n", data_block.total_trips);

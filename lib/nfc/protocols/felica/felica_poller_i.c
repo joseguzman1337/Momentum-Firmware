@@ -3,11 +3,6 @@
 #include <nfc/helpers/felica_crc.h>
 
 #define TAG "FelicaPoller"
-#define FELICA_CMD_READ_WITHOUT_ENCRYPTION (0x06U)
-#define FELICA_CMD_WRITE_WITHOUT_ENCRYPTION (0x08U)
-
-#define FELICA_SERVICE_RW_ACCESS (0x0009U)
-#define FELICA_SERVICE_RO_ACCESS (0x000BU)
 
 static FelicaError felica_poller_process_error(NfcError error) {
     switch(error) {
@@ -139,6 +134,7 @@ FelicaError felica_poller_read_blocks(
     FelicaPoller* instance,
     const uint8_t block_count,
     const uint8_t* const block_numbers,
+    uint16_t service_code,
     FelicaPollerReadCommandResponse** const response_ptr) {
     furi_assert(instance);
     furi_assert(block_count <= 4);
@@ -148,7 +144,7 @@ FelicaError felica_poller_read_blocks(
     felica_poller_prepare_tx_buffer(
         instance,
         FELICA_CMD_READ_WITHOUT_ENCRYPTION,
-        FELICA_SERVICE_RO_ACCESS,
+        service_code,
         block_count,
         block_numbers,
         0,

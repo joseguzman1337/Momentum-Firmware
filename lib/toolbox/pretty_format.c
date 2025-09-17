@@ -28,8 +28,7 @@ void pretty_format_bytes_hex_canonical(
     const size_t line_length = (line_prefix ? strlen(line_prefix) : 0) + 4 * num_places + 2;
 
     /* Reserve memory in adance in order to avoid unnecessary reallocs */
-    furi_string_reset(result);
-    furi_string_reserve(result, line_count * line_length);
+    furi_string_reserve(result, furi_string_size(result) + line_count * line_length);
 
     for(size_t i = 0; i < data_size; i += num_places) {
         if(line_prefix) {
@@ -37,10 +36,16 @@ void pretty_format_bytes_hex_canonical(
         }
 
         const size_t begin_idx = i;
-        const size_t end_idx = MIN(i + num_places, data_size);
+        const size_t wrap_idx = i + num_places;
+        const size_t end_idx = MIN(wrap_idx, data_size);
 
         for(size_t j = begin_idx; j < end_idx; j++) {
             furi_string_cat_printf(result, "%02X ", data[j]);
+        }
+        if(end_idx < wrap_idx) {
+            for(size_t j = end_idx; j < wrap_idx; j++) {
+                furi_string_cat_printf(result, "   ");
+            }
         }
 
         furi_string_push_back(result, '|');

@@ -3,12 +3,14 @@
 #include <gui/gui.h>
 #include <input/input.h>
 #include <lib/toolbox/args.h>
+#include <lib/toolbox/strint.h>
 #include <storage/storage.h>
 #include "ducky_script.h"
 #include "ducky_script_i.h"
 #include <dolphin/dolphin.h>
 
 #define TAG "BadUsb"
+
 #define WORKER_TAG TAG "Worker"
 
 #define BADUSB_ASCII_TO_KEY(script, x) \
@@ -38,15 +40,12 @@ static const uint8_t numpad_keys[10] = {
 };
 
 uint32_t ducky_get_command_len(const char* line) {
-    uint32_t len = strlen(line);
-    for(uint32_t i = 0; i < len; i++) {
-        if(line[i] == ' ') return i;
-    }
-    return 0;
+    char* first_space = strchr(line, ' ');
+    return first_space ? (first_space - line) : 0;
 }
 
 bool ducky_is_line_end(const char chr) {
-    return ((chr == ' ') || (chr == '\0') || (chr == '\r') || (chr == '\n'));
+    return (chr == ' ') || (chr == '\0') || (chr == '\r') || (chr == '\n');
 }
 
 uint16_t ducky_get_keycode(BadUsbScript* bad_usb, const char* param, bool accept_chars) {
@@ -56,14 +55,14 @@ uint16_t ducky_get_keycode(BadUsbScript* bad_usb, const char* param, bool accept
     }
 
     if((accept_chars) && (strlen(param) > 0)) {
-        return (BADUSB_ASCII_TO_KEY(bad_usb, param[0]) & 0xFF);
+        return BADUSB_ASCII_TO_KEY(bad_usb, param[0]) & 0xFF;
     }
     return 0;
 }
 
 bool ducky_get_number(const char* param, uint32_t* val) {
     uint32_t value = 0;
-    if(sscanf(param, "%lu", &value) == 1) {
+    if(strint_to_uint32(param, NULL, &value, 10) == StrintParseNoError) {
         *val = value;
         return true;
     }
@@ -178,29 +177,46 @@ static bool ducky_string_next(BadUsbScript* bad_usb) {
 
 static int32_t ducky_parse_line(BadUsbScript* bad_usb, FuriString* line) {
     uint32_t line_len = furi_string_size(line);
-    const char* line_tmp = furi_string_get_cstr(line);
+    const char* line_cstr = furi_string_get_cstr(line);
 
     if(line_len == 0) {
         return SCRIPT_STATE_NEXT_LINE; // Skip empty lines
     }
-    FURI_LOG_D(WORKER_TAG, "line:%s", line_tmp);
+    FURI_LOG_D(WORKER_TAG, "line:%s", line_cstr);
 
     // Ducky Lang Functions
-    int32_t cmd_result = ducky_execute_cmd(bad_usb, line_tmp);
+    int32_t cmd_result = ducky_execute_cmd(bad_usb, line_cstr);
     if(cmd_result != SCRIPT_STATE_CMD_UNKNOWN) {
         return cmd_result;
     }
 
-    // Special keys + modifiers
-    uint16_t key = ducky_get_keycode(bad_usb, line_tmp, false);
-    if(key == HID_KEYBOARD_NONE) {
-        return ducky_error(bad_usb, "No keycode defined for %s", line_tmp);
+    // Mouse Keys
+    uint16_t key = ducky_get_mouse_keycode_by_name(line_cstr);
+    if(key != HID_MOUSE_INVALID) {
+        bad_usb->hid->mouse_press(bad_usb->hid_inst, key);
+        bad_usb->hid->mouse_release(bad_usb->hid_inst, key);
+        return 0;
     }
-    if((key & 0xFF00) != 0) {
-        // It's a modifier key
-        line_tmp = &line_tmp[ducky_get_command_len(line_tmp) + 1];
-        key |= ducky_get_keycode(bad_usb, line_tmp, true);
+
+    // Parse chain of modifiers linked by spaces and hyphens
+    uint16_t modifiers = 0;
+    while(1) {
+        key = ducky_get_next_modifier_keycode_by_name(&line_cstr);
+        if(key == HID_KEYBOARD_NONE) break;
+
+        modifiers |= key;
+        char next_char = *line_cstr;
+        if(next_char == ' ' || next_char == '-') line_cstr++;
     }
+
+    // Main key
+    char next_char = *line_cstr;
+    uint16_t main_key = ducky_get_keycode_by_name(line_cstr);
+    if(!main_key && next_char) main_key = BADUSB_ASCII_TO_KEY(bad_usb, next_char);
+    key = modifiers | main_key;
+
+    if(key == 0 && next_char) ducky_error(bad_usb, "No keycode defined for %s", line_cstr);
+
     bad_usb->hid->kb_press(bad_usb->hid_inst, key);
     bad_usb->hid->kb_release(bad_usb->hid_inst, key);
     return 0;
@@ -305,7 +321,7 @@ static int32_t ducky_script_execute_next(BadUsbScript* bad_usb, File* script_fil
             FURI_LOG_E(WORKER_TAG, "Unknown command at line %zu", bad_usb->st.line_cur - 1U);
             return SCRIPT_STATE_ERROR;
         } else {
-            return (delay_val + bad_usb->defdelay);
+            return delay_val + bad_usb->defdelay;
         }
     }
 
@@ -344,7 +360,7 @@ static int32_t ducky_script_execute_next(BadUsbScript* bad_usb, File* script_fil
                     FURI_LOG_E(WORKER_TAG, "Unknown command at line %zu", bad_usb->st.line_cur);
                     return SCRIPT_STATE_ERROR;
                 } else {
-                    return (delay_val + bad_usb->defdelay);
+                    return delay_val + bad_usb->defdelay;
                 }
             } else {
                 furi_string_push_back(bad_usb->line, bad_usb->file_buf[i]);

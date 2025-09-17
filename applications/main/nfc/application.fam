@@ -93,6 +93,15 @@ App(
 )
 
 App(
+    appid="social_moscow_parser",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="social_moscow_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=["plugins/supported_cards/social_moscow.c"],
+)
+
+App(
     appid="washcity_parser",
     apptype=FlipperAppType.PLUGIN,
     entry_point="washcity_plugin_ep",
@@ -183,10 +192,76 @@ App(
 )
 
 App(
-    appid="nfc_start",
+    appid="skylanders_parser",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="skylanders_plugin_ep",
     targets=["f7"],
-    apptype=FlipperAppType.STARTUP,
-    entry_point="nfc_on_system_start",
+    requires=["nfc"],
+    sources=["plugins/supported_cards/skylanders.c"],
+)
+
+App(
+    appid="hworld_parser",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="hworld_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=["plugins/supported_cards/hworld.c"],
+)
+
+App(
+    appid="trt_parser",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="trt_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=["plugins/supported_cards/trt.c"],
+)
+
+App(
+    appid="ndef_ul_parser",
+    apptype=FlipperAppType.PLUGIN,
+    cdefines=[("NDEF_PROTO", "NDEF_PROTO_UL")],
+    entry_point="ndef_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=["plugins/supported_cards/ndef.c"],
+)
+App(
+    appid="ndef_mfc_parser",
+    apptype=FlipperAppType.PLUGIN,
+    cdefines=[("NDEF_PROTO", "NDEF_PROTO_MFC")],
+    entry_point="ndef_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=["plugins/supported_cards/ndef.c"],
+)
+
+App(
+    appid="ndef_slix_parser",
+    apptype=FlipperAppType.PLUGIN,
+    cdefines=[("NDEF_PROTO", "NDEF_PROTO_SLIX")],
+    entry_point="ndef_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    sources=["plugins/supported_cards/ndef.c"],
+)
+
+App(
+    appid="disney_infinity_parser",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="disney_infinity_plugin_ep",
+    targets=["f7"],
+    requires=["nfc"],
+    fap_libs=["mbedtls"],
+    sources=["plugins/supported_cards/disney_infinity.c"],
+)
+
+App(
+    appid="cli_nfc",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_nfc_ep",
+    requires=["cli"],
     sources=["nfc_cli.c"],
-    order=30,
 )
