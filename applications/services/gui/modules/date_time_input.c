@@ -114,7 +114,7 @@ static inline void date_time_input_draw_text(
 }
 
 static void date_time_input_draw_hour_24hr_callback(Canvas* canvas, DateTimeInputModel* model) {
-    char buffer[64];
+    char buffer[4];
 
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 0, ROW_1_Y - 2, "                 H    H       M   M      S    S");
@@ -128,36 +128,40 @@ static void date_time_input_draw_hour_24hr_callback(Canvas* canvas, DateTimeInpu
 }
 
 static void date_time_input_draw_hour_12hr_callback(Canvas* canvas, DateTimeInputModel* model) {
-    char buffer[64];
+    char buffer[4];
 
     canvas_set_font(canvas, FontSecondary);
-    canvas_draw_str(canvas, 0, ROW_1_Y - 2, "    H   H                     M   M      S    S");
+    canvas_draw_str(canvas, 0, ROW_1_Y - 2, "       H   H                  M   M      S    S");
     canvas_set_font(canvas, FontPrimary);
 
     uint8_t hour = model->datetime->hour % 12;
     // Show 12:00 instead of 00:00 for 12-hour time
     if(hour == 0) hour = 12;
 
-    // Placeholder XX since FontBigNumbers can't draw letters
-    snprintf(buffer, sizeof(buffer), "%02u  XX", hour);
+    // Placeholder spaces to make room for AM/PM since FontBigNumbers can't draw letters
     date_time_input_draw_block(
-        canvas, 2, ROW_1_Y, 56, ROW_1_H, FontBigNumbers, get_state(model, 1, 0, hour), buffer);
+        canvas, 8, ROW_1_Y, 50, ROW_1_H, FontBigNumbers, get_state(model, 1, 0, hour), buffer);
     canvas_draw_box(canvas, 60, ROW_1_Y + ROW_1_H - 7, 2, 2);
     canvas_draw_box(canvas, 60, ROW_1_Y + ROW_1_H - 7 - 6, 2, 2);
 
-    if(model->datetime->hour < 12) {
-        snprintf(buffer, sizeof(buffer), "AM");
-    } else {
-        snprintf(buffer, sizeof(buffer), "PM");
-    }
+    snprintf(buffer, sizeof(buffer), "%02u", hour);
     date_time_input_draw_text(
-        canvas, 28, ROW_1_Y + 3, 28, ROW_1_H, FontPrimary, get_state(model, 1, 0, hour), buffer);
+        canvas, 8, ROW_1_Y, 30, ROW_1_H, FontBigNumbers, get_state(model, 1, 0, hour), buffer);
+
+    // The AM and PM text shift by 1 pixel so compensate to make them line up
+    if(model->datetime->hour < 12) {
+        date_time_input_draw_text(
+            canvas, 30, ROW_1_Y + 3, 30, ROW_1_H, FontPrimary, get_state(model, 1, 0, hour), "AM");
+    } else {
+        date_time_input_draw_text(
+            canvas, 31, ROW_1_Y + 3, 30, ROW_1_H, FontPrimary, get_state(model, 1, 0, hour), "PM");
+    }
 }
 
 static void date_time_input_draw_time_callback(Canvas* canvas, DateTimeInputModel* model) {
     furi_check(model->datetime);
 
-    char buffer[64];
+    char buffer[4];
 
     // Draw hour depending on RTC time format
     if(furi_hal_rtc_get_locale_timeformat() == FuriHalRtcLocaleTimeFormat24h) {
@@ -180,7 +184,7 @@ static void date_time_input_draw_time_callback(Canvas* canvas, DateTimeInputMode
 static void date_time_input_draw_date_callback(Canvas* canvas, DateTimeInputModel* model) {
     furi_check(model->datetime);
 
-    char buffer[64];
+    char buffer[6];
 
     canvas_set_font(canvas, FontSecondary);
     canvas_draw_str(canvas, 0, ROW_0_Y - 2, "     Y   Y   Y   Y        M   M      D    D");
