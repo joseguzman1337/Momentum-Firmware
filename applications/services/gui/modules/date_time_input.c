@@ -1,4 +1,5 @@
 #include "date_time_input.h"
+#include "furi_hal_rtc.h"
 #include <furi.h>
 #include <assets_icons.h>
 
@@ -88,9 +89,31 @@ static inline void date_time_input_draw_block(
     }
 }
 
-static void date_time_input_draw_time_callback(Canvas* canvas, DateTimeInputModel* model) {
-    furi_check(model->datetime);
+static inline void date_time_input_draw_text(
+    Canvas* canvas,
+    int32_t x,
+    int32_t y,
+    size_t w,
+    size_t h,
+    Font font,
+    EditState state,
+    const char* text) {
+    furi_assert(canvas);
+    furi_assert(text);
 
+    canvas_set_color(canvas, ColorBlack);
+    if(state != EditStateDisabled && state != EditStateNone) {
+        canvas_set_color(canvas, ColorWhite);
+    }
+
+    canvas_set_font(canvas, font);
+    canvas_draw_str_aligned(canvas, x + w / 2, y + h / 2, AlignCenter, AlignCenter, text);
+    if(state != EditStateNone) {
+        canvas_set_color(canvas, ColorBlack);
+    }
+}
+
+static void date_time_input_draw_hour_24hr_callback(Canvas* canvas, DateTimeInputModel* model) {
     char buffer[64];
 
     canvas_set_font(canvas, FontSecondary);
@@ -102,6 +125,46 @@ static void date_time_input_draw_time_callback(Canvas* canvas, DateTimeInputMode
         canvas, 30, ROW_1_Y, 28, ROW_1_H, FontBigNumbers, get_state(model, 1, 0, hour), buffer);
     canvas_draw_box(canvas, 60, ROW_1_Y + ROW_1_H - 7, 2, 2);
     canvas_draw_box(canvas, 60, ROW_1_Y + ROW_1_H - 7 - 6, 2, 2);
+}
+
+static void date_time_input_draw_hour_12hr_callback(Canvas* canvas, DateTimeInputModel* model) {
+    char buffer[64];
+
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 0, ROW_1_Y - 2, "    H   H                     M   M      S    S");
+    canvas_set_font(canvas, FontPrimary);
+
+    uint8_t hour = model->datetime->hour % 12;
+    // Show 12:00 instead of 00:00 for 12-hour time
+    if(hour == 0) hour = 12;
+
+    // Placeholder XX since FontBigNumbers can't draw letters
+    snprintf(buffer, sizeof(buffer), "%02u  XX", hour);
+    date_time_input_draw_block(
+        canvas, 2, ROW_1_Y, 56, ROW_1_H, FontBigNumbers, get_state(model, 1, 0, hour), buffer);
+    canvas_draw_box(canvas, 60, ROW_1_Y + ROW_1_H - 7, 2, 2);
+    canvas_draw_box(canvas, 60, ROW_1_Y + ROW_1_H - 7 - 6, 2, 2);
+
+    if(model->datetime->hour < 12) {
+        snprintf(buffer, sizeof(buffer), "AM");
+    } else {
+        snprintf(buffer, sizeof(buffer), "PM");
+    }
+    date_time_input_draw_text(
+        canvas, 28, ROW_1_Y + 3, 28, ROW_1_H, FontPrimary, get_state(model, 1, 0, hour), buffer);
+}
+
+static void date_time_input_draw_time_callback(Canvas* canvas, DateTimeInputModel* model) {
+    furi_check(model->datetime);
+
+    char buffer[64];
+
+    // Draw hour depending on RTC time format
+    if(furi_hal_rtc_get_locale_timeformat() == FuriHalRtcLocaleTimeFormat24h) {
+        date_time_input_draw_hour_24hr_callback(canvas, model);
+    } else {
+        date_time_input_draw_hour_12hr_callback(canvas, model);
+    }
 
     snprintf(buffer, sizeof(buffer), "%02u", model->datetime->minute);
     date_time_input_draw_block(

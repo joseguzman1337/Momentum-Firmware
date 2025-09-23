@@ -13,17 +13,30 @@ static void example_date_time_input_scene_update_view(void* context) {
 
     dialog_ex_set_header(dialog_ex, "The date and time are", 64, 0, AlignCenter, AlignTop);
 
-    char buffer[26] = {};
+    uint8_t hour = app->date_time.hour;
+    char label_hour[4] = "";
+    if(furi_hal_rtc_get_locale_timeformat() == FuriHalRtcLocaleTimeFormat12h) {
+        if(hour < 12) {
+            snprintf(label_hour, sizeof(label_hour), " AM");
+        } else {
+            snprintf(label_hour, sizeof(label_hour), " PM");
+        }
+        hour %= 12;
+        if(hour == 0) hour = 12;
+    }
+
+    char buffer[29] = {};
     snprintf(
         buffer,
         sizeof(buffer),
-        "%04d-%02d-%02d\n%02d:%02d:%02d",
+        "%04d-%02d-%02d\n%02d:%02d:%02d%s",
         app->date_time.year,
         app->date_time.month,
         app->date_time.day,
-        app->date_time.hour,
+        hour,
         app->date_time.minute,
-        app->date_time.second);
+        app->date_time.second,
+        label_hour);
     dialog_ex_set_text(dialog_ex, buffer, 64, 29, AlignCenter, AlignCenter);
 
     dialog_ex_set_left_button_text(dialog_ex, "Date");
