@@ -58,13 +58,6 @@ void date_time_input_set_result_callback(
     void* callback_context,
     DateTime* datetime);
 
-/** Set date/time input header text
- *
- * @param      date_time_input  date/time input instance
- * @param      text             text to be shown
- */
-void date_time_input_set_header_text(DateTimeInput* date_time_input, const char* text);
-
 /** Set date/time fields which can be edited
  *
  * @param      date_time_input  date/time input instance

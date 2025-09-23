@@ -21,7 +21,6 @@ struct DateTimeInput {
 };
 
 typedef struct {
-    const char* header;
     DateTime* datetime;
 
     uint8_t row;
@@ -335,7 +334,6 @@ DateTimeInput* date_time_input_alloc(void) {
         date_time_input->view,
         DateTimeInputModel * model,
         {
-            model->header = "";
             model->changed_callback = NULL;
             model->callback_context = NULL;
             date_time_input_reset_model_input_data(model);
@@ -375,13 +373,6 @@ void date_time_input_set_result_callback(
             model->datetime = current_datetime;
         },
         true);
-}
-
-void date_time_input_set_header_text(DateTimeInput* date_time_input, const char* text) {
-    furi_check(date_time_input);
-
-    with_view_model(
-        date_time_input->view, DateTimeInputModel * model, { model->header = text; }, true);
 }
 
 void date_time_input_set_editable_fields(
