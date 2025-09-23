@@ -10,6 +10,9 @@
 * LFRFID: Add additional procotols supported by EM4305 chipset (by @jamisonderek)
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* SubGHz: Fix crash in add manually menu
+* OFW: NFC: MFC 1k Banapass Parser 
+* OFW: GUI Bug Fix: Number Input Save Icon
 * Add possibility to use custom buttons when using the SubGHz remote app (by @MrLego8-9)
 * Input Settings: Add Vibro Trigger option (by @956MB & @WillyJL)
 * BT Remote: Add Rename Option (by @aaronjamt & @WillyJL)
