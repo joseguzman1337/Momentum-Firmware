@@ -233,7 +233,7 @@ void subghz_scene_set_type_fill_generation_infos(GenInfo* infos_dest, SetType ty
             .faac_slh.serial = ((key & 0x00FFFFF0) | 0xA0000006) >> 4,
             .faac_slh.btn = 0x06,
             .faac_slh.cnt = 0x02,
-            .faac_slh.seed = key,
+            .faac_slh.seed = (uint32_t)key,
             .faac_slh.manuf = "FAAC_SLH"};
         break;
     case SetTypeFaacSLH_868:
@@ -244,7 +244,7 @@ void subghz_scene_set_type_fill_generation_infos(GenInfo* infos_dest, SetType ty
             .faac_slh.serial = ((key & 0x00FFFFF0) | 0xA0000006) >> 4,
             .faac_slh.btn = 0x06,
             .faac_slh.cnt = 0x02,
-            .faac_slh.seed = (key & 0x0FFFFFFF),
+            .faac_slh.seed = (uint32_t)key,
             .faac_slh.manuf = "FAAC_SLH"};
         break;
     case SetTypeBeninca433:
