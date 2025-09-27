@@ -363,19 +363,15 @@ void subghz_protocol_decoder_gangqi_feed(void* context, bool level, volatile uin
                 instance->decoder.parser_step = GangQiDecoderStepSaveDuration;
             } else if(
                 // End of the key
-                DURATION_DIFF(duration, subghz_protocol_gangqi_const.te_short * 4) <
-                subghz_protocol_gangqi_const.te_delta) {
+                (DURATION_DIFF(duration, subghz_protocol_gangqi_const.te_long * 2) <
+                 subghz_protocol_gangqi_const.te_delta * 3)) {
                 //Found next GAP and add bit 0 or 1 (only bit 0 was found on the remotes)
                 if((DURATION_DIFF(
                         instance->decoder.te_last, subghz_protocol_gangqi_const.te_short) <
-                    subghz_protocol_gangqi_const.te_delta) &&
-                   (DURATION_DIFF(duration, subghz_protocol_gangqi_const.te_short * 4) <
                     subghz_protocol_gangqi_const.te_delta)) {
                     subghz_protocol_blocks_add_bit(&instance->decoder, 0);
                 }
                 if((DURATION_DIFF(instance->decoder.te_last, subghz_protocol_gangqi_const.te_long) <
-                    subghz_protocol_gangqi_const.te_delta) &&
-                   (DURATION_DIFF(duration, subghz_protocol_gangqi_const.te_short * 4) <
                     subghz_protocol_gangqi_const.te_delta)) {
                     subghz_protocol_blocks_add_bit(&instance->decoder, 1);
                 }
