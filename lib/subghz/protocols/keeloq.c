@@ -858,6 +858,11 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                     }
                     break;
                 case KEELOQ_LEARNING_SECURE:
+                    if((strcmp(furi_string_get_cstr(manufacture_code->name), "BFT") == 0)) {
+                        if(instance->seed == 0) {
+                            instance->seed = (fix & 0xFFFFFFF);
+                        }
+                    }
                     man = subghz_protocol_keeloq_common_secure_learning(
                         fix, instance->seed, manufacture_code->key);
                     decrypt = subghz_protocol_keeloq_common_decrypt(hop, man);
