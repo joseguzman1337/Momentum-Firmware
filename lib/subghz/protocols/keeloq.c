@@ -858,9 +858,11 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                     }
                     break;
                 case KEELOQ_LEARNING_SECURE:
+                    bool reset_seed_back = false;
                     if((strcmp(furi_string_get_cstr(manufacture_code->name), "BFT") == 0)) {
                         if(instance->seed == 0) {
                             instance->seed = (fix & 0xFFFFFFF);
+                            reset_seed_back = true;
                         }
                     }
                     man = subghz_protocol_keeloq_common_secure_learning(
@@ -870,6 +872,8 @@ static uint8_t subghz_protocol_keeloq_check_remote_controller_selector(
                         *manufacture_name = furi_string_get_cstr(manufacture_code->name);
                         keystore->mfname = *manufacture_name;
                         return 1;
+                    } else {
+                        if(reset_seed_back) instance->seed = 0;
                     }
                     break;
                 case KEELOQ_LEARNING_MAGIC_XOR_TYPE_1:
