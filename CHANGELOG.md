@@ -7,6 +7,7 @@
 * SubGHz: Add **ZKTeco 430.5 MHz** add manually support
 * SubGHz: Add variant of 'Add Manually' menu with manual editing for each value (PR #909 #911 #914 | by @MrLego8-9)
 * SubGHz: Temporarily remove HoneywellSec protocol due to unstable decoding and incorrect encoding
+* OFW: NFC FeliCa: Service Directory Traverse + Dump All Unencrypted-Readable Services' Blocks
 * OFW: **NFC CLI commands**
 * OFW: LFRFID: **Show ISO-3166 Country Names For Pet Chips**
 * OFW: **JS views finished**
