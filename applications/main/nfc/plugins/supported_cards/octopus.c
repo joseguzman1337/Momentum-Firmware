@@ -67,6 +67,9 @@ bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
                 newer_dollars,
                 newer_cents);
 
+                furi_string_cat_str(
+                    parsed_data, "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"); 
+
             parsed = true;
             break; // Octopus only has one public block
         }
