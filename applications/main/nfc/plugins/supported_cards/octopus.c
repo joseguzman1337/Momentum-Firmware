@@ -50,7 +50,7 @@ bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
                 parsed_data, "If this card was issued \nbefore 2017 October 1st:\n");
             furi_string_cat_printf(
                 parsed_data,
-                "Balance: %s%d.%02d HK$\n",
+                "Balance: HK$ %s%d.%02d\n",
                 older_balance_cents < 0 ? "-" : "",
                 older_dollars,
                 older_cents);
@@ -62,7 +62,7 @@ bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
                 parsed_data, "If this card was issued \nafter 2017 October 1st:\n");
             furi_string_cat_printf(
                 parsed_data,
-                "Balance: %s%d.%02d HK$\n",
+                "Balance: HK$ %s%d.%02d\n",
                 newer_balance_cents < 0 ? "-" : "",
                 newer_dollars,
                 newer_cents);
