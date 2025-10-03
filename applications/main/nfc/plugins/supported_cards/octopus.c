@@ -10,7 +10,7 @@
 
 #define TAG "Octopus"
 
-#define SERVICE_CODE_OCTOPUS_IN_LE  (0x0117U)
+#define SERVICE_CODE_OCTOPUS_IN_LE (0x0117U)
 
 bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
     furi_assert(device);
@@ -45,30 +45,30 @@ bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
             furi_string_printf(parsed_data, "\e#Octopus Card\n");
             furi_string_cat_str(
                 parsed_data, "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-        
+
             furi_string_cat_printf(
                 parsed_data, "If this card was issued \nbefore 2017 October 1st:\n");
             furi_string_cat_printf(
                 parsed_data,
-                "Balance: HK$ %s%d.%02d\n",
+                "Balance: %sHK$ %d.%02d\n",
                 older_balance_cents < 0 ? "-" : "",
                 older_dollars,
                 older_cents);
 
-                furi_string_cat_str(
-                    parsed_data, "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");    
+            furi_string_cat_str(
+                parsed_data, "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 
             furi_string_cat_printf(
                 parsed_data, "If this card was issued \nafter 2017 October 1st:\n");
             furi_string_cat_printf(
                 parsed_data,
-                "Balance: HK$ %s%d.%02d\n",
+                "Balance: %sHK$ %d.%02d\n",
                 newer_balance_cents < 0 ? "-" : "",
                 newer_dollars,
                 newer_cents);
 
-                furi_string_cat_str(
-                    parsed_data, "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"); 
+            furi_string_cat_str(
+                parsed_data, "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
             parsed = true;
             break; // Octopus only has one public block
