@@ -25,22 +25,28 @@ bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
     for(uint16_t i = 0; i < simple_array_get_count(felica_data->public_blocks); i++) {
         FelicaPublicBlock* public_block = simple_array_get(felica_data->public_blocks, i);
         if(public_block->service_code == SERVICE_CODE_OCTOPUS_IN_LE) {
-            uint16_t unsigned_balance = ((uint16_t)public_block->block.data[2] << 8) |
-                                        (uint16_t)public_block->block.data[3]; // 0x0000..0xFFFF
+            uint32_t unsigned_balance = ((uint32_t)public_block->block.data[0] << 24) +
+                                        ((uint32_t)public_block->block.data[1] << 16) +
+                                        ((uint32_t)public_block->block.data[2] << 8) +
+                                        (uint32_t)public_block->block.data[3];
 
-            int32_t older_balance_dimes = (int32_t)unsigned_balance - 350;
-            int32_t newer_balance_dimes = (int32_t)unsigned_balance - 500;
+            int64_t older_balance_dimes = (int64_t)unsigned_balance - 350; // pre-2017, in dimes
+            int64_t newer_balance_dimes = (int64_t)unsigned_balance - 500; // post-2017, in dimes
 
-            uint16_t older_abs_dimes =
-                (uint16_t)(older_balance_dimes < 0 ? -older_balance_dimes : older_balance_dimes);
-            uint16_t newer_abs_dimes =
-                (uint16_t)(newer_balance_dimes < 0 ? -newer_balance_dimes : newer_balance_dimes);
+            bool older_is_negative = older_balance_dimes < 0;
+            bool newer_is_negative = newer_balance_dimes < 0;
 
-            uint16_t older_dollars = (uint16_t)(older_abs_dimes / 10);
+            uint64_t older_abs_dimes =
+                (uint64_t)(older_is_negative ? -older_balance_dimes : older_balance_dimes);
+            uint64_t newer_abs_dimes =
+                (uint64_t)(newer_is_negative ? -newer_balance_dimes : newer_balance_dimes);
+
+            uint32_t older_dollars = (uint32_t)(older_abs_dimes / 10);
             uint8_t older_dimes = (uint8_t)(older_abs_dimes % 10);
 
-            uint16_t newer_dollars = (uint16_t)(newer_abs_dimes / 10);
+            uint32_t newer_dollars = (uint32_t)(newer_abs_dimes / 10);
             uint8_t newer_dimes = (uint8_t)(newer_abs_dimes % 10);
+
 
             furi_string_printf(parsed_data, "\e#Octopus Card\n");
             furi_string_cat_str(
@@ -50,8 +56,8 @@ bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
                 parsed_data, "If this card was issued \nbefore 2017 October 1st:\n");
             furi_string_cat_printf(
                 parsed_data,
-                "Balance: %sHK$ %d.%01d0\n",
-                older_balance_dimes < 0 ? "-" : "",
+                "Balance: %sHK$ %ld.%01d0\n",
+                older_is_negative ? "-" : "",
                 older_dollars,
                 older_dimes);
 
@@ -62,8 +68,8 @@ bool octopus_parse(const NfcDevice* device, FuriString* parsed_data) {
                 parsed_data, "If this card was issued \nafter 2017 October 1st:\n");
             furi_string_cat_printf(
                 parsed_data,
-                "Balance: %sHK$ %d.%01d0\n",
-                newer_balance_dimes < 0 ? "-" : "",
+                "Balance: %sHK$ %ld.%01d0\n",
+                newer_is_negative ? "-" : "",
                 newer_dollars,
                 newer_dimes);
 
