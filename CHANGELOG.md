@@ -151,4 +151,4 @@
 - OFW: Sub-GHz: Fix TIM17 config not applied immediately (by @Aerosnail)
 
 ### Removed:
-- Nothing
+- Disabled FURI_TRACE due to flash space constraints, `furi_check failed` crashes will no longer show the file path of the error for now
