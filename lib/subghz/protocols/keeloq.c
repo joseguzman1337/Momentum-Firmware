@@ -587,7 +587,7 @@ SubGhzProtocolStatus
             ret = SubGhzProtocolStatusErrorParserKey;
             break;
         }
-
+        instance->encoder.front = 0; // reset before start
         instance->encoder.is_running = true;
     } while(false);
 
@@ -597,6 +597,7 @@ SubGhzProtocolStatus
 void subghz_protocol_encoder_keeloq_stop(void* context) {
     SubGhzProtocolEncoderKeeloq* instance = context;
     instance->encoder.is_running = false;
+    instance->encoder.front = 0; // reset position
 }
 
 LevelDuration subghz_protocol_encoder_keeloq_yield(void* context) {
