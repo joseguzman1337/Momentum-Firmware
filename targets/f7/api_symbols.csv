@@ -154,11 +154,8 @@ Header,+,lib/nfc/protocols/iso14443_4a/iso14443_4a_listener.h,,
 Header,+,lib/nfc/protocols/iso14443_4a/iso14443_4a_poller.h,,
 Header,+,lib/nfc/protocols/iso14443_4b/iso14443_4b.h,,
 Header,+,lib/nfc/protocols/iso14443_4b/iso14443_4b_poller.h,,
-<<<<<<< HEAD
 Header,+,lib/nfc/protocols/iso15693_3/iso15693_3.h,,
 Header,+,lib/nfc/protocols/iso15693_3/iso15693_3_listener.h,,
-=======
->>>>>>> ofw/dev
 Header,+,lib/nfc/protocols/iso15693_3/iso15693_3_poller.h,,
 Header,+,lib/nfc/protocols/mf_classic/mf_classic.h,,
 Header,+,lib/nfc/protocols/mf_classic/mf_classic_listener.h,,
