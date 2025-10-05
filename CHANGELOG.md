@@ -76,7 +76,7 @@
   - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
   - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson), support alphabetic combination locks (by @henrygab)
-  - ESP Flasher: Bump Marauder 1.8.4 (by @justcallmekoko), add C5 support (by @Play2BReal)
+  - ESP Flasher: Bump Marauder 1.8.4 (by @justcallmekoko), add C5 support (by @Play2BReal), more reliable bootloader mode on SWCLK (by @WillyJL)
   - FlipDownloader: Added a new option to download GitHub repositories with dedicated keyboard, add auto updating (by @jblanked)
   - FlipSocial: C++ rewrite, comments on feed posts, simpler logic and registration (by @jblanked)
   - FlipWiFi: Minor bugfixes (by @jblanked)
