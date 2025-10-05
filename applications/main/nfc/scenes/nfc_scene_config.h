@@ -26,6 +26,7 @@ ADD_SCENE(nfc, retry_confirm, RetryConfirm)
 ADD_SCENE(nfc, exit_confirm, ExitConfirm)
 ADD_SCENE(nfc, save_confirm, SaveConfirm)
 
+ADD_SCENE(nfc, mf_ultralight_c_dict_attack, MfUltralightCDictAttack)
 ADD_SCENE(nfc, mf_ultralight_unlock_menu, MfUltralightUnlockMenu)
 ADD_SCENE(nfc, mf_ultralight_unlock_warn, MfUltralightUnlockWarn)
 ADD_SCENE(nfc, mf_ultralight_key_input, MfUltralightKeyInput)
@@ -50,6 +51,12 @@ ADD_SCENE(nfc, mf_classic_keys_delete, MfClassicKeysDelete)
 ADD_SCENE(nfc, mf_classic_keys_add, MfClassicKeysAdd)
 ADD_SCENE(nfc, mf_classic_keys_warn_duplicate, MfClassicKeysWarnDuplicate)
 
+ADD_SCENE(nfc, mf_ultralight_c_keys, MfUltralightCKeys)
+ADD_SCENE(nfc, mf_ultralight_c_keys_list, MfUltralightCKeysList)
+ADD_SCENE(nfc, mf_ultralight_c_keys_delete, MfUltralightCKeysDelete)
+ADD_SCENE(nfc, mf_ultralight_c_keys_add, MfUltralightCKeysAdd)
+ADD_SCENE(nfc, mf_ultralight_c_keys_warn_duplicate, MfUltralightCKeysWarnDuplicate)
+
 ADD_SCENE(nfc, set_type, SetType)
 ADD_SCENE(nfc, set_sak, SetSak)
 ADD_SCENE(nfc, set_atqa, SetAtqa)
@@ -59,5 +66,7 @@ ADD_SCENE(nfc, slix_unlock_menu, SlixUnlockMenu)
 ADD_SCENE(nfc, slix_key_input, SlixKeyInput)
 ADD_SCENE(nfc, slix_unlock, SlixUnlock)
 ADD_SCENE(nfc, slix_unlock_success, SlixUnlockSuccess)
+
+ADD_SCENE(nfc, felica_more_info, FelicaMoreInfo)
 
 ADD_SCENE(nfc, generate_info, GenerateInfo)
