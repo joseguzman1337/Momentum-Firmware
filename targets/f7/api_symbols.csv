@@ -963,7 +963,7 @@ Function,-,cuserid,char*,char*
 Function,+,date_time_input_alloc,DateTimeInput*,
 Function,+,date_time_input_free,void,DateTimeInput*
 Function,+,date_time_input_get_view,View*,DateTimeInput*
-Function,+,date_time_input_set_header_text,void,"DateTimeInput*, const char*"
+Function,+,date_time_input_set_editable_fields,void,"DateTimeInput*, _Bool, _Bool, _Bool, _Bool, _Bool, _Bool"
 Function,+,date_time_input_set_result_callback,void,"DateTimeInput*, DateTimeChangedCallback, DateTimeDoneCallback, void*, DateTime*"
 Function,+,datetime_datetime_to_timestamp,uint32_t,DateTime*
 Function,+,datetime_get_days_per_month,uint8_t,"_Bool, uint8_t"
