@@ -137,6 +137,7 @@
 
 ### Fixed:
 - CLI: Fix long delay with quick connect/disconnect, qFlipper should connect faster as expected again (by @WillyJL)
+- Storage: Dont send mount event if SD mounted at boot, fix SD card icon showing late on boot (by @WillyJL)
 - Bad KB:
   - Fix modifier keys with HOLD/RELEASE commands (by @WillyJL)
   - OFW: Fix demo_windows.txt for newer version of ai enabled Windows Notepad not able to keep up with default fast input text (by @ase1590)
