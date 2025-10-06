@@ -74,6 +74,8 @@
   - UL: Keeloq Comunello add manually support (by @xMasterX)
   - UL: Add variant of 'Add Manually' menu with manual editing for each value (by @MrLego8-9)
   - UL: Add ZKTeco 430.5 MHz add manually support (by @xMasterX)
+  - UL: Add Elplast 18bit static code protocol (hello Hackcat ^_^)
+  - UL: Try to decode BFT (2 buttons remotes only) on the fly in regular Read mode (by @xMasterX)
 - RFID:
   - Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
   - OFW: Show ISO-3166 Country Names For Pet Chips (by @zinongli)
@@ -147,6 +149,7 @@
   - Fix read crash with unexpectedly large MFC AUTH(0) response, eg with Chameleon Ultra NTAG emualtion (by @WillyJL)
   - Fix slashes in prefilled filename (by @WillyJL)
 - FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
+- UL: Sub-GHz: Fix crash in add manually menu (by @xMasterX)
 - OFW: GUI: Fix Number Input Save Icon (by @zinongli)
 - OFW: JS: Stop PWM on exit (by @portasynthinca3)
 - OFW: Sub-GHz: Fix TIM17 config not applied immediately (by @Aerosnail)
