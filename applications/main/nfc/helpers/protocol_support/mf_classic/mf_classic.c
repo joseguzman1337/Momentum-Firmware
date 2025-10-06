@@ -139,7 +139,7 @@ static void nfc_scene_read_menu_on_enter_mf_classic(NfcApp* instance) {
             SubmenuIndexCrackNonces,
             nfc_protocol_support_common_submenu_callback,
             instance);
-        }
+    }
 
     submenu_add_item(
         submenu,
