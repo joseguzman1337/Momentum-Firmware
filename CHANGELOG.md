@@ -13,6 +13,7 @@
 * OFW: **JS views finished**
 * OFW: BLE: improved pairing security
 * OFW: FeliCa Emulation: Handle certain Polling commands in firmware
+* OFW PR 4287: Fix Ultralight EV1 regression (by @noproto)
 * OFW PR 4271: NFC: **Ultralight C NFC App Key Management, Dictionary Attack** (by @noproto)
 * OFW PR 4265: NFC: **Fix read crash** with unexpectedly large MFC AUTH(0) response (by @WillyJL)
 * OFW PR 4251: CLI: **Fix long delay** with quick connect/disconnect (by @WillyJL)
