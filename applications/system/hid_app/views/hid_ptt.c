@@ -44,6 +44,7 @@ enum HidPushToTalkAppIndex {
     HidPushToTalkAppIndexFaceTime,
     HidPushToTalkAppIndexGather,
     HidPushToTalkAppIndexGoogleMeet,
+    HidPushToTalkAppIndexGoogleMeetGlobal,
     HidPushToTalkAppIndexGoogleHangouts,
     HidPushToTalkAppIndexJamulus,
     HidPushToTalkAppIndexSignal,
@@ -88,6 +89,32 @@ static void hid_ptt_trigger_hand_macos_meet(HidPushToTalk* hid_ptt) {
 static void hid_ptt_trigger_hand_linux_meet(HidPushToTalk* hid_ptt) {
     hid_hal_keyboard_press(hid_ptt->hid, KEY_MOD_LEFT_CTRL | KEY_MOD_LEFT_ALT | HID_KEYBOARD_H);
     hid_hal_keyboard_release(hid_ptt->hid, KEY_MOD_LEFT_CTRL | KEY_MOD_LEFT_ALT | HID_KEYBOARD_H);
+}
+
+// meet global macos
+static void hid_ptt_trigger_mute_macos_meet_global(HidPushToTalk* hid_ptt) {
+    hid_hal_keyboard_press(
+        hid_ptt->hid,
+        KEY_MOD_LEFT_GUI | KEY_MOD_LEFT_CTRL | HID_KEYBOARD_7);
+    hid_hal_keyboard_release(
+        hid_ptt->hid,
+        KEY_MOD_LEFT_GUI | KEY_MOD_LEFT_CTRL | HID_KEYBOARD_7);
+}
+static void hid_ptt_trigger_camera_macos_meet_global(HidPushToTalk* hid_ptt) {
+    hid_hal_keyboard_press(
+        hid_ptt->hid,
+        KEY_MOD_LEFT_GUI | KEY_MOD_LEFT_CTRL | HID_KEYBOARD_8);
+    hid_hal_keyboard_release(
+        hid_ptt->hid,
+        KEY_MOD_LEFT_GUI | KEY_MOD_LEFT_CTRL | HID_KEYBOARD_8);
+}
+static void hid_ptt_trigger_hand_macos_meet_global(HidPushToTalk* hid_ptt) {
+    hid_hal_keyboard_press(
+        hid_ptt->hid,
+        KEY_MOD_LEFT_GUI | KEY_MOD_LEFT_CTRL | HID_KEYBOARD_9);
+    hid_hal_keyboard_release(
+        hid_ptt->hid,
+        KEY_MOD_LEFT_GUI | KEY_MOD_LEFT_CTRL | HID_KEYBOARD_9);
 }
 static void hid_ptt_trigger_mute_macos_zoom(HidPushToTalk* hid_ptt) {
     hid_hal_keyboard_press(hid_ptt->hid, KEY_MOD_LEFT_GUI | KEY_MOD_LEFT_SHIFT | HID_KEYBOARD_A);
@@ -438,6 +465,13 @@ static void hid_ptt_menu_callback(
                     model->callback_start_ptt = hid_ptt_start_ptt_meet_zoom;
                     model->callback_stop_ptt = hid_ptt_stop_ptt_meet_zoom;
                     break;
+                case HidPushToTalkAppIndexGoogleMeetGlobal:
+                    model->callback_trigger_mute = hid_ptt_trigger_mute_macos_meet_global;
+                    model->callback_trigger_camera = hid_ptt_trigger_camera_macos_meet_global;
+                    model->callback_trigger_hand = hid_ptt_trigger_hand_macos_meet_global;
+                    model->callback_start_ptt = hid_ptt_trigger_mute_macos_meet_global;
+                    model->callback_stop_ptt = hid_ptt_trigger_mute_macos_meet_global;
+                    break;
                 case HidPushToTalkAppIndexJamulus:
                     model->callback_trigger_mute = hid_ptt_trigger_mute_jamulus;
                     model->callback_start_ptt = hid_ptt_trigger_mute_jamulus;
@@ -592,6 +626,15 @@ static void hid_ptt_menu_callback(
                     "This feature is off by default in your audio settings "
                     "and may not work for Windows users who use their screen "
                     "reader. In this situation, the spacebar performs a different action.\n\n";
+                break;
+            case HidPushToTalkAppIndexGoogleMeetGlobal:
+                app_specific_help =
+                    "Google Meet (Global):\n"
+                    "1. Install \"Google Meet - Global Shortcuts\" extension.\n"
+                    "2. Open chrome://extensions/shortcuts.\n"
+                    "3. Set 'Toggle microphone' to Cmd+Ctrl+7 and enable Global.\n"
+                    "4. Set 'Toggle camera' to Cmd+Ctrl+8 and enable Global.\n"
+                    "5. Set 'Raise hand' to Cmd+Ctrl+9 and enable Global.\n\n";
                 break;
             case HidPushToTalkAppIndexDiscord:
                 app_specific_help =
@@ -924,6 +967,13 @@ HidPushToTalk* hid_ptt_alloc(Hid* hid) {
         HidPushToTalkLinux,
         "Google Meet",
         HidPushToTalkAppIndexGoogleMeet,
+        hid_ptt_menu_callback,
+        hid_ptt);
+    ptt_menu_add_item_to_list(
+        hid->hid_ptt_menu,
+        HidPushToTalkMacOS,
+        "Google Meet Global",
+        HidPushToTalkAppIndexGoogleMeetGlobal,
         hid_ptt_menu_callback,
         hid_ptt);
     ptt_menu_add_item_to_list(
