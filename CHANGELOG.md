@@ -21,6 +21,12 @@
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
 * SubGHz: Fix crash in add manually menu
+* OFW PR 4293: NFC FeliCa Improvement: Dump All Systems (by @zinongli)
+* OFW PR 4285: ViewStack: Store View by value to save memory (by @CookiePLMonster)
+* OFW PR 4290: Storage: Dont send mount event if SD mounted at boot (by @WillyJL)
+* OFW PR 4283: NFC lib: Expose nfc_common.h (by @zinongli)
+* OFW: Fix wrbl command tooltip
+* OFW: VSCode: Reduce file watcher resource usage
 * OFW: cli: Buzzer command
 * OFW: Update demo_windows.txt
 * OFW: Fix PVS warnings
