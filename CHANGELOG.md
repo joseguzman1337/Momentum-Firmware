@@ -1,5 +1,6 @@
 ## Main changes
 - Current API: 87.0
+* SubGHz: Add support for **Came Atomo (TOP44RBN)** remotes (thanks @mishamyte for recordings)
 * SubGHz: Add **Elplast 18bit** static code protocol (hello Hackcat ^_^)
 * SubGHz: Try to **decode BFT** (2 buttons remotes only) **on the fly** in regular Read mode (no more KL Unknown and all of that for free?!) (for 4 button remote follow docs [here](https://github.com/DarkFlippers/unleashed-firmware/blob/dev/documentation/SubGHzRemoteProg.md))
 * SubGHz: **Tune Linear** (edited by @WillyJL in PR #919 #920) (add better EZCode support) and **Dickert MAHS** protocol decoders
