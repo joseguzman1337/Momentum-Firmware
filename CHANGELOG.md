@@ -7,6 +7,8 @@
 * SubGHz: Add **ZKTeco 430.5 MHz** add manually support
 * SubGHz: Add variant of 'Add Manually' menu with manual editing for each value (PR #909 #911 #914 | by @MrLego8-9)
 * SubGHz: Temporarily remove HoneywellSec protocol due to unstable decoding and incorrect encoding
+* NFC: Returning fix for reading PWD locked MFUL (PR #922 | by @mishamyte)
+* NFC: Added UL-C keys to the dictionary (PR #923 | by @mishamyte)
 * NFC: Add MIFARE Classic "Show Keys" UI (by @aaronjamt)
 * Apps: HID PTT: adding global zoom and google meet shortcuts for MacOS (PR #921 | by @hryamzik)
 * OFW: NFC FeliCa: Service Directory Traverse + Dump All Unencrypted-Readable Services' Blocks
