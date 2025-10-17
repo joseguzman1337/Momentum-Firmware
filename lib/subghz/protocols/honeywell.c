@@ -35,7 +35,7 @@ static const SubGhzBlockConst subghz_protocol_honeywell_const = {
     .te_long = 280,
     .te_short = 143,
     .te_delta = 51,
-    .min_count_bit_for_found = 62,
+    .min_count_bit_for_found = 64,
 };
 
 struct SubGhzProtocolDecoderHoneywell {
@@ -299,17 +299,19 @@ static void subghz_protocol_decoder_honeywell_addbit(void* context, bool data) {
     instance->decoder.decode_data = (instance->decoder.decode_data << 1) | data;
     instance->decoder.decode_count_bit++;
 
-    if(instance->decoder.decode_count_bit < 62) return;
+    if(instance->decoder.decode_count_bit < 62) {
+        return;
+    }
 
     uint16_t preamble = (instance->decoder.decode_data >> 48) & 0xFFFF;
     //can be multiple, since flipper can't read it well.. (it can, but the sensors are not that good, there are multiple of variations seen)
     if(preamble == 0b0011111111111110 || preamble == 0b0111111111111110 ||
        preamble == 0b1111111111111110) {
         uint8_t datatocrc[4];
-        datatocrc[0] = (instance->decoder.decode_data >> 40) & 0xFFFF;
-        datatocrc[1] = (instance->decoder.decode_data >> 32) & 0xFFFF;
-        datatocrc[2] = (instance->decoder.decode_data >> 24) & 0xFFFF;
-        datatocrc[3] = (instance->decoder.decode_data >> 16) & 0xFFFF;
+        datatocrc[0] = (instance->decoder.decode_data >> 40) & 0xFF;
+        datatocrc[1] = (instance->decoder.decode_data >> 32) & 0xFF;
+        datatocrc[2] = (instance->decoder.decode_data >> 24) & 0xFF;
+        datatocrc[3] = (instance->decoder.decode_data >> 16) & 0xFF;
         uint8_t channel = (instance->decoder.decode_data >> 44) & 0xF;
         uint16_t crc_calc = 0;
         if(channel == 0x2 || channel == 0x4 || channel == 0xA) {
@@ -324,11 +326,15 @@ static void subghz_protocol_decoder_honeywell_addbit(void* context, bool data) {
         }
         uint16_t crc = instance->decoder.decode_data & 0xFFFF;
         if(crc == crc_calc) {
-            //the data is good. process it.
-            instance->generic.data = instance->decoder.decode_data;
-            instance->generic.data_count_bit =
-                instance->decoder
-                    .decode_count_bit; //maybe set it to 64, and hack the first 2 bits to 1! will see if replay needs it
+            // Removing possible artifacts from higher bits and setting header to FF FE
+            instance->generic.data =
+                ((((((0xFF << 16) | ((instance->decoder.decode_data >> 40) & 0xFFFF)) << 16) |
+                   ((instance->decoder.decode_data >> 24) & 0xFFFF))
+                  << 16) |
+                 ((instance->decoder.decode_data >> 8) & 0xFFFF))
+                    << 8 |
+                (instance->decoder.decode_data & 0xFF);
+            instance->generic.data_count_bit = 64;
             if(instance->base.callback)
                 instance->base.callback(&instance->base, instance->base.context);
             instance->decoder.decode_data = 0;
