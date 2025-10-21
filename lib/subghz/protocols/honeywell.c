@@ -379,6 +379,9 @@ SubGhzProtocolStatus
     }
 
     if(instance->generic.data_count_bit != 64) {
+        if(instance->generic.data_count_bit < 62) {
+            return SubGhzProtocolStatusErrorValueBitCount;
+        }
         // Removing possible artifacts from higher bits and setting header to FF FE
         instance->generic.data =
             ((((((0xFF << 16) | ((instance->generic.data >> 40) & 0xFFFF)) << 16) |
