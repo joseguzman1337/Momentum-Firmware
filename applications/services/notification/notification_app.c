@@ -488,9 +488,10 @@ static void notification_process_notification_message(
             break;
         case NotificationMessageTypeLedDisplayBacklightEnforceOn:
             furi_check(app->display_led_lock < UINT8_MAX);
-            app->display_led_lock++;
+
             // --- NIGHT SHIFT ---
-            if(app->display_led_lock == 1) {
+            if(app->display_led_lock <1 ) {
+                app->display_led_lock = 1;
                 notification_apply_internal_led_layer(
                     &app->display,
                     notification_message->data.led.value * display_brightness_setting *
@@ -499,13 +500,11 @@ static void notification_process_notification_message(
             break;
         case NotificationMessageTypeLedDisplayBacklightEnforceAuto:
             if(app->display_led_lock > 0) {
-                app->display_led_lock--;
-                if(app->display_led_lock == 0) {
-                    notification_apply_internal_led_layer(
-                        &app->display,
-                        notification_message->data.led.value * display_brightness_setting *
-                            app->current_night_shift * 1.0f);
-                }
+                app->display_led_lock = 0;
+                notification_apply_internal_led_layer(
+                    &app->display,
+                    notification_message->data.led.value * display_brightness_setting *
+                        app->current_night_shift * 1.0f);
                 // --- NIGHT SHIFT END ---
             } else {
                 FURI_LOG_E(TAG, "Incorrect BacklightEnforce use");
