@@ -490,7 +490,7 @@ static void notification_process_notification_message(
             furi_check(app->display_led_lock < UINT8_MAX);
 
             // --- NIGHT SHIFT ---
-            if(app->display_led_lock <1 ) {
+            if(app->display_led_lock < 1) {
                 app->display_led_lock = 1;
                 notification_apply_internal_led_layer(
                     &app->display,
