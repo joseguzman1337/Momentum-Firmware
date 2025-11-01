@@ -63,8 +63,11 @@
     - UI: Dictionary attack scene and menu options
   - OFW: FeliCa Service Directory Traverse + Dump All Unencrypted-Readable Services' Blocks (by @zinongli)
   - OFW: FeliCa Emulation Handle certain Polling commands in firmware (by @dogtopus)
+  - OFW: FeliCa Dump All Systems (by @zinongli)
   - OFW: Amusement IC Card Parser for FeliCa Lite & Lite-S (by @zinongli)
   - OFW: MFC 1k Banapass Parser (by @zinongli)
+  - UL: Returning fix for reading PWD locked MFUL (by @mishamyte)
+  - UL: Added UL-C keys to the dictionary (by @mishamyte)
   - Add MIFARE Classic "Show Keys" UI (#473 by @aaronjamt)
 - SubGHz:
   - UL: Roger (static 28 bit) with add manually support (by @xMasterX & @mishamyte)
@@ -77,6 +80,9 @@
   - UL: Add ZKTeco 430.5 MHz add manually support (by @xMasterX)
   - UL: Add Elplast 18bit static code protocol (hello Hackcat ^_^)
   - UL: Try to decode BFT (2 buttons remotes only) on the fly in regular Read mode (by @xMasterX)
+  - UL: Add support for Came Atomo TOP44RBN remotes (by @xMasterX & @mishamyte)
+  - UL: Add IL-100 Smart support for Add manually (by @xMasterX)
+  - UL: Add experimental counter overflow mode (OFEX), replicates how some key duplicators work, DO NOT USE if you don't know what you are doing, it will reset your counter value! (by @xMasterX)
 - RFID:
   - Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
   - OFW: Show ISO-3166 Country Names For Pet Chips (by @zinongli)
@@ -106,6 +112,7 @@
 - Apps:
   - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster (by @noproto)
   - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
+  - UL: BT/USB Remote: PTT global zoom and google meet shortcuts for MacOS (by @hryamzik)
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
   - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson), support alphabetic combination locks (by @henrygab)
   - ESP Flasher: Bump Marauder 1.8.4 (by @justcallmekoko), add C5 support (by @Play2BReal), more reliable bootloader mode on SWCLK (by @WillyJL)
@@ -131,11 +138,14 @@
   - UL: Add 868.46 MHz to default subghz freqs list (by @xMasterX)
   - UL: Reduce less popular freqs in default hopper preset, make it faster (by @xMasterX)
   - UL: Tune Linear (add better EZCode support), Dickert MAHS decoders (by @xMasterX)
+  - UL: Some fixes and improvements to Honeywell Sec protocol (by @xMasterX)
 - Infrared:
   - OFW: Add an old JVC model to universal remotes (by @zgracem)
   - OFW: Add Daikin FTXN25LV1B9 and Toyotomi KTN22-12R32 to universal remotes (by @minchogaydarov)
 - OFW: BLE: Improved pairing security (by @hedger)
 - JS: Expose button event type in `gui/widget` button callback, see breaking changes above (by @WillyJL)
+- OFW: NFC: Expose nfc_common.h (by @zinongli)
+- OFW: GUI: Store View by value inViewStack to save memory (by @CookiePLMonster)
 - UL: Docs: Update Sub-GHz DoorHan programming instructions (by @li0ard)
 
 ### Fixed:
