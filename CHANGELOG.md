@@ -144,7 +144,9 @@
   - OFW: Add Daikin FTXN25LV1B9 and Toyotomi KTN22-12R32 to universal remotes (by @minchogaydarov)
 - OFW: BLE: Improved pairing security (by @hedger)
 - JS: Expose button event type in `gui/widget` button callback, see breaking changes above (by @WillyJL)
-- OFW: NFC: Expose nfc_common.h (by @zinongli)
+- NFC:
+  - OFW: Synchronise mf_classic_dict.nfc with mfc_default_keys.dic from Proxmark3 Iceman fork, 164 new MFC keys (by @ry4000)
+  - OFW: Expose nfc_common.h (by @zinongli)
 - OFW: GUI: Store View by value inViewStack to save memory (by @CookiePLMonster)
 - UL: Docs: Update Sub-GHz DoorHan programming instructions (by @li0ard)
 
