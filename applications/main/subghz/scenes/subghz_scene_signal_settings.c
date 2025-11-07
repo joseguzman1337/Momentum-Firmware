@@ -6,8 +6,7 @@
 
 #define TAG "SubGhzSceneSignalSettings"
 
-char * protocol_counter_allowed = "";
-uint8_t counter_mode = 0xff;
+uint32_t counter_mode = 0xff;
 
 #define COUNTER_MODE_COUNT 7
 const char* const counter_mode_text[COUNTER_MODE_COUNT] = {
@@ -30,20 +29,18 @@ const int32_t counter_mode_value[COUNTER_MODE_COUNT] = {
     6,
 };
 
-void subghz_scene_signal_settings_counter_mode_changed (VariableItem* item){
+void subghz_scene_signal_settings_counter_mode_changed(VariableItem* item) {
     SubGhz* subghz = variable_item_get_context(item);
-    UNUSED (subghz);
+    UNUSED(subghz);
     uint8_t index = variable_item_get_current_value_index(item);
     variable_item_set_current_value_text(item, counter_mode_text[index]);
     counter_mode = counter_mode_value[index];
-
 }
 
 void subghz_scene_signal_settings_on_enter(void* context) {
-    // when we open saved file we do some check and fill up subghz->filepath. So now we use it to check is CounterMode in file
+    // when we open saved file we do some check and fill up subghz->file_path. So now we use it to check is there CounterMode in file or not
     SubGhz* subghz = context;
 
-    FuriString* tmp_string = furi_string_alloc();
     const char* file_path = furi_string_get_cstr(subghz->file_path);
 
     furi_assert(subghz);
@@ -51,9 +48,14 @@ void subghz_scene_signal_settings_on_enter(void* context) {
 
     Storage* storage = furi_record_open(RECORD_STORAGE);
     FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
+    FuriString* tmp_string = furi_string_alloc();
+    
     uint32_t tmp_counter_mode = 0;
     counter_mode = 0xff;
 
+    // open file and check is it contains allowed protocols and CounterMode variable - if not then CcounterMode will stay 0xff 
+    // if file contain allowed protocols but not contain CounterMode - set it to default 0
+    // if file contain CounterMode then load it
     if(!flipper_format_file_open_existing(fff_data_file, file_path)) {
         FURI_LOG_E(TAG, "Error open file %s", file_path);
     } else {
@@ -61,21 +63,22 @@ void subghz_scene_signal_settings_on_enter(void* context) {
         if((!strcmp(furi_string_get_cstr(tmp_string), "Nice FloR-S")) ||
            (!strcmp(furi_string_get_cstr(tmp_string), "CAME Atomo")) ||
            (!strcmp(furi_string_get_cstr(tmp_string), "Alutech AT-4N")) ||
-           (!strcmp(furi_string_get_cstr(tmp_string), "KeeLoq")) ) {
-
-                if(flipper_format_read_uint32(fff_data_file, "CounterMode", &tmp_counter_mode, 1)) {
-                    counter_mode = (uint8_t)tmp_counter_mode;
-                } else {
-                    counter_mode = 0;
-                }
+           (!strcmp(furi_string_get_cstr(tmp_string), "KeeLoq"))) {
+            if(flipper_format_read_uint32(fff_data_file, "CounterMode", &tmp_counter_mode, 1)) {
+                counter_mode = (uint8_t)tmp_counter_mode;
+            } else {
+                counter_mode = 0;
             }
+        }
     }
-    FURI_LOG_I(TAG, "CounterMode %i", counter_mode);
+    FURI_LOG_I(TAG, "Loaded CounterMode value %li", counter_mode);
 
     furi_string_free(tmp_string);
+    flipper_format_file_close(fff_data_file);
     flipper_format_free(fff_data_file);
     furi_record_close(RECORD_STORAGE);
 
+    //Create and Enable/Disable variable_item_list depent from current CounterMode value
     VariableItemList* variable_item_list = subghz->variable_item_list;
     int32_t value_index;
     VariableItem* item;
@@ -87,14 +90,12 @@ void subghz_scene_signal_settings_on_enter(void* context) {
         available_count,
         subghz_scene_signal_settings_counter_mode_changed,
         subghz);
-    value_index = value_index_int32(
-        counter_mode,
-        counter_mode_value,
-        available_count);
+    value_index = value_index_int32(counter_mode, counter_mode_value, available_count);
 
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, counter_mode_text[value_index]);
-    variable_item_set_locked(item,(counter_mode == 0xff)," Not available \n for this \nprotocol !");
+    variable_item_set_locked(
+        item, (counter_mode == 0xff), " Not available \n for this \nprotocol !");
 
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdVariableItemList);
 }
@@ -104,13 +105,45 @@ bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent even
     if(event.type == SceneManagerEventTypeBack) {
         scene_manager_previous_scene(subghz->scene_manager);
         return true;
-        }
-        else return false;
-    }
-
+    } else
+        return false;
+}
 
 void subghz_scene_signal_settings_on_exit(void* context) {
     SubGhz* subghz = context;
+    const char* file_path = furi_string_get_cstr(subghz->file_path);
+
+    furi_assert(subghz);
+    furi_assert(file_path);
+
+    // if ConterMode was changed from 0xff then we must update or write new value to file
+    if(counter_mode != 0xff) {
+        Storage* storage = furi_record_open(RECORD_STORAGE);
+        FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
+
+        // check is the file available for update or write brand new value and to it
+        if(flipper_format_file_open_existing(fff_data_file, file_path)) {
+            if(flipper_format_update_uint32(fff_data_file, "CounterMode", &counter_mode, 1)) {
+                FURI_LOG_I(TAG, "Successfully update CounterMode value to %li", counter_mode);
+            } else {
+                FURI_LOG_E(TAG, "Error update CounterMode value trying append and add .. ");
+                flipper_format_file_close(fff_data_file);
+                flipper_format_file_open_append(fff_data_file, file_path);
+                if(flipper_format_write_uint32(fff_data_file, "CounterMode", &counter_mode, 1)) {
+                    FURI_LOG_I(TAG, "Successfully added CounterMode value %li", counter_mode);
+                } else {
+                    FURI_LOG_E(TAG, "Error with adding CounterMode value %li", counter_mode);
+                }
+            }
+        } else {
+            FURI_LOG_E(TAG, "Error open file %s for writing", file_path);
+        }
+
+        flipper_format_file_close(fff_data_file);
+        flipper_format_free(fff_data_file);
+        furi_record_close(RECORD_STORAGE);
+    }
+
     variable_item_list_set_selected_item(subghz->variable_item_list, 0);
     variable_item_list_reset(subghz->variable_item_list);
 }
