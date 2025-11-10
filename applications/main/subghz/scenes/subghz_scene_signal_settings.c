@@ -124,13 +124,13 @@ void subghz_scene_signal_settings_on_enter(void* context) {
     variable_item_set_locked(
         item, (counter_mode == 0xff), " Not available \n for this \nprotocol !");
 
-    item = variable_item_list_add(
-        variable_item_list,
-        "Counter Value",
-        1,
-        NULL,
-        subghz);
-    variable_item_set_current_value_text(item, "FFFFFF");
+    // item = variable_item_list_add(
+    //     variable_item_list,
+    //     "Counter Value",
+    //     1,
+    //     NULL,
+    //     subghz);
+    // variable_item_set_current_value_text(item, "FFFFFF");
 
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdVariableItemList);
 }

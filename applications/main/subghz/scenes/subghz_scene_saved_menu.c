@@ -34,14 +34,14 @@ void subghz_scene_saved_menu_on_enter(void* context) {
         SubmenuIndexDelete,
         subghz_scene_saved_menu_submenu_callback,
         subghz);
-    //if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
+    if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagDebug)) {
         submenu_add_item(
             subghz->submenu,
             "Signal Settings",
             SubmenuIndexSignalSettings,
             subghz_scene_saved_menu_submenu_callback,
             subghz);
-    //};
+    };
     submenu_set_selected_item(
         subghz->submenu,
         scene_manager_get_scene_state(subghz->scene_manager, SubGhzSceneSavedMenu));
