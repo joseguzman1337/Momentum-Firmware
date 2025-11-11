@@ -108,7 +108,7 @@ void subghz_scene_signal_settings_on_enter(void* context) {
 
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, counter_mode_text[value_index]);
-    variable_item_set_locked(item, (counter_mode == 0xff), "Not available\nfor this\nprotocol!");
+    variable_item_set_locked(item, (counter_mode == 0xff), "Not available\nfor this\nprotocol !");
 
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdVariableItemList);
 }
@@ -134,19 +134,14 @@ void subghz_scene_signal_settings_on_exit(void* context) {
         Storage* storage = furi_record_open(RECORD_STORAGE);
         FlipperFormat* fff_data_file = flipper_format_file_alloc(storage);
 
-        // check is the file available for update or write brand new value to it
+        // check is the file available for update/insert CounterMode value
         if(flipper_format_file_open_existing(fff_data_file, file_path)) {
-            if(flipper_format_update_uint32(fff_data_file, "CounterMode", &counter_mode, 1)) {
-                FURI_LOG_D(TAG, "Successfully update CounterMode value to %li", counter_mode);
+            if(flipper_format_insert_or_update_uint32(
+                   fff_data_file, "CounterMode", &counter_mode, 1)) {
+                FURI_LOG_D(
+                    TAG, "Successfully updated/inserted CounterMode value %li", counter_mode);
             } else {
-                FURI_LOG_E(TAG, "Error update CounterMode value trying append and add .. ");
-                flipper_format_file_close(fff_data_file);
-                flipper_format_file_open_append(fff_data_file, file_path);
-                if(flipper_format_write_uint32(fff_data_file, "CounterMode", &counter_mode, 1)) {
-                    FURI_LOG_D(TAG, "Successfully added CounterMode value %li", counter_mode);
-                } else {
-                    FURI_LOG_E(TAG, "Error with adding CounterMode value %li", counter_mode);
-                }
+                FURI_LOG_E(TAG, "Error update/insert CounterMode value");
             }
         } else {
             FURI_LOG_E(TAG, "Error open file %s for writing", file_path);
