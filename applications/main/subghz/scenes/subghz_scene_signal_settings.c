@@ -49,6 +49,16 @@ void subghz_scene_signal_settings_counter_mode_changed(VariableItem* item) {
     counter_mode = counter_mode_value[index];
 }
 
+void subghz_scene_signal_settings_variable_item_list_enter_callback(void* context, uint32_t index) {
+    SubGhz* subghz = context;
+
+    if(index == 1) {
+ //   view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdByteInput);
+ //   view_dispatcher_send_custom_event(subghz->view_dispatcher, 13);
+    scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSignalSettingsCounter);
+    }
+}
+
 void subghz_scene_signal_settings_on_enter(void* context) {
     // When we open saved file we do some check and fill up subghz->file_path.
     // So now we use it to check is there CounterMode in file or not
@@ -98,6 +108,8 @@ void subghz_scene_signal_settings_on_enter(void* context) {
     int32_t value_index;
     VariableItem* item;
 
+    variable_item_list_set_enter_callback (variable_item_list,subghz_scene_signal_settings_variable_item_list_enter_callback,subghz);
+
     item = variable_item_list_add(
         variable_item_list,
         "Counter Mode",
@@ -109,6 +121,16 @@ void subghz_scene_signal_settings_on_enter(void* context) {
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, counter_mode_text[value_index]);
     variable_item_set_locked(item, (counter_mode == 0xff), "Not available\nfor this\nprotocol !");
+
+    item = variable_item_list_add(
+        variable_item_list,
+        "Edit Counter",
+        1,
+        NULL,
+        subghz);
+    variable_item_set_current_value_index(item, 0);
+    variable_item_set_current_value_text(item, "----");
+
 
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdVariableItemList);
 }
