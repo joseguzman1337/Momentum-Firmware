@@ -13,6 +13,10 @@
 #include <stddef.h>
 #include "infrared_error_code.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief InfraredBruteForce opaque type declaration.
  */
@@ -56,11 +60,16 @@ InfraredErrorCode infrared_brute_force_calculate_messages(
     bool ignore_unknown_buttons);
 
 /**
- * @brief Start transmitting signals from a category stored in an InfraredBruteForce's instance dictionary.
+ * @brief Start transmitting signals from a category stored in the dictionary.
+ *
+ * The function locates the category identified by @p index, reports the number of
+ * records it contains via @p record_count, and prepares the brute-force instance
+ * to transmit those signals. On failure @p record_count is set to zero.
  *
  * @param[in,out] brute_force pointer to the instance to be started.
  * @param[in] index index of the signal category in the dictionary.
- * @returns true on success, false otherwise.
+ * @param[out] record_count pointer that receives the number of records in the category.
+ * @returns true if the category is found and the backing database file is opened, false otherwise.
  */
 bool infrared_brute_force_start(
     InfraredBruteForce* brute_force,
@@ -132,3 +141,7 @@ size_t infrared_brute_force_get_button_count(const InfraredBruteForce* brute_for
  */
 const char*
     infrared_brute_force_get_button_name(const InfraredBruteForce* brute_force, size_t index);
+
+#ifdef __cplusplus
+}
+#endif
