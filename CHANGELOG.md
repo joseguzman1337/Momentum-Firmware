@@ -51,6 +51,7 @@
     - Sub-GHz Scheduler (by @shalebridge, fixes by @xMasterX)
   - Tools:
     - FlipCrypt (by @Tyl3rA)
+    - IconEdit (by @rdefeo)
     - Programmer Calculator (by @armixz)
     - Resistance Calculator (by @instantiator)
     - Tasks (by @MadLadSquad)
