@@ -52,12 +52,24 @@ void infrared_brute_force_set_db_filename(InfraredBruteForce* brute_force, const
  *
  * @param[in,out] brute_force pointer to the instance to be updated.
  * @param[in] auto_detect_buttons bool whether to automatically register newly discovered buttons.
+ * @param[in] ignore_unknown_buttons bool whether to ignore unknown buttons when auto_detect_buttons is false.
  * @returns InfraredErrorCodeNone on success, otherwise error code.
  */
-InfraredErrorCode infrared_brute_force_calculate_messages(
+InfraredErrorCode infrared_brute_force_calculate_messages_ex(
     InfraredBruteForce* brute_force,
     bool auto_detect_buttons,
     bool ignore_unknown_buttons);
+
+/**
+ * @brief Build a signal dictionary from a previously set database file.
+ *
+ * This function must be called each time after setting the database via
+ * a infrared_brute_force_set_db_filename() call.
+ *
+ * @param[in,out] brute_force pointer to the instance to be updated.
+ * @returns InfraredErrorCodeNone on success, otherwise error code.
+ */
+InfraredErrorCode infrared_brute_force_calculate_messages(InfraredBruteForce* brute_force);
 
 /**
  * @brief Start transmitting signals from a category stored in the dictionary.

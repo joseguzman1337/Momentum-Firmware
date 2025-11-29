@@ -470,7 +470,7 @@ static void infrared_cli_brute_force_signals(
             printf("Missing signal name.\r\n");
             break;
         }
-        if(infrared_brute_force_calculate_messages(brute_force, false, true) !=
+        if(infrared_brute_force_calculate_messages_ex(brute_force, false, true) !=
            InfraredErrorCodeNone) {
             printf("Invalid remote name.\r\n");
             break;
