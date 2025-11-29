@@ -39,7 +39,9 @@
     - Image Viewer (by @polioan)
     - Space Playground (by @alanfortlink)
     - Video Player (by @LTVA1)
-  - NFC: NFC-Eink (by @RebornedBrain)
+  - NFC:
+    - NFC-Eink (by @RebornedBrain)
+    - SaFlip (by @aaronjamt)
   - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
   - Sub-GHz:
     - Chief Cooker (by @denr01)
