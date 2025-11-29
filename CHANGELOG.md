@@ -86,6 +86,8 @@
   - UL: Add support for Came Atomo TOP44RBN remotes (by @xMasterX & @mishamyte)
   - UL: Add IL-100 Smart support for Add manually (by @xMasterX)
   - UL: Add experimental counter overflow mode (OFEX), replicates how some key duplicators work, DO NOT USE if you don't know what you are doing, it will reset your counter value! (by @xMasterX)
+  - UL: Counter modes settings per-file for Keeloq, CAME Atomo, Nice Flor S, AlutechAT4N (by @xMasterX & @Dmitry422)
+  - UL: Add AN-Motors AT4 button on arrow keys (0xC) (by @xMasterX)
 - RFID:
   - Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
   - OFW: Show ISO-3166 Country Names For Pet Chips (by @zinongli)
@@ -147,13 +149,16 @@
 - Infrared:
   - OFW: Add an old JVC model to universal remotes (by @zgracem)
   - OFW: Add Daikin FTXN25LV1B9 and Toyotomi KTN22-12R32 to universal remotes (by @minchogaydarov)
+  - OFW: Infrared Universal remote DBs unit test & move infrared_signal / infrared_brute_force into lib (by @xMasterX)
 - OFW: BLE: Improved pairing security (by @hedger)
 - JS: Expose button event type in `gui/widget` button callback, see breaking changes above (by @WillyJL)
 - NFC:
   - OFW: Synchronise mf_classic_dict.nfc with mfc_default_keys.dic from Proxmark3 Iceman fork, 164 new MFC keys (by @ry4000)
   - OFW: Expose nfc_common.h (by @zinongli)
 - OFW: GUI: Store View by value inViewStack to save memory (by @CookiePLMonster)
-- UL: Docs: Update Sub-GHz DoorHan programming instructions (by @li0ard)
+- Docs:
+  - UL: Update Sub-GHz DoorHan programming instructions (by @li0ard)
+  - OFW: Update devboard docs (by @alexeyzakh)
 
 ### Fixed:
 - CLI: Fix long delay with quick connect/disconnect, qFlipper should connect faster as expected again (by @WillyJL)
