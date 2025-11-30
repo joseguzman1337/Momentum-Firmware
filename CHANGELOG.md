@@ -127,7 +127,7 @@
   - UL: BT/USB Remote: PTT global zoom and google meet shortcuts for MacOS (by @hryamzik)
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
   - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson), support alphabetic combination locks (by @henrygab)
-  - ESP Flasher: Bump Marauder 1.8.4 (by @justcallmekoko), add C5 support (by @Play2BReal), more reliable bootloader mode on SWCLK (by @WillyJL)
+  - ESP Flasher: Bump Marauder 1.8.10 (by @justcallmekoko), bump FlipperHTTP 2.1.1 (by @jblanked), add C5 support (by @Play2BReal), more reliable bootloader mode on SWCLK (by @WillyJL)
   - FlipDownloader: Added a new option to download GitHub repositories with dedicated keyboard, add auto updating, new keyboard, better saving system (by @jblanked)
   - FlipSocial: C++ rewrite, comments on feed posts, simpler logic and registration, fixed auto-updating, better saving system, bugfixes (by @jblanked)
   - FlipWiFi: Minor bugfixes (by @jblanked)
