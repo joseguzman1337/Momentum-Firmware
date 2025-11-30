@@ -117,7 +117,7 @@
 - Archive: Support opening and favoriting Picopass files (by @WillyJL)
 - Bad KB: Colemak keyboard layout (#466 by @Ashe-Sterling)
 - GUI:
-  - GUI: Add Sreen Settings shortcut to Control Center brightness click (#487 by @tototo31)
+  - GUI: Add Screen Settings shortcut to Control Center brightness click (#487 by @tototo31)
   - OFW: Add date/time input module (by @aaronjamt)
 
 ### Updated:
