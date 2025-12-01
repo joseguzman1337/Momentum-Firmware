@@ -4,7 +4,6 @@
 #include <lib/toolbox/value_index.h>
 #include <machine/endian.h>
 #include <toolbox/strint.h>
-#include <gui/view_dispatcher.h>
 
 #define TAG "SubGhzSceneSignalSettings"
 
@@ -63,7 +62,7 @@ void subghz_scene_signal_settings_byte_input_callback(void* context) {
 
 void subghz_scene_signal_settings_variable_item_list_enter_callback(void* context, uint32_t index) {
     SubGhz* subghz = context;
-
+    // when we click OK on "Edit counter" item
     if(index == 1) {
         // Setup byte_input view
         ByteInput* byte_input = subghz->byte_input;
@@ -78,8 +77,6 @@ void subghz_scene_signal_settings_variable_item_list_enter_callback(void* contex
             byte_count);
 
         view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdByteInput);
-        //   view_dispatcher_send_custom_event(subghz->view_dispatcher, 13);
-        //   scene_manager_next_scene(subghz->scene_manager, SubGhzSceneSignalSettingsCounter);
     }
 }
 
@@ -158,9 +155,15 @@ void subghz_scene_signal_settings_on_enter(void* context) {
     FuriString* tmp_text = furi_string_alloc_set_str("");
     FuriString* textCnt = furi_string_alloc_set_str("");
     bool counter_not_available = true;
+    SubGhzProtocolDecoderBase* decoder = subghz_txrx_get_decoder(subghz->txrx);
 
-    // decode loaded sugbhz file and take information string from decoder
-    subghz_protocol_decoder_base_get_string(subghz_txrx_get_decoder(subghz->txrx), tmp_text);
+    // deserialaze and decode loaded sugbhz file and take information string from decoder
+    if(subghz_protocol_decoder_base_deserialize(decoder, subghz_txrx_get_fff_data(subghz->txrx)) ==
+       SubGhzProtocolStatusOk) {
+        subghz_protocol_decoder_base_get_string(decoder, tmp_text);
+    } else {
+        FURI_LOG_E(TAG, "Cant deserialize this subghz file");
+    }
 
     // In protocols output we allways have HEX format for "Cnt:" output (text formating like ...Cnt:%05lX\r\n")
     // we take 8 simbols starting from  "Cnt:........"
@@ -176,6 +179,7 @@ void subghz_scene_signal_settings_on_enter(void* context) {
             FURI_LOG_D(
                 TAG, "Found 8 bytes string starting with Cnt:%s", furi_string_get_cstr(textCnt));
             counter_not_available = false;
+
             // trim and convert 8 simbols string to uint32 by base 16 (hex) by strint_to_uint32();
             // later we use loaded_counter in subghz_scene_signal_settings_on_event to check is there 0 or not - special case
             strint_to_uint32(furi_string_get_cstr(textCnt), NULL, &loaded_counter32, 16);
@@ -226,14 +230,14 @@ bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent even
         if(event.event == SubGhzCustomEventByteInputDone) {
             switch(byte_count) {
             case 2:
-                // when readed from file original signal has Cnt:00 we can step to 0000+FFFF = FFFF, but we need 0000 for next step
+                // when signal has Cnt:00 we can step only to 0000+FFFF = FFFF, but we need 0000 for next step
                 // for this case we must use +1 additional step to increace Cnt from FFFF to 0000.
 
                 // save current user definded counter increase value (mult)
                 tmp_counter = furi_hal_subghz_get_rolling_counter_mult();
 
                 // increase signal counter to max value - at result it must be 0000 in most cases
-                // but can be FFFF in case Cnt:0000 (for this we have +1 additional step
+                // but can be FFFF in case Cnt:0000 (for this we have +1 additional step below)
                 furi_hal_subghz_set_rolling_counter_mult(0xFFFF);
                 subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
                 subghz_txrx_stop(subghz->txrx);
@@ -244,7 +248,7 @@ bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent even
                     subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
                     subghz_txrx_stop(subghz->txrx);
                 }
-                // at this point we have signal Cnt:00
+                // at this point we must have signal Cnt:00
                 // convert back after byte_view and do one send with our new mult (counter16) - at end we must have signal Cnt = counter16
                 counter16 = __bswap16(counter16);
                 if(counter16 > 0) {
@@ -280,7 +284,7 @@ bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent even
             default:
                 break;
             }
-            // ???????????????????
+
             scene_manager_previous_scene(subghz->scene_manager);
             return true;
 
