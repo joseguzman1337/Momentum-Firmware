@@ -45,9 +45,9 @@ are available:
 * `button_menu`
 * `button_panel`
 * `byte_input`
-* `dialog_ex`
+* `dialog`
 * `empty_screen`
-* `file_browser`
+* `file_picker`
 * `loading`
 * `menu`
 * `number_input`
