@@ -12,6 +12,7 @@
 * OFW: Fix Felica standard loading from nfc file
 * Apps: **Check out more Apps updates and fixes by following** [this link](https://github.com/xMasterX/all-the-plugins/commits/dev)
 ## Other changes
+* SubGHz Remote: Add default remote and clear slot features (by @jknlsn)
 * Fix typo in README warning about scammers (PR #931 | by @koterba)
 * Bad USB: Colemak keyboard layout (by @Ashe-Sterling)
 * Display: Remove display_back_light bug from "DisplayBacklightEnforceOn" (PR #928 | by @Dmitry422)
