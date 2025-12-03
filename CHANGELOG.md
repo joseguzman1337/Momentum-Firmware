@@ -19,7 +19,8 @@
 * OFW PR 4279: NFC FeliCa Minor Fix: FelicaPollerEventType should only be Incomplete if the tag is FeliCa Lite (by @zinongli)
 * OFW PR 4261: Add date/time input module (by @aaronjamt)
 * OFW PR 4312: Infrared: Fix infrared CLI plugin MissingImports (by @WillyJL)
-* Disable halloween anim
+* Dolphin: Enable winter anims
+* Dolphin: Disable halloween anim
 <br><br>
 #### Known NFC post-refactor regressions list: 
 - Mifare Mini clones reading is broken (original mini working fine) (OFW)
