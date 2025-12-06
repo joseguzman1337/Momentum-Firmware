@@ -189,7 +189,7 @@ static void subghz_protocol_encoder_came_atomo_get_upload(
 
     if(came_atomo_counter_mode == 0) {
         // Check for OFEX (overflow experimental) mode
-        if(furi_hal_subghz_get_rolling_counter_mult() != 0xFFFE) {
+        if(furi_hal_subghz_get_rolling_counter_mult() != -0x7FFFFFFF) {
             if(instance->generic.cnt < 0xFFFF) {
                 if((instance->generic.cnt + furi_hal_subghz_get_rolling_counter_mult()) > 0xFFFF) {
                     instance->generic.cnt = 0;
@@ -205,7 +205,7 @@ static void subghz_protocol_encoder_came_atomo_get_upload(
             if((instance->generic.cnt + 0x1) > 0xFFFF) {
                 instance->generic.cnt = 0;
             } else if(instance->generic.cnt >= 0x1 && instance->generic.cnt != 0xFFFE) {
-                instance->generic.cnt = furi_hal_subghz_get_rolling_counter_mult();
+                instance->generic.cnt = 0xFFFE;
             } else {
                 instance->generic.cnt++;
             }

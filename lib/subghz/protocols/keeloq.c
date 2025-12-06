@@ -186,7 +186,7 @@ static bool subghz_protocol_keeloq_gen_data(
 
         if(keeloq_counter_mode == 0) {
             // Check for OFEX (overflow experimental) mode
-            if(furi_hal_subghz_get_rolling_counter_mult() != 0xFFFE) {
+            if(furi_hal_subghz_get_rolling_counter_mult() != -0x7FFFFFFF) {
                 // If counter is 0xFFFF we will reset it to 0
                 if(instance->generic.cnt < 0xFFFF) {
                     // Increase counter with value set in global settings (mult)
@@ -205,7 +205,7 @@ static bool subghz_protocol_keeloq_gen_data(
                 if((instance->generic.cnt + 0x1) > 0xFFFF) {
                     instance->generic.cnt = 0;
                 } else if(instance->generic.cnt >= 0x1 && instance->generic.cnt != 0xFFFE) {
-                    instance->generic.cnt = furi_hal_subghz_get_rolling_counter_mult();
+                    instance->generic.cnt = 0xFFFE;
                 } else {
                     instance->generic.cnt++;
                 }

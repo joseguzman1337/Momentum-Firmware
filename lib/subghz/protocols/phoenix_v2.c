@@ -253,7 +253,7 @@ static bool
 
     // Reconstruction of the data
     // Check for OFEX (overflow experimental) mode
-    if(furi_hal_subghz_get_rolling_counter_mult() != 0xFFFE) {
+    if(furi_hal_subghz_get_rolling_counter_mult() != -0x7FFFFFFF) {
         if(instance->generic.cnt < 0xFFFF) {
             if((instance->generic.cnt + furi_hal_subghz_get_rolling_counter_mult()) > 0xFFFF) {
                 instance->generic.cnt = 0;
@@ -269,7 +269,7 @@ static bool
         if((instance->generic.cnt + 0x1) > 0xFFFF) {
             instance->generic.cnt = 0;
         } else if(instance->generic.cnt >= 0x1 && instance->generic.cnt != 0xFFFE) {
-            instance->generic.cnt = furi_hal_subghz_get_rolling_counter_mult();
+            instance->generic.cnt = 0xFFFE;
         } else {
             instance->generic.cnt++;
         }
@@ -599,7 +599,7 @@ void subghz_protocol_decoder_phoenix_v2_get_string(void* context, FuriString* ou
         "V2 Phoenix %dbit\r\n"
         "Key:%05lX%08lX\r\n"
         "Sn:0x%07lX \r\n"
-        "Cnt:0x%04lX\r\n"
+        "Cnt:%04lX\r\n"
         "Btn:%X\r\n",
         instance->generic.data_count_bit,
         (uint32_t)(instance->generic.data >> 32) & 0xFFFFFFFF,
