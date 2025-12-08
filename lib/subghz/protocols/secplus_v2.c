@@ -401,10 +401,18 @@ static void subghz_protocol_secplus_v2_encode(SubGhzProtocolEncoderSecPlus_v2* i
     uint8_t roll_1[9] = {0};
     uint8_t roll_2[9] = {0};
 
-    instance->generic.cnt += furi_hal_subghz_get_rolling_counter_mult();
-
+    // ---Experemental case - we dont know counter size exactly, so just will be think that is "FF FF FF F"
+    if((instance->generic.cnt + (furi_hal_subghz_get_rolling_counter_mult() & 0xFFFFFFF)) >
+       0xFFFFFFF) {
+        instance->generic.cnt = 0xE500000;
+    } else {
+        instance->generic.cnt += (furi_hal_subghz_get_rolling_counter_mult() & 0xFFFFFFF);
+    }
+    // --- instead of :
+    //instance->generic.cnt += furi_hal_subghz_get_rolling_counter_mult();
     //ToDo it is not known what value the counter starts
-    if(instance->generic.cnt > 0xFFFFFFF) instance->generic.cnt = 0xE500000;
+    //if(instance->generic.cnt > 0xFFFFFFF) instance->generic.cnt = 0xE500000;
+
     uint32_t rolling = subghz_protocol_blocks_reverse_key(instance->generic.cnt, 28);
 
     for(int8_t i = 17; i > -1; i--) {
@@ -939,13 +947,14 @@ void subghz_protocol_decoder_secplus_v2_get_string(void* context, FuriString* ou
     SubGhzProtocolDecoderSecPlus_v2* instance = context;
     subghz_protocol_secplus_v2_remote_controller(&instance->generic, instance->secplus_packet_1);
 
+    // need to research or practice check how much bits in counter
     furi_string_cat_printf(
         output,
         "%s %db\r\n"
         "Pk1:0x%lX%08lX\r\n"
         "Pk2:0x%lX%08lX\r\n"
         "Sn:0x%08lX  Btn:0x%01X\r\n"
-        "Cnt:%03lX\r\n",
+        "Cnt:%07lX\r\n",
 
         instance->generic.protocol_name,
         instance->generic.data_count_bit,

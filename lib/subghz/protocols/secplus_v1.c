@@ -596,10 +596,12 @@ void subghz_protocol_decoder_secplus_v1_get_string(void* context, FuriString* ou
         } else {
             furi_string_cat_printf(output, "\r\n");
         }
+
+        // use 'Count:' instead of 'Cnt:' to exclude this protocol counter from Counter edit
         furi_string_cat_printf(
             output,
             "Sn:0x%08lX\r\n"
-            "Cnt:%03lX "
+            "Count:%03lX "
             "SwID:0x%X\r\n",
             instance->generic.serial,
             instance->generic.cnt,
@@ -618,7 +620,7 @@ void subghz_protocol_decoder_secplus_v1_get_string(void* context, FuriString* ou
         furi_string_cat_printf(
             output,
             "Sn:0x%08lX\r\n"
-            "Cnt:%03lX "
+            "Count:%03lX "
             "SwID:0x%X\r\n",
             instance->generic.serial,
             instance->generic.cnt,

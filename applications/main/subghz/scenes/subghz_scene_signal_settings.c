@@ -232,7 +232,14 @@ void subghz_scene_signal_settings_on_enter(void* context) {
     } else {
         place = furi_string_search_str(tmp_text, "Cnt:", 0);
         if(place > 0) {
-            furi_string_set_n(textCnt, tmp_text, place + 4, 8);
+            // defence from memory leaks. Check can we take 8 symbols after 'Cnt:' ?
+            // if from current place to end of stirngs more than 8 symbols - ok, if not - just take symbols from current place to end of string.
+            // +4 - its 'Cnt:' lenght
+            uint8_t n_symbols_taken = 8;
+            if(sizeof(tmp_text) - (place + 4) < 8) {
+                n_symbols_taken = sizeof(tmp_text) - (place + 4);
+            }
+            furi_string_set_n(textCnt, tmp_text, place + 4, n_symbols_taken);
             furi_string_trim(textCnt);
             FURI_LOG_D(
                 TAG,
@@ -278,7 +285,7 @@ void subghz_scene_signal_settings_on_enter(void* context) {
             };
 
         } else {
-            FURI_LOG_D(TAG, "Counter not available for this protocol");
+            FURI_LOG_D(TAG, "Counter editor not available for this protocol");
         }
     }
 
@@ -335,6 +342,7 @@ bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent even
 
                 // restore user definded counter increase value (mult)
                 furi_hal_subghz_set_rolling_counter_mult(tmp_counter);
+
                 break;
             case 4:
                 // the same for 32 bit Counter
