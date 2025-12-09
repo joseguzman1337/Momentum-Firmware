@@ -124,8 +124,8 @@
 
 ### Updated:
 - Apps:
-  - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster (by @noproto)
-  - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
+  - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster, 4.0 update Static Encrypted Nested attacks run 10x faster in NFC app (by @noproto)
+  - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9), add default remote and clear slot features (by @jknlsn)
   - UL: BT/USB Remote: PTT global zoom and google meet shortcuts for MacOS (by @hryamzik)
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
   - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson), support alphabetic combination locks (by @henrygab)
@@ -137,11 +137,11 @@
   - Flipper Blackhat: Add Deauth Broadcast command, updated for latest firmware (by @o7-machinehum)
   - KeyCopier: Added Weiser WR3 key format (by @lightos), added Suzuki SUZ18 key format (by @RIcePatrol)
   - Mass Storage: Add ability to spoof USB identity values (by @xtruan)
-  - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
+  - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes, support for TRT cards and Intertic disposable ST25TB cards, T-Mobilitat can parse card number (by @luu176)
   - NFC Maker: Support making empty/blank NDEF payloads (by @WillyJL)
   - NFC Playlist: Refactor playlist worker, new settings layout and management, loop setting, controls to move between items, time controls setting (by @acegoal07)
   - NMEA GPS: Moved to GPIO/GPS subfolder (by @WillyJL)
-  - Passy: Misc memory management bugfixes, misc UI improvements (by @qistoph)
+  - Passy: Misc memory management bugfixes, misc UI improvements, save DG2 and DG7 to document specific file, code cleanup (by @qistoph)
   - RFID/iButton Fuzzer: Fix prev navigation for custom UIDs (by @ahnilica)
   - Seader: Fix ATS handling (by @NVX), reset SAM on error, support config card, code optimizations, use same commands as Proxmark3, distinguish SIO SE/SR (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
