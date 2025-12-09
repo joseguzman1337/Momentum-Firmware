@@ -127,7 +127,7 @@ static bool subghz_protocol_somfy_telis_gen_data(
     btn = subghz_protocol_somfy_telis_get_btn_code();
 
     // Check for OFEX (overflow experimental) mode
-    if(furi_hal_subghz_get_rolling_counter_mult() != 0xFFFE) {
+    if(furi_hal_subghz_get_rolling_counter_mult() != -0x7FFFFFFF) {
         if(instance->generic.cnt < 0xFFFF) {
             if((instance->generic.cnt + furi_hal_subghz_get_rolling_counter_mult()) > 0xFFFF) {
                 instance->generic.cnt = 0;
@@ -143,7 +143,7 @@ static bool subghz_protocol_somfy_telis_gen_data(
         if((instance->generic.cnt + 0x1) > 0xFFFF) {
             instance->generic.cnt = 0;
         } else if(instance->generic.cnt >= 0x1 && instance->generic.cnt != 0xFFFE) {
-            instance->generic.cnt = furi_hal_subghz_get_rolling_counter_mult();
+            instance->generic.cnt = 0xFFFE;
         } else {
             instance->generic.cnt++;
         }
@@ -761,7 +761,7 @@ void subghz_protocol_decoder_somfy_telis_get_string(void* context, FuriString* o
         "%s %db\r\n"
         "Key:0x%lX%08lX\r\n"
         "Sn:0x%06lX \r\n"
-        "Cnt:0x%04lX\r\n"
+        "Cnt:%04lX\r\n"
         "Btn:%s\r\n",
 
         instance->generic.protocol_name,

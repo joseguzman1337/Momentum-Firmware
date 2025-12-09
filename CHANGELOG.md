@@ -90,7 +90,7 @@
   - UL: Add support for Came Atomo TOP44RBN remotes (by @xMasterX & @mishamyte)
   - UL: Add IL-100 Smart support for Add manually (by @xMasterX)
   - UL: Add experimental counter overflow mode (OFEX), replicates how some key duplicators work, DO NOT USE if you don't know what you are doing, it will reset your counter value! (by @xMasterX)
-  - UL: Counter modes settings per-file for Keeloq, CAME Atomo, Nice Flor S, AlutechAT4N (by @xMasterX & @Dmitry422)
+  - UL: Counter modes settings per-file for Keeloq, CAME Atomo, Nice Flor S, AlutechAT4N and option to edit counter value (by @xMasterX & @Dmitry422)
   - UL: Add AN-Motors AT4 button on arrow keys (0xC) (by @xMasterX)
 - RFID:
   - Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
@@ -112,7 +112,9 @@
   - Added `gui/popup`
   - Added `gui/vi_list`
   - Changed API for `gui/submenu`, see breaking changes above
-- Desktop: Add Keybinds support for directories (#331 by @956MB & @WillyJL)
+- Desktop:
+  - Add Keybinds support for directories (#331 by @956MB & @WillyJL)
+  - UL: Enable winter animations (by @xMasterX)
 - Input Settings: Add Vibro Trigger option (#429 by @956MB)
 - Archive: Support opening and favoriting Picopass files (by @WillyJL)
 - Bad KB: Colemak keyboard layout (#466 by @Ashe-Sterling)
