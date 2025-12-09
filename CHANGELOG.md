@@ -104,7 +104,7 @@
 - CLI:
   - OFW: NFC CLI commands (by @RebornedBrain)
   - OFW: Buzzer command (by @ivanbarsukov)
-- JS: Added all missing GUI views for JS (by @portasynthinca3):
+- OFW: JS: Added all missing GUI views for JS (by @portasynthinca3):
   - Added `gui/button_menu`
   - Added `gui/button_panel`
   - Added `gui/menu`
@@ -117,7 +117,7 @@
 - Archive: Support opening and favoriting Picopass files (by @WillyJL)
 - Bad KB: Colemak keyboard layout (#466 by @Ashe-Sterling)
 - GUI:
-  - GUI: Add Screen Settings shortcut to Control Center brightness click (#487 by @tototo31)
+  - Add Screen Settings shortcut to Control Center brightness click (#487 by @tototo31)
   - OFW: Add date/time input module (by @aaronjamt)
 
 ### Updated:
@@ -163,7 +163,7 @@
 - NFC:
   - OFW: Synchronise mf_classic_dict.nfc with mfc_default_keys.dic from Proxmark3 Iceman fork, 164 new MFC keys (by @ry4000)
   - OFW: Expose nfc_common.h (by @zinongli)
-- OFW: GUI: Store View by value inViewStack to save memory (by @CookiePLMonster)
+- OFW: GUI: Store View by value in ViewStack to save memory (by @CookiePLMonster)
 - Docs:
   - UL: Update Sub-GHz DoorHan programming instructions (by @li0ard)
   - OFW: Update devboard docs (by @alexeyzakh)
