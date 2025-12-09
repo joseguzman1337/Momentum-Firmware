@@ -66,6 +66,7 @@
     - Dictionary attack: Uses system and user dictionaries stored under /nfc/assets/ to unlock Ultralight C tags
     - Key management: Extra Actions → MIFARE Ultralight C Keys in the NFC app allows you to add, list, and remove Ultralight C keys from your Flipper
     - UI: Dictionary attack scene and menu options
+  - XERO: Support for MFKey 4.0, MIFARE Classic Static Encrypted Nested attacks run 10x faster (by @noproto)
   - OFW: FeliCa Service Directory Traverse + Dump All Unencrypted-Readable Services' Blocks (by @zinongli)
   - OFW: FeliCa Emulation Handle certain Polling commands in firmware (by @dogtopus)
   - OFW: FeliCa Dump All Systems (by @zinongli)
@@ -178,6 +179,7 @@
   - OFW: Fix demo_windows.txt for newer version of ai enabled Windows Notepad not able to keep up with default fast input text (by @ase1590)
 - Desktop: Fix lock screen hang (#438 by @aaronjamt)
 - NFC:
+  - XERO: Keys found in key cache are now used in Nested attacks, deleting key cache is no longer required (by @noproto)
   - Fix incorrect Saflok year formula (#433 by @Eltrick)
   - Fix read crash with unexpectedly large MFC AUTH(0) response, eg with Chameleon Ultra NTAG emualtion (by @WillyJL)
   - Fix slashes in prefilled filename (by @WillyJL)
