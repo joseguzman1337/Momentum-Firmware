@@ -401,17 +401,37 @@ static void subghz_protocol_secplus_v2_encode(SubGhzProtocolEncoderSecPlus_v2* i
     uint8_t roll_1[9] = {0};
     uint8_t roll_2[9] = {0};
 
-    // ---Experemental case - we dont know counter size exactly, so just will be think that is "FF FF FF F"
-    if((instance->generic.cnt + (furi_hal_subghz_get_rolling_counter_mult() & 0xFFFFFFF)) >
-       0xFFFFFFF) {
-        instance->generic.cnt = 0xE500000;
+    // Experemental case - we dont know counter size exactly, so just will be think that it is in range of 0xE500000 - 0xFFFFFFF
+    // one case when we have mult = 0xFFFFFFFF  - its when we reset counter before aplaying new cnt value
+    // so at first step we reset cnt to 0 and now we sure here will be second step (set new cnt value);
+    // at second step check what user set for new Cnt (and correct it if cnt less than 0xE500000 or more than 0xFFFFFFF)
+    if(((int32_t)furi_hal_subghz_get_rolling_counter_mult() == (int32_t)0xFFFFFFFF) &
+       (instance->generic.cnt != 0)) {
+        instance->generic.cnt = 0;
     } else {
-        instance->generic.cnt += (furi_hal_subghz_get_rolling_counter_mult() & 0xFFFFFFF);
+        // if cnt was reset to 0 on previous step and user want new Cnt then set it to 0xE500000 or 0xFFFFFFF or new user value
+        if(instance->generic.cnt == 0) {
+            if((uint32_t)furi_hal_subghz_get_rolling_counter_mult() < (uint32_t)0xE500000) {
+                instance->generic.cnt = 0xE500000;
+            } else {
+                if((uint32_t)furi_hal_subghz_get_rolling_counter_mult() > (uint32_t)0xFFFFFFF) {
+                    instance->generic.cnt = 0xFFFFFFF;
+                } else {
+                    instance->generic.cnt +=
+                        ((furi_hal_subghz_get_rolling_counter_mult() & 0xFFFFFFF));
+                }
+            }
+        } else {
+            // if we have not special cases - so work as standart mode
+            if((instance->generic.cnt + (furi_hal_subghz_get_rolling_counter_mult() & 0xFFFFFFF)) >
+               0xFFFFFFF) {
+                instance->generic.cnt = 0xE500000;
+            } else {
+                instance->generic.cnt +=
+                    ((furi_hal_subghz_get_rolling_counter_mult() & 0xFFFFFFF));
+            }
+        }
     }
-    // --- instead of :
-    //instance->generic.cnt += furi_hal_subghz_get_rolling_counter_mult();
-    //ToDo it is not known what value the counter starts
-    //if(instance->generic.cnt > 0xFFFFFFF) instance->generic.cnt = 0xE500000;
 
     uint32_t rolling = subghz_protocol_blocks_reverse_key(instance->generic.cnt, 28);
 

@@ -334,11 +334,9 @@ bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent even
                 // convert back after byte_input and do one send with our new mult (counter16) - at end we must have signal Cnt = counter16
                 counter16 = __bswap16(counter16);
 
-                if(counter16 > 0) {
-                    furi_hal_subghz_set_rolling_counter_mult(counter16);
-                    subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
-                    subghz_txrx_stop(subghz->txrx);
-                }
+                furi_hal_subghz_set_rolling_counter_mult(counter16);
+                subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                subghz_txrx_stop(subghz->txrx);
 
                 // restore user definded counter increase value (mult)
                 furi_hal_subghz_set_rolling_counter_mult(tmp_counter);
@@ -360,11 +358,9 @@ bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent even
 
                 counter32 = __bswap32(counter32);
 
-                if(counter32 > 0) {
-                    furi_hal_subghz_set_rolling_counter_mult(counter32);
-                    subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
-                    subghz_txrx_stop(subghz->txrx);
-                }
+                furi_hal_subghz_set_rolling_counter_mult(counter32);
+                subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                subghz_txrx_stop(subghz->txrx);
 
                 furi_hal_subghz_set_rolling_counter_mult(tmp_counter);
                 break;
