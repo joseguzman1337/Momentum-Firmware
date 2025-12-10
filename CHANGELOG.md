@@ -7,6 +7,8 @@
 * SubGHz: Add IL-100 Smart support for Add manually
 * SubGHz: Add **experimental counter overflow mode** (OFEX), replicates how some key duplicators work, DO NOT USE if you don't know what you are doing, it will reset your counter value! (accesible with debug on in radio settings - counter incr.)
 * SubGHz: **Return Honeywell Sec** with fixes and improvements (by htotoo & LiQuiDz & xMasterX)
+* NFC: Keys found in key cache are now used in Nested attacks, deleting key cache is no longer required (by @noproto)
+* NFC: MFKey 4.0, MIFARE Classic Static Encrypted Nested attacks run 10x faster (by @noproto)
 * NFC: **Add Saflok MFUL Parser Support** (by @aaronjamt)
 * NFC: **Add MFUL counters to Info page** (by @aaronjamt)
 * OFW: Fix Felica standard loading from nfc file
