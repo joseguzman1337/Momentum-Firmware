@@ -2,10 +2,19 @@
 #include "subghz/types.h"
 #include "../helpers/subghz_custom_event.h"
 #include <lib/toolbox/value_index.h>
+#include <machine/endian.h>
+#include <toolbox/strint.h>
 
 #define TAG "SubGhzSceneSignalSettings"
 
 static uint32_t counter_mode = 0xff;
+static uint32_t loaded_counter32 = 0x0;
+static uint32_t counter32 = 0x0;
+static uint16_t counter16 = 0x0;
+static uint8_t byte_count = 0;
+static uint8_t* byte_ptr = NULL;
+static uint8_t hex_char_lenght = 0;
+static FuriString* byte_input_text;
 
 #define COUNTER_MODE_COUNT 7
 static const char* const counter_mode_text[COUNTER_MODE_COUNT] = {
@@ -43,17 +52,96 @@ static Protocols protocols[] = {
 
 #define PROTOCOLS_COUNT (sizeof(protocols) / sizeof(Protocols));
 
+// our special case function based on strint_to_uint32 from strint.c
+StrintParseError strint_to_uint32_base16(const char* str, uint32_t* out, uint8_t* lenght) {
+    // skip whitespace
+    while(((*str >= '\t') && (*str <= '\r')) || *str == ' ') {
+        str++;
+    }
+
+    // read digits
+    uint32_t limit = UINT32_MAX;
+    uint32_t mul_limit = limit / 16;
+    uint32_t result = 0;
+    int read_total = 0;
+
+    while(*str != 0) {
+        int digit_value;
+        if(*str >= '0' && *str <= '9') {
+            digit_value = *str - '0';
+        } else if(*str >= 'A' && *str <= 'Z') {
+            digit_value = *str - 'A' + 10;
+        } else if(*str >= 'a' && *str <= 'z') {
+            digit_value = *str - 'a' + 10;
+        } else {
+            break;
+        }
+
+        if(digit_value >= 16) {
+            break;
+        }
+
+        if(result > mul_limit) return StrintParseOverflowError;
+        result *= 16;
+        if(result > limit - digit_value) return StrintParseOverflowError; //-V658
+        result += digit_value;
+
+        read_total++;
+        str++;
+    }
+
+    if(read_total == 0) {
+        result = 0;
+        *lenght = 0;
+        return StrintParseAbsentError;
+    }
+
+    if(out) *out = result;
+    if(lenght) *lenght = read_total;
+    return StrintParseNoError;
+}
+
 void subghz_scene_signal_settings_counter_mode_changed(VariableItem* item) {
     uint8_t index = variable_item_get_current_value_index(item);
     variable_item_set_current_value_text(item, counter_mode_text[index]);
     counter_mode = counter_mode_value[index];
 }
 
-void subghz_scene_signal_settings_on_enter(void* context) {
-    // When we open saved file we do some check and fill up subghz->file_path.
-    // So now we use it to check is there CounterMode in file or not
+void subghz_scene_signal_settings_byte_input_callback(void* context) {
+    SubGhz* subghz = context;
+    view_dispatcher_send_custom_event(subghz->view_dispatcher, SubGhzCustomEventByteInputDone);
+}
+
+void subghz_scene_signal_settings_variable_item_list_enter_callback(void* context, uint32_t index) {
     SubGhz* subghz = context;
 
+    // when we click OK on "Edit counter" item
+    if(index == 1) {
+        furi_string_cat_printf(byte_input_text, "%i", hex_char_lenght * 4);
+        furi_string_cat_str(byte_input_text, "-bit counter in HEX");
+
+        // Setup byte_input view
+        ByteInput* byte_input = subghz->byte_input;
+        byte_input_set_header_text(byte_input, furi_string_get_cstr(byte_input_text));
+
+        byte_input_set_result_callback(
+            byte_input,
+            subghz_scene_signal_settings_byte_input_callback,
+            NULL,
+            subghz,
+            byte_ptr,
+            byte_count);
+        view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdByteInput);
+    }
+}
+
+void subghz_scene_signal_settings_on_enter(void* context) {
+    SubGhz* subghz = context;
+
+    // ### Counter mode section ###
+
+    // When we open saved file we do some check and fill up subghz->file_path.
+    // So now we use it to check is there CounterMode in file or not
     const char* file_path = furi_string_get_cstr(subghz->file_path);
 
     furi_assert(subghz);
@@ -98,6 +186,14 @@ void subghz_scene_signal_settings_on_enter(void* context) {
     int32_t value_index;
     VariableItem* item;
 
+    variable_item_list_set_selected_item(subghz->variable_item_list, 0);
+    variable_item_list_reset(subghz->variable_item_list);
+
+    variable_item_list_set_enter_callback(
+        variable_item_list,
+        subghz_scene_signal_settings_variable_item_list_enter_callback,
+        subghz);
+
     item = variable_item_list_add(
         variable_item_list,
         "Counter Mode",
@@ -110,16 +206,175 @@ void subghz_scene_signal_settings_on_enter(void* context) {
     variable_item_set_current_value_text(item, counter_mode_text[value_index]);
     variable_item_set_locked(item, (counter_mode == 0xff), "Not available\nfor this\nprotocol !");
 
+    // ### Counter edit section ###
+    FuriString* tmp_text = furi_string_alloc_set_str("");
+    FuriString* textCnt = furi_string_alloc_set_str("");
+    byte_input_text = furi_string_alloc_set_str("Enter ");
+
+    bool counter_not_available = true;
+    SubGhzProtocolDecoderBase* decoder = subghz_txrx_get_decoder(subghz->txrx);
+
+    // deserialaze and decode loaded sugbhz file and take information string from decoder
+    if(subghz_protocol_decoder_base_deserialize(decoder, subghz_txrx_get_fff_data(subghz->txrx)) ==
+       SubGhzProtocolStatusOk) {
+        subghz_protocol_decoder_base_get_string(decoder, tmp_text);
+    } else {
+        FURI_LOG_E(TAG, "Cant deserialize this subghz file");
+    }
+
+    // In protocols output we allways have HEX format for "Cnt:" output (text formating like ...Cnt:%05lX\r\n")
+    // we take 8 simbols starting from  "Cnt:........"
+    // at first we search "Cnt:????" that mean for this protocol counter cannot be decoded
+
+    int8_t place = furi_string_search_str(tmp_text, "Cnt:??", 0);
+    if(place > 0) {
+        FURI_LOG_D(TAG, "Founded Cnt:???? - counter not available for this protocol");
+    } else {
+        place = furi_string_search_str(tmp_text, "Cnt:", 0);
+        if(place > 0) {
+            furi_string_set_n(textCnt, tmp_text, place + 4, 8);
+            furi_string_trim(textCnt);
+            FURI_LOG_D(
+                TAG,
+                "Taked 8 bytes hex value starting after 'Cnt:' - %s",
+                furi_string_get_cstr(textCnt));
+
+            // trim and convert 8 simbols string to uint32 by base 16 (hex);
+            // later we use loaded_counter in subghz_scene_signal_settings_on_event to check is there 0 or not - special case
+
+            if(strint_to_uint32_base16(
+                   furi_string_get_cstr(textCnt), &loaded_counter32, &hex_char_lenght) ==
+               StrintParseNoError) {
+                counter_not_available = false;
+
+                // calculate and roundup number of hex bytes do display counter in byte_input (every 2 hex simbols = 1 byte for view)
+                // later must be used in byte_input to restrict number of available byte to edit
+                // cnt_byte_count = (hex_char_lenght + 1) / 2;
+
+                FURI_LOG_D(
+                    TAG,
+                    "Result of conversion from String to uint_32 DEC %li, HEX %lX, HEX lenght %i symbols",
+                    loaded_counter32,
+                    loaded_counter32,
+                    hex_char_lenght);
+
+                // Check is there byte_count more than 2 hex bytes long (16 bit) or not (32bit)
+                // To show hex value we must correct revert bytes for ByteInput view
+                if(hex_char_lenght > 4) {
+                    counter32 = loaded_counter32;
+                    furi_string_printf(tmp_text, "%lX", counter32);
+                    counter32 = __bswap32(counter32);
+                    byte_ptr = (uint8_t*)&counter32;
+                    byte_count = 4;
+                } else {
+                    counter16 = loaded_counter32;
+                    furi_string_printf(tmp_text, "%X", counter16);
+                    counter16 = __bswap16(counter16);
+                    byte_ptr = (uint8_t*)&counter16;
+                    byte_count = 2;
+                }
+            } else {
+                FURI_LOG_E(TAG, "Cant convert text counter value");
+            };
+
+        } else {
+            FURI_LOG_D(TAG, "Counter not available for this protocol");
+        }
+    }
+
+    furi_assert(byte_ptr);
+    furi_assert(byte_count > 0);
+
+    item = variable_item_list_add(variable_item_list, "Edit Counter", 1, NULL, subghz);
+    variable_item_set_current_value_index(item, 0);
+    variable_item_set_current_value_text(item, furi_string_get_cstr(tmp_text));
+    variable_item_set_locked(item, (counter_not_available), "Not available\nfor this\nprotocol !");
+
+    furi_string_free(tmp_text);
+    furi_string_free(textCnt);
+
     view_dispatcher_switch_to_view(subghz->view_dispatcher, SubGhzViewIdVariableItemList);
 }
 
 bool subghz_scene_signal_settings_on_event(void* context, SceneManagerEvent event) {
     SubGhz* subghz = context;
-    if(event.type == SceneManagerEventTypeBack) {
-        scene_manager_previous_scene(subghz->scene_manager);
-        return true;
-    } else
-        return false;
+    int32_t tmp_counter = 0;
+
+    if(event.type == SceneManagerEventTypeCustom) {
+        if(event.event == SubGhzCustomEventByteInputDone) {
+            switch(byte_count) {
+            case 2:
+                // when signal has Cnt:00 we can step only to 0000+FFFF = FFFF, but we need 0000 for next step
+                // for this case we must use +1 additional step to increace Cnt from FFFF to 0000.
+
+                // save current user definded counter increase value (mult)
+                tmp_counter = furi_hal_subghz_get_rolling_counter_mult();
+
+                // increase signal counter to max value - at result it must be 0000 in most cases
+                // but can be FFFF in case Cnt:0000 (for this we have +1 additional step below)
+                furi_hal_subghz_set_rolling_counter_mult(0xFFFF);
+                subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                subghz_txrx_stop(subghz->txrx);
+
+                // if file Cnt:00 then do +1 additional step
+                if(loaded_counter32 == 0) {
+                    furi_hal_subghz_set_rolling_counter_mult(1);
+                    subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                    subghz_txrx_stop(subghz->txrx);
+                }
+
+                // at this point we must have signal Cnt:00
+                // convert back after byte_input and do one send with our new mult (counter16) - at end we must have signal Cnt = counter16
+                counter16 = __bswap16(counter16);
+
+                if(counter16 > 0) {
+                    furi_hal_subghz_set_rolling_counter_mult(counter16);
+                    subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                    subghz_txrx_stop(subghz->txrx);
+                }
+
+                // restore user definded counter increase value (mult)
+                furi_hal_subghz_set_rolling_counter_mult(tmp_counter);
+                break;
+            case 4:
+                // the same for 32 bit Counter
+                tmp_counter = furi_hal_subghz_get_rolling_counter_mult();
+
+                furi_hal_subghz_set_rolling_counter_mult(0xFFFFFFFF);
+                subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                subghz_txrx_stop(subghz->txrx);
+
+                if(loaded_counter32 == 0) {
+                    furi_hal_subghz_set_rolling_counter_mult(1);
+                    subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                    subghz_txrx_stop(subghz->txrx);
+                }
+
+                counter32 = __bswap32(counter32);
+
+                if(counter32 > 0) {
+                    furi_hal_subghz_set_rolling_counter_mult(counter32);
+                    subghz_tx_start(subghz, subghz_txrx_get_fff_data(subghz->txrx));
+                    subghz_txrx_stop(subghz->txrx);
+                }
+
+                furi_hal_subghz_set_rolling_counter_mult(tmp_counter);
+                break;
+            default:
+                break;
+            }
+
+            scene_manager_previous_scene(subghz->scene_manager);
+            return true;
+
+        } else {
+            if(event.type == SceneManagerEventTypeBack) {
+                scene_manager_previous_scene(subghz->scene_manager);
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void subghz_scene_signal_settings_on_exit(void* context) {
@@ -152,6 +407,10 @@ void subghz_scene_signal_settings_on_exit(void* context) {
         furi_record_close(RECORD_STORAGE);
     }
 
+    // Clear views
     variable_item_list_set_selected_item(subghz->variable_item_list, 0);
     variable_item_list_reset(subghz->variable_item_list);
+    byte_input_set_result_callback(subghz->byte_input, NULL, NULL, NULL, NULL, 0);
+    byte_input_set_header_text(subghz->byte_input, "");
+    furi_string_free(byte_input_text);
 }

@@ -148,7 +148,7 @@ static void subghz_protocol_encoder_hay21_get_upload(SubGhzProtocolEncoderHay21*
 
     // Counter increment
     // Check for OFEX (overflow experimental) mode
-    if(furi_hal_subghz_get_rolling_counter_mult() != 0xFFFE) {
+    if(furi_hal_subghz_get_rolling_counter_mult() != -0x7FFFFFFF) {
         if(instance->generic.cnt < 0xF) {
             if((instance->generic.cnt + furi_hal_subghz_get_rolling_counter_mult()) > 0xF) {
                 instance->generic.cnt = 0;
@@ -470,10 +470,10 @@ void subghz_protocol_decoder_hay21_get_string(void* context, FuriString* output)
     furi_string_cat_printf(
         output,
         "%s - %dbit\r\n"
-        "Key: 0x%06lX\r\n"
-        "Serial: 0x%02X\r\n"
-        "Btn: 0x%01X - %s\r\n"
-        "Cnt: 0x%01X\r\n",
+        "Key:0x%06lX\r\n"
+        "Serial:0x%02X\r\n"
+        "Btn:0x%01X - %s\r\n"
+        "Cnt:%01X\r\n",
         instance->generic.protocol_name,
         instance->generic.data_count_bit,
         (uint32_t)(instance->generic.data & 0xFFFFFFFF),

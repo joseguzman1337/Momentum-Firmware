@@ -66,6 +66,7 @@
     - Dictionary attack: Uses system and user dictionaries stored under /nfc/assets/ to unlock Ultralight C tags
     - Key management: Extra Actions → MIFARE Ultralight C Keys in the NFC app allows you to add, list, and remove Ultralight C keys from your Flipper
     - UI: Dictionary attack scene and menu options
+  - XERO: Support for MFKey 4.0, MIFARE Classic Static Encrypted Nested attacks run 10x faster (by @noproto)
   - OFW: FeliCa Service Directory Traverse + Dump All Unencrypted-Readable Services' Blocks (by @zinongli)
   - OFW: FeliCa Emulation Handle certain Polling commands in firmware (by @dogtopus)
   - OFW: FeliCa Dump All Systems (by @zinongli)
@@ -90,7 +91,7 @@
   - UL: Add support for Came Atomo TOP44RBN remotes (by @xMasterX & @mishamyte)
   - UL: Add IL-100 Smart support for Add manually (by @xMasterX)
   - UL: Add experimental counter overflow mode (OFEX), replicates how some key duplicators work, DO NOT USE if you don't know what you are doing, it will reset your counter value! (by @xMasterX)
-  - UL: Counter modes settings per-file for Keeloq, CAME Atomo, Nice Flor S, AlutechAT4N (by @xMasterX & @Dmitry422)
+  - UL: Counter modes settings per-file for Keeloq, CAME Atomo, Nice Flor S, AlutechAT4N and option to edit counter value (by @xMasterX & @Dmitry422)
   - UL: Add AN-Motors AT4 button on arrow keys (0xC) (by @xMasterX)
 - RFID:
   - Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
@@ -104,7 +105,7 @@
 - CLI:
   - OFW: NFC CLI commands (by @RebornedBrain)
   - OFW: Buzzer command (by @ivanbarsukov)
-- JS: Added all missing GUI views for JS (by @portasynthinca3):
+- OFW: JS: Added all missing GUI views for JS (by @portasynthinca3):
   - Added `gui/button_menu`
   - Added `gui/button_panel`
   - Added `gui/menu`
@@ -112,18 +113,20 @@
   - Added `gui/popup`
   - Added `gui/vi_list`
   - Changed API for `gui/submenu`, see breaking changes above
-- Desktop: Add Keybinds support for directories (#331 by @956MB & @WillyJL)
+- Desktop:
+  - Add Keybinds support for directories (#331 by @956MB & @WillyJL)
+  - UL: Enable winter animations (by @xMasterX)
 - Input Settings: Add Vibro Trigger option (#429 by @956MB)
 - Archive: Support opening and favoriting Picopass files (by @WillyJL)
 - Bad KB: Colemak keyboard layout (#466 by @Ashe-Sterling)
 - GUI:
-  - GUI: Add Screen Settings shortcut to Control Center brightness click (#487 by @tototo31)
+  - Add Screen Settings shortcut to Control Center brightness click (#487 by @tototo31)
   - OFW: Add date/time input module (by @aaronjamt)
 
 ### Updated:
 - Apps:
-  - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster (by @noproto)
-  - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9)
+  - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster, 4.0 update Static Encrypted Nested attacks run 10x faster in NFC app (by @noproto)
+  - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9), add default remote and clear slot features (by @jknlsn)
   - UL: BT/USB Remote: PTT global zoom and google meet shortcuts for MacOS (by @hryamzik)
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
   - Combo Cracker: Allow press and hold to change values, add tutorial (by @TAxelAnderson), support alphabetic combination locks (by @henrygab)
@@ -135,11 +138,11 @@
   - Flipper Blackhat: Add Deauth Broadcast command, updated for latest firmware (by @o7-machinehum)
   - KeyCopier: Added Weiser WR3 key format (by @lightos), added Suzuki SUZ18 key format (by @RIcePatrol)
   - Mass Storage: Add ability to spoof USB identity values (by @xtruan)
-  - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes (by @luu176)
+  - Metroflip: Fix unsupported card crash, RENFE Suma 10 support, GEG Connect AID added, Top Up log parsing and animations, 16 new rail lines, support for parsing area codes, saving function for Suica/Japan Rail IC, bugfixes, support for TRT cards and Intertic disposable ST25TB cards, T-Mobilitat can parse card number (by @luu176)
   - NFC Maker: Support making empty/blank NDEF payloads (by @WillyJL)
   - NFC Playlist: Refactor playlist worker, new settings layout and management, loop setting, controls to move between items, time controls setting (by @acegoal07)
   - NMEA GPS: Moved to GPIO/GPS subfolder (by @WillyJL)
-  - Passy: Misc memory management bugfixes, misc UI improvements (by @qistoph)
+  - Passy: Misc memory management bugfixes, misc UI improvements, save DG2 and DG7 to document specific file, code cleanup (by @qistoph)
   - RFID/iButton Fuzzer: Fix prev navigation for custom UIDs (by @ahnilica)
   - Seader: Fix ATS handling (by @NVX), reset SAM on error, support config card, code optimizations, use same commands as Proxmark3, distinguish SIO SE/SR (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
@@ -163,7 +166,7 @@
 - NFC:
   - OFW: Synchronise mf_classic_dict.nfc with mfc_default_keys.dic from Proxmark3 Iceman fork, 164 new MFC keys (by @ry4000)
   - OFW: Expose nfc_common.h (by @zinongli)
-- OFW: GUI: Store View by value inViewStack to save memory (by @CookiePLMonster)
+- OFW: GUI: Store View by value in ViewStack to save memory (by @CookiePLMonster)
 - Docs:
   - UL: Update Sub-GHz DoorHan programming instructions (by @li0ard)
   - OFW: Update devboard docs (by @alexeyzakh)
@@ -176,6 +179,7 @@
   - OFW: Fix demo_windows.txt for newer version of ai enabled Windows Notepad not able to keep up with default fast input text (by @ase1590)
 - Desktop: Fix lock screen hang (#438 by @aaronjamt)
 - NFC:
+  - XERO: Keys found in key cache are now used in Nested attacks, deleting key cache is no longer required (by @noproto)
   - Fix incorrect Saflok year formula (#433 by @Eltrick)
   - Fix read crash with unexpectedly large MFC AUTH(0) response, eg with Chameleon Ultra NTAG emualtion (by @WillyJL)
   - Fix slashes in prefilled filename (by @WillyJL)
