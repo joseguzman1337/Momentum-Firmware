@@ -16,7 +16,8 @@ typedef struct {
 
 static const uint32_t mf_classic_data_format_version = 2;
 
-#define MF_CLASSIC_PLUS2K_SCAN_SECTORS 18
+// MIFARE Plus 2K SL1 has 32 sectors (128 blocks total) per official specification
+#define MF_CLASSIC_PLUS2K_SCAN_SECTORS 32
 
 static const MfClassicFeatures mf_classic_features[MfClassicTypeNum] = {
     [MfClassicTypeMini] =
