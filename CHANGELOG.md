@@ -93,6 +93,7 @@
   - UL: Add experimental counter overflow mode (OFEX), replicates how some key duplicators work, DO NOT USE if you don't know what you are doing, it will reset your counter value! (by @xMasterX)
   - UL: Counter modes settings per-file for Keeloq, CAME Atomo, Nice Flor S, AlutechAT4N and option to edit counter value (by @xMasterX & @Dmitry422)
   - UL: Add AN-Motors AT4 button on arrow keys (0xC) (by @xMasterX)
+  - UL: OFEX support for SecPlus v1 and v2, various fixes (by @Dmitry422 & xMasterX)
 - RFID:
   - Support writing Securakey, Jablotron and FDX-B to EM4305 cards (#434 by @jamisonderek)
   - OFW: Show ISO-3166 Country Names For Pet Chips (by @zinongli)
@@ -125,7 +126,7 @@
 
 ### Updated:
 - Apps:
-  - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster, 4.0 update Static Encrypted Nested attacks run 10x faster in NFC app (by @noproto)
+  - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster, 4.0 update, Static Encrypted Nested attacks run 10x faster in NFC app (by @noproto)
   - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9), add default remote and clear slot features (by @jknlsn)
   - UL: BT/USB Remote: PTT global zoom and google meet shortcuts for MacOS (by @hryamzik)
   - Asteroids: Bugfixes, title screen, Drone Buddy power-up (by @SimplyMinimal)
