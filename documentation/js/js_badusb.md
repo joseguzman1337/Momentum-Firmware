@@ -42,6 +42,29 @@ if (badusb.isConnected()) {
 
 <br>
 
+## getLockState()
+Returns the current state of keyboard lock LEDs (Caps Lock, Num Lock, Scroll Lock).
+
+**Return value**
+
+An object with boolean fields:
+- `caps` – Caps Lock LED state
+- `num` – Num Lock LED state
+- `scroll` – Scroll Lock LED state
+
+**Examples**
+```js
+let locks = badusb.getLockState();
+if (locks.caps) {
+    // CAPSLOCK LED is on
+}
+if (!locks.num) {
+    // Enable Num Lock before doing ALT+Numpad tricks
+}
+```
+
+<br>
+
 ## press()
 Press and release a key.
 

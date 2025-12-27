@@ -219,6 +219,31 @@ static void js_badusb_is_connected(struct mjs* mjs) {
     mjs_return(mjs, mjs_mk_boolean(mjs, is_connected));
 }
 
+static void js_badusb_get_lock_state(struct mjs* mjs) {
+    mjs_val_t obj_inst = mjs_get(mjs, mjs_get_this(mjs), INST_PROP_NAME, ~0);
+    JsBadusbInst* badusb = mjs_get_ptr(mjs, obj_inst);
+    furi_assert(badusb);
+
+    if(badusb->usb_if_prev == NULL) {
+        mjs_prepend_errorf(mjs, MJS_INTERNAL_ERROR, "HID is not started");
+        mjs_return(mjs, MJS_UNDEFINED);
+        return;
+    }
+
+    uint8_t leds = furi_hal_hid_get_led_state();
+    mjs_val_t obj = mjs_mk_object(mjs);
+    mjs_set(mjs, obj, "caps", ~0, mjs_mk_boolean(mjs, (leds & HID_KB_LED_CAPS) != 0));
+    mjs_set(mjs, obj, "num", ~0, mjs_mk_boolean(mjs, (leds & HID_KB_LED_NUM) != 0));
+    mjs_set(
+        mjs,
+        obj,
+        "scroll",
+        ~0,
+        mjs_mk_boolean(mjs, (leds & HID_KB_LED_SCROLL) != 0));
+
+    mjs_return(mjs, obj);
+}
+
 uint16_t get_keycode_by_name(JsBadusbInst* badusb, const char* key_name, size_t name_len) {
     if(name_len == 1) { // Single char
         return (ASCII_TO_KEY(badusb->layout, key_name[0]));
@@ -494,6 +519,7 @@ static void* js_badusb_create(struct mjs* mjs, mjs_val_t* object, JsModules* mod
     mjs_set(mjs, badusb_obj, "setup", ~0, MJS_MK_FN(js_badusb_setup));
     mjs_set(mjs, badusb_obj, "quit", ~0, MJS_MK_FN(js_badusb_quit));
     mjs_set(mjs, badusb_obj, "isConnected", ~0, MJS_MK_FN(js_badusb_is_connected));
+    mjs_set(mjs, badusb_obj, "getLockState", ~0, MJS_MK_FN(js_badusb_get_lock_state));
     mjs_set(mjs, badusb_obj, "press", ~0, MJS_MK_FN(js_badusb_press));
     mjs_set(mjs, badusb_obj, "hold", ~0, MJS_MK_FN(js_badusb_hold));
     mjs_set(mjs, badusb_obj, "release", ~0, MJS_MK_FN(js_badusb_release));
