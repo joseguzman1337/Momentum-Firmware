@@ -214,7 +214,9 @@ static void nfc_scene_read_and_saved_menu_on_enter_mf_ultralight(NfcApp* instanc
     if(is_locked ||
        (data->type != MfUltralightTypeNTAG213 && data->type != MfUltralightTypeNTAG215 &&
         data->type != MfUltralightTypeNTAG216 && data->type != MfUltralightTypeUL11 &&
-        data->type != MfUltralightTypeUL21 && data->type != MfUltralightTypeOrigin)) {
+        data->type != MfUltralightTypeUL21 && data->type != MfUltralightTypeOrigin &&
+        data->type != MfUltralightTypeNTAGI2CPlus1K &&
+        data->type != MfUltralightTypeNTAGI2CPlus2K)) {
         submenu_remove_item(submenu, SubmenuIndexCommonWrite);
     }
 
