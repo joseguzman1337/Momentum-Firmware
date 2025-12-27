@@ -8,6 +8,9 @@
 
 #include <assets_icons.h>
 #include <float_tools.h>
+#include <flipper_format/flipper_format_i.h>
+#include <storage/storage.h>
+#include <lib/toolbox/path.h>
 
 #define TAG "frequency_analyzer"
 
@@ -24,6 +27,13 @@ typedef enum {
     SubGhzFrequencyAnalyzerStatusIDLE,
 } SubGhzFrequencyAnalyzerStatus;
 
+#define SUBGHZ_FA_IGNORE_FREQ_MAX 8
+#define SUBGHZ_FA_IGNORE_FILE_TYPE "Flipper SubGhz Ignore Frequency File"
+#define SUBGHZ_FA_IGNORE_FILE_VERSION 1
+#define SUBGHZ_FA_IGNORE_FILE_PATH \
+    EXT_PATH("subghz/assets/frequency_analyzer_ignore.settings")
+#define SUBGHZ_FA_IGNORE_FIELD_FREQUENCY "Frequency"
+
 struct SubGhzFrequencyAnalyzer {
     View* view;
     SubGhzFrequencyAnalyzerWorker* worker;
@@ -37,6 +47,10 @@ struct SubGhzFrequencyAnalyzer {
     uint8_t selected_index;
     uint8_t max_index;
     bool show_frame;
+
+    // List of frequencies the user chose to ignore in the analyzer
+    uint32_t ignored_frequencies[SUBGHZ_FA_IGNORE_FREQ_MAX];
+    uint8_t ignored_count;
 };
 
 typedef struct {
@@ -219,6 +233,26 @@ bool subghz_frequency_analyzer_input(InputEvent* event, void* context) {
 
     bool need_redraw = false;
     if(event->key == InputKeyBack) {
+        // Long press Back: add current frequency (or selected history item) to ignore list
+        if(event->type == InputTypeLong) {
+            uint32_t freq_to_ignore = 0;
+            with_view_model(
+                instance->view,
+                SubGhzFrequencyAnalyzerModel * model,
+                {
+                    if(model->show_frame && model->max_index > 0) {
+                        freq_to_ignore = model->history_frequency[model->selected_index];
+                    } else {
+                        freq_to_ignore = model->frequency;
+                    }
+                },
+                false);
+            if(freq_to_ignore != 0) {
+                subghz_frequency_analyzer_add_ignored(instance, freq_to_ignore);
+            }
+            // Stay in analyzer after updating ignore list
+            return true;
+        }
         return need_redraw;
     }
 
@@ -336,12 +370,128 @@ uint32_t round_int(uint32_t value, uint8_t n) {
     return value;
 }
 
+static bool subghz_frequency_analyzer_is_ignored(
+    SubGhzFrequencyAnalyzer* instance,
+    uint32_t frequency_rounded) {
+    for(uint8_t i = 0; i < instance->ignored_count; i++) {
+        if(instance->ignored_frequencies[i] == frequency_rounded) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void subghz_frequency_analyzer_load_ignored(SubGhzFrequencyAnalyzer* instance) {
+    instance->ignored_count = 0;
+
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+    FlipperFormat* file = flipper_format_file_alloc(storage);
+    FuriString* tmp = furi_string_alloc();
+    uint32_t version = 0;
+
+    if(FSE_OK == storage_sd_status(storage) &&
+       flipper_format_file_open_existing(file, SUBGHZ_FA_IGNORE_FILE_PATH)) {
+        do {
+            if(!flipper_format_read_header(file, tmp, &version)) break;
+            if(strcmp(furi_string_get_cstr(tmp), SUBGHZ_FA_IGNORE_FILE_TYPE) != 0 ||
+               version != SUBGHZ_FA_IGNORE_FILE_VERSION) {
+                break;
+            }
+
+            uint32_t count = 0;
+            if(!flipper_format_get_value_count(
+                   file, SUBGHZ_FA_IGNORE_FIELD_FREQUENCY, &count)) {
+                break;
+            }
+
+            if(count > SUBGHZ_FA_IGNORE_FREQ_MAX) count = SUBGHZ_FA_IGNORE_FREQ_MAX;
+            for(uint32_t i = 0; i < count; i++) {
+                uint32_t freq = 0;
+                if(!flipper_format_read_uint32(
+                       file, SUBGHZ_FA_IGNORE_FIELD_FREQUENCY, &freq, 1)) {
+                    break;
+                }
+                instance->ignored_frequencies[instance->ignored_count++] = freq;
+            }
+        } while(false);
+    }
+
+    furi_string_free(tmp);
+    flipper_format_file_close(file);
+    flipper_format_free(file);
+    furi_record_close(RECORD_STORAGE);
+}
+
+static void subghz_frequency_analyzer_save_ignored(SubGhzFrequencyAnalyzer* instance) {
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+    FlipperFormat* file = flipper_format_file_alloc(storage);
+
+    bool ok = false;
+    do {
+        if(FSE_OK != storage_sd_status(storage)) break;
+        if(!flipper_format_file_open_always(file, SUBGHZ_FA_IGNORE_FILE_PATH)) break;
+        if(!flipper_format_write_header_cstr(
+               file, SUBGHZ_FA_IGNORE_FILE_TYPE, SUBGHZ_FA_IGNORE_FILE_VERSION))
+            break;
+
+        for(uint8_t i = 0; i < instance->ignored_count; i++) {
+            uint32_t freq = instance->ignored_frequencies[i];
+            if(!flipper_format_write_uint32(
+                   file, SUBGHZ_FA_IGNORE_FIELD_FREQUENCY, &freq, 1)) {
+                break;
+            }
+        }
+        ok = true;
+    } while(false);
+
+    if(!ok) {
+        FURI_LOG_W(TAG, "Failed to save ignored frequencies");
+    }
+
+    flipper_format_file_close(file);
+    flipper_format_free(file);
+    furi_record_close(RECORD_STORAGE);
+}
+
+static void subghz_frequency_analyzer_add_ignored(
+    SubGhzFrequencyAnalyzer* instance,
+    uint32_t frequency) {
+    uint32_t rounded = round_int(frequency, 3);
+    if(rounded == 0) return;
+
+    if(subghz_frequency_analyzer_is_ignored(instance, rounded)) {
+        return;
+    }
+
+    if(instance->ignored_count >= SUBGHZ_FA_IGNORE_FREQ_MAX) {
+        // Simple policy: drop oldest
+        for(uint8_t i = 1; i < instance->ignored_count; i++) {
+            instance->ignored_frequencies[i - 1] = instance->ignored_frequencies[i];
+        }
+        instance->ignored_count--;
+    }
+
+    instance->ignored_frequencies[instance->ignored_count++] = rounded;
+    subghz_frequency_analyzer_save_ignored(instance);
+}
+
 void subghz_frequency_analyzer_pair_callback(
     void* context,
     uint32_t frequency,
     float rssi,
     bool signal) {
     SubGhzFrequencyAnalyzer* instance = (SubGhzFrequencyAnalyzer*)context;
+
+    // Apply user-configured ignore list: if this frequency is ignored, pretend there is no
+    // signal so the analyzer does not lock or record it.
+    if(frequency != 0) {
+        uint32_t rounded = round_int(frequency, 3);
+        if(subghz_frequency_analyzer_is_ignored(instance, rounded)) {
+            rssi = 0.f;
+            signal = false;
+        }
+    }
+
     if(float_is_equal(rssi, 0.f) && instance->locked) {
         if(instance->callback) {
             instance->callback(SubGhzCustomEventSceneAnalyzerUnlock, instance->context);
@@ -448,6 +598,9 @@ void subghz_frequency_analyzer_enter(void* context) {
 
     //Start worker
     instance->worker = subghz_frequency_analyzer_worker_alloc(instance->context);
+
+    // Load ignored frequencies from persistent storage
+    subghz_frequency_analyzer_load_ignored(instance);
 
     subghz_frequency_analyzer_worker_set_pair_callback(
         instance->worker,
