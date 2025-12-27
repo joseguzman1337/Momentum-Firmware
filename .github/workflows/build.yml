@@ -154,7 +154,7 @@ jobs:
 
       - name: "Force deploy website to refresh devbuilds"
         if: ${{ env.SHOULD_DEPLOY == 'true' }}
-        uses: Codex-/return-dispatch@v2
+        uses: Codex-/return-dispatch@v3
         id: force-deploy
         with:
           token: ${{ secrets.REPO_DISPATCH_TOKEN }}
