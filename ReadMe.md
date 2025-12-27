@@ -27,7 +27,7 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 <br>
 
-Note that mentioned below are only a few of our staple additions to the firmware. For a full list check [down here](https://github.com/Next-Flip/Momentum-Firmware#List-of-Changes).
+Note that mentioned below are only a few of our staple additions to the firmware. For a full list check [down here](https://github.com/joseguzman1337/Momentum-Firmware#List-of-Changes).
 
 <br>
 <h2 align="center">Momentum Settings</h2>
@@ -180,7 +180,7 @@ There are 4 methods to install Momentum, we recommend you use the **Web Updater*
 
 ```bash
 To download the repository:
-$ git clone --recursive --jobs 8 https://github.com/Next-Flip/Momentum-Firmware.git
+$ git clone --recursive --jobs 8 https://github.com/joseguzman1337/Momentum-Firmware.git
 $ cd Momentum-Firmware/
 
 To flash directly to the Flipper (Needs to be connected via USB, qFlipper closed)
