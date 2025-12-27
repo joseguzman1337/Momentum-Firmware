@@ -90,9 +90,9 @@ static void widget_element_file_list_draw(Canvas* canvas, WidgetElement* element
 
             size_t scroll_counter = model->scroll_counter;
             scroll_counter =
-                i == 0 && model->count > model->lines ?
-                    (scroll_counter < SCROLL_DELAY ? 0 : scroll_counter - SCROLL_DELAY) :
-                    0;
+                i == 0 ? (model->count > model->lines &&
+                          (scroll_counter < SCROLL_DELAY ? 0 : scroll_counter - SCROLL_DELAY)) :
+                         0;
 
             elements_scrollable_text_line(
                 canvas,

@@ -56,12 +56,11 @@ typedef union __attribute__((packed)) {
 } ScreenFrameColor;
 
 typedef enum {
-    BrowserPathOff,
-    BrowserPathCurrent,
-    BrowserPathBrief,
-    BrowserPathFull,
-    BrowserPathModeCount,
-} BrowserPathMode;
+    SelectionIndicatorStylePlus,
+    SelectionIndicatorStyleStar,
+    SelectionIndicatorStyleDash,
+    SelectionIndicatorStyleCount,
+} SelectionIndicatorStyle;
 
 typedef struct {
     char asset_pack[ASSET_PACKS_NAME_LEN];
@@ -93,7 +92,7 @@ typedef struct {
     bool sort_dirs_first;
     bool show_hidden_files;
     bool show_internal_tab;
-    BrowserPathMode browser_path_mode;
+    SelectionIndicatorStyle selection_indicator_style;
     uint32_t favorite_timeout;
     bool scroll_marquee;
     bool dark_mode;
