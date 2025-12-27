@@ -220,6 +220,11 @@ static bool hid_tiktok_input_callback(InputEvent* event, void* context) {
                     hid_hal_consumer_key_release_all(hid_tiktok->hid);
                     model->is_cursor_set = false;
                     consumed = false;
+                } else if(event->key == InputKeyOk) {
+                    // Re-center cursor if TikTok/Shorts stops reacting to swipes/taps
+                    hid_tiktok_reset_cursor(hid_tiktok);
+                    model->is_cursor_set = true;
+                    consumed = true;
                 }
             }
         },
