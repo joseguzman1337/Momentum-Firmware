@@ -191,23 +191,17 @@ static void subghz_protocol_encoder_came_atomo_get_upload(
 
     if(came_atomo_counter_mode == 0) {
         // Check for OFEX (overflow experimental) mode
-        if(furi_hal_subghz_get_rolling_counter_mult() != 0xFFFE) {
-            if(instance->generic.cnt < 0xFFFF) {
-                if((instance->generic.cnt + furi_hal_subghz_get_rolling_counter_mult()) > 0xFFFF) {
-                    instance->generic.cnt = 0;
-                } else {
-                    instance->generic.cnt += furi_hal_subghz_get_rolling_counter_mult();
-                }
-            } else if(
-                (instance->generic.cnt >= 0xFFFF) &&
-                (furi_hal_subghz_get_rolling_counter_mult() != 0)) {
+        if(furi_hal_subghz_get_rolling_counter_mult() != -0x7FFFFFFF) {
+            if((instance->generic.cnt + furi_hal_subghz_get_rolling_counter_mult()) > 0xFFFF) {
                 instance->generic.cnt = 0;
+            } else {
+                instance->generic.cnt += furi_hal_subghz_get_rolling_counter_mult();
             }
         } else {
             if((instance->generic.cnt + 0x1) > 0xFFFF) {
                 instance->generic.cnt = 0;
             } else if(instance->generic.cnt >= 0x1 && instance->generic.cnt != 0xFFFE) {
-                instance->generic.cnt = furi_hal_subghz_get_rolling_counter_mult();
+                instance->generic.cnt = 0xFFFE;
             } else {
                 instance->generic.cnt++;
             }
@@ -833,7 +827,7 @@ void subghz_protocol_decoder_came_atomo_get_string(void* context, FuriString* ou
         "%s %db\r\n"
         "Key:%08lX%08lX\r\n"
         "Sn:0x%08lX       Btn:%01X\r\n"
-        "Cnt:0x%04lX\r\n"
+        "Cnt:%04lX\r\n"
         "Btn_Cnt:0x%02X",
 
         instance->generic.protocol_name,
