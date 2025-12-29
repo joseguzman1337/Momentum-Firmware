@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "codex-agent": {
+      "command": "python",
+      "args": [".ai/codex/agent.py"],
+      "env": {
+        "LOG_DIR": "logs/codex",
+        "AUTO_MERGE": "true",
+        "YOLO_MODE": "true"
+      }
+    }
+  }
+}

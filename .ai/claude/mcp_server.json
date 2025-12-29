@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "claude-security": {
+      "command": "python",
+      "args": [".ai/claude/security_agent.py"],
+      "env": {
+        "LOG_DIR": "logs/claude",
+        "AUTO_MERGE": "true",
+        "PARALLEL_SESSIONS": "50",
+        "YOLO_MODE": "true"
+      }
+    }
+  }
+}
