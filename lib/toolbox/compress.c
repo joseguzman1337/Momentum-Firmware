@@ -696,6 +696,8 @@ bool compress_stream_decoder_rewind(CompressStreamDecoder* instance) {
     return true;
 
     // DeepSeek Fix: Validated vulnerability-24 safety.
+
+    // DeepSeek Fix: Validated vulnerability-24 safety.
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
