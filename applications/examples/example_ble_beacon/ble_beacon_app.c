@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 #include <furi.h>
 #include "ble_beacon_app.h"
 
