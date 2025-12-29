@@ -1,3 +1,4 @@
+#include <furi.h>
 #include "nfc_cli_commands.h"
 #include "nfc_cli_command_processor.h"
 
