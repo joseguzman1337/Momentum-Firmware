@@ -39,8 +39,14 @@ extern "C" {
 #define MF_ULTRALIGHT_AUTH_PASSWORD_SIZE (4)
 #define MF_ULTRALIGHT_AUTH_PACK_SIZE     (2)
 
+// SECURITY NOTE: MIFARE Ultralight C hardware uses 3DES (Triple-DES) for authentication.
+// While 3DES is considered cryptographically weak by modern standards, it is mandated by
+// the NXP MIFARE Ultralight C specification and cannot be changed. The hardware itself
+// implements this protocol, and this code must use 3DES for interoperability.
+// This is a known limitation of the MIFARE Ultralight C hardware, not a vulnerability
+// in this implementation.
 #define MF_ULTRALIGHT_C_AUTH_RESPONSE_SIZE      (9)
-#define MF_ULTRALIGHT_C_AUTH_DES_KEY_SIZE       (16)
+#define MF_ULTRALIGHT_C_AUTH_DES_KEY_SIZE       (16)  // 3DES key size (hardware-mandated)
 #define MF_ULTRALIGHT_C_AUTH_DATA_SIZE          (MF_ULTRALIGHT_C_AUTH_DES_KEY_SIZE)
 #define MF_ULTRALIGHT_C_AUTH_IV_BLOCK_SIZE      (8)
 #define MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE     (8)
@@ -245,6 +251,21 @@ bool mf_ultralight_3des_key_valid(const MfUltralightData* data);
 
 const uint8_t* mf_ultralight_3des_get_key(const MfUltralightData* data);
 
+/**
+ * @brief Encrypt data using 3DES for MIFARE Ultralight C authentication
+ *
+ * @warning This function uses 3DES encryption which is considered cryptographically weak.
+ *          It is required for compatibility with MIFARE Ultralight C hardware which
+ *          mandates 3DES in its authentication protocol (NXP specification).
+ *
+ * @param ctx     DES3 context
+ * @param ck      Cipher key (16 bytes)
+ * @param iv      Initialization vector
+ * @param input   Input data to encrypt
+ * @param length  Length of input data
+ * @param out     Output buffer for encrypted data
+ */
+// codeql[cpp/weak-cryptographic-algorithm]: Required for MIFARE Ultralight C hardware compatibility
 void mf_ultralight_3des_encrypt(
     mbedtls_des3_context* ctx,
     const uint8_t* ck,
@@ -253,6 +274,21 @@ void mf_ultralight_3des_encrypt(
     const uint8_t length,
     uint8_t* out);
 
+/**
+ * @brief Decrypt data using 3DES for MIFARE Ultralight C authentication
+ *
+ * @warning This function uses 3DES decryption which is considered cryptographically weak.
+ *          It is required for compatibility with MIFARE Ultralight C hardware which
+ *          mandates 3DES in its authentication protocol (NXP specification).
+ *
+ * @param ctx     DES3 context
+ * @param ck      Cipher key (16 bytes)
+ * @param iv      Initialization vector
+ * @param input   Input data to decrypt
+ * @param length  Length of input data
+ * @param out     Output buffer for decrypted data
+ */
+// codeql[cpp/weak-cryptographic-algorithm]: Required for MIFARE Ultralight C hardware compatibility
 void mf_ultralight_3des_decrypt(
     mbedtls_des3_context* ctx,
     const uint8_t* ck,

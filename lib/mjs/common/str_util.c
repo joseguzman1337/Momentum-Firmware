@@ -420,9 +420,11 @@ int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) {
 
         /*
      * Microsoft version of vsnprintf() is not always null-terminated, so put
-     * the terminator manually
+     * the terminator manually. Only do this if buffer allocation succeeded.
      */
-        (*buf)[len] = 0;
+        if(*buf != NULL && len >= 0) {
+            (*buf)[len] = 0;
+        }
         /* LCOV_EXCL_STOP */
     } else if(len >= (int)size) {
         /* Standard-compliant code path. Allocate a buffer that is large enough. */

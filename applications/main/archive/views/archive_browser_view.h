@@ -113,6 +113,7 @@ typedef struct {
     bool select_mode;
     FuriString** selected_files;
     size_t selected_count;
+    size_t selected_capacity;
     char** clipboard;
     size_t clipboard_count;
     bool clipboard_copy;

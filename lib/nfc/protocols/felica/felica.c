@@ -1,3 +1,31 @@
+/**
+ * @file felica.c
+ * @brief FeliCa NFC protocol implementation
+ *
+ * SECURITY NOTE - Use of 3DES Cryptographic Algorithm:
+ * =======================================================
+ * This file implements the FeliCa NFC protocol as specified by Sony Corporation
+ * in JIS X 6319-4 and ECMA-340 standards. The protocol REQUIRES the use of
+ * 3DES (Triple DES) encryption for authentication and MAC calculation.
+ *
+ * Code scanning tools will flag the use of mbedtls_des3_* functions as a security
+ * vulnerability because 3DES is deprecated (NIST deprecated it in 2023 due to its
+ * 64-bit block size making it vulnerable to birthday attacks).
+ *
+ * However, this is NOT a bug or security flaw in this implementation:
+ * - 3DES is mandated by the FeliCa protocol specification for backward compatibility
+ * - Changing to AES would break compatibility with existing FeliCa cards and infrastructure
+ * - The protocol-level limitation cannot be fixed at the implementation level
+ * - Newer FeliCa chips (2011+) support AES, but 3DES remains mandatory for legacy support
+ *
+ * The code includes CodeQL suppression annotations on 3DES usage to document that
+ * this is an intentional, specification-required design decision.
+ *
+ * References:
+ * - FeliCa specification: JIS X 6319-4, ECMA-340
+ * - Sony FeliCa technical documentation
+ */
+
 #include "felica_i.h"
 #include <lib/toolbox/hex.h>
 
@@ -516,6 +544,31 @@ static void felica_reverse_copy_block(const uint8_t* array, uint8_t* reverse_arr
     }
 }
 
+/**
+ * @brief Calculate FeliCa session key using 3DES encryption
+ *
+ * SECURITY NOTE: This function uses 3DES (Triple DES) encryption, which is
+ * considered cryptographically weak by modern standards (deprecated by NIST in 2023).
+ * However, 3DES is REQUIRED by the FeliCa protocol specification (JIS X 6319-4, ECMA-340)
+ * for backward compatibility with existing FeliCa cards and infrastructure.
+ *
+ * The FeliCa protocol mandates 3DES for:
+ * - Session key derivation
+ * - MAC (Message Authentication Code) calculation
+ * - Authentication with FeliCa Lite and standard cards
+ *
+ * This implementation correctly follows the FeliCa specification. Replacing 3DES
+ * would break compatibility with the FeliCa ecosystem. Newer FeliCa chips (2011+)
+ * support AES, but 3DES remains mandatory for backward compatibility.
+ *
+ * Code scanning tools may flag this as a security issue. This is a protocol-level
+ * limitation, not a bug in this implementation.
+ *
+ * @param ctx   mbedtls DES3 context
+ * @param ck    Card key (16 bytes)
+ * @param rc    Random challenge (16 bytes)
+ * @param out   Output session key (16 bytes)
+ */
 void felica_calculate_session_key(
     mbedtls_des3_context* ctx,
     const uint8_t* ck,
@@ -537,10 +590,31 @@ void felica_calculate_session_key(
     felica_reverse_copy_block(rc, rc_reversed);
     felica_reverse_copy_block(rc + 8, rc_reversed + 8);
 
+    // SECURITY: Using 3DES as required by FeliCa protocol specification
+    // codeql[cpp/weak-cryptographic-algorithm] - Required by FeliCa protocol (JIS X 6319-4)
     mbedtls_des3_set2key_enc(ctx, ck_reversed);
+    // codeql[cpp/weak-cryptographic-algorithm] - Required by FeliCa protocol (JIS X 6319-4)
     mbedtls_des3_crypt_cbc(ctx, MBEDTLS_DES_ENCRYPT, FELICA_DATA_BLOCK_SIZE, iv, rc_reversed, out);
 }
 
+/**
+ * @brief Calculate FeliCa MAC (Message Authentication Code) using 3DES-CBC
+ *
+ * SECURITY NOTE: This function uses 3DES (Triple DES) encryption, which is
+ * considered cryptographically weak by modern standards. However, this is
+ * REQUIRED by the FeliCa protocol specification (JIS X 6319-4, ECMA-340).
+ *
+ * See felica_calculate_session_key() for detailed security information.
+ *
+ * @param ctx          mbedtls DES3 context
+ * @param session_key  Session key derived from card key and random challenge
+ * @param rc           Random challenge
+ * @param first_block  First block for MAC calculation
+ * @param data         Data to authenticate
+ * @param length       Data length (must be multiple of 8)
+ * @param mac          Output MAC (8 bytes)
+ * @return true if MAC calculation succeeded, false on error
+ */
 static bool felica_calculate_mac(
     mbedtls_des3_context* ctx,
     const uint8_t* session_key,
@@ -554,6 +628,8 @@ static bool felica_calculate_mac(
     uint8_t reverse_data[8];
     uint8_t iv[8];
     uint8_t out[8];
+    // SECURITY: Using 3DES as required by FeliCa protocol specification
+    // codeql[cpp/weak-cryptographic-algorithm] - Required by FeliCa protocol (JIS X 6319-4)
     mbedtls_des3_set2key_enc(ctx, session_key);
 
     felica_reverse_copy_block(rc, iv);
@@ -561,6 +637,7 @@ static bool felica_calculate_mac(
     uint8_t i = 0;
     bool error = false;
     do {
+        // codeql[cpp/weak-cryptographic-algorithm] - Required by FeliCa protocol (JIS X 6319-4)
         if(mbedtls_des3_crypt_cbc(ctx, MBEDTLS_DES_ENCRYPT, 8, iv, reverse_data, out) == 0) {
             memcpy(iv, out, sizeof(iv));
             felica_reverse_copy_block(data + i, reverse_data);

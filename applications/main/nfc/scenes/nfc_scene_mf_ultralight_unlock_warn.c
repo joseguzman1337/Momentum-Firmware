@@ -23,7 +23,7 @@ void nfc_scene_mf_ultralight_unlock_warn_on_enter(void* context) {
             furi_string_cat_printf(password_str, "%02X ", nfc->mf_ul_auth->password.data[i]);
         }
         furi_string_cat_str(password_str, "\nWarning: incorrect password\nwill block the card!");
-        nfc_text_store_set(nfc, furi_string_get_cstr(password_str));
+        nfc_text_store_set(nfc, "%s", furi_string_get_cstr(password_str));
         furi_string_free(password_str);
 
         const char* message = (type == MfUltralightAuthTypeReader) ? "Password Captured!" :

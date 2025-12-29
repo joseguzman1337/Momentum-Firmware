@@ -112,7 +112,20 @@ class UpdateDownloader:
         # Unzip tgz
         self.logger.info(f"Unzipping {file_path}")
         with tarfile.open(file_path, "r") as tar:
-            tar.extractall(target_dir)
+            # Secure extraction: validate all members before extracting
+            def is_within_directory(directory, target):
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+                return os.path.commonprefix([abs_directory, abs_target]) == abs_directory
+
+            def safe_extract(tar, path):
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception(f"Attempted path traversal in tar file: {member.name}")
+                tar.extractall(path)
+
+            safe_extract(tar, target_dir)
 
         return True
 

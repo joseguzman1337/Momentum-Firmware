@@ -15,6 +15,7 @@
 #define FURI_HAL_SPEAKER_MAX_VOLUME 60
 
 static FuriMutex* furi_hal_speaker_mutex = NULL;
+static FuriHalSpeakerOutput furi_hal_speaker_output = FuriHalSpeakerOutputInternal;
 
 // #define FURI_HAL_SPEAKER_NEW_VOLUME
 
@@ -36,8 +37,13 @@ bool furi_hal_speaker_acquire(uint32_t timeout) {
     if(furi_mutex_acquire(furi_hal_speaker_mutex, timeout) == FuriStatusOk) {
         furi_hal_power_insomnia_enter();
         furi_hal_bus_enable(FuriHalBusTIM16);
+        const GpioPin* speaker_pin = furi_hal_speaker_get_pin();
         furi_hal_gpio_init_ex(
-            &gpio_speaker, GpioModeAltFunctionPushPull, GpioPullNo, GpioSpeedLow, GpioAltFn14TIM16);
+            speaker_pin,
+            GpioModeAltFunctionPushPull,
+            GpioPullNo,
+            GpioSpeedLow,
+            GpioAltFn14TIM16);
         return true;
     } else {
         return false;
@@ -49,7 +55,8 @@ void furi_hal_speaker_release(void) {
     furi_check(furi_hal_speaker_is_mine());
 
     furi_hal_speaker_stop();
-    furi_hal_gpio_init(&gpio_speaker, GpioModeAnalog, GpioPullDown, GpioSpeedLow);
+    const GpioPin* speaker_pin = furi_hal_speaker_get_pin();
+    furi_hal_gpio_init(speaker_pin, GpioModeAnalog, GpioPullDown, GpioSpeedLow);
 
     furi_hal_bus_disable(FuriHalBusTIM16);
     furi_hal_power_insomnia_exit();
@@ -136,4 +143,34 @@ void furi_hal_speaker_stop(void) {
     furi_check(furi_hal_speaker_is_mine());
     LL_TIM_DisableAllOutputs(FURI_HAL_SPEAKER_TIMER);
     LL_TIM_DisableCounter(FURI_HAL_SPEAKER_TIMER);
+}
+
+void furi_hal_speaker_set_output(FuriHalSpeakerOutput output) {
+    if(output > FuriHalSpeakerOutputExternal) {
+        return;
+    }
+
+    if(!furi_hal_speaker_mutex) {
+        return;
+    }
+
+    if(furi_mutex_acquire(furi_hal_speaker_mutex, 0) != FuriStatusOk) {
+        FURI_LOG_W(TAG, "Speaker busy, skipping output change");
+        return;
+    }
+
+    furi_hal_speaker_output = output;
+    furi_check(furi_mutex_release(furi_hal_speaker_mutex) == FuriStatusOk);
+}
+
+FuriHalSpeakerOutput furi_hal_speaker_get_output(void) {
+    return furi_hal_speaker_output;
+}
+
+const GpioPin* furi_hal_speaker_get_pin(void) {
+    if(furi_hal_speaker_output == FuriHalSpeakerOutputExternal) {
+        return &gpio_ext_pa6;
+    }
+
+    return &gpio_speaker;
 }

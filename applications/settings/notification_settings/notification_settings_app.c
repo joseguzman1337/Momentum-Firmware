@@ -80,6 +80,16 @@ const float volume_value[VOLUME_COUNT] = {
     0.55f, 0.60f, 0.65f, 0.70f, 0.75f, 0.80f, 0.85f, 0.90f, 0.95f, 1.00f,
 };
 
+#define SPEAKER_OUTPUT_COUNT 2
+const char* const speaker_output_text[SPEAKER_OUTPUT_COUNT] = {
+    "Internal",
+    "External",
+};
+const uint32_t speaker_output_value[SPEAKER_OUTPUT_COUNT] = {
+    FuriHalSpeakerOutputInternal,
+    FuriHalSpeakerOutputExternal,
+};
+
 #define DELAY_COUNT 12
 const char* const delay_text[DELAY_COUNT] = {
     "Always ON",
@@ -160,6 +170,15 @@ static void volume_changed(VariableItem* item) {
     notification_message(app->notification, &sequence_note_c);
 }
 
+static void speaker_output_changed(VariableItem* item) {
+    NotificationAppSettings* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+
+    variable_item_set_current_value_text(item, speaker_output_text[index]);
+    app->notification->settings.speaker_output = speaker_output_value[index];
+    furi_hal_speaker_set_output(app->notification->settings.speaker_output);
+}
+
 static void vibro_changed(VariableItem* item) {
     NotificationAppSettings* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
@@ -213,6 +232,17 @@ static NotificationAppSettings* alloc_settings(void) {
         app->notification->settings.led_brightness, backlight_value, BACKLIGHT_COUNT);
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, backlight_text[value_index]);
+
+    item = variable_item_list_add(
+        app->variable_item_list,
+        "Speaker Output",
+        SPEAKER_OUTPUT_COUNT,
+        speaker_output_changed,
+        app);
+    value_index = value_index_uint32(
+        app->notification->settings.speaker_output, speaker_output_value, SPEAKER_OUTPUT_COUNT);
+    variable_item_set_current_value_index(item, value_index);
+    variable_item_set_current_value_text(item, speaker_output_text[value_index]);
 
     if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagStealthMode)) {
         item = variable_item_list_add(app->variable_item_list, "Volume", 1, NULL, app);

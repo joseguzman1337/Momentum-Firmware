@@ -1054,11 +1054,14 @@ const char* storage_file_get_error_desc(File* file) {
 
 /****************** Raw SD API ******************/
 
-FS_Error storage_sd_format(Storage* storage) {
+FS_Error storage_sd_format(Storage* storage, SDFormatType format_type) {
     furi_check(storage);
 
     S_API_PROLOGUE;
-    SAData data = {};
+    SAData data = {
+        .sdformat = {
+            .format_type = format_type,
+        }};
     S_API_MESSAGE(StorageCommandSDFormat);
     S_API_EPILOGUE;
     return S_RETURN_ERROR;

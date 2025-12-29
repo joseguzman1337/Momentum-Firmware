@@ -6,14 +6,20 @@
 
 #define TAG "PowerSettings"
 
-#define POWER_SETTINGS_VER_1 (1) // Previous version number
-#define POWER_SETTINGS_VER   (2) // New version number
+#define POWER_SETTINGS_VER_1 (1)
+#define POWER_SETTINGS_VER_2 (2)
+#define POWER_SETTINGS_VER   (3)
 
 #define POWER_SETTINGS_MAGIC (0x21)
 
 typedef struct {
     uint32_t auto_poweroff_delay_ms;
-} PowerSettingsPrevious;
+} PowerSettingsPreviousV1;
+
+typedef struct {
+    uint32_t auto_poweroff_delay_ms;
+    uint8_t charge_supress_percent;
+} PowerSettingsPreviousV2;
 
 void power_settings_load(PowerSettings* settings) {
     furi_assert(settings);
@@ -34,19 +40,35 @@ void power_settings_load(PowerSettings* settings) {
                 POWER_SETTINGS_VER);
 
             // if config previous version - load it and manual set new settings to inital value
-        } else if(version == POWER_SETTINGS_VER_1) {
-            PowerSettingsPrevious* settings_previous = malloc(sizeof(PowerSettingsPrevious));
+        } else if(version == POWER_SETTINGS_VER_2) {
+            PowerSettingsPreviousV2* settings_previous = malloc(sizeof(PowerSettingsPreviousV2));
 
             success = saved_struct_load(
                 POWER_SETTINGS_PATH,
                 settings_previous,
-                sizeof(PowerSettingsPrevious),
+                sizeof(PowerSettingsPreviousV2),
+                POWER_SETTINGS_MAGIC,
+                POWER_SETTINGS_VER_2);
+            if(success) {
+                settings->auto_poweroff_delay_ms = settings_previous->auto_poweroff_delay_ms;
+                settings->charge_supress_percent = settings_previous->charge_supress_percent;
+                settings->charge_current_limit_ma = 0;
+            }
+
+            free(settings_previous);
+        } else if(version == POWER_SETTINGS_VER_1) {
+            PowerSettingsPreviousV1* settings_previous = malloc(sizeof(PowerSettingsPreviousV1));
+
+            success = saved_struct_load(
+                POWER_SETTINGS_PATH,
+                settings_previous,
+                sizeof(PowerSettingsPreviousV1),
                 POWER_SETTINGS_MAGIC,
                 POWER_SETTINGS_VER_1);
-            // new settings initialization
             if(success) {
                 settings->auto_poweroff_delay_ms = settings_previous->auto_poweroff_delay_ms;
                 settings->charge_supress_percent = 0;
+                settings->charge_current_limit_ma = 0;
             }
 
             free(settings_previous);

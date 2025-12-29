@@ -482,11 +482,29 @@ bool mf_classic_block_to_value(const MfClassicBlock* block, int32_t* value, uint
 void mf_classic_value_to_block(int32_t value, uint8_t addr, MfClassicBlock* block) {
     furi_check(block);
 
-    uint32_t v_inv = ~((uint32_t)value);
+    // Use byte arrays to avoid static analyzer warnings about buffer overflows
+    // when taking address of scalar variables with memcpy
+    uint32_t v = (uint32_t)value;
+    uint32_t v_inv = ~v;
 
-    memcpy(&block->data[0], &value, 4); //-V1086
-    memcpy(&block->data[4], &v_inv, 4); //-V1086
-    memcpy(&block->data[8], &value, 4); //-V1086
+    uint8_t value_bytes[sizeof(uint32_t)];
+    uint8_t v_inv_bytes[sizeof(uint32_t)];
+
+    // Convert uint32_t to byte array (little-endian, as MiFare Classic uses LE)
+    value_bytes[0] = (uint8_t)(v & 0xFF);
+    value_bytes[1] = (uint8_t)((v >> 8) & 0xFF);
+    value_bytes[2] = (uint8_t)((v >> 16) & 0xFF);
+    value_bytes[3] = (uint8_t)((v >> 24) & 0xFF);
+
+    v_inv_bytes[0] = (uint8_t)(v_inv & 0xFF);
+    v_inv_bytes[1] = (uint8_t)((v_inv >> 8) & 0xFF);
+    v_inv_bytes[2] = (uint8_t)((v_inv >> 16) & 0xFF);
+    v_inv_bytes[3] = (uint8_t)((v_inv >> 24) & 0xFF);
+
+    // Copy to block data - memcpy from proper byte arrays
+    memcpy(&block->data[0], value_bytes, sizeof(uint32_t));
+    memcpy(&block->data[4], v_inv_bytes, sizeof(uint32_t));
+    memcpy(&block->data[8], value_bytes, sizeof(uint32_t));
 
     block->data[12] = addr;
     block->data[13] = ~addr & 0xFF;

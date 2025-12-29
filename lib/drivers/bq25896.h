@@ -48,6 +48,15 @@ uint16_t bq25896_get_vreg_voltage(const FuriHalI2cBusHandle* handle);
  */
 void bq25896_set_vreg_voltage(const FuriHalI2cBusHandle* handle, uint16_t vreg_voltage);
 
+/** Get fast charge current limit in mA */
+uint16_t bq25896_get_charge_current_limit(const FuriHalI2cBusHandle* handle);
+
+/** Set fast charge current limit in mA
+ *
+ * Valid range: 0mA - 8064mA, in steps of 64mA
+ */
+void bq25896_set_charge_current_limit(const FuriHalI2cBusHandle* handle, uint16_t current_ma);
+
 /** Check OTG BOOST Fault status */
 bool bq25896_check_otg_fault(const FuriHalI2cBusHandle* handle);
 

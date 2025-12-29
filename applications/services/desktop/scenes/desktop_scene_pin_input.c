@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <notification/notification.h>
 #include <notification/notification_messages.h>
+#include <storage/storage.h>
 #include <momentum/momentum.h>
 
 #include "../desktop.h"
@@ -60,7 +61,7 @@ static void desktop_scene_pin_input_done_callback(const DesktopPinCode* pin_code
         uint32_t pin_fails = furi_hal_rtc_get_pin_fails() + 1;
         if(pin_fails >= 10 && momentum_settings.bad_pins_format) {
             Storage* storage = furi_record_open(RECORD_STORAGE);
-            storage_sd_format(storage);
+            storage_sd_format(storage, SDFormatTypeAuto);
             furi_record_close(RECORD_STORAGE);
             furi_hal_rtc_reset_registers();
             Power* power = furi_record_open(RECORD_POWER);
