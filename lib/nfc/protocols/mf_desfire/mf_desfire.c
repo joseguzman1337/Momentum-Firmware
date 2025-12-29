@@ -135,19 +135,23 @@ bool mf_desfire_load(MfDesfireData* data, FlipperFormat* ff, uint32_t version) {
             break;
 
         const uint32_t master_key_version_count = data->master_key_settings.max_keys;
-        simple_array_init(data->master_key_versions, master_key_version_count);
+        if(master_key_version_count > 0) {
+            simple_array_init(data->master_key_versions, master_key_version_count);
 
-        uint32_t i;
-        for(i = 0; i < master_key_version_count; ++i) {
-            if(!mf_desfire_key_version_load(
-                   simple_array_get(data->master_key_versions, i),
-                   MF_DESFIRE_FFF_PICC_PREFIX,
-                   i,
-                   ff))
-                break;
+            uint32_t i;
+            for(i = 0; i < master_key_version_count; ++i) {
+                if(!mf_desfire_key_version_load(
+                       simple_array_get(data->master_key_versions, i),
+                       MF_DESFIRE_FFF_PICC_PREFIX,
+                       i,
+                       ff))
+                    break;
+            }
+
+            if(i != master_key_version_count) break;
+        } else {
+            simple_array_reset(data->master_key_versions);
         }
-
-        if(i != master_key_version_count) break;
 
         uint32_t application_count;
         if(!mf_desfire_application_count_load(&application_count, ff)) break;
