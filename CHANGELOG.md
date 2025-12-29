@@ -225,3 +225,5 @@
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
 
 - Fixed issue-37: Automated resolution by DeepSeek AI.
+
+- Fixed issue-36: Automated resolution by DeepSeek AI.
