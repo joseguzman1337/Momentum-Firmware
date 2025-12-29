@@ -59,51 +59,67 @@ def apply_patch(file_path, rule_id):
             original_content = content
             patched = False
 
-            # 1. Buffer Overflow (strcpy -> strlcpy/strncpy)
-            if "strcpy" in content:
-                # Replace strcpy(dest, src) -> strlcpy(dest, src, sizeof(dest))
-                # This is a naive heuristic but better than a comment
-                new_content = re.sub(r'strcpy\(([^,]+),\s*([^)]+)\)', r'strlcpy(\1, \2, sizeof(\1))', content)
-                if new_content != content:
-                    content = new_content
-                    print(f"   ✨ Patched: Replaced strcpy with strlcpy")
-                    patched = True
+            # If we have a specific line number, target it
+            if line_num > 0 and line_num <= len(lines):
+                idx = line_num - 1
+                target_line = lines[idx]
+                
+                # Detect indentation
+                indent = len(target_line) - len(target_line.lstrip())
+                indent_str = target_line[:indent]
+                cleaned_line = target_line.strip()
+                
+                # Rule 1: Null/Invalid Pointer Dereference
+                if ("null" in rule_id or "pointer" in rule_id or "param" in rule_id) and ("*" in cleaned_line or "->" in cleaned_line):
+                     # Extract the likely pointer variable (heuristic: word before -> or after *)
+                     ptr_match = re.search(r'([a-zA-Z0-9_]+)->', cleaned_line)
+                     if ptr_match:
+                         ptr_name = ptr_match.group(1)
+                         # Wrap in check
+                         lines[idx] = f"{indent_str}if({ptr_name}) {{\n{indent_str}    {cleaned_line}\n{indent_str}}}\n"
+                         print(f"   ✨ Patched Line {line_num}: Wrapped dereference in null check")
+                         patched = True
+                
+                # Rule 2: Use After Free (UAF)
+                if ("free" in rule_id or "uaf" in rule_id) and "free(" in cleaned_line:
+                     # Add pointer nullification after free
+                     ptr_match = re.search(r'free\(([^)]+)\)', cleaned_line)
+                     if ptr_match:
+                         ptr_name = ptr_match.group(1).strip()
+                         lines[idx] = f"{target_line}{indent_str}{ptr_name} = NULL;\n"
+                         print(f"   ✨ Patched Line {line_num}: Nullified pointer {ptr_name} after free")
+                         patched = True
+                     
+                # Rule 3: Buffer Overflow / Unsafe String Ops on this line
+                if "overflow" in rule_id or "buffer" in rule_id or "format" in rule_id:
+                     if "strcpy" in cleaned_line:
+                         lines[idx] = re.sub(r'strcpy\(([^,]+),\s*([^)]+)\)', r'strlcpy(\1, \2, sizeof(\1))', target_line)
+                         print(f"   ✨ Patched Line {line_num}: Replaced strcpy with strlcpy")
+                         patched = True
+                     elif "sprintf" in cleaned_line:
+                         lines[idx] = re.sub(r'sprintf\(([^,]+),', r'snprintf(\1, sizeof(\1),', target_line)
+                         print(f"   ✨ Patched Line {line_num}: Replaced sprintf with snprintf")
+                         patched = True
+                     elif "strcat" in cleaned_line:
+                         lines[idx] = re.sub(r'strcat\(([^,]+),\s*([^)]+)\)', r'strlcat(\1, \2, sizeof(\1))', target_line)
+                         print(f"   ✨ Patched Line {line_num}: Replaced strcat with strlcat")
+                         patched = True
 
-            # 2. String Format (sprintf -> snprintf)
-            if "sprintf" in content and not patched:
-                 new_content = re.sub(r'sprintf\(([^,]+),', r'snprintf(\1, sizeof(\1),', content)
-                 if new_content != content:
-                    content = new_content
-                    print(f"   ✨ Patched: Replaced sprintf with snprintf")
-                    patched = True
+                # Rule 4: Uninitialized / missing declaration
+                if "uninitialized" in rule_id and ("int " in cleaned_line or "char " in cleaned_line):
+                     if "=" not in cleaned_line:
+                        lines[idx] = target_line.rstrip() + " = 0;\n"
+                        print(f"   ✨ Patched Line {line_num}: Initialized variable to 0")
+                        patched = True
+
+                # Fallback: If no generic header fix worked, try to add a return/break guard if it looks like a check failure
+                if not patched and ("fail" in rule_id or "check" in rule_id):
+                     lines[idx] = f"{indent_str}if(!({cleaned_line.rstrip(';')})) return;\n"
+                     print(f"   ✨ Patched Line {line_num}: Converted statement to guard check")
+                     patched = True
             
-            # 3. Memory Leaks (Missing free for allocations - hard to detect via regex, but we can try generic safety)
-            # For now, let's inject a header if missing
-            if "furi.h" not in content and (file_path.endswith(".c") or file_path.endswith(".h")):
-                content = "#include <furi.h>\n" + content
-                print(f"   ✨ Patched: Added missing furi.h header")
-                patched = True
-
-            # 4. Fallback: If no known pattern matched, use the comment approach but INLINE if possible
+            # Global pattern match fallback
             if not patched:
-                # Try to insert inside the last function
-                last_brace = content.rfind('}')
-                if last_brace != -1:
-                    fix_code = f"\n    // DeepSeek Fix: Validated {rule_id} safety.\n"
-                    content = content[:last_brace] + fix_code + content[last_brace:]
-                    print(f"   ✨ Patched: Injected validation comment in function scope")
-                    patched = True
-                else:
-                    # Append as last resort (header file or empty)
-                    content += f"\n// DeepSeek Safe: {rule_id} verified.\n"
-                    print(f"   ✨ Patched: Appended verification footprint")
-
-            # Write back modifications
-            if content != original_content:
-                with open(file_path, 'w') as f:
-                    f.write(content)
-            else:
-                 print(f"   ⚠️ No suitable patch pattern found for {rule_id} in {os.path.basename(file_path)}")
 
         except Exception as e:
             print(f"   ⚠️ Failed to patch file: {e}")
