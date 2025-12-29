@@ -1,20 +1,30 @@
 {
-    "theme": "GitHub",
+  "tools": {
     "autoAccept": false,
-    "sandbox": false,
-    "vimMode": false,
+    "exclude": [
+      "run_shell_command(rm -rf)",
+      "run_shell_command(sudo)"
+    ],
+    "sandbox": false
+  },
+  "model": {
+    "compressionThreshold": 0.6
+  },
+  "general": {
     "checkpointing": {
-        "enabled": true
+      "enabled": true
     },
+    "vimMode": false
+  },
+  "context": {
     "fileFiltering": {
-        "respectGitIgnore": true
-    },
-    "usageStatisticsEnabled": false,
-    "chatCompression": {
-        "contextPercentageThreshold": 0.6
-    },
-    "excludeTools": [
-        "run_shell_command(rm -rf)",
-        "run_shell_command(sudo)"
-    ]
+      "respectGitIgnore": true
+    }
+  },
+  "ui": {
+    "theme": "GitHub"
+  },
+  "privacy": {
+    "usageStatisticsEnabled": false
+  }
 }
