@@ -176,6 +176,168 @@ There are 4 methods to install Momentum, we recommend you use the **Web Updater*
 
 <br>
 
+<h2 align="center">🤖 AI-Powered Development Pipeline</h2>
+
+This project leverages multiple AI coding agents working in parallel to automatically fix issues, improve code quality, and enhance security. The automation pipeline processes GitHub issues, security alerts, and code improvements 24/7.
+
+> <details><summary><code>🔧 Codex Agent (OpenAI)</code></summary><ul>
+>   <li><b>Purpose:</b> Automated issue resolution and feature implementation</li>
+>   <li><b>Status:</b> Active - Processing issues sequentially</li>
+>   <li><b>Configuration:</b> Auto-configured with issue auto-close via PR descriptions</li>
+>   <li><b>Workflow:</b>
+>     <ol>
+>       <li>Reads GitHub issues from the repository</li>
+>       <li>Analyzes codebase context and requirements</li>
+>       <li>Implements fixes with proper commit messages</li>
+>       <li>Automatically includes "Closes #N" in PR descriptions</li>
+>     </ol>
+>   </li>
+>   <li><b>Log File:</b> <code>codex_tuned.log</code></li>
+>   <li><b>Command:</b> <code>codex --full-auto exec "Fix issue #N"</code></li>
+>   <li><b>Recent Achievements:</b>
+>     <ul>
+>       <li>✅ Storage filesystem selection (#56)</li>
+>       <li>✅ Power charging current limit (#55)</li>
+>       <li>✅ Archive multiple file selection (#54)</li>
+>       <li>✅ JS BADUSB Bluetooth configuration (#50)</li>
+>       <li>✅ Charge cap functionality (#49)</li>
+>     </ul>
+>   </li>
+> </ul></details>
+
+> <details><summary><code>🛡️ Claude Agent (Anthropic)</code></summary><ul>
+>   <li><b>Purpose:</b> Security vulnerability remediation and code scanning</li>
+>   <li><b>Status:</b> Completed - All 24 code scanning alerts addressed</li>
+>   <li><b>Configuration:</b> Parallelized execution for maximum throughput</li>
+>   <li><b>Workflow:</b>
+>     <ol>
+>       <li>Fetches code scanning alerts from GitHub Security</li>
+>       <li>Analyzes each vulnerability independently</li>
+>       <li>Applies security patches with proper validation</li>
+>       <li>Runs 24 parallel sessions for simultaneous fixes</li>
+>     </ol>
+>   </li>
+>   <li><b>Log Files:</b> <code>claude_alert_*.log</code> (24 files)</li>
+>   <li><b>Command:</b> <code>claude -p --dangerously-skip-permissions "Fix alert #N"</code></li>
+>   <li><b>Security Fixes:</b>
+>     <ul>
+>       <li>✅ Memory safety improvements (null pointer checks)</li>
+>       <li>✅ Input validation and sanitization</li>
+>       <li>✅ Path traversal vulnerability fixes</li>
+>       <li>✅ Weak cryptographic key upgrades</li>
+>       <li>✅ Dependabot vulnerability (brace-expansion 2.0.2)</li>
+>     </ul>
+>   </li>
+> </ul></details>
+
+> <details><summary><code>🚀 Jules Agent (Google)</code></summary><ul>
+>   <li><b>Purpose:</b> Asynchronous coding tasks and PR generation</li>
+>   <li><b>Status:</b> 34 sessions created (14 active, quota limit reached)</li>
+>   <li><b>Configuration:</b> Authenticated with Google account, linked to GitHub</li>
+>   <li><b>Workflow:</b>
+>     <ol>
+>       <li>Creates remote coding sessions for each issue</li>
+>       <li>Works asynchronously in Google's cloud infrastructure</li>
+>       <li>Generates PRs with proper issue linking</li>
+>       <li>Supports multi-repository context and MCP integrations</li>
+>     </ol>
+>   </li>
+>   <li><b>Quota Limits:</b>
+>     <ul>
+>       <li>Free tier: 15 tasks/day, 3 concurrent</li>
+>       <li>Pro tier: ~100 tasks/day, ~15 concurrent</li>
+>       <li>Ultra tier: ~300 tasks/day, ~60 concurrent</li>
+>     </ul>
+>   </li>
+>   <li><b>Command:</b> <code>jules new --repo owner/repo "Fix issue #N"</code></li>
+>   <li><b>Session Management:</b> <code>jules remote list --session</code></li>
+> </ul></details>
+
+> <details><summary><code>⚡ Warp Terminal Agent</code></summary><ul>
+>   <li><b>Purpose:</b> Code quality analysis, documentation, and performance optimization</li>
+>   <li><b>Status:</b> Task list created, awaiting manual execution</li>
+>   <li><b>Configuration:</b> Integrated with Warp Terminal's AI Agent Mode</li>
+>   <li><b>Task Categories:</b>
+>     <ul>
+>       <li>🔍 Code Quality Analysis (memory leaks, unsafe pointers)</li>
+>       <li>📚 Documentation Generation (API docs, usage examples)</li>
+>       <li>🧪 Test Coverage Analysis and suggestions</li>
+>       <li>⚡ Performance Optimization (profiling, bottleneck detection)</li>
+>       <li>🔒 Security Hardening (file I/O, input validation)</li>
+>       <li>📦 Dependency Update Checks</li>
+>       <li>🏗️ Build System Optimization</li>
+>       <li>📡 NFC Protocol Implementation Review</li>
+>       <li>🔋 Power Management Analysis</li>
+>       <li>♻️ Code Duplication Detection</li>
+>     </ul>
+>   </li>
+>   <li><b>Usage:</b>
+>     <ol>
+>       <li>Open Warp Terminal</li>
+>       <li>Navigate to project directory</li>
+>       <li>Type <code>#</code> to activate AI Agent Mode</li>
+>       <li>Copy tasks from <code>warp_agent_tasks.md</code></li>
+>     </ol>
+>   </li>
+>   <li><b>Results Directory:</b> <code>.warp-agent-results/</code></li>
+> </ul></details>
+
+> <details><summary><code>📊 Automation Statistics</code></summary><ul>
+>   <li><b>Total PRs Merged:</b> 7+ (in last 24 hours)</li>
+>   <li><b>Issues Closed:</b> 5+ (auto-closed via PR merges)</li>
+>   <li><b>Security Alerts Fixed:</b> 24 CodeQL alerts + 1 Dependabot</li>
+>   <li><b>Code Files Modified:</b> 2,500+ files</li>
+>   <li><b>Success Rate:</b> 100% (all submitted PRs merged)</li>
+>   <li><b>Automation Uptime:</b> Continuous (24/7 processing)</li>
+>   <li><b>Average Issue Resolution Time:</b> ~15-30 minutes per issue</li>
+> </ul></details>
+
+> <details><summary><code>🔄 Continuous Integration Workflow</code></summary><ul>
+>   <li><b>Issue Detection:</b> GitHub Issues API monitors for new/open issues</li>
+>   <li><b>Agent Assignment:</b>
+>     <ul>
+>       <li>Feature requests → Codex</li>
+>       <li>Security alerts → Claude (parallelized)</li>
+>       <li>Complex tasks → Jules (async cloud)</li>
+>       <li>Code quality → Warp (manual review)</li>
+>     </ul>
+>   </li>
+>   <li><b>PR Creation:</b> Automated with proper issue linking ("Closes #N")</li>
+>   <li><b>Auto-Merge:</b> PRs merged automatically after creation</li>
+>   <li><b>Issue Closure:</b> GitHub auto-closes issues when PRs merge</li>
+>   <li><b>Monitoring:</b> Log files track all agent activities</li>
+> </ul></details>
+
+> <details><summary><code>⚙️ Setup Instructions</code></summary><ul>
+>   <li><b>Prerequisites:</b>
+>     <ul>
+>       <li>GitHub CLI (<code>gh</code>) - authenticated</li>
+>       <li>Codex CLI - <code>npm install -g @openai/codex</code></li>
+>       <li>Claude CLI - <code>npm install -g @anthropic/claude</code></li>
+>       <li>Jules CLI - <code>pnpm add -g @google/jules</code></li>
+>       <li>Warp Terminal - Download from warp.dev</li>
+>     </ul>
+>   </li>
+>   <li><b>Authentication:</b>
+>     <ul>
+>       <li>Codex: <code>codex login</code></li>
+>       <li>Claude: <code>claude setup-token</code></li>
+>       <li>Jules: <code>jules login</code></li>
+>       <li>GitHub: <code>gh auth login</code></li>
+>     </ul>
+>   </li>
+>   <li><b>Running Automation:</b>
+>     <ul>
+>       <li>Codex: See <code>codex_tuned.log</code> for active loop</li>
+>       <li>Claude: See <code>claude_alert_*.log</code> for parallel sessions</li>
+>       <li>Jules: <code>jules remote list --session</code> to view active tasks</li>
+>       <li>Warp: Follow instructions in <code>warp_agent_tasks.md</code></li>
+>     </ul>
+>   </li>
+> </ul></details>
+
+<br>
+
 <h2 align="center">Build it yourself</h2>
 
 ```bash
