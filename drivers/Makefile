@@ -42,9 +42,6 @@ OBJECTS = $(SOURCES:.cpp=.o)
 # Default target
 all: build
 
-# Create build directory
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
 
 # Build object files
 %.o: %.cpp

@@ -144,6 +144,7 @@ remove_old() {
 }
 
 # Build the driver
+# Build the driver
 build_driver() {
     print_status "Building RTL88xxAU driver..."
     
@@ -152,8 +153,23 @@ build_driver() {
         exit 1
     fi
     
+    # Clean as root to remove any previous root-owned artifacts
     make clean
-    make build
+    
+    # Build as the original user if possible to access their keychain for signing
+    if [ -n "$SUDO_USER" ]; then
+        print_status "Building as user '$SUDO_USER' to access keychain for signing..."
+        # We need to preserve the environment variables usually
+        if sudo -u "$SUDO_USER" make build; then
+            print_success "Driver built successfully (as user)"
+        else
+            print_error "Build failed as user. Retrying as root (signing might fail)..."
+            make build
+        fi
+    else
+        print_warning "SUDO_USER not detected. Building as root (signing might fail)"
+        make build
+    fi
     
     if [ ! -d "$BUILD_DIR/$KEXT_NAME" ]; then
         print_error "Build failed - kernel extension not found"
