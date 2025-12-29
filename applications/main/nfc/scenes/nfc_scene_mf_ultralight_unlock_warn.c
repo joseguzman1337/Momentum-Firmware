@@ -1,3 +1,4 @@
+#include <furi.h>
 #include "../nfc_app_i.h"
 #include <dolphin/dolphin.h>
 
