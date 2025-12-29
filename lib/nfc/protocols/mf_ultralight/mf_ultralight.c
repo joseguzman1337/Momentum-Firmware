@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 #include "mf_ultralight.h"
 
 #include <bit_lib/bit_lib.h>
