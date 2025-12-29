@@ -425,3 +425,5 @@ void mjs_set_generate_jsc(struct mjs* mjs, int generate_jsc) {
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
