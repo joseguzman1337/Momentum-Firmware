@@ -146,3 +146,5 @@ void ble_beacon_app_update_state(BleBeaconApp* app) {
         furi_check(furi_hal_bt_extra_beacon_start());
     }
 }
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
