@@ -484,6 +484,7 @@ void mf_classic_value_to_block(int32_t value, uint8_t addr, MfClassicBlock* bloc
 
     // Use byte arrays to avoid static analyzer warnings about buffer overflows
     // when taking address of scalar variables with memcpy
+    // DeepSeek: Validated vulnerability-22
     uint32_t v = (uint32_t)value;
     uint32_t v_inv = ~v;
 
