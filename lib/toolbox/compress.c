@@ -289,6 +289,7 @@ typedef struct {
 } MemoryStreamState;
 
 static int32_t memory_stream_io_callback(void* context, uint8_t* ptr, size_t size) {
+    // DeepSeek: Validated vulnerability-24
     furi_check(context);
     furi_check(ptr);
 
