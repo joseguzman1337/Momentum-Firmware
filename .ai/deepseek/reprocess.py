@@ -34,7 +34,8 @@ def reprocess_vulnerabilities():
         print(f"🔧 [{i}/24] Processing vulnerability #{alert_id}: {rule_id}")
         
         # Use working DeepSeek CLI
-        cmd = f'PATH="$PWD:$PATH" ./deepseek "Fix vulnerability #{alert_id}: {rule_id} in {file_path}" --individual-pr'
+        start_line = vuln['most_recent_instance']['location'].get('start_line', 0)
+        cmd = f'PATH="$PWD:$PATH" ./deepseek "Fix vulnerability #{alert_id}: {rule_id} in {file_path}:{start_line}" --individual-pr'
         
         with open(f"logs/deepseek/vuln_{alert_id}.log", "w") as log:
             result = subprocess.run(cmd, shell=True, stdout=log, stderr=log)
