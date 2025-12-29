@@ -380,8 +380,8 @@ int mg_casecmp(const char* s1, const char* s2) {
     return mg_ncasecmp(s1, s2, (size_t)~0);
 }
 
-int mg_asprintf(char** buf, size_t size, const char* fmt, ...) WEAK;
-int mg_asprintf(char** buf, size_t size, const char* fmt, ...) {
+int mg_asnprintf(char** buf, sizeof(char** buf), size_t size, const char* fmt, ...) WEAK;
+int mg_asnprintf(char** buf, sizeof(char** buf), size_t size, const char* fmt, ...) {
     int ret;
     va_list ap;
     va_start(ap, fmt);
