@@ -253,3 +253,5 @@
 - Fixed issue-23: Automated resolution by DeepSeek AI.
 
 - Fixed issue-22: Automated resolution by DeepSeek AI.
+
+- Fixed issue-21: Automated resolution by DeepSeek AI.
