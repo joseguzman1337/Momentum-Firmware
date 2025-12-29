@@ -5,9 +5,56 @@
       "maxAge": "14d",
       "maxCount": 25,
       "minRetention": "1d"
-    }
+    },
+    "enablePromptCompletion": true,
+    "vimMode": false
   },
   "model": {
-    "maxSessionTurns": 50
+    "maxSessionTurns": 50,
+    "compressionThreshold": 0.3
+  },
+  "ui": {
+    "showLineNumbers": true,
+    "showCitations": true,
+    "showStatusInTitle": true,
+    "hideContextSummary": false,
+    "footer": {
+      "hideContextPercentage": false
+    }
+  },
+  "context": {
+    "fileFiltering": {
+      "respectGitIgnore": true,
+      "respectGeminiIgnore": true,
+      "enableRecursiveFileSearch": true
+    }
+  },
+  "tools": {
+    "autoAccept": false,
+    "useRipgrep": true,
+    "enableToolOutputTruncation": true,
+    "truncateToolOutputThreshold": 15000,
+    "discoveryCommand": "python .gemini/tools/momentum_agent.py --discover",
+    "callCommand": "python .gemini/tools/momentum_agent.py",
+    "shell": {
+      "showColor": true
+    }
+  },
+  "security": {
+    "folderTrust": {
+      "enabled": true
+    }
+  },
+  "experimental": {
+    "codebaseInvestigatorSettings": {
+      "enabled": true,
+      "maxNumTurns": 15
+    }
+  },
+  "telemetry": {
+    "enabled": true,
+    "target": "local",
+    "outfile": ".gemini/telemetry.jsonl",
+    "logPrompts": false
   }
 }

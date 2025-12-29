@@ -17,6 +17,7 @@
 ### Added:
 - Apps:
   - Games: Geometry Flip (by @goosedev72-projects)
+  - Agents: Claude Slack (by @joseguzman1337)
   - GPIO:
     - [GPIO] Explorer (by @EvgeniGenchev07)
     - [KT0803] FM Transmitter (by @goosedev72-projects)

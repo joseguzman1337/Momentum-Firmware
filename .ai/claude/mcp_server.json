@@ -6,7 +6,6 @@
       "env": {
         "LOG_DIR": "logs/claude",
         "AUTO_MERGE": "true",
-        "PARALLEL_SESSIONS": "50",
         "YOLO_MODE": "true"
       }
     }

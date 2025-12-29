@@ -10,6 +10,7 @@ class TaskRouter:
             'performance': 'deepseek', 
             'feature': 'codex',
             'architecture': 'gemini',
+            'refactoring': 'codex-cloud',
             'quality': 'warp',
             'async': 'jules',
             'cloud': 'amazonq',
@@ -29,8 +30,10 @@ class TaskRouter:
             return 'security'
         elif any(word in title + body for word in ['performance', 'optimize', 'speed']):
             return 'performance'
-        elif any(word in title + body for word in ['architecture', 'refactor', 'design']):
+        elif any(word in title + body for word in ['architecture', 'design']):
             return 'architecture'
+        elif any(word in title + body for word in ['refactor', 'restructure', 'reorganize']):
+            return 'refactoring'
         elif any(word in title + body for word in ['quality', 'lint', 'documentation']):
             return 'quality'
         elif any(word in title + body for word in ['aws', 'cloud', 'infrastructure', 'deployment']):

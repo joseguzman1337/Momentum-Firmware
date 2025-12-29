@@ -15,6 +15,7 @@ Complete AI-powered development automation with YOLO mode, A2A communication, RA
 │   ├── claude_server.json
 │   ├── gemini_server.json
 │   ├── jules_server.json
+│   ├── claude_slack_server.json
 │   └── servers/
 │       ├── rag_server.py      # RAG knowledge base
 │       └── a2a_server.py      # Agent-to-agent communication
@@ -148,6 +149,12 @@ tail -f logs/codex/*.log
 - Manual review tasks
 - **Mode**: Manual (task list)
 
+### Claude Slack
+- Slack message monitoring
+- Coding intent detection
+- Automated session routing
+- **Mode**: YOLO (`--auto-route`)
+
 ### Amazon Q
 - AWS/cloud infrastructure fixes
 - Deployment optimization
@@ -172,6 +179,7 @@ The super orchestrator intelligently routes tasks:
 | async, complex, multi-step | Jules |
 | aws, cloud, infrastructure, deployment | Amazon Q |
 | build, tooling, development, workflow, ci | Kiro |
+| slack, mention, @claude, message | Claude Slack |
 
 ## 🔐 Security
 

@@ -130,5 +130,10 @@
         "format": "json",
         "rotation": "daily",
         "retention_days": 30
+    },
+    "internet_access": {
+        "config_file": ".ai/configs/internet_access.json",
+        "enabled": true,
+        "security_mode": "strict"
     }
 }

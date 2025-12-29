@@ -1,0 +1,11 @@
+{
+  "name": "momentum-firmware",
+  "image": "universal",
+  "setupScript": ".codex/setup.sh",
+  "maintenanceScript": ".codex/maintenance.sh",
+  "environmentVariables": {
+    "FLIPPER_TOOLCHAIN": "gcc-arm-none-eabi",
+    "FBT_VERBOSE": "1"
+  },
+  "internetAccess": "limited"
+}

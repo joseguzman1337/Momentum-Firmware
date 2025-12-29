@@ -1,0 +1,15 @@
+description = "Research firmware development resources from web"
+prompt = """
+Research and analyze web resources for Momentum Firmware development.
+
+Use web_fetch to gather information from: {{args}}
+
+Focus on:
+- Flipper Zero hardware specifications
+- Firmware development best practices
+- Security considerations for embedded systems
+- API documentation and examples
+- Community discussions and solutions
+
+Provide actionable insights for the Momentum Firmware project.
+"""

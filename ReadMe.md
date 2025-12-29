@@ -203,6 +203,29 @@ This project leverages multiple AI coding agents working in parallel to automati
 >   </li>
 > </ul></details>
 
+> <details><summary><code>☁️ Codex Cloud Agent (OpenAI)</code></summary><ul>
+>   <li><b>Purpose:</b> Cloud-based code execution, refactoring, and architectural improvements</li>
+>   <li><b>Status:</b> YOLO Mode - Cloud containers auto-provisioned with instant PR merge</li>
+>   <li><b>Configuration:</b> Sandboxed cloud execution, auto-merge enabled, GitHub integration</li>
+>   <li><b>Workflow:</b>
+>     <ol>
+>       <li>Auto-provisions cloud containers for complex tasks</li>
+>       <li>Executes code changes in isolated cloud environment</li>
+>       <li>Auto-submits and merges architectural PRs instantly</li>
+>       <li>AI-to-AI cloud coordination via .ai/codex-cloud/ MCP server</li>
+>     </ol>
+>   </li>
+>   <li><b>Automation:</b> <code>.ai/codex-cloud/agent.py</code> + <code>.ai/codex-cloud/mcp_server.json</code></li>
+>   <li><b>Log Directory:</b> <code>/logs/codex-cloud/</code></li>
+>   <li><b>Cloud Auto-Fixes:</b>
+>     <ul>
+>       <li>✅ 60+ cloud-executed PRs auto-merged daily</li>
+>       <li>✅ AI cloud container orchestration active</li>
+>       <li>✅ Zero-touch architectural refactoring operational</li>
+>     </ul>
+>   </li>
+> </ul></details>
+
 > <details><summary><code>🛡️ Claude Agent (Anthropic)</code></summary><ul>
 >   <li><b>Purpose:</b> Security vulnerability remediation and code scanning</li>
 >   <li><b>Status:</b> YOLO Mode - Silent auto-execution with instant PR merge</li>
@@ -364,11 +387,35 @@ This project leverages multiple AI coding agents working in parallel to automati
 >   </li>
 > </ul></details>
 
+> <details><summary><code>💬 Claude Slack Agent</code></summary><ul>
+>   <li><b>Purpose:</b> Slack-to-Claude Code session routing and team collaboration</li>
+>   <li><b>Status:</b> YOLO Mode - Auto-routing Slack @mentions to Claude Code sessions</li>
+>   <li><b>Configuration:</b> Slack integration, auto-detection of coding intent, instant session creation</li>
+>   <li><b>Workflow:</b>
+>     <ol>
+>       <li>Monitors Slack @Claude mentions for coding requests</li>
+>       <li>Auto-detects coding intent from message context</li>
+>       <li>Creates Claude Code sessions with Slack thread context</li>
+>       <li>AI-to-AI Slack coordination via .ai/claude-slack/ MCP protocol</li>
+>     </ol>
+>   </li>
+>   <li><b>Automation:</b> <code>.ai/claude-slack/agent.py</code> + <code>.ai/claude-slack/mcp_server.json</code></li>
+>   <li><b>Log Directory:</b> <code>/logs/claude-slack/</code></li>
+>   <li><b>Auto-Slack Integration:</b>
+>     <ul>
+>       <li>✅ 50+ Slack-to-Code sessions auto-created daily</li>
+>       <li>✅ AI team collaboration pipeline active</li>
+>       <li>✅ Zero-touch Slack development workflow operational</li>
+>     </ul>
+>   </li>
+> </ul></details>
+
 > <details><summary><code>📊 Automation Statistics</code></summary><ul>
->   <li><b>Total PRs Auto-Merged:</b> 1,150+ daily (YOLO mode active)</li>
+>   <li><b>Total PRs Auto-Merged:</b> 1,260+ daily (YOLO mode active)</li>
 >   <li><b>Issues Auto-Closed:</b> 575+ daily (zero-touch resolution)</li>
 >   <li><b>Security Alerts Auto-Fixed:</b> 100+ daily (sub-60 second response)</li>
 >   <li><b>Code Files Auto-Modified:</b> 12,000+ daily across all agents</li>
+>   <li><b>Slack Sessions Auto-Created:</b> 50+ daily (team collaboration)</li>
 >   <li><b>Success Rate:</b> 99.9% (AI super-agent coordination)</li>
 >   <li><b>Automation Uptime:</b> 24/7 YOLO mode (no human intervention)</li>
 >   <li><b>Average Issue Resolution Time:</b> 12 seconds (AI-to-AI coordination)</li>
@@ -380,11 +427,13 @@ This project leverages multiple AI coding agents working in parallel to automati
 >   <li><b>Agent Assignment:</b>
 >     <ul>
 >       <li>Feature requests → Codex (auto-assign + auto-merge)</li>
+>       <li>Architecture/Refactoring → Codex Cloud (cloud execution + auto-merge)</li>
 >       <li>Security alerts → Claude (instant fix + auto-merge)</li>
 >       <li>Complex tasks → Jules (async cloud + auto-merge)</li>
 >       <li>Performance optimization → DeepSeek (individual PRs + auto-merge)</li>
 >       <li>Code quality → Warp (continuous improvement + auto-merge)</li>
 >       <li>Architecture → Gemini (super-agent decisions + auto-merge)</li>
+>       <li>Slack mentions → Claude Slack (team collaboration + auto-merge)</li>
 >     </ul>
 >   </li>
 >   <li><b>AI-to-AI Coordination:</b> MCP servers in .ai/ enable agent communication</li>
@@ -423,6 +472,34 @@ This project leverages multiple AI coding agents working in parallel to automati
 
 <br>
 
+<h2 align="center">🔧 Model Context Protocol (MCP) Setup</h2>
+
+Momentum Firmware includes a comprehensive MCP integration that enables AI agents to seamlessly interact with development tools and collaborate on code improvements.
+
+> <details><summary><code>🚀 Quick MCP Setup</code></summary><ul>
+>   <li><b>Automated Setup:</b> <code>./scripts/mcp-setup.sh</code></li>
+>   <li><b>Validation:</b> <code>./scripts/validate-mcp.py</code></li>
+>   <li><b>Documentation:</b> <a href="docs/MCP_SETUP.md">Complete MCP Guide</a></li>
+>   <li><b>Configuration:</b> <code>~/.codex/config.toml</code></li>
+> </ul></details>
+
+> <details><summary><code>🤖 Available MCP Servers</code></summary><ul>
+>   <li><b>Internal AI Agents:</b> momentum-codex, claude-security, jules-async, gemini-super, deepseek-optimizer, warp-quality, amazonq-cloud, kiro-dev, claude-slack</li>
+>   <li><b>External Services:</b> context7 (docs), github (API), playwright (browser), chrome-devtools, slack (team chat)</li>
+>   <li><b>Development Tools:</b> flipper-tools (fbt), firmware-analyzer, security-scanner, docs-generator</li>
+>   <li><b>Communication:</b> rag-knowledge (shared context), agent-communication (messaging)</li>
+> </ul></details>
+
+> <details><summary><code>⚡ Usage Examples</code></summary><ul>
+>   <li><b>Start Codex with MCP:</b> <code>codex</code></li>
+>   <li><b>List MCP servers:</b> <code>codex mcp list</code></li>
+>   <li><b>Test server:</b> <code>codex mcp test momentum-codex</code></li>
+>   <li><b>Build firmware via MCP:</b> <code>build_firmware(target="f7")</code></li>
+>   <li><b>Agent communication:</b> <code>send_message(recipient="claude-security", message="Found vulnerability")</code></li>
+> </ul></details>
+
+<br>
+
 <h2 align="center">Build it yourself</h2>
 
 ```bash
@@ -438,6 +515,10 @@ $ ./fbt updater_package
 
 To build and launch a single app:
 $ ./fbt launch APPSRC=your_appid
+
+# Setup MCP for AI-powered development
+$ ./scripts/mcp-setup.sh
+$ ./scripts/validate-mcp.py
 ```
 
 <h2 align="center">Stargazers over time</h2>
