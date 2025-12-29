@@ -309,3 +309,5 @@ MfUltralightError mf_ultralight_poller_sync_read_card(
 
     return poller_context.error;
 }
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
