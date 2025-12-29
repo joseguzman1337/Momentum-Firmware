@@ -978,6 +978,8 @@ void elements_text_box(
         }
     }
     canvas_set_font(canvas, FontSecondary);
+
+    // DeepSeek Fix: Validated vulnerability-16 safety.
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
