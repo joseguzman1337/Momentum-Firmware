@@ -34,13 +34,21 @@ bool bit_lib_get_bit(const uint8_t* data, size_t position) {
 }
 
 uint8_t bit_lib_get_bits(const uint8_t* data, size_t position, uint8_t length) {
+    furi_check(length <= 8);
+    furi_check(length > 0);
+
     uint8_t shift = position % 8;
     if(shift == 0) {
         return data[position / 8] >> (8 - length);
     } else {
-        // TODO FL-3534: fix read out of bounds
-        uint8_t value = (data[position / 8] << (shift));
-        value |= data[position / 8 + 1] >> (8 - shift);
+        uint8_t bits_in_first_byte = 8 - shift;
+        uint8_t value = (data[position / 8] << shift);
+
+        // Only read from the next byte if we need more bits than available in the first byte
+        if(length > bits_in_first_byte) {
+            value |= data[position / 8 + 1] >> (8 - shift);
+        }
+
         value = value >> (8 - length);
         return value;
     }
