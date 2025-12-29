@@ -1,3 +1,4 @@
+#include <furi.h>
 #include "varint.h"
 
 size_t varint_uint32_pack(uint32_t value, uint8_t* output) {
