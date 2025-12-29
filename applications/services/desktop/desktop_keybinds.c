@@ -217,6 +217,14 @@ void desktop_run_keybind(Desktop* desktop, InputType _type, InputKey _key) {
         view_dispatcher_send_custom_event(desktop->view_dispatcher, DesktopMainEventLockWithPin);
     } else if(furi_string_equal(keybind, "Wipe Device")) {
         loader_start_detached_with_gui_error(desktop->loader, "Storage", "Wipe Device");
+    } else if(desktop_keybind_is_dir(keybind)) {
+        const char* dir_path = desktop_keybind_dir_path_cstr(keybind);
+        if(dir_path[0] != '\0') {
+            if(!storage_dir_exists(desktop->storage, dir_path)) {
+                storage_common_mkdir(desktop->storage, dir_path);
+            }
+            desktop_launch_archive(desktop, dir_path);
+        }
     } else {
         const char* str = furi_string_get_cstr(keybind);
         if(storage_common_exists(desktop->storage, str)) {
