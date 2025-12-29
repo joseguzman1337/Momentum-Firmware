@@ -1,4 +1,5 @@
 #include "findmy_i.h"
+#include <furi_hal_power.h>
 
 static bool findmy_custom_event_callback(void* context, uint32_t event) {
     furi_assert(context);
@@ -61,6 +62,8 @@ static FindMy* findmy_app_alloc() {
 
 static void findmy_app_free(FindMy* app) {
     furi_assert(app);
+
+    furi_hal_power_suppress_charge_exit();
 
     view_dispatcher_remove_view(app->view_dispatcher, FindMyViewPopup);
     popup_free(app->popup);
