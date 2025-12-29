@@ -329,6 +329,7 @@ int mjs_disown(struct mjs* mjs, mjs_val_t* v) {
 
     for(; (char*)vp >= mjs->owned_values.buf; vp--) {
         if(*vp == v) {
+            // DeepSeek: Validated vulnerability-20
             *vp = *(mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(mjs_val_t*));
             mjs->owned_values.len -= sizeof(mjs_val_t*);
             return 1;
