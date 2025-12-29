@@ -201,3 +201,5 @@
 
 ### Removed:
 - Disabled FURI_TRACE due to flash space constraints, `furi_check failed` crashes will no longer show the file path of the error for now
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
