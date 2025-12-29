@@ -292,6 +292,38 @@ This project leverages multiple AI coding agents working in parallel to automati
 >   </li>
 > </ul></details>
 
+> <details><summary><code>🧠 DeepSeek CLI Agent</code></summary><ul>
+>   <li><b>Purpose:</b> High-performance code generation, optimization, and mathematical reasoning</li>
+>   <li><b>Status:</b> Installed and authenticated - Ready for deployment</li>
+>   <li><b>Configuration:</b> API key configured, context window optimized for large codebases</li>
+>   <li><b>Workflow:</b>
+>     <ol>
+>       <li>Processes complex algorithmic challenges and optimizations</li>
+>       <li>Generates high-quality code with mathematical precision</li>
+>       <li>Handles large-scale refactoring and performance improvements</li>
+>       <li>Provides detailed technical analysis and recommendations</li>
+>     </ol>
+>   </li>
+>   <li><b>Key Features:</b>
+>     <ul>
+>       <li>🚀 Ultra-fast inference for rapid development cycles</li>
+>       <li>🔬 Advanced mathematical and algorithmic reasoning</li>
+>       <li>⚡ Optimized for performance-critical code generation</li>
+>       <li>🎯 Specialized in embedded systems and firmware development</li>
+>       <li>💡 Cost-effective alternative to GPT-4 for coding tasks</li>
+>     </ul>
+>   </li>
+>   <li><b>Command:</b> <code>deepseek "Optimize algorithm for issue #N"</code></li>
+>   <li><b>Use Cases:</b>
+>     <ul>
+>       <li>Algorithm optimization and performance tuning</li>
+>       <li>Complex mathematical computations in firmware</li>
+>       <li>Memory-efficient data structure implementations</li>
+>       <li>Real-time system optimizations</li>
+>     </ul>
+>   </li>
+> </ul></details>
+
 > <details><summary><code>⚡ Warp Terminal Agent</code></summary><ul>
 >   <li><b>Purpose:</b> Code quality analysis, documentation, and performance optimization</li>
 >   <li><b>Status:</b> Task list created, awaiting manual execution</li>
@@ -338,6 +370,7 @@ This project leverages multiple AI coding agents working in parallel to automati
 >       <li>Feature requests → Codex</li>
 >       <li>Security alerts → Claude (parallelized)</li>
 >       <li>Complex tasks → Jules (async cloud)</li>
+>       <li>Performance optimization → DeepSeek</li>
 >       <li>Code quality → Warp (manual review)</li>
 >     </ul>
 >   </li>
@@ -354,6 +387,7 @@ This project leverages multiple AI coding agents working in parallel to automati
 >       <li>Codex CLI - <code>npm install -g @openai/codex</code></li>
 >       <li>Claude CLI - <code>npm install -g @anthropic/claude</code></li>
 >       <li>Jules CLI - <code>pnpm add -g @google/jules</code></li>
+>       <li>DeepSeek CLI - <code>pip install deepseek-cli</code></li>
 >       <li>Warp Terminal - Download from warp.dev</li>
 >     </ul>
 >   </li>
@@ -362,6 +396,7 @@ This project leverages multiple AI coding agents working in parallel to automati
 >       <li>Codex: <code>codex login</code></li>
 >       <li>Claude: <code>claude setup-token</code></li>
 >       <li>Jules: <code>jules login</code></li>
+>       <li>DeepSeek: <code>deepseek auth</code></li>
 >       <li>GitHub: <code>gh auth login</code></li>
 >     </ul>
 >   </li>
@@ -370,6 +405,7 @@ This project leverages multiple AI coding agents working in parallel to automati
 >       <li>Codex: See <code>codex_tuned.log</code> for active loop</li>
 >       <li>Claude: See <code>claude_alert_*.log</code> for parallel sessions</li>
 >       <li>Jules: <code>jules remote list --session</code> to view active tasks</li>
+>       <li>DeepSeek: <code>deepseek status</code> to check active optimizations</li>
 >       <li>Warp: Follow instructions in <code>warp_agent_tasks.md</code></li>
 >     </ul>
 >   </li>
