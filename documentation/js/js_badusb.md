@@ -40,6 +40,8 @@ Configuration object *(optional)*:
 - pairing (number | string): Pairing mode, optional (0 = YesNo, 1 = PinType, 2 = PinYesNo)
 - layoutPath (string): Path to keyboard layout file, optional
 
+MAC addresses use the standard byte order (AA first).
+
 **Examples**
 ```js
 // Start BLE HID with default parameters
