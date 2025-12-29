@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 /**
  * @file felica.c
  * @brief FeliCa NFC protocol implementation
