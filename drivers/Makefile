@@ -22,7 +22,7 @@ MIN_VERSION = -mmacosx-version-min=12.0
 
 # Compiler Flags
 CFLAGS = $(ARCH) $(SDK) $(MIN_VERSION) -O2 -Wall -Wextra
-CXXFLAGS = $(CFLAGS) -std=c++17
+CXXFLAGS = $(CFLAGS) -std=c++17 -fno-modules
 KEXT_FLAGS = -fno-builtin -fno-stack-protector -mno-red-zone -fno-exceptions -fno-asynchronous-unwind-tables
 
 # Framework Paths
@@ -63,6 +63,13 @@ build: $(BUILD_DIR) $(OBJECTS)
 	# Set permissions
 	chmod -R 755 $(BUILD_DIR)/$(KEXT_NAME)
 	chmod 644 $(BUILD_DIR)/$(KEXT_NAME)/Contents/Info.plist
+	
+	# Sign with Apple Development certificate
+	codesign --force --sign "Apple Development: ipartner@gmail.com (5VFBH8ZDF6)" \
+		--entitlements kext.entitlements \
+		--options runtime \
+		--timestamp $(BUILD_DIR)/$(KEXT_NAME) || \
+	codesign --force --sign - $(BUILD_DIR)/$(KEXT_NAME)
 	
 	@echo "Build complete: $(BUILD_DIR)/$(KEXT_NAME)"
 

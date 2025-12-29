@@ -1,6 +1,7 @@
 import Foundation
 import DriverKit
 import NetworkingDriverKit
+import os.log
 
 /// Manages the virtual network interface for the RTL8814AU driver
 class NetworkInterface {

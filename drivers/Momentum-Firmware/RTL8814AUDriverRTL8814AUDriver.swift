@@ -1,8 +1,8 @@
 import Foundation
-import SystemExtensions
 import DriverKit
 import USBDriverKit
 import NetworkingDriverKit
+import os.log
 
 @main
 class RTL8814AUDriver: IOUserUSBHostDevice {

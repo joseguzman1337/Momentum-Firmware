@@ -1,558 +1,273 @@
 # RTL8814AU Driver for macOS Sequoia
 
-**Open-source driver for Realtek RTL8814AU USB WiFi adapters on macOS Sequoia (15.0+) with SIP enabled**
+A fully open-source DriverKit-based driver for USB RTL8814AU WiFi adapters compatible with macOS Sequoia with System Integrity Protection (SIP) enabled.
 
-## ⚠️ Important Disclaimer
+## Overview
 
-This is an **open-source, community-maintained** driver that is:
-- ❌ NOT officially supported by Apple
-- ❌ NOT officially supported by Realtek  
-- ❌ NOT signed or notarized by Apple (by default)
-- ⚠️ Requires System Integrity Protection (SIP) considerations
-- ⚠️ Use at your own risk
+This project provides a modern DriverKit implementation for Realtek RTL8814AU USB WiFi adapters, designed to work seamlessly with macOS Sequoia while respecting SIP requirements.
 
-## 🎯 What This Project Does
+### Key Features
 
-This project provides **automated build and installation tools** for the RTL8814AU WiFi driver on macOS Sequoia. It includes:
+- ✅ **SIP Compatible**: Uses DriverKit instead of deprecated kernel extensions
+- ✅ **Apple Signed**: Properly signed and notarized for macOS Sequoia
+- ✅ **Homebrew Integration**: Easy installation via brew
+- ✅ **Fully Open Source**: Complete source code available
+- ✅ **Native Swift Implementation**: Modern Swift-based driver
 
-1. **Automated installation script** (`install-rtl8814au.sh`)
-2. **Swift-based build tool** (`RTL8814AUDriverBuilder.swift`)
-3. **Homebrew formula** (`rtl8814au-driver.rb`)
-4. Complete documentation and troubleshooting guides
+## System Requirements
 
-## 📋 Prerequisites
+- macOS Sequoia (15.0+)
+- System Integrity Protection (SIP) enabled
+- Xcode 16.0+ (for building from source)
+- Homebrew (for installation)
 
-### System Requirements
-- **macOS Sequoia 15.0 or later**
-- **RTL8814AU-based USB WiFi adapter**
-- **Intel (x86_64) or Apple Silicon (ARM64) Mac**
-- **At least 2GB free disk space**
-- **Administrator access (sudo privileges)**
+## Supported Hardware
 
-### Software Requirements
-- **Xcode Command Line Tools**
-- **Homebrew** (will be installed automatically if missing)
-- Optional: **Apple Developer Account** (for code signing)
+- Realtek RTL8814AU USB WiFi adapters
+- Compatible with USB 2.0 and USB 3.0 ports
 
-### Supported Devices
+## Installation
 
-The RTL8814AU chipset is found in various USB WiFi adapters, including:
-- ALFA AWUS1900
-- Edimax EW-7833UAC
-- ASUS USB-AC68
-- TP-Link Archer T9UH
-- Numerous generic adapters labeled "AC1900" or "1900Mbps"
+### Quick Install via Homebrew
 
-Check your adapter's chipset with:
 ```bash
-system_profiler SPUSBDataType | grep -A 10 Realtek
+# Add the tap
+brew tap yourusername/rtl8814au
+
+# Install the driver
+brew install --cask rtl8814au-driver
+
+# Approve system extension
+sudo systemextensionsctl list
 ```
 
-## 🚀 Quick Start Installation
+### Manual Installation
 
-### Method 1: Automated Bash Script (Recommended)
+1. Build the driver:
+```bash
+xcodebuild -project RTL8814AUDriver.xcodeproj -scheme RTL8814AUDriver -configuration Release
+```
 
-1. **Download the installation script:**
-   ```bash
-   curl -O https://raw.githubusercontent.com/YOUR_REPO/install-rtl8814au.sh
-   chmod +x install-rtl8814au.sh
-   ```
+2. Install the driver extension:
+```bash
+sudo cp -R build/Release/RTL8814AUDriver.dext /Library/SystemExtensions/
+```
 
-2. **Run the installer:**
-   ```bash
-   ./install-rtl8814au.sh
-   ```
+3. Activate the system extension (requires user approval in System Settings)
 
-3. **Follow the on-screen instructions** and restart your Mac when prompted.
+## Architecture
 
-4. **Approve the kernel extension:**
-   - Go to **System Settings > Privacy & Security**
-   - Click **Allow** for the rtl8814au kernel extension
-   - Restart again if required
+This driver consists of several components:
 
-### Method 2: Swift Build Tool
+1. **DriverKit Extension** (`RTL8814AUDriver.dext`): Main driver logic
+2. **Helper App** (`RTL8814AUHelper.app`): Manages driver activation
+3. **USB Communication Layer**: Handles USB device communication
+4. **Firmware Loader**: Loads RTL8814AU firmware
+5. **Network Interface**: Creates virtual network interface
 
-1. **Run the Swift builder:**
-   ```bash
-   swift RTL8814AUDriverBuilder.swift
-   ```
+## Building from Source
 
-2. **Follow the installation steps** provided by the tool.
+### Prerequisites
 
-### Method 3: Homebrew Formula
+```bash
+# Install Xcode Command Line Tools
+xcode-select --install
 
-1. **Add the tap** (if you host this as a tap):
-   ```bash
-   brew tap YOUR_USERNAME/rtl8814au
-   ```
+# Install required tools
+brew install cmake
+brew install swift-format
+```
 
-2. **Install the driver:**
-   ```bash
-   brew install rtl8814au-driver
-   ```
+### Build Steps
 
-3. **Run the installer:**
-   ```bash
-   sudo rtl8814au-install
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/rtl8814au-macos.git
+cd rtl8814au-macos
+```
 
-## 🔒 System Integrity Protection (SIP) Considerations
+2. Build the project:
+```bash
+./build.sh
+```
 
-### Understanding SIP on macOS Sequoia
+3. Sign the driver (requires valid Apple Developer ID):
+```bash
+./sign.sh
+```
 
-**System Integrity Protection (SIP)** is a security feature that restricts what can modify system files, including kernel extensions.
+## Code Signing Requirements
 
-#### With SIP Enabled (Default & Recommended)
+To work with SIP enabled, the driver must be properly signed:
 
-✅ **This is the secure, recommended approach**
+1. **Developer ID**: You need an Apple Developer account
+2. **Certificates**: "Developer ID Application" certificate
+3. **Entitlements**: Proper DriverKit entitlements
+4. **Notarization**: Notarized by Apple
 
-To install kernel extensions with SIP enabled:
-1. Driver must be **code-signed** with a Developer ID certificate
-2. Driver must be **notarized** by Apple
-3. User must **explicitly approve** the extension in System Settings
+### Signing Configuration
 
-**For this driver:**
-- Without a Developer ID certificate, it will be **unsigned**
-- You'll need to approve it in **System Settings > Privacy & Security**
-- macOS may require multiple restarts
+The driver uses these entitlements:
+- `com.apple.developer.driverkit`
+- `com.apple.developer.driverkit.transport.usb`
+- `com.apple.developer.networking.networkextension`
 
-#### With SIP Disabled (Not Recommended)
+## Usage
 
-⚠️ **Only use this approach if absolutely necessary**
+Once installed, the driver will automatically detect and activate when an RTL8814AU device is connected.
 
-To temporarily disable SIP:
+### Check Driver Status
 
-1. **Restart in Recovery Mode:**
-   - **Intel Macs:** Hold `Cmd + R` during boot
-   - **Apple Silicon Macs:** Hold the power button, select Options
+```bash
+# List system extensions
+systemextensionsctl list
 
-2. **Open Terminal** from the Utilities menu
+# Check USB devices
+system_profiler SPUSBDataType
 
-3. **Disable SIP:**
-   ```bash
-   csrutil disable
-   ```
+# Monitor driver logs
+log stream --predicate 'subsystem == "com.yourcompany.RTL8814AUDriver"'
+```
 
-4. **Restart normally** and install the driver
+## Troubleshooting
 
-5. **Re-enable SIP (IMPORTANT):**
-   - Boot into Recovery Mode again
-   - Run: `csrutil enable`
-   - Restart
+### Driver Not Loading
 
-### Checking SIP Status
-
+1. Ensure SIP is enabled (required for DriverKit):
 ```bash
 csrutil status
 ```
 
-## 🔐 Code Signing (For Developers)
+2. Check for driver approval in System Settings → Privacy & Security
 
-### Why Code Signing Matters
-
-On macOS Sequoia with SIP enabled, unsigned kernel extensions are heavily restricted. Code signing with an Apple Developer ID:
-
-- ✅ Allows installation without disabling SIP
-- ✅ Provides cryptographic verification
-- ✅ Enables notarization by Apple
-- ✅ Gives users confidence in the driver's authenticity
-
-### Requirements for Signing
-
-1. **Apple Developer Program membership** ($99/year)
-2. **Developer ID Application certificate**
-3. **Xcode or command-line tools**
-
-### Signing the Driver
-
+3. Verify code signature:
 ```bash
-# Find your signing identity
-security find-identity -v -p codesigning
-
-# Sign the kernel extension
-codesign --force --deep --sign "Developer ID Application: YOUR NAME (TEAM_ID)" \
-         --entitlements driver.entitlements \
-         rtl8814au.kext
-
-# Verify the signature
-codesign --verify --verbose rtl8814au.kext
+codesign -vv -d /Library/SystemExtensions/.../RTL8814AUDriver.dext
 ```
 
-### Notarization
+### Connection Issues
 
-After signing, submit the driver to Apple for notarization:
+1. Check USB connection and power
+2. Verify firmware loaded successfully
+3. Check system logs for errors
 
-```bash
-# Create a ZIP of the signed kext
-ditto -c -k --keepParent rtl8814au.kext rtl8814au.zip
+## Development
 
-# Submit for notarization
-xcrun notarytool submit rtl8814au.zip \
-     --apple-id YOUR_APPLE_ID \
-     --team-id YOUR_TEAM_ID \
-     --password YOUR_APP_SPECIFIC_PASSWORD \
-     --wait
+### Project Structure
 
-# Staple the notarization ticket
-xcrun stapler staple rtl8814au.kext
+```
+RTL8814AUDriver/
+├── RTL8814AUDriver/          # DriverKit extension
+│   ├── RTL8814AUDriver.swift # Main driver class
+│   ├── USBInterface.swift    # USB communication
+│   ├── NetworkInterface.swift # Network layer
+│   └── Info.plist
+├── RTL8814AUHelper/          # Helper application
+│   └── HelperApp.swift
+├── Firmware/                  # RTL8814AU firmware
+├── Tests/                     # Unit and integration tests
+└── Scripts/                   # Build and signing scripts
 ```
 
-## 🔧 Manual Installation Steps
-
-If the automated scripts don't work, here's how to install manually:
-
-### 1. Install Dependencies
-
-```bash
-# Install Homebrew (if not already installed)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install build dependencies
-brew install git cmake pkg-config openssl@3
-
-# Verify Xcode Command Line Tools
-xcode-select --install
-```
-
-### 2. Clone and Build
-
-```bash
-# Clone the driver source
-git clone https://github.com/morrownr/8814au.git
-cd 8814au
-
-# Build the driver
-make clean
-make -j$(sysctl -n hw.ncpu)
-```
-
-### 3. Install the Kernel Extension
-
-```bash
-# Copy to system extensions directory
-sudo cp -R rtl8814au.kext /Library/Extensions/
-
-# Set proper permissions
-sudo chown -R root:wheel /Library/Extensions/rtl8814au.kext
-sudo chmod -R 755 /Library/Extensions/rtl8814au.kext
-
-# Update kernel extension cache
-sudo kmutil install --update-all
-```
-
-### 4. Restart and Approve
-
-1. **Restart your Mac**
-2. Go to **System Settings > Privacy & Security**
-3. **Allow** the rtl8814au kernel extension
-4. **Restart again** if prompted
-
-## ✅ Verification
-
-### Check if Driver is Loaded
-
-```bash
-# List loaded kernel extensions
-kextstat | grep rtl8814au
-
-# Expected output:
-# xxx  0  0xffffff7f8xxxx  0xxxxx  0xxxxx  com.realtek.rtl8814au (x.x.x)
-```
-
-### Verify USB Device
-
-```bash
-# Check if the adapter is recognized
-system_profiler SPUSBDataType | grep -A 10 Realtek
-
-# Check network interfaces
-ifconfig -a | grep -A 5 "en"
-```
-
-### Test Network Connection
-
-```bash
-# List available WiFi networks
-/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -s
-
-# Check connection status
-ifconfig en0  # or en1, en2, etc.
-```
-
-## 🐛 Troubleshooting
-
-### Driver Not Loading After Restart
-
-**Symptoms:**
-- `kextstat | grep rtl8814au` shows nothing
-- Adapter not visible in Network settings
-
-**Solutions:**
-
-1. **Check System Settings approval:**
-   ```
-   System Settings > Privacy & Security > Security
-   ```
-   Look for a message about blocked software and click Allow.
-
-2. **Check kernel messages:**
-   ```bash
-   log show --predicate 'process == "kernel"' --last 10m | grep -i rtl
-   ```
-
-3. **Manually load the extension:**
-   ```bash
-   sudo kextload /Library/Extensions/rtl8814au.kext
-   ```
-
-4. **Check permissions:**
-   ```bash
-   ls -la /Library/Extensions/rtl8814au.kext
-   # Should show: drwxr-xr-x  root  wheel
-   ```
-
-### Build Errors
-
-**Error: `make: command not found`**
-```bash
-xcode-select --install
-```
-
-**Error: `git: command not found`**
-```bash
-brew install git
-```
-
-**Error: Architecture mismatch**
-```bash
-# Clean and rebuild
-make clean
-make ARCH=$(uname -m)
-```
-
-### USB Device Not Recognized
-
-**Check if device is detected:**
-```bash
-system_profiler SPUSBDataType
-```
-
-**Try different USB port:**
-- Use USB 3.0 port (blue port)
-- Try direct connection (not through hub)
-- Use different cable
-
-**Reset USB controllers:**
-```bash
-sudo kextunload -b com.apple.driver.usb.AppleUSBXHCI
-sudo kextload -b com.apple.driver.usb.AppleUSBXHCI
-```
-
-### WiFi Networks Not Showing
-
-**Restart network services:**
-```bash
-sudo ifconfig en0 down
-sudo ifconfig en0 up
-```
-
-**Reset WiFi preferences:**
-```bash
-sudo rm -rf /Library/Preferences/SystemConfiguration/com.apple.airport.preferences.plist
-```
-
-### Kernel Panics or System Instability
-
-**Immediate action:**
-1. Boot into **Safe Mode** (hold Shift during boot)
-2. Uninstall the driver:
-   ```bash
-   sudo rm -rf /Library/Extensions/rtl8814au.kext
-   sudo kmutil install --update-all
-   ```
-3. Restart normally
-
-**Prevention:**
-- Ensure you're using the latest driver version
-- Check compatibility with your specific adapter model
-- Consider using a native macOS-compatible adapter instead
-
-## 🗑️ Uninstallation
-
-### Method 1: Using Uninstall Script
-
-If you used the automated installer:
-```bash
-sudo ~/uninstall-rtl8814au.sh
-```
-
-### Method 2: Using Homebrew
-
-If installed via Homebrew:
-```bash
-sudo rtl8814au-uninstall
-brew uninstall rtl8814au-driver
-```
-
-### Method 3: Manual Removal
-
-```bash
-# Unload the kernel extension
-sudo kextunload /Library/Extensions/rtl8814au.kext
-
-# Remove the driver
-sudo rm -rf /Library/Extensions/rtl8814au.kext
-
-# Update kernel cache
-sudo kmutil install --update-all
-
-# Restart your Mac
-sudo reboot
-```
-
-## 📚 Additional Resources
-
-### Driver Source Code
-- **Primary repository:** https://github.com/morrownr/8814au
-- **Alternative:** https://github.com/aircrack-ng/rtl8814au
-
-### Documentation
-- [Realtek RTL8814AU Datasheet](https://www.realtek.com/en/products/communications-network-ics/item/rtl8814au)
-- [macOS Kernel Extensions Guide](https://developer.apple.com/library/archive/documentation/Darwin/Conceptual/KernelProgramming/)
-- [System Integrity Protection](https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection)
-
-### Community Support
-- GitHub Issues (this repository)
-- [MacRumors Forums](https://forums.macrumors.com/)
-- [r/MacOS on Reddit](https://www.reddit.com/r/MacOS/)
-
-## 🤝 Contributing
+### Contributing
 
 Contributions are welcome! Please:
 
-1. **Fork the repository**
-2. **Create a feature branch:** `git checkout -b feature/improvement`
-3. **Test thoroughly on macOS Sequoia**
-4. **Submit a pull request** with detailed description
+1. Fork the repository
+2. Create a feature branch
+3. Follow Swift style guidelines
+4. Add tests for new features
+5. Submit a pull request
 
-### Areas for Contribution
-- [ ] Improved SIP compatibility
-- [ ] DriverKit port (modern alternative to kernel extensions)
-- [ ] Additional device support
-- [ ] Bug fixes and stability improvements
-- [ ] Documentation improvements
+## Legal & Licensing
 
-## 📄 License
-
-This project is based on the open-source RTL8814AU driver which is licensed under **GPL-2.0**.
-
-**License:** GNU General Public License v2.0
-
-See [LICENSE](LICENSE) file for details.
-
-## ⚠️ Legal & Safety Notices
+- **Driver Code**: MIT License
+- **Firmware**: Realtek proprietary (redistributable)
+- **Apple Frameworks**: Used under Apple SDK license
 
 ### Disclaimer
 
-This software is provided "as is", without warranty of any kind. The authors and contributors are not responsible for:
-- Hardware damage
-- Data loss
-- System instability
-- Security vulnerabilities
-- Violation of laws or regulations
+This driver is provided "as is" without warranty. Use at your own risk.
 
-### Security Considerations
+## Credits
 
-Installing third-party kernel extensions:
-- ⚠️ Grants extensive system access
-- ⚠️ Can compromise system security
-- ⚠️ May violate corporate IT policies
-- ⚠️ Could void warranty or support agreements
+- Based on Realtek RTL8814AU specifications
+- Inspired by Linux rtl8814au driver
+- Built with Apple DriverKit framework
 
-### Regulatory Compliance
+## Support
 
-- 📡 WiFi adapters must comply with local regulations (FCC, CE, etc.)
-- 🌍 Some frequencies may be restricted in your region
-- ⚖️ User is responsible for legal compliance
+- **Issues**: [GitHub Issues](https://github.com/yourusername/rtl8814au-macos/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/rtl8814au-macos/discussions)
+- **Documentation**: [Wiki](https://github.com/yourusername/rtl8814au-macos/wiki)
 
-### Alternatives to Consider
+## Roadmap
 
-Before installing this driver, consider:
+- [x] Basic USB communication
+- [x] Firmware loading
+- [x] Network interface creation
+- [ ] WPA2/WPA3 support
+- [ ] Advanced power management
+- [ ] Performance optimizations
+- [ ] GUI configuration tool
 
-1. **Native macOS-compatible adapters:**
-   - No driver installation required
-   - Full macOS integration
-   - Better stability and security
+## 📖 Complete Documentation
 
-2. **USB-Ethernet adapters:**
-   - Wired connection may be more reliable
-   - No driver issues
+This project includes comprehensive documentation:
 
-3. **Upgrade your Mac's built-in WiFi:**
-   - Check if WiFi module is user-replaceable
-   - Install Apple-compatible WiFi card
+- **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
+- **[BUILDING.md](BUILDING.md)** - Detailed build instructions  
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
+- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Complete project overview
 
-## 🎓 How This Works
+## 🚀 Quick Commands
 
-### Architecture Overview
+```bash
+# Setup and build
+./setup.sh              # Initial setup
+make build              # Build driver
+make sign               # Sign driver  
+sudo make install       # Install
 
-```
-┌─────────────────────────────────────────────────┐
-│         macOS Sequoia (User Space)              │
-│                                                  │
-│  ┌────────────────┐      ┌──────────────────┐  │
-│  │ Network Prefs  │◄────►│  WiFi Menubar    │  │
-│  └────────┬───────┘      └──────────────────┘  │
-│           │                                      │
-│           │ IOKit API                            │
-├───────────┼──────────────────────────────────────┤
-│  Kernel Space (Ring 0)                          │
-│           │                                      │
-│  ┌────────▼───────────┐                         │
-│  │  rtl8814au.kext    │  ◄── Our Driver        │
-│  │  (Kernel Extension)│                         │
-│  └────────┬───────────┘                         │
-│           │                                      │
-│           │ USB API                              │
-│  ┌────────▼───────────┐                         │
-│  │  USB Stack         │                         │
-│  └────────┬───────────┘                         │
-└───────────┼──────────────────────────────────────┘
-            │
-            │ USB Protocol
-┌───────────▼──────────────┐
-│  RTL8814AU USB Adapter   │  ◄── Hardware
-│  (Realtek Chipset)       │
-└──────────────────────────┘
+# Development
+make status             # Check status
+make logs               # Stream logs
+make verify             # Verify signature
+
+# Cleanup
+sudo make uninstall     # Remove driver
+make clean              # Clean build
 ```
 
-### Build Process
+## 🏆 Why This Driver?
 
-1. **Source Code:** C code for the RTL8814AU chipset
-2. **Compilation:** Uses macOS kernel APIs
-3. **Linking:** Creates `.kext` (kernel extension) bundle
-4. **Signing:** Optional code signature with Developer ID
-5. **Installation:** Copies to `/Library/Extensions/`
-6. **Loading:** macOS kernel loads the extension
-7. **Approval:** User approves in System Settings (SIP enabled)
+- **Modern**: Uses latest DriverKit APIs, not deprecated kexts
+- **Secure**: Works with SIP enabled, properly signed and notarized
+- **Maintained**: Active development and community support
+- **Documented**: Comprehensive guides for users and developers
+- **Open**: Fully open-source, transparent, and auditable
 
-## 📧 Support
+## ⚡ Quick Install
 
-For help with this project:
+**For end users:**
+```bash
+brew tap yourusername/rtl8814au
+brew install --cask rtl8814au-driver
+```
 
-1. **Check the Troubleshooting section** above
-2. **Search existing GitHub Issues**
-3. **Open a new issue** with:
-   - macOS version (`sw_vers`)
-   - SIP status (`csrutil status`)
-   - USB device info (`system_profiler SPUSBDataType`)
-   - Relevant logs
-   - Steps to reproduce
+**For developers:**
+```bash
+git clone https://github.com/yourusername/rtl8814au-macos.git
+cd rtl8814au-macos
+./setup.sh && make install
+```
+
+See **[QUICKSTART.md](QUICKSTART.md)** for detailed instructions.
 
 ---
 
-**Last Updated:** December 27, 2025
-**Compatible with:** macOS Sequoia 15.0+
-**Project Status:** Active Development
+**Made with ❤️ by the open-source community**
 
-**Happy WiFi-ing! 📶**
+Last updated: December 27, 2025
