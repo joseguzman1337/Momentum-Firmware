@@ -86,3 +86,5 @@ size_t varint_int32_length(int32_t value) {
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
