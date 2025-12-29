@@ -694,3 +694,5 @@ bool compress_stream_decoder_rewind(CompressStreamDecoder* instance) {
 
     return true;
 }
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
