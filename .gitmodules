@@ -1,10 +1,12 @@
 [submodule "applications/external"]
 	path = applications/external
 	url = https://github.com/Next-Flip/Momentum-Apps.git
+	branch = dev
 [submodule "assets/protobuf"]
 	path = assets/protobuf
 	url = https://github.com/Next-Flip/flipperzero-protobuf.git
 	shallow = false
+	branch = dev
 [submodule "lib/mlib"]
 	path = lib/mlib
 	url = https://github.com/P-p-H-d/mlib.git
