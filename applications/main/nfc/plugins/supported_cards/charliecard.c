@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 #include <furi.h>
 /*
  * Parser for MBTA CharlieCard (Boston, MA, USA).
