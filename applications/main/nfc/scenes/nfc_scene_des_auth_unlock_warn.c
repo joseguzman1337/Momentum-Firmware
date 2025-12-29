@@ -1,3 +1,4 @@
+#include <furi.h>
 #include "../nfc_app_i.h"
 
 void nfc_scene_des_auth_unlock_warn_dialog_callback(DialogExResult result, void* context) {
