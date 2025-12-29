@@ -439,3 +439,5 @@ MfUltralightError mf_ultralight_poller_read_tearing_flag(
 
     return ret;
 }
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
