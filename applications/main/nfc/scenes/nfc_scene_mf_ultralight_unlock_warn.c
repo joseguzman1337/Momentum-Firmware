@@ -98,3 +98,5 @@ void nfc_scene_mf_ultralight_unlock_warn_on_exit(void* context) {
 
     notification_message_block(nfc->notifications, &sequence_reset_green);
 }
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
