@@ -83,7 +83,7 @@ class LogMonitor:
         cmd = [
             "log", "stream", 
             "--predicate", 
-            'senderImagePath contains "realtek" OR eventMessage contains "realtek2" OR process == "kernel" OR process == "sysextd"', 
+            'senderImagePath contains "realtek" OR eventMessage contains "realtek" OR process == "kernel" OR process == "sysextd"', 
             "--style", "syslog",
             "--timeout", "60" # Auto-stop after 60s to prevent hanging
         ]
