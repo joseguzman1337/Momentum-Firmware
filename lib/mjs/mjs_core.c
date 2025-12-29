@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 #include <furi.h>
 /*
  * Copyright (c) 2017 Cesanta Software Limited
