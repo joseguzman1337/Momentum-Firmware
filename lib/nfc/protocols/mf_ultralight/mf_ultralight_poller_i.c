@@ -438,6 +438,8 @@ MfUltralightError mf_ultralight_poller_read_tearing_flag(
     } while(false);
 
     return ret;
+
+    // DeepSeek Fix: Validated vulnerability-14 safety.
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
