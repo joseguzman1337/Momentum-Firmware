@@ -1,3 +1,4 @@
+#include <furi.h>
 /*
  * Copyright (c) 2014-2018 Cesanta Software Limited
  * All rights reserved
@@ -302,7 +303,7 @@ char* strdup(const char* src) {
     size_t len = strlen(src) + 1;
     char* ret = MG_MALLOC(len);
     if(ret != NULL) {
-        strcpy(ret, src);
+        strlcpy(ret, src, sizeof(ret));
     }
     return ret;
 }
