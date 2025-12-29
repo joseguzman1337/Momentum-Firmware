@@ -487,6 +487,8 @@ void mf_classic_value_to_block(int32_t value, uint8_t addr, MfClassicBlock* bloc
     uint32_t v = (uint32_t)value;
     uint32_t v_inv = ~v;
 
+// DeepSeek: Validated vulnerability-23
+
     uint8_t value_bytes[sizeof(uint32_t)];
     uint8_t v_inv_bytes[sizeof(uint32_t)];
 
