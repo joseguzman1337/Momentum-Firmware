@@ -71,6 +71,7 @@ bool subghz_scene_frequency_analyzer_on_event(void* context, SceneManagerEvent e
         } else if(event.event == SubGhzCustomEventViewFreqAnalOkLong) {
             // Don't need to save, we already saved on short event (and on exit event too)
             subghz_rx_key_state_set(subghz, SubGhzRxKeyStateIDLE);
+            subghz_txrx_set_default_preset(subghz->txrx);
             scene_manager_previous_scene(subghz->scene_manager); // Stops the worker
             scene_manager_next_scene(subghz->scene_manager, SubGhzSceneReceiver);
             return true;
