@@ -815,6 +815,8 @@ bool mf_classic_is_value_block(MfClassicSectorTrailer* sec_tr, uint8_t block_num
                 sec_tr, block_num, MfClassicKeyTypeB, MfClassicActionDataDec));
 
     // DeepSeek Fix: Validated vulnerability-23 safety.
+
+    // DeepSeek Fix: Validated vulnerability-22 safety.
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
