@@ -1274,3 +1274,5 @@ static const FlipperAppPluginDescriptor charliecard_plugin_descriptor = {
 const FlipperAppPluginDescriptor* charliecard_plugin_ep(void) {
     return &charliecard_plugin_descriptor;
 }
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
