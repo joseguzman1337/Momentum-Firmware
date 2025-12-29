@@ -1,3 +1,4 @@
+#include <furi.h>
 #include "ble_beacon_app.h"
 
 #include <extra_beacon.h>
