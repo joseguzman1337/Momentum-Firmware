@@ -1615,6 +1615,7 @@ Function,+,furi_hal_power_enable_external_3_3v,void,
 Function,+,furi_hal_power_enable_otg,_Bool,
 Function,+,furi_hal_power_gauge_is_ok,_Bool,
 Function,+,furi_hal_power_get_bat_health_pct,uint8_t,
+Function,+,furi_hal_power_get_battery_charge_current_limit,uint16_t,
 Function,+,furi_hal_power_get_battery_charge_voltage_limit,float,
 Function,+,furi_hal_power_get_battery_current,float,FuriHalPowerIC
 Function,+,furi_hal_power_get_battery_design_capacity,uint32_t,
@@ -1635,6 +1636,7 @@ Function,+,furi_hal_power_is_otg_enabled,_Bool,
 Function,+,furi_hal_power_is_shutdown_requested,_Bool,
 Function,+,furi_hal_power_off,void,
 Function,+,furi_hal_power_reset,void,
+Function,+,furi_hal_power_set_battery_charge_current_limit,void,uint16_t
 Function,+,furi_hal_power_set_battery_charge_voltage_limit,void,float
 Function,+,furi_hal_power_shutdown,void,
 Function,+,furi_hal_power_sleep,void,
@@ -1765,6 +1767,9 @@ Function,+,furi_hal_speaker_release,void,
 Function,+,furi_hal_speaker_set_volume,void,float
 Function,+,furi_hal_speaker_start,void,"float, float"
 Function,+,furi_hal_speaker_stop,void,
+Function,+,furi_hal_speaker_set_output,void,FuriHalSpeakerOutput
+Function,+,furi_hal_speaker_get_output,FuriHalSpeakerOutput,
+Function,+,furi_hal_speaker_get_pin,const GpioPin*,
 Function,+,furi_hal_spi_acquire,void,const FuriHalSpiBusHandle*
 Function,+,furi_hal_spi_bus_deinit,void,FuriHalSpiBus*
 Function,+,furi_hal_spi_bus_handle_deinit,void,const FuriHalSpiBusHandle*
@@ -3505,7 +3510,7 @@ Function,+,storage_get_pubsub,FuriPubSub*,Storage*
 Function,+,storage_int_backup,FS_Error,"Storage*, const char*"
 Function,+,storage_int_restore,FS_Error,"Storage*, const char*, StorageNameConverter"
 Function,+,storage_list_dir,_Bool,"Storage*, const char*, FuriString***, size_t*, _Bool, const char**, size_t"
-Function,+,storage_sd_format,FS_Error,Storage*
+Function,?,storage_sd_format,FS_Error,"Storage*, SDFormatType"
 Function,+,storage_sd_info,FS_Error,"Storage*, SDInfo*"
 Function,+,storage_sd_mount,FS_Error,Storage*
 Function,+,storage_sd_status,FS_Error,Storage*
