@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 #include "elements.h"
 #include <m-core.h>
 #include <assets_icons.h>
