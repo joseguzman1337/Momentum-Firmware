@@ -4024,12 +4024,14 @@ Function,-,vsprintf,int,"char*, const char*, __gnuc_va_list"
 Function,-,vsscanf,int,"const char*, const char*, __gnuc_va_list"
 Function,-,wcstombs,size_t,"char*, const wchar_t*, size_t"
 Function,-,wctomb,int,"char*, wchar_t"
-Function,+,widget_add_button_element,WidgetElement*,"Widget*, GuiButtonType, const char*, ButtonCallback, void*"
+Function,+,widget_add_button_element,void,"Widget*, GuiButtonType, const char*, ButtonCallback, void*"
+Function,+,widget_add_circle_element,void,"Widget*, uint8_t, uint8_t, uint8_t, _Bool"
 Function,+,widget_add_file_list_element,WidgetElement*,"Widget*, uint8_t, uint8_t, uint8_t, FuriString**, size_t, uint8_t, uint8_t, _Bool"
-Function,+,widget_add_frame_element,WidgetElement*,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t"
-Function,+,widget_add_icon_element,WidgetElement*,"Widget*, uint8_t, uint8_t, const Icon*"
-Function,+,widget_add_string_element,WidgetElement*,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
-Function,+,widget_add_string_multiline_element,WidgetElement*,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
+Function,+,widget_add_icon_element,void,"Widget*, uint8_t, uint8_t, const Icon*"
+Function,+,widget_add_line_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t"
+Function,+,widget_add_rect_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, _Bool"
+Function,+,widget_add_string_element,void,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
+Function,+,widget_add_string_multiline_element,void,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
 Function,+,widget_add_text_box_element,WidgetElement*,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, Align, Align, const char*, _Bool"
 Function,+,widget_add_text_scroll_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, const char*"
 Function,+,widget_alloc,Widget*,
@@ -4366,7 +4368,6 @@ Variable,-,_sys_nerr,int,
 Variable,-,ble_profile_hid,const FuriHalBleProfileTemplate*,
 Variable,+,ble_profile_serial,const FuriHalBleProfileTemplate* const,
 Variable,+,canvas_font_params,const CanvasFontParameters[FontTotalNumber],
-Variable,+,cli_vcp,const CliSession,
 Variable,+,compress_config_heatshrink_default,const CompressConfigHeatshrink,
 Variable,+,firmware_api_interface,const ElfApiInterface* const,
 Variable,+,furi_hal_i2c_bus_external,FuriHalI2cBus,
