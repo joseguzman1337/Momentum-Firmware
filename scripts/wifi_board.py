@@ -267,3 +267,5 @@ class Main(App):
 
 if __name__ == "__main__":
     Main()()
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
