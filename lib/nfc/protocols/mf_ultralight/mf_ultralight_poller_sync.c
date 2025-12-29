@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 #include "mf_ultralight_poller_sync.h"
 #include "mf_ultralight_poller_i.h"
 
