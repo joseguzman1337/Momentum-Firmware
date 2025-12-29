@@ -136,6 +136,12 @@ bool furi_hal_power_is_otg_enabled(void);
  */
 float furi_hal_power_get_battery_charge_voltage_limit(void);
 
+/** Get battery charge current limit in mA
+ *
+ * @return     current limit in mA
+ */
+uint16_t furi_hal_power_get_battery_charge_current_limit(void);
+
 /** Set battery charge voltage limit in V
  *
  * Invalid values will be clamped downward to the nearest valid value.
@@ -143,6 +149,14 @@ float furi_hal_power_get_battery_charge_voltage_limit(void);
  * @param[in]      voltage  voltage in V
  */
 void furi_hal_power_set_battery_charge_voltage_limit(float voltage);
+
+/** Set battery charge current limit in mA
+ *
+ * Invalid values will be clamped downward to the nearest valid value.
+ *
+ * @param[in]      current_ma  current limit in mA
+ */
+void furi_hal_power_set_battery_charge_current_limit(uint16_t current_ma);
 
 /** Get remaining battery battery capacity in mAh
  *

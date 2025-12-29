@@ -481,6 +481,12 @@ static void power_settings_apply(Power* power) {
     } else if(power_is_running_auto_poweroff_timer(power)) {
         power_auto_poweroff_disarm(power);
     }
+
+    uint16_t charge_current_limit = power->settings.charge_current_limit_ma;
+    if(charge_current_limit == 0) {
+        charge_current_limit = POWER_SETTINGS_CHARGE_CURRENT_LIMIT_DEFAULT_MA;
+    }
+    furi_hal_power_set_battery_charge_current_limit(charge_current_limit);
 }
 
 // do something depend from power queue message

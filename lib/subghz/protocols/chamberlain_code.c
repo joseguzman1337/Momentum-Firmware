@@ -219,8 +219,7 @@ SubGhzProtocolStatus
         if(ret != SubGhzProtocolStatusOk) {
             break;
         }
-        if(instance->generic.data_count_bit >
-           subghz_protocol_chamb_code_const.min_count_bit_for_found) {
+        if(!subghz_protocol_chamb_code_normalize_data(&instance->generic)) {
             FURI_LOG_E(TAG, "Wrong number of bits in key");
             ret = SubGhzProtocolStatusErrorValueBitCount;
             break;
@@ -297,6 +296,46 @@ static bool subghz_protocol_chamb_code_to_bit(uint64_t* data, uint8_t size) {
         data_tmp >>= 4;
     }
     data[0] = data_res;
+    return true;
+}
+
+static bool subghz_protocol_chamb_code_normalize_data(SubGhzBlockGeneric* generic) {
+    furi_assert(generic);
+
+    if(generic->data_count_bit == 7 || generic->data_count_bit == 8 ||
+       generic->data_count_bit == 9) {
+        return true;
+    }
+
+    if(generic->data_count_bit != 10 && generic->data_count_bit != 11) {
+        return false;
+    }
+
+    uint64_t data = generic->data;
+    uint8_t count = (uint8_t)generic->data_count_bit;
+
+    if((data & CHAMBERLAIN_7_CODE_MASK) == CHAMBERLAIN_7_CODE_MASK_CHECK) {
+        count = 7;
+        data &= ~CHAMBERLAIN_7_CODE_MASK;
+        data = (data >> 12) | ((data >> 4) & 0xF);
+    } else if((data & CHAMBERLAIN_8_CODE_MASK) == CHAMBERLAIN_8_CODE_MASK_CHECK) {
+        count = 8;
+        data &= ~CHAMBERLAIN_8_CODE_MASK;
+        data = (data >> 4) | ((uint64_t)CHAMBERLAIN_CODE_BIT_0 << 8);
+    } else if((data & CHAMBERLAIN_9_CODE_MASK) == CHAMBERLAIN_9_CODE_MASK_CHECK) {
+        count = 9;
+        data &= ~CHAMBERLAIN_9_CODE_MASK;
+        data >>= 4;
+    } else {
+        return false;
+    }
+
+    if(!subghz_protocol_chamb_code_to_bit(&data, count)) {
+        return false;
+    }
+
+    generic->data = data;
+    generic->data_count_bit = count;
     return true;
 }
 
@@ -450,8 +489,7 @@ SubGhzProtocolStatus
         if(ret != SubGhzProtocolStatusOk) {
             break;
         }
-        if(instance->generic.data_count_bit >
-           subghz_protocol_chamb_code_const.min_count_bit_for_found) {
+        if(!subghz_protocol_chamb_code_normalize_data(&instance->generic)) {
             FURI_LOG_E(TAG, "Wrong number of bits in key");
             ret = SubGhzProtocolStatusErrorValueBitCount;
             break;

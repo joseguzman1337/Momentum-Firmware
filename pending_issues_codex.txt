@@ -1,0 +1,39 @@
+Issue #56: Storage: Choose filesystem when formatting SD
+Issue #55: Power: Add charging current limit setting
+Issue #54: Archive: Allow selecting multiple files
+Issue #53: Unable to use my Chamberlain garage door with recent FW versions
+Issue #52: Esp32 wifi Marauder crash
+Issue #51: Feature Request: Extra settings for external speaker
+Issue #50: JS : BADUSB Bluetooth configuration function for js
+Issue #49: Charge cap not working.
+Issue #48: Are you able to keybind to a specific folder? (say NFC cards folder)
+Issue #47: NULL pointer dereference
+Issue #46: Adding custom fonts guide in wiki
+Issue #45: Change BLE Remote Name
+Issue #44: NFC emulate ISO15693-3 Flipper crash and reboot
+Issue #43: Is there a possibility to run cron job on FZ0?
+Issue #42: iButton, RFID, NFC in JS
+Issue #41: NFC: magic tag write/wipe crash
+Issue #40: Mifare Plus X 2k SL 1 can be read as Mifare Classic 2k
+Issue #39: GuiSrv crash while decompressing bitmap icon
+Issue #38: Show more details about signals
+Issue #37: add support for the IKEA smart lock "ROTHULT"
+Issue #36: USB serial spoofing switch
+Issue #35: Coupling spamming BLE option with keyboard attack
+Issue #34: Add Blackmagic camera controls to the HID Bluetooth Remote APP (Commands included in request)
+Issue #33: Question about disk image
+Issue #32: BadUSB JavaScript execution over Bluetooth HID
+Issue #31: Xiaomi Air filter reset
+Issue #30: New usbdisk js module function: identity spoofing like Mass Storage app
+Issue #29: Duress PIN (panic/erase) to wipe device + SD
+Issue #28: Bad KB Bluetooth Device type spoofing
+Issue #27: bit_lib Library Extension
+Issue #26: dev version: space plaground
+Issue #25: SDcard issues and crashing
+Issue #24: subghz add Beninca HEADY
+Issue #23: Combine favorite directories.
+Issue #22: Problems during normal usage and even when idle
+Issue #21: nfc mifare write to original card crash
+Issue #20: Possibly broken ISO14443-4A?
+Issue #19: Add DS2431 support to 1-wire
+Issue #7: Dependency Dashboard

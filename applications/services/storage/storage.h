@@ -516,9 +516,10 @@ const char* storage_file_get_error_desc(File* file);
  * @brief Format the SD Card.
  *
  * @param storage pointer to a storage API instance.
+ * @param format_type filesystem type to use for formatting.
  * @return FSE_OK if the card was successfully formatted, any other error code on failure.
  */
-FS_Error storage_sd_format(Storage* storage);
+FS_Error storage_sd_format(Storage* storage, SDFormatType format_type);
 
 /**
  * @brief Unmount the SD card.

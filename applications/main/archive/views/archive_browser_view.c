@@ -181,9 +181,10 @@ static void render_item_menu(Canvas* canvas, ArchiveBrowserViewModel* model) {
                     "Info",
                     ArchiveBrowserEventFileMenuInfo);
                 if(!favorites) {
+                    const char* select_label = selected->selected ? "Deselect" : "Select";
                     archive_menu_add_item(
                         menu_array_push_raw(model->context_menu),
-                        model->select_mode ? "Deselect" : "Select",
+                        select_label,
                         ArchiveBrowserEventFileMenuSelectMode);
                 }
                 if(selected->type != ArchiveFileTypeFolder) {
@@ -749,6 +750,10 @@ ArchiveBrowserView* browser_alloc(void) {
             files_array_init(model->files);
             menu_array_init(model->context_menu);
             model->tab_idx = TAB_DEFAULT;
+            model->select_mode = false;
+            model->selected_files = NULL;
+            model->selected_count = 0;
+            model->selected_capacity = 0;
         },
         true);
 

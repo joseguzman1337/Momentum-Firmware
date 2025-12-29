@@ -258,6 +258,14 @@ static NfcCommand mf_ultralight_poller_read_callback(NfcGenericEvent event, void
             mfu_event->data->auth_context.skip_auth = true;
             if(mfu_poller->data->type == MfUltralightTypeMfulC) {
                 mfu_event->data->auth_context.skip_auth = false;
+                // SECURITY NOTE: MIFARE Ultralight C cards use 3DES authentication as specified
+                // by NXP hardware (MF0ICU2). This is a hardware-mandated protocol requirement,
+                // not a design choice. The use of 3DES here is necessary for interoperability
+                // with existing MIFARE Ultralight C infrastructure. Users should be aware that
+                // 3DES is deprecated and consider using cards with stronger authentication
+                // mechanisms (e.g., NTAG series with AES) for new deployments.
+                // Reference: NXP MF0ICU2 datasheet and ISO/IEC 14443-A specification
+                // codeql[cpp/weak-cryptographic-algorithm]: Required for MIFARE Ultralight C hardware compatibility
                 memset(
                     mfu_poller->auth_context.tdes_key.data,
                     0x00,

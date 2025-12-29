@@ -1,6 +1,7 @@
 #pragma once
 #include <furi.h>
 #include <toolbox/api_lock.h>
+#include "storage_sd_api.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,6 +109,10 @@ typedef struct {
     File* image;
 } SAVirtualInit;
 
+typedef struct {
+    SDFormatType format_type;
+} SASDFormat;
+
 typedef union {
     SADataFOpen fopen;
     SADataFRead fread;
@@ -130,6 +135,7 @@ typedef union {
     SADataPath path;
     SADataRename rename;
 
+    SASDFormat sdformat;
     SAInfo sdinfo;
 
     SAVirtualInit virtualinit;

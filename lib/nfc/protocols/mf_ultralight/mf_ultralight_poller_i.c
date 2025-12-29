@@ -113,6 +113,13 @@ MfUltralightError mf_ultralight_poller_authentication_test(MfUltralightPoller* i
         instance, auth_cmd, sizeof(auth_cmd), true, dummy);
 }
 
+// SECURITY NOTE: This function uses 3DES encryption as required by the Mifare Ultralight C
+// hardware specification (NXP AN10855). 3DES is a legacy algorithm mandated by the physical
+// NFC tag chip and cannot be replaced with modern algorithms like AES without breaking
+// hardware compatibility. This is protocol compliance code, not a security vulnerability.
+// Code scanning tools may flag this as a weakness, but it's a false positive in this context.
+//
+// SUPPRESS: CodeQL [cpp/weak-cryptographic-algorithm] - Required by hardware protocol
 MfUltralightError mf_ultralight_poller_authenticate_start(
     MfUltralightPoller* instance,
     const uint8_t* RndA,
@@ -132,6 +139,7 @@ MfUltralightError mf_ultralight_poller_authenticate_start(
 
         uint8_t iv[MF_ULTRALIGHT_C_AUTH_IV_BLOCK_SIZE] = {0};
         uint8_t* RndB = output + MF_ULTRALIGHT_C_AUTH_RND_B_BLOCK_OFFSET;
+        // 3DES decrypt as required by Mifare Ultralight C protocol
         mf_ultralight_3des_decrypt(
             &instance->des_context,
             instance->auth_context.tdes_key.data,
@@ -143,6 +151,7 @@ MfUltralightError mf_ultralight_poller_authenticate_start(
 
         memcpy(output, RndA, MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE);
 
+        // 3DES encrypt as required by Mifare Ultralight C protocol
         mf_ultralight_3des_encrypt(
             &instance->des_context,
             instance->auth_context.tdes_key.data,
@@ -156,6 +165,7 @@ MfUltralightError mf_ultralight_poller_authenticate_start(
     return ret;
 }
 
+// SUPPRESS: CodeQL [cpp/weak-cryptographic-algorithm] - Required by hardware protocol
 MfUltralightError mf_ultralight_poller_authenticate_end(
     MfUltralightPoller* instance,
     const uint8_t* RndB,
@@ -177,6 +187,7 @@ MfUltralightError mf_ultralight_poller_authenticate_end(
 
         if(ret != MfUltralightErrorNone) break;
 
+        // 3DES decrypt as required by Mifare Ultralight C protocol
         mf_ultralight_3des_decrypt(
             &instance->des_context,
             instance->auth_context.tdes_key.data,
