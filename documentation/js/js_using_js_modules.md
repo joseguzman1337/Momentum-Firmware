@@ -4,7 +4,7 @@ In the previous guides, we learned how to write a basic JavaScript app using [bu
 
 For example:
 * The `serial` module enables transmitting and receiving data via a serial interface
-* The `badusb` module enables USB keyboard emulation and sending key press events via USB
+* The `badusb` module enables USB/BLE keyboard emulation and sending key press events
 * The `math` module provides mathematical functions
 
 JS modules are written in C/C++, making them fast and efficient. They come with Flipper Zero firmware and are stored on the microSD card in compiled form as **FAL (Flipper Application File)** files.
