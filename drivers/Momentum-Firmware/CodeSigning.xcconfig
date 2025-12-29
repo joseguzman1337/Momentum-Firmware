@@ -1,0 +1,20 @@
+// Replace YOUR_TEAM_ID with your Apple Developer Team ID
+// You can find this in your Apple Developer Account
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
+
+// Code signing identity
+CODE_SIGN_IDENTITY = Apple Development
+CODE_SIGN_STYLE = Automatic
+
+// For development
+// CODE_SIGN_IDENTITY = Apple Development
+
+// For distribution (uncomment these for release builds)
+// CODE_SIGN_IDENTITY = Developer ID Application
+// PROVISIONING_PROFILE_SPECIFIER = 
+
+// Enable hardened runtime
+ENABLE_HARDENED_RUNTIME = YES
+
+// Allow debugging
+OTHER_CODE_SIGN_FLAGS = --timestamp --options=runtime
