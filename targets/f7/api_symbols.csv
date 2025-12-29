@@ -1615,7 +1615,6 @@ Function,+,furi_hal_power_enable_external_3_3v,void,
 Function,+,furi_hal_power_enable_otg,_Bool,
 Function,+,furi_hal_power_gauge_is_ok,_Bool,
 Function,+,furi_hal_power_get_bat_health_pct,uint8_t,
-Function,+,furi_hal_power_get_battery_charge_current_limit,uint16_t,
 Function,+,furi_hal_power_get_battery_charge_voltage_limit,float,
 Function,+,furi_hal_power_get_battery_current,float,FuriHalPowerIC
 Function,+,furi_hal_power_get_battery_design_capacity,uint32_t,
@@ -1636,7 +1635,6 @@ Function,+,furi_hal_power_is_otg_enabled,_Bool,
 Function,+,furi_hal_power_is_shutdown_requested,_Bool,
 Function,+,furi_hal_power_off,void,
 Function,+,furi_hal_power_reset,void,
-Function,+,furi_hal_power_set_battery_charge_current_limit,void,uint16_t
 Function,+,furi_hal_power_set_battery_charge_voltage_limit,void,float
 Function,+,furi_hal_power_shutdown,void,
 Function,+,furi_hal_power_sleep,void,
@@ -1767,9 +1765,6 @@ Function,+,furi_hal_speaker_release,void,
 Function,+,furi_hal_speaker_set_volume,void,float
 Function,+,furi_hal_speaker_start,void,"float, float"
 Function,+,furi_hal_speaker_stop,void,
-Function,+,furi_hal_speaker_set_output,void,FuriHalSpeakerOutput
-Function,+,furi_hal_speaker_get_output,FuriHalSpeakerOutput,
-Function,+,furi_hal_speaker_get_pin,const GpioPin*,
 Function,+,furi_hal_spi_acquire,void,const FuriHalSpiBusHandle*
 Function,+,furi_hal_spi_bus_deinit,void,FuriHalSpiBus*
 Function,+,furi_hal_spi_bus_handle_deinit,void,const FuriHalSpiBusHandle*
@@ -3510,7 +3505,7 @@ Function,+,storage_get_pubsub,FuriPubSub*,Storage*
 Function,+,storage_int_backup,FS_Error,"Storage*, const char*"
 Function,+,storage_int_restore,FS_Error,"Storage*, const char*, StorageNameConverter"
 Function,+,storage_list_dir,_Bool,"Storage*, const char*, FuriString***, size_t*, _Bool, const char**, size_t"
-Function,?,storage_sd_format,FS_Error,"Storage*, SDFormatType"
+Function,+,storage_sd_format,FS_Error,Storage*
 Function,+,storage_sd_info,FS_Error,"Storage*, SDInfo*"
 Function,+,storage_sd_mount,FS_Error,Storage*
 Function,+,storage_sd_status,FS_Error,Storage*
@@ -4029,14 +4024,14 @@ Function,-,vsprintf,int,"char*, const char*, __gnuc_va_list"
 Function,-,vsscanf,int,"const char*, const char*, __gnuc_va_list"
 Function,-,wcstombs,size_t,"char*, const wchar_t*, size_t"
 Function,-,wctomb,int,"char*, wchar_t"
-Function,?,widget_add_button_element,void,"Widget*, GuiButtonType, const char*, ButtonCallback, void*"
-Function,?,widget_add_circle_element,void,"Widget*, uint8_t, uint8_t, uint8_t, _Bool"
+Function,+,widget_add_button_element,void,"Widget*, GuiButtonType, const char*, ButtonCallback, void*"
+Function,+,widget_add_circle_element,void,"Widget*, uint8_t, uint8_t, uint8_t, _Bool"
 Function,+,widget_add_file_list_element,WidgetElement*,"Widget*, uint8_t, uint8_t, uint8_t, FuriString**, size_t, uint8_t, uint8_t, _Bool"
-Function,?,widget_add_icon_element,void,"Widget*, uint8_t, uint8_t, const Icon*"
-Function,?,widget_add_line_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t"
-Function,?,widget_add_rect_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, _Bool"
-Function,?,widget_add_string_element,void,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
-Function,?,widget_add_string_multiline_element,void,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
+Function,+,widget_add_icon_element,void,"Widget*, uint8_t, uint8_t, const Icon*"
+Function,+,widget_add_line_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t"
+Function,+,widget_add_rect_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, _Bool"
+Function,+,widget_add_string_element,void,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
+Function,+,widget_add_string_multiline_element,void,"Widget*, uint8_t, uint8_t, Align, Align, Font, const char*"
 Function,+,widget_add_text_box_element,WidgetElement*,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, Align, Align, const char*, _Bool"
 Function,+,widget_add_text_scroll_element,void,"Widget*, uint8_t, uint8_t, uint8_t, uint8_t, const char*"
 Function,+,widget_alloc,Widget*,
