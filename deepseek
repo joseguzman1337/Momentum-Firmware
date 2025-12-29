@@ -1,30 +1,5 @@
-#!/usr/bin/env python3
-import sys
-import time
-import subprocess
-import json
-
-def mock_deepseek_fix(vulnerability_desc):
-    """Mock DeepSeek CLI that actually processes vulnerabilities"""
-    print(f"🔧 DeepSeek processing: {vulnerability_desc}")
-    
-    # Simulate processing time
-    time.sleep(2)
-    
-    # Create a mock PR
-    pr_title = f"Fix {vulnerability_desc}"
-    cmd = f'gh pr create --title "{pr_title}" --body "Auto-fix by DeepSeek CLI" --head main --base main || echo "PR creation simulated"'
-    
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    
-    print(f"✅ DeepSeek completed: {vulnerability_desc}")
-    print(f"📝 PR result: {result.stdout.strip() or 'Simulated'}")
-    
-    return True
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        vulnerability = " ".join(sys.argv[1:])
-        mock_deepseek_fix(vulnerability)
-    else:
-        print("Usage: deepseek 'vulnerability description'")
+#!/bin/bash
+# DeepSeek CLI Wrapper
+# Ensures the correct Python environment and script are used
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+python3 .ai/deepseek/optimization_agent.py "$@"
