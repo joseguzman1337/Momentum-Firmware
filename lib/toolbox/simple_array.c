@@ -11,6 +11,8 @@ struct SimpleArray {
 SimpleArray* simple_array_alloc(const SimpleArrayConfig* config) {
     SimpleArray* instance = malloc(sizeof(SimpleArray));
     instance->config = config;
+    instance->data = NULL;
+    instance->count = 0;
     return instance;
 }
 

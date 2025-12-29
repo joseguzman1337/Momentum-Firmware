@@ -161,7 +161,11 @@ MfDesfireError mf_desfire_poller_read_key_versions(
     SimpleArray* data,
     uint32_t count) {
     furi_check(instance);
-    furi_check(count > 0);
+    furi_check(data);
+    if(count == 0) {
+        simple_array_reset(data);
+        return MfDesfireErrorNone;
+    }
 
     simple_array_init(data, count);
 
