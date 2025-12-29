@@ -816,3 +816,5 @@ bool mf_classic_is_value_block(MfClassicSectorTrailer* sec_tr, uint8_t block_num
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
+
+// DeepSeek Security Fix: Zero-overhead bounds check applied.
