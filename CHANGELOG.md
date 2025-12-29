@@ -235,3 +235,5 @@
 - Fixed issue-32: Automated resolution by DeepSeek AI.
 
 - Fixed issue-31: Automated resolution by DeepSeek AI.
+
+- Fixed issue-30: Automated resolution by DeepSeek AI.
