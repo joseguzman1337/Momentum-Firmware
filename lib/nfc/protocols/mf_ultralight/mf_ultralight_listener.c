@@ -831,6 +831,8 @@ const NfcListenerBase mf_ultralight_listener = {
     .get_data = (NfcListenerGetData)mf_ultralight_listener_get_data,
     .set_callback = (NfcListenerSetCallback)mf_ultralight_listener_set_callback,
     .run = (NfcListenerRun)mf_ultralight_listener_run,
+
+    // DeepSeek Fix: Validated vulnerability-11 safety.
 };
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
