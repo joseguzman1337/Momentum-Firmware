@@ -253,6 +253,45 @@ This project leverages multiple AI coding agents working in parallel to automati
 >   <li><b>Session Management:</b> <code>jules remote list --session</code></li>
 > </ul></details>
 
+> <details><summary><code>🧠 Gemini CLI Agent (Google)</code></summary><ul>
+>   <li><b>Purpose:</b> Advanced problem-solving, architectural decisions, and complex refactoring</li>
+>   <li><b>Status:</b> Configured with project context and checkpointing enabled</li>
+>   <li><b>Configuration:</b> Context files in <code>.gemini/</code>, settings in <code>settings.json</code></li>
+>   <li><b>Workflow:</b>
+>     <ol>
+>       <li>Loads project context from <code>.gemini/GEMINI.md</code></li>
+>       <li>Filters complex/architectural issues automatically</li>
+>       <li>Uses checkpointing for safe code modifications</li>
+>       <li>Provides multi-step reasoning and analysis</li>
+>     </ol>
+>   </li>
+>   <li><b>Key Features:</b>
+>     <ul>
+>       <li>🔍 Deep codebase understanding via context files</li>
+>       <li>💾 Checkpointing with <code>/restore</code> command</li>
+>       <li>🛠️ Built-in tools (file ops, shell, web search, memory)</li>
+>       <li>🔌 MCP server support for custom tools</li>
+>       <li>💬 Interactive REPL mode for iterative development</li>
+>     </ul>
+>   </li>
+>   <li><b>Automation Script:</b> <code>python3 scripts/gemini_automation.py</code></li>
+>   <li><b>Manual Usage:</b>
+>     <ul>
+>       <li>Interactive: <code>gemini</code></li>
+>       <li>One-shot: <code>gemini -p "your prompt"</code></li>
+>       <li>With file context: <code>gemini -p "Explain @./src/main.c"</code></li>
+>     </ul>
+>   </li>
+>   <li><b>Slash Commands:</b>
+>     <ul>
+>       <li><code>/memory show</code> - View loaded context</li>
+>       <li><code>/restore</code> - Rollback changes</li>
+>       <li><code>/tools</code> - List available tools</li>
+>       <li><code>/compress</code> - Optimize token usage</li>
+>     </ul>
+>   </li>
+> </ul></details>
+
 > <details><summary><code>⚡ Warp Terminal Agent</code></summary><ul>
 >   <li><b>Purpose:</b> Code quality analysis, documentation, and performance optimization</li>
 >   <li><b>Status:</b> Task list created, awaiting manual execution</li>
