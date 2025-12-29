@@ -11,7 +11,9 @@ class TaskRouter:
             'feature': 'codex',
             'architecture': 'gemini',
             'quality': 'warp',
-            'async': 'jules'
+            'async': 'jules',
+            'cloud': 'amazonq',
+            'development': 'kiro'
         }
     
     def route_issue(self, issue_data):
@@ -31,6 +33,10 @@ class TaskRouter:
             return 'architecture'
         elif any(word in title + body for word in ['quality', 'lint', 'documentation']):
             return 'quality'
+        elif any(word in title + body for word in ['aws', 'cloud', 'infrastructure', 'deployment']):
+            return 'cloud'
+        elif any(word in title + body for word in ['build', 'tooling', 'development', 'workflow', 'ci']):
+            return 'development'
         else:
             return 'feature'
     

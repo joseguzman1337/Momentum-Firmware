@@ -172,7 +172,7 @@ Momentum firmware includes an enhanced asset system:
 ### Setting Up Development Environment
 ```bash
 # Clone with submodules
-git clone --recursive https://github.com/Next-Flip/Momentum-Firmware.git
+git clone --recursive https://github.com/joseguzman1337/Momentum-Firmware.git
 
 # Set up VSCode (one time)
 ./fbt vscode_dist

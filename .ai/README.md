@@ -148,6 +148,18 @@ tail -f logs/codex/*.log
 - Manual review tasks
 - **Mode**: Manual (task list)
 
+### Amazon Q
+- AWS/cloud infrastructure fixes
+- Deployment optimization
+- Cloud resource management
+- **Mode**: YOLO (`q dev --auto-fix`)
+
+### Kiro
+- Development workflow automation
+- Tooling optimization
+- Build system fixes
+- **Mode**: YOLO (`kiro fix --auto`)
+
 ## 📊 Task Routing
 
 The super orchestrator intelligently routes tasks:
@@ -158,6 +170,8 @@ The super orchestrator intelligently routes tasks:
 | architecture, refactor, optimize | Gemini |
 | feature, bug, enhancement | Codex |
 | async, complex, multi-step | Jules |
+| aws, cloud, infrastructure, deployment | Amazon Q |
+| build, tooling, development, workflow, ci | Kiro |
 
 ## 🔐 Security
 

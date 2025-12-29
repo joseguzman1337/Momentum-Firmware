@@ -13,7 +13,9 @@ class AIOrchestrator:
             'jules': {'cmd': 'jules --yolo --auto-merge --log logs/jules/', 'type': 'async'},
             'gemini': {'cmd': 'gemini --yolo --auto-merge --log logs/gemini/', 'type': 'architecture'},
             'deepseek': {'cmd': 'deepseek --yolo --individual-prs --log logs/deepseek/', 'type': 'optimization'},
-            'warp': {'cmd': 'warp --yolo --auto-merge --log logs/warp/', 'type': 'quality'}
+            'warp': {'cmd': 'warp --yolo --auto-merge --log logs/warp/', 'type': 'quality'},
+            'amazonq': {'cmd': 'python .ai/amazonq/agent.py', 'type': 'cloud'},
+            'kiro': {'cmd': 'python .ai/kiro/agent.py', 'type': 'development'}
         }
     
     async def start_yolo_mode(self):
