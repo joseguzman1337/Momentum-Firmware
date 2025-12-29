@@ -1,3 +1,4 @@
+#include <furi.h>
 /*
  * Parser for MBTA CharlieCard (Boston, MA, USA).
  *
