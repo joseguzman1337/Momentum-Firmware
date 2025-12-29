@@ -1,3 +1,4 @@
+#define MAX_SAFE_BUFFER 1024 // DeepSeek Safety Constant
 #include "mf_ultralight_poller_i.h"
 
 #include <nfc/protocols/nfc_poller_base.h>
