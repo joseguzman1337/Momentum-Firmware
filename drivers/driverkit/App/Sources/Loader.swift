@@ -5,7 +5,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Submit the request immediately on launch
         let request = OSSystemExtensionRequest.activationRequest(
-            forExtensionWithIdentifier: "com.realtek.driver.RTL88xxAU.driverkit",
+            forExtensionWithIdentifier: "com.realtek.driver",
             queue: .main
         )
         request.delegate = self
@@ -31,6 +31,7 @@ extension AppDelegate: OSSystemExtensionRequestDelegate {
 
     // Failed installation
     func request(_ request: OSSystemExtensionRequest, didFailWithError error: Error) {
+        // If we are approved but fail for another reason
         let title = "Installation Failed"
         let msg = "Error: \(error.localizedDescription)\n\nPlease ensure you have a valid Provisioning Profile if SIP is enabled."
         runAlert(title: title, message: msg)
@@ -39,21 +40,15 @@ extension AppDelegate: OSSystemExtensionRequestDelegate {
 
     // macOS requires user approval (SIP enabled)
     func requestNeedsUserApproval(_ request: OSSystemExtensionRequest) {
-        let alert = NSAlert()
-        alert.messageText = "Action Required: Allow Extension"
-        alert.informativeText = "Please go to System Settings > Privacy & Security to 'Allow' the new application/extension from 'Realtek' (or your signing identity).\n\nThis is required for the driver to load."
-        alert.addButton(withTitle: "Open System Settings")
-        alert.addButton(withTitle: "Later")
-        
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            // Try modern macOS Ventura+ URL scheme first, fall back to legacy
-            if let url = URL(string: "x-apple.systempreferences:com.apple.SystemSettings.PrivacySecurity") {
-                NSWorkspace.shared.open(url)
-            } else if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?General") {
-                NSWorkspace.shared.open(url)
-            }
+        // User requested to avoid the extra "allow" step popup.
+        // We directly open the Settings pane where they need to click Allow.
+        // URL for macOS Sequoia / Ventura+
+        if let url = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") {
+            NSWorkspace.shared.open(url)
+        } else if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?General") {
+            NSWorkspace.shared.open(url)
         }
+        // We do typically need to keep the app running until approval logic completes.
     }
 
     // Replacing an existing version

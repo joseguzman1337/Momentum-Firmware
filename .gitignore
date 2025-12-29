@@ -67,4 +67,5 @@ PVS-Studio.log
 /fbt_options_local.py
 
 # JS packages
-node_modules/
+node_modules/realtek2/build/
+build/

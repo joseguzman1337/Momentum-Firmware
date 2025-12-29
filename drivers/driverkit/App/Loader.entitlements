@@ -5,5 +5,7 @@
     <!-- Restricted entitlement removed to allow launch without provisioning profile -->
     <key>com.apple.security.app-sandbox</key>
     <true/>
+    <key>com.apple.security.get-task-allow</key>
+    <true/>
 </dict>
 </plist>

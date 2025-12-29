@@ -17,10 +17,31 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			MhYt9Gp7iLSFfbhh/fR22yoI1ekR8fB03hBHWUXy4n4=
+			uzO1VZizdCNekk5kHAWRx0F7SXC2eXcJSppxnSlMYdg=
 			</data>
 		</dict>
 		<key>Library/SystemExtensions/com.realtek.driver.RTL88xxAU.driverkit.dext/Contents/_CodeSignature/CodeResources</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ZobeEKKKL+EbNsu4bcusyCfPxOoRa02r8YReWu5inps=
+			</data>
+		</dict>
+		<key>Library/SystemExtensions/com.realtek.driver.dext/Contents/Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			QFzheQKWOnZ0rfhwYya9v8io537zbg3A83oiq/xDjcs=
+			</data>
+		</dict>
+		<key>Library/SystemExtensions/com.realtek.driver.dext/Contents/MacOS/RTL88xxAUUserDriver</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Uj3uvs9BZSIXANUs3f7VFdyrn06ho2XuKL8WegSTZvc=
+			</data>
+		</dict>
+		<key>Library/SystemExtensions/com.realtek.driver.dext/Contents/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash2</key>
 			<data>

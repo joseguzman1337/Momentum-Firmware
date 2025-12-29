@@ -3,7 +3,7 @@
 
 # Configuration
 APP_NAME = RTLLoader
-DEXT_NAME = com.realtek.driver.RTL88xxAU.driverkit
+DEXT_NAME = com.realtek.driver
 BUILD_DIR = build
 DRIVERKIT_DIR = driverkit
 ARCH = arm64 x86_64
