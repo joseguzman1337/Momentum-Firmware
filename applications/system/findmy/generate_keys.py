@@ -1,3 +1,25 @@
+"""
+Apple Find My Network Key Generator
+
+This script generates cryptographic keys for use with Apple's Find My network.
+
+SECURITY NOTICE:
+This implementation uses SECP224R1 (P-224), a 224-bit elliptic curve, which is
+MANDATED by Apple's Find My Network Accessory Specification. While P-224 provides
+less than the current recommended 256-bit minimum security level (approximately
+112 bits of security), it cannot be replaced with a stronger curve like P-256
+because:
+1. The public key must fit into a single Bluetooth Low Energy advertisement payload
+2. Compatibility with Apple's Find My network requires P-224
+3. The protocol specification explicitly requires this curve
+
+This is a protocol constraint imposed by Apple, not a cryptographic weakness in
+this implementation. The security level is considered acceptable for the Find My
+use case given key rotation and limited attack surface.
+
+Reference: https://support.apple.com/guide/security/find-my-security-sec6cbc80fd0/web
+"""
+
 import base64
 import os
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -50,6 +72,18 @@ def main():
 
     for i in range(nkeys):
         while True:
+            # SECURITY NOTE: SECP224R1 (P-224) is mandated by Apple's Find My Network
+            # Accessory Specification. While P-224 provides less than 256-bit security,
+            # it is required because the public key must fit into a single Bluetooth
+            # Low Energy advertisement payload. This is a protocol constraint, not an
+            # implementation choice. See: https://support.apple.com/guide/security/find-my-security-sec6cbc80fd0/web
+            #
+            # P-224 provides approximately 112 bits of security, which while below current
+            # best practices (128-bit minimum, 256-bit recommended), is sufficient for
+            # the Find My use case where keys rotate and the attack surface is limited.
+            #
+            # nosemgrep: python.cryptography.security.insufficient-ec-key-size
+            # codeql[py/weak-cryptographic-algorithm]: Required by Apple Find My protocol
             private_key = ec.generate_private_key(ec.SECP224R1(), default_backend())
             public_key = private_key.public_key()
 

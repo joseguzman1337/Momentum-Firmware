@@ -742,6 +742,7 @@ void archive_clear_selection(ArchiveBrowserViewModel* model) {
     free(model->selected_files);
     model->selected_files = NULL;
     model->selected_count = 0;
+    model->selected_capacity = 0;
 
     for(size_t i = 0; i < files_array_size(model->files); i++) {
         ArchiveFile_t* file = files_array_get(model->files, i);

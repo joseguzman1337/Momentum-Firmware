@@ -10,6 +10,11 @@
 extern "C" {
 #endif
 
+typedef enum {
+    FuriHalSpeakerOutputInternal = 0,
+    FuriHalSpeakerOutputExternal = 1,
+} FuriHalSpeakerOutput;
+
 /** Init speaker */
 void furi_hal_speaker_init(void);
 
@@ -62,6 +67,15 @@ void furi_hal_speaker_set_volume(float volume);
  * @warning    no ownership check if called from ISR
  */
 void furi_hal_speaker_stop(void);
+
+/** Set speaker output pin */
+void furi_hal_speaker_set_output(FuriHalSpeakerOutput output);
+
+/** Get speaker output pin */
+FuriHalSpeakerOutput furi_hal_speaker_get_output(void);
+
+/** Get speaker output GPIO pin */
+const GpioPin* furi_hal_speaker_get_pin(void);
 
 #ifdef __cplusplus
 }

@@ -24,6 +24,16 @@ static const uint8_t reset_sound_mask = 1 << 4;
 static const uint8_t reset_display_mask = 1 << 5;
 static const uint8_t reset_blink_mask = 1 << 6;
 
+typedef struct {
+    uint8_t version;
+    float display_brightness;
+    float led_brightness;
+    float speaker_volume;
+    uint32_t display_off_delay_ms;
+    int8_t contrast;
+    bool vibro_on;
+} NotificationSettingsV2;
+
 static void notification_vibro_on(bool force);
 static void notification_vibro_off(void);
 static void notification_sound_on(float freq, float volume, bool force);
@@ -424,12 +434,48 @@ static void
 }
 
 static bool notification_load_settings(NotificationApp* app) {
-    return saved_struct_load(
-        NOTIFICATION_SETTINGS_PATH,
-        &app->settings,
-        sizeof(NotificationSettings),
-        NOTIFICATION_SETTINGS_MAGIC,
-        NOTIFICATION_SETTINGS_VERSION);
+    uint8_t version = 0;
+    if(!saved_struct_get_metadata(NOTIFICATION_SETTINGS_PATH, NULL, &version, NULL)) {
+        return false;
+    }
+
+    if(version == NOTIFICATION_SETTINGS_VERSION) {
+        if(!saved_struct_load(
+               NOTIFICATION_SETTINGS_PATH,
+               &app->settings,
+               sizeof(NotificationSettings),
+               NOTIFICATION_SETTINGS_MAGIC,
+               NOTIFICATION_SETTINGS_VERSION)) {
+            return false;
+        }
+    } else if(version == NOTIFICATION_SETTINGS_VERSION_2) {
+        NotificationSettingsV2 v2 = {0};
+        if(!saved_struct_load(
+               NOTIFICATION_SETTINGS_PATH,
+               &v2,
+               sizeof(v2),
+               NOTIFICATION_SETTINGS_MAGIC,
+               NOTIFICATION_SETTINGS_VERSION_2)) {
+            return false;
+        }
+
+        app->settings.version = NOTIFICATION_SETTINGS_VERSION;
+        app->settings.display_brightness = v2.display_brightness;
+        app->settings.led_brightness = v2.led_brightness;
+        app->settings.speaker_volume = v2.speaker_volume;
+        app->settings.display_off_delay_ms = v2.display_off_delay_ms;
+        app->settings.contrast = v2.contrast;
+        app->settings.vibro_on = v2.vibro_on;
+        app->settings.speaker_output = FuriHalSpeakerOutputInternal;
+    } else {
+        return false;
+    }
+
+    if(app->settings.speaker_output > FuriHalSpeakerOutputExternal) {
+        app->settings.speaker_output = FuriHalSpeakerOutputInternal;
+    }
+
+    return true;
 }
 
 static bool notification_save_settings(NotificationApp* app) {
@@ -466,6 +512,7 @@ static NotificationApp* notification_app_alloc(void) {
     app->display_timer = furi_timer_alloc(notification_display_timer, FuriTimerTypeOnce, app);
 
     app->settings.speaker_volume = 1.0f;
+    app->settings.speaker_output = FuriHalSpeakerOutputInternal;
     app->settings.display_brightness = 1.0f;
     app->settings.led_brightness = 1.0f;
     app->settings.display_off_delay_ms = 30000;
@@ -523,6 +570,7 @@ static void notification_apply_settings(NotificationApp* app) {
     }
 
     notification_apply_lcd_contrast(app);
+    furi_hal_speaker_set_output(app->settings.speaker_output);
 }
 
 static void notification_init_settings(NotificationApp* app) {

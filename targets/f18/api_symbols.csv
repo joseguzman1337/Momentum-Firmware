@@ -1370,6 +1370,7 @@ Function,+,furi_hal_power_enable_otg,_Bool,
 Function,+,furi_hal_power_gauge_is_ok,_Bool,
 Function,+,furi_hal_power_get_bat_health_pct,uint8_t,
 Function,+,furi_hal_power_get_battery_charge_voltage_limit,float,
+Function,+,furi_hal_power_get_battery_charge_current_limit,uint16_t,
 Function,+,furi_hal_power_get_battery_current,float,FuriHalPowerIC
 Function,+,furi_hal_power_get_battery_design_capacity,uint32_t,
 Function,+,furi_hal_power_get_battery_full_capacity,uint32_t,
@@ -1390,6 +1391,7 @@ Function,+,furi_hal_power_is_shutdown_requested,_Bool,
 Function,+,furi_hal_power_off,void,
 Function,+,furi_hal_power_reset,void,
 Function,+,furi_hal_power_set_battery_charge_voltage_limit,void,float
+Function,+,furi_hal_power_set_battery_charge_current_limit,void,uint16_t
 Function,+,furi_hal_power_shutdown,void,
 Function,+,furi_hal_power_sleep,void,
 Function,+,furi_hal_power_sleep_available,_Bool,
@@ -1498,6 +1500,9 @@ Function,+,furi_hal_speaker_release,void,
 Function,+,furi_hal_speaker_set_volume,void,float
 Function,+,furi_hal_speaker_start,void,"float, float"
 Function,+,furi_hal_speaker_stop,void,
+Function,+,furi_hal_speaker_set_output,void,FuriHalSpeakerOutput
+Function,+,furi_hal_speaker_get_output,FuriHalSpeakerOutput,
+Function,+,furi_hal_speaker_get_pin,const GpioPin*,
 Function,+,furi_hal_spi_acquire,void,const FuriHalSpiBusHandle*
 Function,+,furi_hal_spi_bus_deinit,void,FuriHalSpiBus*
 Function,+,furi_hal_spi_bus_handle_deinit,void,const FuriHalSpiBusHandle*

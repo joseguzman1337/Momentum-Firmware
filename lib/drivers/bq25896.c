@@ -166,6 +166,22 @@ void bq25896_set_vreg_voltage(const FuriHalI2cBusHandle* handle, uint16_t vreg_v
         handle, BQ25896_ADDRESS, 0x06, *(uint8_t*)&bq25896_regs.r06, BQ25896_I2C_TIMEOUT);
 }
 
+uint16_t bq25896_get_charge_current_limit(const FuriHalI2cBusHandle* handle) {
+    furi_hal_i2c_read_reg_8(
+        handle, BQ25896_ADDRESS, 0x04, (uint8_t*)&bq25896_regs.r04, BQ25896_I2C_TIMEOUT);
+    return (uint16_t)bq25896_regs.r04.ICHG * 64;
+}
+
+void bq25896_set_charge_current_limit(const FuriHalI2cBusHandle* handle, uint16_t current_ma) {
+    if(current_ma > 8064) {
+        current_ma = 8064;
+    }
+
+    bq25896_regs.r04.ICHG = (uint8_t)(current_ma / 64);
+    furi_hal_i2c_write_reg_8(
+        handle, BQ25896_ADDRESS, 0x04, *(uint8_t*)&bq25896_regs.r04, BQ25896_I2C_TIMEOUT);
+}
+
 bool bq25896_check_otg_fault(const FuriHalI2cBusHandle* handle) {
     furi_hal_i2c_read_reg_8(
         handle, BQ25896_ADDRESS, 0x0C, (uint8_t*)&bq25896_regs.r0C, BQ25896_I2C_TIMEOUT);

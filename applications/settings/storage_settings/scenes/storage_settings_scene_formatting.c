@@ -39,7 +39,7 @@ void storage_settings_scene_formatting_on_enter(void* context) {
     view_dispatcher_switch_to_view(app->view_dispatcher, StorageSettingsViewDialogEx);
 
     notification_message_block(app->notification, &sequence_set_formatting_leds);
-    error = storage_sd_format(app->fs_api);
+    error = storage_sd_format(app->fs_api, app->format_type);
     notification_message(app->notification, &sequence_reset_formatting_leds);
     notification_message(app->notification, &sequence_blink_green_100);
 

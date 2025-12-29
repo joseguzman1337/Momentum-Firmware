@@ -13,6 +13,8 @@
 #define SCENE_STATE_DEFAULT      (0)
 #define SCENE_STATE_NEED_REFRESH (1)
 
+#define ARCHIVE_SELECTION_INITIAL_CAPACITY (8U)
+
 const char* archive_get_flipper_app_name(ArchiveFileTypeEnum file_type) {
     switch(file_type) {
     case ArchiveFileTypeIButton:
@@ -136,6 +138,87 @@ static void archive_mount_disk_image(ArchiveBrowserView* browser, ArchiveFile_t*
     } while(0);
     if(disk_image && !browser->disk_image) storage_file_free(disk_image);
     furi_record_close(RECORD_STORAGE);
+}
+
+static bool archive_selection_ensure_capacity(ArchiveBrowserViewModel* model, size_t needed) {
+    if(model->selected_capacity >= needed) {
+        return true;
+    }
+
+    size_t new_capacity =
+        model->selected_capacity > 0 ? model->selected_capacity : ARCHIVE_SELECTION_INITIAL_CAPACITY;
+    while(new_capacity < needed) {
+        new_capacity *= 2;
+    }
+
+    FuriString** resized =
+        realloc(model->selected_files, sizeof(FuriString*) * new_capacity);
+    if(!resized) {
+        return false;
+    }
+
+    model->selected_files = resized;
+    model->selected_capacity = new_capacity;
+    return true;
+}
+
+static void archive_selection_add(
+    ArchiveBrowserViewModel* model,
+    ArchiveBrowserView* browser,
+    ArchiveFile_t* current) {
+    if(!current || current->selected) {
+        return;
+    }
+
+    if(current->type == ArchiveFileTypeFolder) {
+        archive_deselect_children(model, furi_string_get_cstr(current->path));
+    }
+
+    if(!archive_selection_ensure_capacity(model, model->selected_count + 1)) {
+        return;
+    }
+
+    model->select_mode = true;
+    model->selected_files[model->selected_count] = furi_string_alloc_set(current->path);
+    model->selected_count++;
+    current->selected = true;
+    archive_update_offset(browser);
+}
+
+static void archive_selection_remove(
+    ArchiveBrowserViewModel* model,
+    ArchiveBrowserView* browser,
+    ArchiveFile_t* current) {
+    if(!current) {
+        return;
+    }
+
+    if(!current->selected && current->type == ArchiveFileTypeFolder) {
+        archive_deselect_children(model, furi_string_get_cstr(current->path));
+        if(model->selected_count == 0) {
+            archive_clear_selection(model);
+        }
+        archive_update_offset(browser);
+        return;
+    }
+
+    for(size_t i = 0; i < model->selected_count; i++) {
+        if(furi_string_cmp(model->selected_files[i], current->path) == 0) {
+            furi_string_free(model->selected_files[i]);
+            for(size_t j = i; j < model->selected_count - 1; j++) {
+                model->selected_files[j] = model->selected_files[j + 1];
+            }
+            model->selected_count--;
+            current->selected = false;
+            break;
+        }
+    }
+
+    if(model->selected_count == 0) {
+        archive_clear_selection(model);
+    }
+
+    archive_update_offset(browser);
 }
 
 static void
@@ -306,20 +389,12 @@ bool archive_scene_browser_on_event(void* context, SceneManagerEvent event) {
                 browser->view,
                 ArchiveBrowserViewModel * model,
                 {
-                    if(!model->select_mode) {
-                        model->select_mode = true;
-                        if(model->selected_files == NULL) {
-                            model->selected_files = malloc(sizeof(FuriString*) * 50);
-                            model->selected_count = 0;
-                        }
-
-                        ArchiveFile_t* current = archive_get_current_file(browser);
-                        model->selected_files[model->selected_count] =
-                            furi_string_alloc_set(current->path);
-                        model->selected_count++;
-                        current->selected = true;
+                    ArchiveFile_t* current = archive_get_current_file(browser);
+                    if(!current) break;
+                    if(current->selected) {
+                        archive_selection_remove(model, browser, current);
                     } else {
-                        archive_clear_selection(model);
+                        archive_selection_add(model, browser, current);
                     }
                 },
                 true);
@@ -331,16 +406,7 @@ bool archive_scene_browser_on_event(void* context, SceneManagerEvent event) {
                 ArchiveBrowserViewModel * model,
                 {
                     ArchiveFile_t* current = archive_get_current_file(browser);
-                    if(!current->selected) {
-                        // If current file type is a folder, deselect all files that start with the same path to not have a conflict.
-                        if(current->type == ArchiveFileTypeFolder) {
-                            archive_deselect_children(model, furi_string_get_cstr(current->path));
-                        }
-                        model->selected_files[model->selected_count] =
-                            furi_string_alloc_set(current->path);
-                        model->selected_count++;
-                        current->selected = true;
-                    }
+                    archive_selection_add(model, browser, current);
                 },
                 true);
             break;
@@ -350,21 +416,7 @@ bool archive_scene_browser_on_event(void* context, SceneManagerEvent event) {
                 ArchiveBrowserViewModel * model,
                 {
                     ArchiveFile_t* current = archive_get_current_file(browser);
-                    if(!current->selected && current->type == ArchiveFileTypeFolder) {
-                        archive_deselect_children(model, furi_string_get_cstr(current->path));
-                    } else {
-                        for(size_t i = 0; i < model->selected_count; i++) {
-                            if(furi_string_cmp(model->selected_files[i], current->path) == 0) {
-                                furi_string_free(model->selected_files[i]);
-                                for(size_t j = i; j < model->selected_count - 1; j++) {
-                                    model->selected_files[j] = model->selected_files[j + 1];
-                                }
-                                model->selected_count--;
-                                current->selected = false;
-                                break;
-                            }
-                        }
-                    }
+                    archive_selection_remove(model, browser, current);
                 },
                 true);
             break;

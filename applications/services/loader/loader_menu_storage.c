@@ -78,7 +78,7 @@ int32_t loader_menu_storage_settings(void* context) {
                     dialog_ex_set_left_button_text(dialog_ex, NULL);
                     dialog_ex_set_right_button_text(dialog_ex, NULL);
 
-                    FS_Error error = storage_sd_format(storage);
+                    FS_Error error = storage_sd_format(storage, SDFormatTypeAuto);
                     if(error != FSE_OK) {
                         dialog_ex_set_header(
                             dialog_ex, "Cannot Format SD Card", 64, 10, AlignCenter, AlignCenter);

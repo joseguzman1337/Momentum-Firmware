@@ -42,6 +42,18 @@ const uint32_t auto_poweroff_delay_value[AUTO_POWEROFF_DELAY_COUNT] = {
 
 #define CHARGE_SUPRESS_STEP 5
 
+#define CHARGE_CURRENT_LIMIT_COUNT 8
+const uint32_t charge_current_limit_value[CHARGE_CURRENT_LIMIT_COUNT] = {
+    0,
+    128,
+    256,
+    512,
+    768,
+    1024,
+    1536,
+    POWER_SETTINGS_CHARGE_CURRENT_LIMIT_DEFAULT_MA,
+};
+
 // change variable_item_list visible text and charge_supress_percent_settings when user change item in variable_item_list
 static void power_settings_scene_start_charge_supress_percent_changed(VariableItem* item) {
     PowerSettingsApp* app = variable_item_get_context(item);
@@ -51,6 +63,22 @@ static void power_settings_scene_start_charge_supress_percent_changed(VariableIt
 
     variable_item_set_current_value_text(item, charge_supress_str);
     app->settings.charge_supress_percent = value == 100 ? 0 : value;
+}
+
+static void power_settings_scene_start_charge_current_limit_changed(VariableItem* item) {
+    PowerSettingsApp* app = variable_item_get_context(item);
+    uint8_t index = variable_item_get_current_value_index(item);
+    uint32_t current_ma = charge_current_limit_value[index];
+    char current_str[12];
+
+    if(current_ma == 0) {
+        snprintf(current_str, sizeof(current_str), "Default");
+    } else {
+        snprintf(current_str, sizeof(current_str), "%lu mA", current_ma);
+    }
+
+    variable_item_set_current_value_text(item, current_str);
+    app->settings.charge_current_limit_ma = current_ma;
 }
 
 // change variable_item_list visible text and app_poweroff_delay_time_settings when user change item in variable_item_list
@@ -110,6 +138,20 @@ void power_settings_scene_start_on_enter(void* context) {
     snprintf(charge_supress_str, sizeof(charge_supress_str), "%u%%", value);
     variable_item_set_current_value_index(item, value_index);
     variable_item_set_current_value_text(item, charge_supress_str);
+
+    item = variable_item_list_add(
+        variable_item_list,
+        "Charge Current",
+        CHARGE_CURRENT_LIMIT_COUNT,
+        power_settings_scene_start_charge_current_limit_changed,
+        app);
+
+    value_index = value_index_uint32(
+        app->settings.charge_current_limit_ma,
+        charge_current_limit_value,
+        CHARGE_CURRENT_LIMIT_COUNT);
+    variable_item_set_current_value_index(item, value_index);
+    power_settings_scene_start_charge_current_limit_changed(item);
 
     variable_item_list_set_selected_item(
         variable_item_list,
