@@ -196,7 +196,7 @@ static void rpc_system_storage_list_root(const PB_Main* request, void* context) 
         response.content.storage_list_response.file[i].size = 0;
         response.content.storage_list_response.file[i].type = PB_Storage_File_FileType_DIR;
         char* str = malloc(strlen(hard_coded_dirs[i]) + 1);
-        strcpy(str, hard_coded_dirs[i]);
+        strlcpy(str, hard_coded_dirs[i], sizeof(str));
         response.content.storage_list_response.file[i].name = str;
     }
 
