@@ -5,6 +5,8 @@ env.Append(
     CPPPATH=[
         "#/",
         "#/lib",
+        "#/lib/lwip/src/include",
+        "#/lib/lwip/port",
         # Ugly hack
         Dir("../assets/compiled"),
         Dir("../../icons"),
@@ -47,6 +49,7 @@ libs = env.BuildModules(
         "bit_lib",
         "datetime",
         "ieee754_parse_wrap",
+        "lwip",
     ],
 )
 

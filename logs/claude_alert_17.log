@@ -1,0 +1,24 @@
+Perfect! I've successfully fixed the code scanning alert. 
+
+## Summary
+
+**Issue**: Code Scanning Alert #17 - Incorrect 'not' operator usage at `applications/main/nfc/plugins/supported_cards/charliecard.c:1162`
+
+**Problem**: The code was using the bitwise AND operator `&` instead of the logical AND operator `&&` in a conditional expression that uses the logical NOT operator `!`.
+
+**Fix Applied**: Changed line 1162 from:
+```c
+if(!dt_eq(balance_sector.end_validity, CHARLIE_EPOCH) &
+```
+to:
+```c
+if(!dt_eq(balance_sector.end_validity, CHARLIE_EPOCH) &&
+```
+
+**Why This Matters**:
+1. **Correctness**: Logical operators (`&&`) are the correct choice for boolean conditions, providing proper short-circuit evaluation
+2. **Security**: Bitwise operations on boolean values can lead to unexpected behavior and logic errors
+3. **Performance**: Logical AND short-circuits (stops evaluating if the first condition is false), while bitwise AND always evaluates both operands
+4. **Consistency**: The use of `!` (logical NOT) indicates the intention was to use logical operations throughout
+
+The fix ensures the condition properly checks that the end validity is not equal to the CHARLIE_EPOCH AND that it's greater than or equal to the issued date before displaying the expiry information.

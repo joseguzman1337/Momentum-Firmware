@@ -1,0 +1,10 @@
+App(
+    appid="network_service",
+    name="Network Service",
+    apptype=FlipperAppType.SERVICE,
+    entry_point="network_service_app",
+    cdefines=["LWIP_OPTS_FILE=\"lwipopts.h\""],
+    stack_size=2048,
+    order=30,
+    sdk_headers=["network_service.h"],
+)
