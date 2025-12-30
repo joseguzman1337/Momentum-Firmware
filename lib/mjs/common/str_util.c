@@ -302,7 +302,7 @@ char* strdup(const char* src) {
     size_t len = strlen(src) + 1;
     char* ret = MG_MALLOC(len);
     if(ret != NULL) {
-        strcpy(ret, src);
+        strlcpy(ret, src, sizeof(ret));
     }
     return ret;
 }
