@@ -314,10 +314,10 @@ App(
 )
 
 App(
-    appid="hotels_parser",
+    appid="octopus_parser",
     apptype=FlipperAppType.PLUGIN,
-    entry_point="hotels_plugin_ep",
+    entry_point="octopus_plugin_ep",
     targets=["f7"],
     requires=["nfc"],
-    sources=["plugins/supported_cards/hotels.c"],
+    sources=["plugins/supported_cards/octopus.c"],
 )
