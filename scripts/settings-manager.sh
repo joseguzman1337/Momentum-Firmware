@@ -4,7 +4,7 @@
 case "$1" in
     "backup")
         mkdir -p backups/settings
-        cp .gemini/settings.json "backups/settings/settings_$(date +%Y%m%d_%H%M%S).json"
+        cp .ai/.gemini/settings.json "backups/settings/settings_$(date +%Y%m%d_%H%M%S).json"
         echo "✅ Settings backed up"
         ;;
     "restore")
@@ -13,16 +13,16 @@ case "$1" in
             ls -1 backups/settings/ 2>/dev/null || echo "No backups found"
             exit 1
         fi
-        cp "backups/settings/$2" .gemini/settings.json
+        cp "backups/settings/$2" .ai/.gemini/settings.json
         echo "✅ Settings restored from $2"
         ;;
     "reset")
-        rm -f .gemini/settings.json
+        rm -f .ai/.gemini/settings.json
         echo "✅ Settings reset to defaults"
         ;;
     "show")
         echo "Current Gemini CLI settings:"
-        cat .gemini/settings.json | jq '.' 2>/dev/null || cat .gemini/settings.json
+        cat .ai/.gemini/settings.json | jq '.' 2>/dev/null || cat .ai/.gemini/settings.json
         ;;
     *)
         echo "Settings Manager for Momentum Firmware"

@@ -82,9 +82,9 @@ EOF
 
 # Setup Claude Code settings
 echo "🤖 Configuring Claude Code settings..."
-mkdir -p ~/.claude
+mkdir -p .ai/.claude
 
-cat > ~/.claude/settings.json << 'EOF'
+cat > .ai/.claude/settings.json << 'EOF'
 {
   "allowedCommands": [
     "./fbt",
@@ -103,7 +103,7 @@ cat > ~/.claude/settings.json << 'EOF'
       "args": [".ai/tools/flipper_mcp.py"]
     },
     "firmware-analyzer": {
-      "command": "python", 
+      "command": "python",
       "args": [".ai/tools/firmware_analyzer.py"]
     }
   }
@@ -121,7 +121,7 @@ cat > CLAUDE_SETUP.md << 'EOF'
 
 ## Firmware Development Shortcuts
 - **Build**: `Cmd+Shift+P` → "Tasks: Run Task" → "Build Firmware"
-- **Flash**: `Cmd+Shift+P` → "Tasks: Run Task" → "Flash Firmware"  
+- **Flash**: `Cmd+Shift+P` → "Tasks: Run Task" → "Flash Firmware"
 - **Debug**: `F5` to start debugging session
 
 ## Claude Code Commands

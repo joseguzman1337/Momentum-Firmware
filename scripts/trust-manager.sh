@@ -1,30 +1,30 @@
 #!/bin/bash
 # Trusted Folders management for Momentum Firmware
 
-TRUST_FILE="$HOME/.gemini/trustedFolders.json"
+TRUST_FILE="$HOME/.ai/.gemini/trustedFolders.json"
 
 case "$1" in
     "status")
         echo "🔒 Folder Trust Status"
         echo "====================="
-        
+
         if [ -f "$TRUST_FILE" ]; then
             echo "Trust configuration found:"
             cat "$TRUST_FILE" | jq '.' 2>/dev/null || cat "$TRUST_FILE"
         else
             echo "No trust configuration found"
         fi
-        
+
         echo ""
         echo "Current folder: $(pwd)"
         echo "Trust status: Run 'gemini /permissions' to check"
         ;;
-        
+
     "trust")
         echo "🔓 Trusting current folder: $(pwd)"
         echo "Run 'gemini /permissions' and select 'Trust folder'"
         ;;
-        
+
     "untrust")
         if [ -f "$TRUST_FILE" ]; then
             current_dir=$(pwd)
@@ -35,7 +35,7 @@ case "$1" in
             echo "No trust file found"
         fi
         ;;
-        
+
     "backup")
         if [ -f "$TRUST_FILE" ]; then
             backup_file="backups/trust_$(date +%Y%m%d_%H%M%S).json"
@@ -46,28 +46,28 @@ case "$1" in
             echo "No trust file to backup"
         fi
         ;;
-        
+
     "setup")
         echo "🛡️  Setting up Trusted Folders for Momentum Firmware"
         echo "=================================================="
-        
+
         # Check if trust is enabled
-        if grep -q '"enabled": true' .gemini/settings.json 2>/dev/null; then
+        if grep -q '"enabled": true' .ai/.gemini/settings.json 2>/dev/null; then
             echo "✅ Folder trust is enabled"
         else
             echo "❌ Folder trust is not enabled"
-            echo "Add to .gemini/settings.json:"
+            echo "Add to .ai/.gemini/settings.json:"
             echo '{"security": {"folderTrust": {"enabled": true}}}'
             exit 1
         fi
-        
+
         echo ""
         echo "Next steps:"
         echo "1. Run 'gemini' in this directory"
         echo "2. When prompted, select 'Trust folder'"
         echo "3. This enables full Gemini CLI features for firmware development"
         ;;
-        
+
     *)
         echo "Momentum Firmware Trust Manager"
         echo "Usage: $0 {status|trust|untrust|backup|setup}"

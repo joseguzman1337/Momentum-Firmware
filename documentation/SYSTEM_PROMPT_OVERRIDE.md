@@ -12,9 +12,9 @@ This feature is intended for advanced users who need to enforce strict, project-
 ## How to enable
 You can set the environment variable temporarily in your shell, or persist it via a .gemini/.env file. See Persisting Environment Variables.
 
-### Use the project default path (.gemini/system.md):
+### Use the project default path (.ai/.gemini/system.md):
 `GEMINI_SYSTEM_MD=true` or `GEMINI_SYSTEM_MD=1`
-The CLI reads ./.gemini/system.md (relative to your current project directory).
+The CLI reads ./.ai/.gemini/system.md (relative to your current project directory).
 
 ### Use a custom file path:
 `GEMINI_SYSTEM_MD=/absolute/path/to/my-system.md`
@@ -29,8 +29,8 @@ If the override is enabled but the target file does not exist, the CLI will erro
 ## Quick examples
 - **One‑off session using a project file:**
   `GEMINI_WRITE_SYSTEM_MD=1 gemini`
-- **Persist for a project using .gemini/.env:**
-  Create .gemini/system.md, then add to .gemini/.env:
+- **Persist for a project using .ai/.gemini/.env:**
+  Create .ai/.gemini/system.md, then add to .ai/.gemini/.env:
   `GEMINI_SYSTEM_MD=1`
 - **Use a custom file under your home directory:**
   `GEMINI_SYSTEM_MD=~/prompts/SYSTEM.md gemini`
@@ -63,10 +63,10 @@ Keep SYSTEM.md minimal but complete for safety and tool operation. Keep GEMINI.m
 
 ### Error: missing system prompt file '…'
 - Ensure the referenced path exists and is readable.
-- For GEMINI_SYSTEM_MD=1|true, create ./.gemini/system.md in your project.
+- For GEMINI_SYSTEM_MD=1|true, create ./.ai/.gemini/system.md in your project.
 
 ### Override not taking effect
-- Confirm the variable is loaded (use .gemini/.env or export in your shell).
+- Confirm the variable is loaded (use .ai/.gemini/.env or export in your shell).
 - Paths are resolved from the current working directory; try an absolute path.
 
 ### Restore defaults
