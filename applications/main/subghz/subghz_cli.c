@@ -3,7 +3,10 @@
 #include <furi.h>
 #include <furi_hal.h>
 
-#include <lib/toolbox/args.h>
+#include <applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h>
+#include <cli/cli_main_commands.h>
+#include <cli/cli_ansi.h>
+
 #include <lib/subghz/subghz_keystore.h>
 
 #include <lib/subghz/receiver.h>
@@ -17,6 +20,9 @@
 #include <lib/subghz/devices/cc1101_int/cc1101_int_interconnect.h>
 #include <lib/subghz/devices/devices.h>
 #include <lib/subghz/devices/cc1101_configs.h>
+
+#include <lib/cli/args.h>
+#include <pure/strint.h>
 
 #include "helpers/subghz_chat.h"
 

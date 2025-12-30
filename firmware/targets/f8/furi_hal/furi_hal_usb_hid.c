@@ -21,11 +21,7 @@
 
 #define HID_INTERVAL 2
 
-#define HID_VID_DEFAULT 0x046D
-#define HID_PID_DEFAULT 0xC529
-
-struct HidIadDescriptor {
-    struct usb_iad_descriptor hid_iad;
+struct HidIntfDescriptor {
     struct usb_interface_descriptor hid;
     struct usb_hid_descriptor hid_desc;
     struct usb_endpoint_descriptor hid_ep_in;

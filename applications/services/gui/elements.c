@@ -703,7 +703,7 @@ void elements_scrollable_text_line_centered(
     size_t len_px = canvas_string_width(canvas, furi_string_get_cstr(line));
     bool marquee = momentum_settings.scroll_marquee;
     if(len_px > width) {
-        if(centered && !marquee) {
+        if(centered) {
             centered = false;
             x -= width / 2;
         }

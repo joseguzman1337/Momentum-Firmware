@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,88.0,,
+Version,+,87.2,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/drivers/subghz/si4463_ext/si4463_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
@@ -39,10 +39,23 @@ Header,+,applications/services/notification/notification_messages.h,,
 Header,+,applications/services/power/power_service/power.h,,
 Header,+,applications/services/rpc/rpc_app.h,,
 Header,+,applications/services/storage/storage.h,,
-Header,+,lib/bit_lib/bit_lib.h,,
 Header,+,lib/ble_profile/extra_profiles/hid_profile.h,,
 Header,+,lib/ble_profile/extra_services/hid_service.h,,
+Header,+,lib/cli/args.h,,
+Header,+,lib/cli/cli_ansi.h,,
+Header,+,lib/cli/cli_command.h,,
+Header,+,lib/cli/cli_registry.h,,
+Header,+,lib/cli/shell/cli_shell.h,,
+Header,+,lib/compress/compress.h,,
+Header,+,lib/compress/tar/tar_archive.h,,
+Header,+,lib/containers/bit_buffer.h,,
+Header,+,lib/containers/buffer_stream.h,,
+Header,+,lib/containers/m_cstr_dup.h,,
+Header,+,lib/containers/pipe.h,,
+Header,+,lib/containers/simple_array.h,,
 Header,+,lib/datetime/datetime.h,,
+Header,+,lib/debug/pretty_format.h,,
+Header,+,lib/debug/profiler.h,,
 Header,+,lib/digital_signal/digital_sequence.h,,
 Header,+,lib/digital_signal/digital_signal.h,,
 Header,+,lib/drivers/cc1101_regs.h,,
@@ -56,6 +69,8 @@ Header,+,lib/flipper_application/plugins/plugin_manager.h,,
 Header,+,lib/flipper_format/flipper_format.h,,
 Header,+,lib/flipper_format/flipper_format_i.h,,
 Header,+,lib/flipper_format/flipper_format_stream.h,,
+Header,+,lib/flipper_metadata/property.h,,
+Header,+,lib/flipper_metadata/version.h,,
 Header,+,lib/ibutton/ibutton_key.h,,
 Header,+,lib/ibutton/ibutton_protocols.h,,
 Header,+,lib/ibutton/ibutton_worker.h,,
@@ -126,6 +141,12 @@ Header,+,lib/nanopb/pb_decode.h,,
 Header,+,lib/nanopb/pb_encode.h,,
 Header,+,lib/nfc/helpers/iso13239_crc.h,,
 Header,+,lib/nfc/helpers/iso14443_crc.h,,
+Header,+,lib/nfc/helpers/logger/history/nfc_history_chain_data_type.h,,
+Header,+,lib/nfc/helpers/logger/history/nfc_history_data_type.h,,
+Header,+,lib/nfc/helpers/logger/nfc_trace_data_type.h,,
+Header,+,lib/nfc/helpers/logger/transaction/nfc_packet_data_type.h,,
+Header,+,lib/nfc/helpers/logger/transaction/nfc_transaction.h,,
+Header,+,lib/nfc/helpers/logger/transaction/nfc_transaction_data_type.h,,
 Header,+,lib/nfc/helpers/nfc_data_generator.h,,
 Header,+,lib/nfc/helpers/nfc_util.h,,
 Header,+,lib/nfc/nfc.h,,
@@ -134,40 +155,75 @@ Header,+,lib/nfc/nfc_listener.h,,
 Header,+,lib/nfc/nfc_poller.h,,
 Header,+,lib/nfc/nfc_scanner.h,,
 Header,+,lib/nfc/protocols/felica/felica.h,,
+Header,+,lib/nfc/protocols/felica/felica_listener.h,,
+Header,+,lib/nfc/protocols/felica/felica_listener_history_data.h,,
 Header,+,lib/nfc/protocols/felica/felica_poller.h,,
+Header,+,lib/nfc/protocols/felica/felica_poller_history_data.h,,
+Header,+,lib/nfc/protocols/felica/felica_poller_sync.h,,
 Header,+,lib/nfc/protocols/iso14443_3a/iso14443_3a.h,,
 Header,+,lib/nfc/protocols/iso14443_3a/iso14443_3a_listener.h,,
+Header,+,lib/nfc/protocols/iso14443_3a/iso14443_3a_listener_history_data.h,,
 Header,+,lib/nfc/protocols/iso14443_3a/iso14443_3a_poller.h,,
+Header,+,lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_history_data.h,,
 Header,+,lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_sync.h,,
 Header,+,lib/nfc/protocols/iso14443_3b/iso14443_3b.h,,
 Header,+,lib/nfc/protocols/iso14443_3b/iso14443_3b_poller.h,,
+Header,+,lib/nfc/protocols/iso14443_3b/iso14443_3b_poller_history_data.h,,
 Header,+,lib/nfc/protocols/iso14443_4a/iso14443_4a.h,,
 Header,+,lib/nfc/protocols/iso14443_4a/iso14443_4a_listener.h,,
+Header,+,lib/nfc/protocols/iso14443_4a/iso14443_4a_listener_history_data.h,,
 Header,+,lib/nfc/protocols/iso14443_4a/iso14443_4a_poller.h,,
+Header,+,lib/nfc/protocols/iso14443_4a/iso14443_4a_poller_history_data.h,,
 Header,+,lib/nfc/protocols/iso14443_4b/iso14443_4b.h,,
 Header,+,lib/nfc/protocols/iso14443_4b/iso14443_4b_poller.h,,
-Header,+,lib/nfc/protocols/iso15693_3/iso15693_3.h,,
-Header,+,lib/nfc/protocols/iso15693_3/iso15693_3_poller.h,,
+Header,+,lib/nfc/protocols/iso14443_4b/iso14443_4b_poller_history_data.h,,
+Header,+,lib/nfc/protocols/iso15693_3/iso15693_3_listener_history_data.h,,
+Header,+,lib/nfc/protocols/iso15693_3/iso15693_3_poller_history_data.h,,
 Header,+,lib/nfc/protocols/mf_classic/mf_classic.h,,
 Header,+,lib/nfc/protocols/mf_classic/mf_classic_listener.h,,
 Header,+,lib/nfc/protocols/mf_classic/mf_classic_poller.h,,
 Header,+,lib/nfc/protocols/mf_classic/mf_classic_poller_sync.h,,
 Header,+,lib/nfc/protocols/mf_desfire/mf_desfire.h,,
 Header,+,lib/nfc/protocols/mf_desfire/mf_desfire_poller.h,,
+Header,+,lib/nfc/protocols/mf_desfire/mf_desfire_poller_history_data.h,,
+Header,+,lib/nfc/protocols/mf_plus/mf_plus.h,,
+Header,+,lib/nfc/protocols/mf_plus/mf_plus_poller.h,,
+Header,+,lib/nfc/protocols/mf_plus/mf_plus_poller_history_data.h,,
 Header,+,lib/nfc/protocols/mf_ultralight/mf_ultralight.h,,
 Header,+,lib/nfc/protocols/mf_ultralight/mf_ultralight_listener.h,,
+Header,+,lib/nfc/protocols/mf_ultralight/mf_ultralight_listener_history_data.h,,
 Header,+,lib/nfc/protocols/mf_ultralight/mf_ultralight_poller.h,,
+Header,+,lib/nfc/protocols/mf_ultralight/mf_ultralight_poller_history_data.h,,
 Header,+,lib/nfc/protocols/mf_ultralight/mf_ultralight_poller_sync.h,,
+Header,+,lib/nfc/protocols/nfc_protocol.h,,
 Header,+,lib/nfc/protocols/slix/slix.h,,
+Header,+,lib/nfc/protocols/slix/slix_listener_history_data.h,,
+Header,+,lib/nfc/protocols/slix/slix_poller.h,,
+Header,+,lib/nfc/protocols/slix/slix_poller_history_data.h,,
 Header,+,lib/nfc/protocols/st25tb/st25tb.h,,
 Header,+,lib/nfc/protocols/st25tb/st25tb_poller.h,,
+Header,+,lib/nfc/protocols/st25tb/st25tb_poller_history_data.h,,
 Header,+,lib/nfc/protocols/st25tb/st25tb_poller_sync.h,,
 Header,+,lib/one_wire/maxim_crc.h,,
 Header,+,lib/one_wire/one_wire_host.h,,
 Header,+,lib/one_wire/one_wire_slave.h,,
 Header,+,lib/print/wrappers.h,,
 Header,+,lib/pulse_reader/pulse_reader.h,,
+Header,+,lib/pure/bit_lib.h,,
+Header,+,lib/pure/float_tools.h,,
+Header,+,lib/pure/hex.h,,
+Header,+,lib/pure/strint.h,,
+Header,+,lib/pure/value_index.h,,
+Header,+,lib/pure/varint.h,,
+Header,+,lib/settings_helpers/submenu_based.h,,
+Header,+,lib/signal_common/level_duration.h,,
+Header,+,lib/signal_common/manchester_decoder.h,,
+Header,+,lib/signal_common/manchester_encoder.h,,
+Header,+,lib/signal_common/protocols/protocol.h,,
+Header,+,lib/signal_common/protocols/protocol_dict.h,,
+Header,+,lib/signal_common/pulse_protocols/pulse_glue.h,,
 Header,+,lib/signal_reader/signal_reader.h,,
+Header,+,lib/srv_util/api_lock.h,,
 Header,+,lib/stm32wb_hal/Inc/stm32wbxx_ll_adc.h,,
 Header,+,lib/stm32wb_hal/Inc/stm32wbxx_ll_bus.h,,
 Header,+,lib/stm32wb_hal/Inc/stm32wbxx_ll_comp.h,,
@@ -195,6 +251,17 @@ Header,+,lib/stm32wb_hal/Inc/stm32wbxx_ll_tim.h,,
 Header,+,lib/stm32wb_hal/Inc/stm32wbxx_ll_usart.h,,
 Header,+,lib/stm32wb_hal/Inc/stm32wbxx_ll_utils.h,,
 Header,+,lib/stm32wb_hal/Inc/stm32wbxx_ll_wwdg.h,,
+Header,+,lib/storage_util/crc32_calc.h,,
+Header,+,lib/storage_util/dir_walk.h,,
+Header,+,lib/storage_util/md5_calc.h,,
+Header,+,lib/storage_util/name_generator.h,,
+Header,+,lib/storage_util/path.h,,
+Header,+,lib/storage_util/saved_struct.h,,
+Header,+,lib/storage_util/stream/buffered_file_stream.h,,
+Header,+,lib/storage_util/stream/file_stream.h,,
+Header,+,lib/storage_util/stream/stream.h,,
+Header,+,lib/storage_util/stream/stream_cache.h,,
+Header,+,lib/storage_util/stream/string_stream.h,,
 Header,+,lib/subghz/blocks/const.h,,
 Header,+,lib/subghz/blocks/decoder.h,,
 Header,+,lib/subghz/blocks/encoder.h,,
@@ -212,31 +279,6 @@ Header,+,lib/subghz/subghz_setting.h,,
 Header,+,lib/subghz/subghz_tx_rx_worker.h,,
 Header,+,lib/subghz/subghz_worker.h,,
 Header,+,lib/subghz/transmitter.h,,
-Header,+,lib/toolbox/api_lock.h,,
-Header,+,lib/toolbox/arg_parser.h,,
-Header,+,lib/toolbox/args.h,,
-Header,+,lib/toolbox/bit_buffer.h,,
-Header,+,lib/toolbox/compress.h,,
-Header,+,lib/toolbox/crc32_calc.h,,
-Header,+,lib/toolbox/dir_walk.h,,
-Header,+,lib/toolbox/float_tools.h,,
-Header,+,lib/toolbox/hex.h,,
-Header,+,lib/toolbox/keys_dict.h,,
-Header,+,lib/toolbox/manchester_decoder.h,,
-Header,+,lib/toolbox/manchester_encoder.h,,
-Header,+,lib/toolbox/name_generator.h,,
-Header,+,lib/toolbox/path.h,,
-Header,+,lib/toolbox/pretty_format.h,,
-Header,+,lib/toolbox/protocols/protocol_dict.h,,
-Header,+,lib/toolbox/saved_struct.h,,
-Header,+,lib/toolbox/simple_array.h,,
-Header,+,lib/toolbox/stream/buffered_file_stream.h,,
-Header,+,lib/toolbox/stream/file_stream.h,,
-Header,+,lib/toolbox/stream/stream.h,,
-Header,+,lib/toolbox/stream/string_stream.h,,
-Header,+,lib/toolbox/tar/tar_archive.h,,
-Header,+,lib/toolbox/value_index.h,,
-Header,+,lib/toolbox/version.h,,
 Header,+,targets/f7/ble_glue/furi_ble/event_dispatcher.h,,
 Header,+,targets/f7/ble_glue/furi_ble/gatt.h,,
 Header,+,targets/f7/ble_glue/furi_ble/profile_interface.h,,
@@ -766,6 +808,15 @@ Function,+,bt_keys_storage_set_storage_path,void,"Bt*, const char*"
 Function,+,bt_profile_restore_default,_Bool,Bt*
 Function,+,bt_profile_start,FuriHalBleProfileBase*,"Bt*, const FuriHalBleProfileTemplate*, FuriHalBleProfileParams"
 Function,+,bt_set_status_changed_callback,void,"Bt*, BtStatusChangedCallback, void*"
+Function,+,buffer_get_data,uint8_t*,Buffer*
+Function,+,buffer_get_size,size_t,Buffer*
+Function,+,buffer_reset,void,Buffer*
+Function,+,buffer_stream_alloc,BufferStream*,"size_t, size_t"
+Function,+,buffer_stream_free,void,BufferStream*
+Function,+,buffer_stream_get_overrun_count,size_t,BufferStream*
+Function,+,buffer_stream_receive,Buffer*,"BufferStream*, uint32_t"
+Function,+,buffer_stream_reset,void,BufferStream*
+Function,+,buffer_stream_send_from_isr,_Bool,"BufferStream*, const uint8_t*, size_t"
 Function,+,buffered_file_stream_alloc,Stream*,Storage*
 Function,+,buffered_file_stream_close,_Bool,Stream*
 Function,+,buffered_file_stream_get_error,FS_Error,Stream*
@@ -948,7 +999,9 @@ Function,+,elements_multiline_text_framed,void,"Canvas*, int32_t, int32_t, const
 Function,+,elements_progress_bar,void,"Canvas*, int32_t, int32_t, size_t, float"
 Function,+,elements_progress_bar_with_text,void,"Canvas*, int32_t, int32_t, size_t, float, const char*"
 Function,+,elements_scrollable_text_line,void,"Canvas*, int32_t, int32_t, size_t, FuriString*, size_t, _Bool"
+Function,+,elements_scrollable_text_line_centered,void,"Canvas*, int32_t, int32_t, size_t, FuriString*, size_t, _Bool, _Bool"
 Function,+,elements_scrollbar,void,"Canvas*, size_t, size_t"
+Function,+,elements_scrollbar_horizontal,void,"Canvas*, int32_t, int32_t, size_t, size_t, size_t"
 Function,+,elements_scrollbar_pos,void,"Canvas*, int32_t, int32_t, size_t, size_t, size_t"
 Function,+,elements_slightly_rounded_box,void,"Canvas*, int32_t, int32_t, size_t, size_t"
 Function,+,elements_slightly_rounded_frame,void,"Canvas*, int32_t, int32_t, size_t, size_t"
@@ -1546,6 +1599,8 @@ Function,+,furi_hal_serial_async_rx,uint8_t,FuriHalSerialHandle*
 Function,+,furi_hal_serial_async_rx_available,_Bool,FuriHalSerialHandle*
 Function,+,furi_hal_serial_async_rx_start,void,"FuriHalSerialHandle*, FuriHalSerialAsyncRxCallback, void*, _Bool"
 Function,+,furi_hal_serial_async_rx_stop,void,FuriHalSerialHandle*
+Function,+,furi_hal_serial_configure_flow_control,void,"FuriHalSerialHandle*, _Bool, _Bool"
+Function,+,furi_hal_serial_configure_framing,void,"FuriHalSerialHandle*, FuriHalSerialDataBits, FuriHalSerialParity, FuriHalSerialStopBits"
 Function,+,furi_hal_serial_control_acquire,FuriHalSerialHandle*,FuriHalSerialId
 Function,+,furi_hal_serial_control_deinit,void,
 Function,+,furi_hal_serial_control_init,void,
@@ -2413,7 +2468,8 @@ Function,+,memchr,void*,"const void*, int, size_t"
 Function,+,memcmp,int,"const void*, const void*, size_t"
 Function,+,memcpy,void*,"void*, const void*, size_t"
 Function,-,memmem,void*,"const void*, size_t, const void*, size_t"
-Function,-,memmgr_alloc_from_pool,void*,size_t
+Function,-,memmgr_aux_pool_alloc,void*,size_t
+Function,-,memmgr_aux_pool_get_free,size_t,
 Function,+,memmgr_get_free_heap,size_t,
 Function,+,memmgr_get_minimum_free_heap,size_t,
 Function,+,memmgr_get_total_heap,size_t,
@@ -2443,6 +2499,7 @@ Function,+,mf_classic_get_blocks_num_in_sector,uint8_t,uint8_t
 Function,+,mf_classic_get_device_name,const char*,"const MfClassicData*, NfcDeviceNameType"
 Function,+,mf_classic_get_first_block_num_of_sector,uint8_t,uint8_t
 Function,+,mf_classic_get_read_sectors_and_keys,void,"const MfClassicData*, uint8_t*, uint8_t*"
+Function,+,mf_classic_get_scannable_sectors_num,uint8_t,MfClassicType
 Function,+,mf_classic_get_sector_by_block,uint8_t,uint8_t
 Function,+,mf_classic_get_sector_trailer_by_sector,MfClassicSectorTrailer*,"const MfClassicData*, uint8_t"
 Function,+,mf_classic_get_sector_trailer_num_by_block,uint8_t,uint8_t
@@ -2698,6 +2755,7 @@ Function,+,nfc_device_set_loading_callback,void,"NfcDevice*, NfcLoadingCallback,
 Function,+,nfc_device_set_uid,_Bool,"NfcDevice*, const uint8_t*, size_t"
 Function,+,nfc_felica_listener_set_sensf_res_data,NfcError,"Nfc*, const uint8_t*, const uint8_t, const uint8_t*, const uint8_t"
 Function,+,nfc_free,void,Nfc*
+Function,+,nfc_get_logger,NfcLogger*,Nfc*
 Function,+,nfc_iso14443a_listener_set_col_res_data,NfcError,"Nfc*, uint8_t*, uint8_t, uint8_t*, uint8_t"
 Function,+,nfc_iso14443a_listener_tx_custom_parity,NfcError,"Nfc*, const BitBuffer*"
 Function,+,nfc_iso14443a_poller_trx_custom_parity,NfcError,"Nfc*, const BitBuffer*, BitBuffer*, uint32_t"
@@ -2711,6 +2769,8 @@ Function,+,nfc_listener_get_protocol,NfcProtocol,const NfcListener*
 Function,+,nfc_listener_start,void,"NfcListener*, NfcGenericCallback, void*"
 Function,+,nfc_listener_stop,void,NfcListener*
 Function,+,nfc_listener_tx,NfcError,"Nfc*, const BitBuffer*"
+Function,+,nfc_logger_config,void,"NfcLogger*, _Bool, const char*"
+Function,+,nfc_logger_raw_log_file_present,_Bool,"NfcLogger*, FuriString*"
 Function,+,nfc_poller_alloc,NfcPoller*,"Nfc*, NfcProtocol"
 Function,+,nfc_poller_detect,_Bool,NfcPoller*
 Function,+,nfc_poller_free,void,NfcPoller*
@@ -2722,7 +2782,9 @@ Function,+,nfc_poller_stop,void,NfcPoller*
 Function,+,nfc_poller_trx,NfcError,"Nfc*, const BitBuffer*, BitBuffer*, uint32_t"
 Function,+,nfc_protocol_get_parent,NfcProtocol,NfcProtocol
 Function,+,nfc_protocol_has_parent,_Bool,"NfcProtocol, NfcProtocol"
-Function,+,nfc_reset,void,Nfc*
+Function,+,nfc_protocol_layer_list_alloc,NfcProtocol*,"NfcProtocol, uint8_t*"
+Function,+,nfc_protocol_layer_list_free,void,NfcProtocol*
+Function,+,nfc_protocol_layers_get_count,uint8_t,NfcProtocol
 Function,+,nfc_scanner_alloc,NfcScanner*,Nfc*
 Function,+,nfc_scanner_free,void,NfcScanner*
 Function,+,nfc_scanner_start,void,"NfcScanner*, NfcScannerCallback, void*"
@@ -2734,6 +2796,8 @@ Function,+,nfc_set_guard_time_us,void,"Nfc*, uint32_t"
 Function,+,nfc_set_mask_receive_time_fc,void,"Nfc*, uint32_t"
 Function,+,nfc_start,void,"Nfc*, NfcEventCallback, void*"
 Function,+,nfc_stop,void,Nfc*
+Function,+,nfc_transaction_free,void,NfcTransaction*
+Function,+,nfc_transaction_read,_Bool,"Stream*, NfcTransaction**"
 Function,+,nfc_util_even_parity32,uint8_t,uint32_t
 Function,+,nfc_util_odd_parity,void,"const uint8_t*, uint8_t*, uint8_t"
 Function,+,nfc_util_odd_parity8,uint8_t,uint8_t
@@ -2845,6 +2909,12 @@ Function,+,powf,float,"float, float"
 Function,-,powl,long double,"long double, long double"
 Function,+,pretty_format_bytes_hex_canonical,void,"FuriString*, size_t, const char*, const uint8_t*, size_t"
 Function,-,printf,int,"const char*, ..."
+Function,+,profiler_alloc,Profiler*,
+Function,+,profiler_dump,void,Profiler*
+Function,+,profiler_free,void,Profiler*
+Function,+,profiler_prealloc,void,"Profiler*, const char*"
+Function,+,profiler_start,void,"Profiler*, const char*"
+Function,+,profiler_stop,void,"Profiler*, const char*"
 Function,+,property_value_out,void,"PropertyValueContext*, const char*, unsigned int, ..."
 Function,+,protocol_dict_alloc,ProtocolDict*,"const ProtocolBase**, size_t"
 Function,+,protocol_dict_decoders_feed,ProtocolId,"ProtocolDict*, _Bool, uint32_t"
@@ -3133,6 +3203,17 @@ Function,-,strcoll_l,int,"const char*, const char*, locale_t"
 Function,+,strcpy,char*,"char*, const char*"
 Function,+,strcspn,size_t,"const char*, const char*"
 Function,+,strdup,char*,const char*
+Function,+,stream_cache_alloc,StreamCache*,
+Function,+,stream_cache_at_end,_Bool,StreamCache*
+Function,+,stream_cache_drop,void,StreamCache*
+Function,+,stream_cache_fill,size_t,"StreamCache*, Stream*"
+Function,+,stream_cache_flush,_Bool,"StreamCache*, Stream*"
+Function,+,stream_cache_free,void,StreamCache*
+Function,+,stream_cache_pos,size_t,StreamCache*
+Function,+,stream_cache_read,size_t,"StreamCache*, uint8_t*, size_t"
+Function,+,stream_cache_seek,int32_t,"StreamCache*, int32_t"
+Function,+,stream_cache_size,size_t,StreamCache*
+Function,+,stream_cache_write,size_t,"StreamCache*, const uint8_t*, size_t"
 Function,+,stream_clean,void,Stream*
 Function,+,stream_copy,size_t,"Stream*, Stream*, size_t"
 Function,+,stream_copy_full,size_t,"Stream*, Stream*"
@@ -3367,12 +3448,21 @@ Function,+,subghz_worker_set_pair_callback,void,"SubGhzWorker*, SubGhzWorkerPair
 Function,+,subghz_worker_start,void,SubGhzWorker*
 Function,+,subghz_worker_stop,void,SubGhzWorker*
 Function,+,submenu_add_item,void,"Submenu*, const char*, uint32_t, SubmenuItemCallback, void*"
+Function,+,submenu_add_lockable_item,void,"Submenu*, const char*, uint32_t, SubmenuItemCallback, void*, _Bool, const char*"
 Function,+,submenu_alloc,Submenu*,
 Function,+,submenu_free,void,Submenu*
 Function,+,submenu_get_view,View*,Submenu*
 Function,+,submenu_reset,void,Submenu*
 Function,+,submenu_set_header,void,"Submenu*, const char*"
+Function,+,submenu_set_orientation,void,"Submenu*, ViewOrientation"
 Function,+,submenu_set_selected_item,void,"Submenu*, uint32_t"
+Function,+,submenu_settings_helpers_alloc,SubmenuSettingsHelper*,const SubmenuSettingsHelperDescriptor*
+Function,+,submenu_settings_helpers_app_start,_Bool,"SubmenuSettingsHelper*, void*"
+Function,+,submenu_settings_helpers_assign_objects,void,"SubmenuSettingsHelper*, ViewDispatcher*, SceneManager*, Submenu*, uint32_t, uint32_t"
+Function,+,submenu_settings_helpers_free,void,SubmenuSettingsHelper*
+Function,+,submenu_settings_helpers_scene_enter,void,SubmenuSettingsHelper*
+Function,+,submenu_settings_helpers_scene_event,_Bool,"SubmenuSettingsHelper*, SceneManagerEvent"
+Function,+,submenu_settings_helpers_scene_exit,void,SubmenuSettingsHelper*
 Function,-,system,int,const char*
 Function,+,t5577_write,void,LFRFIDT5577*
 Function,+,t5577_write_with_mask,void,"LFRFIDT5577*, uint8_t, _Bool, uint32_t"
@@ -3448,13 +3538,17 @@ Function,+,variable_item_get_current_value_index,uint8_t,VariableItem*
 Function,+,variable_item_list_add,VariableItem*,"VariableItemList*, const char*, uint8_t, VariableItemChangeCallback, void*"
 Function,+,variable_item_list_alloc,VariableItemList*,
 Function,+,variable_item_list_free,void,VariableItemList*
+Function,+,variable_item_list_get,VariableItem*,"VariableItemList*, uint8_t"
 Function,+,variable_item_list_get_selected_item_index,uint8_t,VariableItemList*
 Function,+,variable_item_list_get_view,View*,VariableItemList*
 Function,+,variable_item_list_reset,void,VariableItemList*
 Function,+,variable_item_list_set_enter_callback,void,"VariableItemList*, VariableItemListEnterCallback, void*"
+Function,+,variable_item_list_set_header,void,"VariableItemList*, const char*"
 Function,+,variable_item_list_set_selected_item,void,"VariableItemList*, uint8_t"
 Function,+,variable_item_set_current_value_index,void,"VariableItem*, uint8_t"
 Function,+,variable_item_set_current_value_text,void,"VariableItem*, const char*"
+Function,+,variable_item_set_item_label,void,"VariableItem*, const char*"
+Function,+,variable_item_set_locked,void,"VariableItem*, _Bool, const char*"
 Function,+,variable_item_set_values_count,void,"VariableItem*, uint8_t"
 Function,-,vasiprintf,int,"char**, const char*, __gnuc_va_list"
 Function,-,vasniprintf,char*,"char*, size_t*, const char*, __gnuc_va_list"

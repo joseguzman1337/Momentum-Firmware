@@ -1,8 +1,8 @@
 #include <furi.h>
-#include "toolbox/level_duration.h"
+#include "level_duration.h"
 #include "protocol_fdx_b.h"
-#include <toolbox/manchester_decoder.h>
-#include <bit_lib/bit_lib.h>
+#include <manchester_decoder.h>
+#include <pure/bit_lib.h>
 #include "lfrfid_protocols.h"
 #include <furi_hal_rtc.h>
 #include <tools/iso_3166.h>
@@ -267,7 +267,7 @@ static bool protocol_fdx_b_get_temp(const uint8_t* data, float* temp) {
     bool ex_temperature_present = (ex_calc_parity == ex_parity) && !(extended & 0xe00);
 
     if(ex_temperature_present) {
-        float temperature_f = 74 + ex_temperature * 0.2;
+        float temperature_f = 74 + ex_temperature * 0.2f;
         *temp = temperature_f;
         return true;
     } else {

@@ -1,5 +1,5 @@
-#include "../subghz_i.h"
-#include <lib/toolbox/value_index.h>
+#include "../subghz_i.h" // IWYU pragma: keep
+#include <pure/value_index.h>
 #include <applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h>
 #include <applications/drivers/subghz/si4463_ext/si4463_ext_interconnect.h>
 
