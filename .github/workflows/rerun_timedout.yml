@@ -13,7 +13,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.run_attempt == 1 }}
     steps:
       - name: Rerun workflow due to timeout
-        uses: actions/github-script@v6
+        uses: actions/github-script@v8
         with:
           script: |
             const runId = context.payload.workflow_run.id;
