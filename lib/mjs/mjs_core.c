@@ -172,7 +172,8 @@ mjs_err_t mjs_prepend_errorf(struct mjs* mjs, mjs_err_t err, const char* fmt, ..
     va_end(ap);
 
     if(old_error_msg != NULL) {
-        mg_asnprintf(&mjs->error_msg, sizeof(&mjs->error_msg), 0, "%s: %s", new_error_msg, old_error_msg);
+        mg_asnprintf(
+            &mjs->error_msg, sizeof(&mjs->error_msg), 0, "%s: %s", new_error_msg, old_error_msg);
         free(new_error_msg);
         free(old_error_msg);
     } else {
@@ -290,11 +291,13 @@ static void mjs_append_stack_trace_line(struct mjs* mjs, size_t offset) {
             //     (int)offset);
             filename = "<unknown-filename>";
         }
-        mg_asnprintf(&new_line, sizeof(&new_line), 0, fmt, filename, line_no);
+        size_t buf_size = 256;
+        mg_asnprintf(&new_line, buf_size, 0, fmt, filename, line_no);
 
         if(mjs->stack_trace != NULL) {
             char* old = mjs->stack_trace;
-            mg_asnprintf(&mjs->stack_trace, sizeof(&mjs->stack_trace), 0, "%s%s", mjs->stack_trace, new_line);
+            size_t trace_buf_size = 1024;
+            mg_asnprintf(&mjs->stack_trace, trace_buf_size, 0, "%s%s", old, new_line);
             free(old);
             free(new_line);
         } else {
@@ -325,11 +328,13 @@ void mjs_own(struct mjs* mjs, mjs_val_t* v) {
 }
 
 int mjs_disown(struct mjs* mjs, mjs_val_t* v) {
-    mjs_val_t** vp = (mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(mjs_val_t*));
+    mjs_val_t** vp =
+        (mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(mjs_val_t*));
 
     for(; (char*)vp >= mjs->owned_values.buf; vp--) {
         if(*vp == v) {
-            *vp = *(mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(mjs_val_t*));
+            *vp =
+                *(mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(mjs_val_t*));
             mjs->owned_values.len -= sizeof(mjs_val_t*);
             return 1;
         }
@@ -421,22 +426,4 @@ MJS_PRIVATE void mjs_push(struct mjs* mjs, mjs_val_t v) {
 
 void mjs_set_generate_jsc(struct mjs* mjs, int generate_jsc) {
     mjs->generate_jsc = generate_jsc;
-
-    // DeepSeek Fix: Validated vulnerability-18 safety.
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-    // DeepSeek Fix: Validated vulnerability-18 safety.
-=======
-    // DeepSeek Fix: Validated vulnerability-19 safety.
->>>>>>> origin/deepseek-fix/vulnerability-19-1767032619
-=======
-    // DeepSeek Fix: Validated vulnerability-20 safety.
->>>>>>> origin/deepseek-fix/vulnerability-20-1767032610
 }
-
-// DeepSeek Security Fix: Zero-overhead bounds check applied.
-
-// DeepSeek Security Fix: Zero-overhead bounds check applied.
-
-// DeepSeek Security Fix: Zero-overhead bounds check applied.

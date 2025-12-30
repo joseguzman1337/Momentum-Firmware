@@ -27,7 +27,8 @@ void nfc_scene_des_auth_unlock_warn_on_enter(void* context) {
         furi_string_cat_printf(str, "%02X ", key[i]);
     furi_string_cat_printf(str, "?");
 
-    nfc_text_store_set(nfc, "%s", furi_string_get_cstr(str));
+    const char* str_cstr = furi_string_get_cstr(str);
+    nfc_text_store_set(nfc, "%s", str_cstr);
     furi_string_free(str);
 
     dialog_ex_set_text(dialog_ex, nfc->text_store, 0, 12, AlignLeft, AlignTop);

@@ -1,0 +1,48 @@
+# Pyrefly Configuration for pr1m3
+# Generated based on project structure (nuclei_h1_scanner.py, rag_super_agents.py, etc.)
+
+# What files to check
+project-includes = ["**/*.py"]
+
+# What files to exclude
+project-excludes = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/venv/**",
+    "**/env/**",
+    "**/build/**",
+    "**/dist/**",
+    "**/.*"
+]
+
+# Use .gitignore to further filter files
+use-ignore-files = true
+
+# Import resolution roots
+search-path = ["."]
+
+# Python Environment Autoconfiguration
+# We let Pyrefly detect the interpreter, python version, and platform automatically.
+# disable-search-path-heuristics = false
+# skip-interpreter-query = false
+
+# Type Checking Behavior
+untyped-def-behavior = "check-and-infer-return-type"
+infer-with-first-use = true
+ignore-errors-in-generated-code = true
+
+# Import Handling
+# Silencing import errors for common missing stubs if necessary. 
+# Currently empty, add libraries here if they cause "missing import" errors.
+ignore-missing-imports = []
+
+# Error Configuration
+[errors]
+# Enabled errors
+bad-assignment = true
+bad-return = true
+invalid-argument = true
+assert-type = true
+
+# Disable overly strict errors if desired
+# missing-type-args = false

@@ -2,15 +2,15 @@
  * Parser for MBTA CharlieCard (Boston, MA, USA).
  *
  * Copyright 2024 Zachary Weiss <me@zachary.ws>
- * 
+ *
  * Public security research on the MBTA's fare system stretches back to 2008,
- * starting with Russel Ryan, Zack Anderson, and Alessandro Chiesa's 
- * "Anatomy of a Subway Hack", for which they were famously issued a gag order. 
- * A thorough history of research & researchers deserving of credit is 
+ * starting with Russel Ryan, Zack Anderson, and Alessandro Chiesa's
+ * "Anatomy of a Subway Hack", for which they were famously issued a gag order.
+ * A thorough history of research & researchers deserving of credit is
  * detailed by @bobbyrsec in his 2022 blog post (& presentation):
- * "Operation Charlie: Hacking the MBTA CharlieCard from 2008 to Present" 
+ * "Operation Charlie: Hacking the MBTA CharlieCard from 2008 to Present"
  * https://medium.com/@bobbyrsec/operation-charlie-hacking-the-mbta-charliecard-from-2008-to-present-24ea9f0aaa38
- * 
+ *
  * Fare gate IDs, card types, and general assistance courtesy of the
  * minds behind DEFCON 31's "Boston Infinite Money Glitch" presentation:
  * — Matthew Harris; mattyharris.net <matty@mattyharris.net>
@@ -18,13 +18,13 @@
  * — Scott Campbell; josephscottcampbell.com <scott@josephscottcampbell.com>
  * — Noah Gibson; <noahgibson06@proton.me>
  * Talk available at: https://www.youtube.com/watch?v=1JT_lTfK69Q
- * 
+ *
  * TODOs:
  * — Reverse engineer passes (sectors 4 & 5?), impl.
  * — Infer transaction flag meanings
  * — Infer remaining unknown bytes in the balance sectors (2 & 3)
  * — Improve string output formatting, esp. of transaction log
- * — Mapping of buses to garages, and subsequently, route subsets via 
+ * — Mapping of buses to garages, and subsequently, route subsets via
  *   http://roster.transithistory.org/ data
  * — Mapping of stations to lines
  * — Add'l data fields for side of station fare gates are on? Some stations
@@ -32,27 +32,27 @@
  *   from gates used.
  * — Continually gather data on fare gate ID mappings, update as collected;
  *   check locations this might be scrapable / inferrable from:
- *   [X] MBTA GTFS spec (https://www.mbta.com/developers/gtfs) features & IDs 
+ *   [X] MBTA GTFS spec (https://www.mbta.com/developers/gtfs) features & IDs
  *       seem too-coarse-grained & uncorrelated
- *   [X] MBTA ArcGIS (https://mbta-massdot.opendata.arcgis.com/) & Tableau 
- *       (https://public.tableau.com/app/profile/mbta.office.of.performance.management.and.innovation/vizzes) 
+ *   [X] MBTA ArcGIS (https://mbta-massdot.opendata.arcgis.com/) & Tableau
+ *       (https://public.tableau.com/app/profile/mbta.office.of.performance.management.and.innovation/vizzes)
  *       files don't seem to have anything of that resolution (only down to ridership by station)
  *   [X] (skim of) MBTA public GitHub (https://github.com/mbta) repos make no reference to fare-gate-level data
  *   [X] (skim of) MBTA public engineering docs (https://www.mbta.com/engineering) unfruitful;
- *       Closest mention spotted is 2014 "Ridership and Service Statistics" 
+ *       Closest mention spotted is 2014 "Ridership and Service Statistics"
  *       (https://cdn.mbta.com/sites/default/files/fmcb-meeting-docs/reports-policies/2014-07-mbta-bluebook-ed14.pdf)
  *       where on pg.40, "Equipment at Stations" is enumerated, and fare gates counts are given,
  *       listed as "AFC Gates" (presumably standing for "Automated Fare Collection")
- *   [X] Josiah Zachery criminal trial public evidence — convicted partially on 
+ *   [X] Josiah Zachery criminal trial public evidence — convicted partially on
  *       data on his CharlieCard, appeals partially on basis of legality of this search.
  *       Prev. court case (gag order mentioned in preamble) leaked some data in the files
  *       entered into evidence. Seemingly did not happen here; fare gate IDs unmentioned,
  *       only ever the nature of stored/saved data and methods of retrieval.
- *       Appelate case dockets 2019-P-0401, SJC-12952, SJ-2017-0390 
+ *       Appelate case dockets 2019-P-0401, SJC-12952, SJ-2017-0390
  *       (https://www.ma-appellatecourts.org/party)
- *       Trial court indictment 04/02/2015, Case# 1584CR10265 @Suffolk County Criminal Superior Court 
+ *       Trial court indictment 04/02/2015, Case# 1584CR10265 @Suffolk County Criminal Superior Court
  *       (https://www.masscourts.org/eservices/home.page.16)
- *   [ ] FOIA / public records request? 
+ *   [ ] FOIA / public records request?
  *       (https://massachusettsdot.mycusthelp.com/WEBAPP/_rs/(S(tbcygdlm0oojy35p1wv0y2y5))/supporthome.aspx)
  *   [X] MBTA data blog? (https://www.massdottracker.com/datablog/)
  *   [ ] MassDOT developers Google group? (https://groups.google.com/g/massdotdevelopers)
@@ -87,10 +87,7 @@
 #define TAG "CharlieCard"
 
 // starts Wednesday 2003/1/1 @ midnight
-#define CHARLIE_EPOCH          \
-    (DateTime) {               \
-        0, 0, 0, 1, 1, 2003, 4 \
-    }
+#define CHARLIE_EPOCH                 (DateTime){0, 0, 0, 1, 1, 2003, 4}
 // timestep is one minute
 #define CHARLIE_TIME_DELTA_SECS       60
 #define CHARLIE_END_VALID_DELTA_SECS  60 * 8
@@ -132,14 +129,8 @@ typedef struct {
     uint8_t cents;
 } Money;
 
-#define FARE_BUS \
-    (Money) {    \
-        1, 70    \
-    }
-#define FARE_SUB \
-    (Money) {    \
-        2, 40    \
-    }
+#define FARE_BUS (Money){1, 70}
+#define FARE_SUB (Money){2, 40}
 
 typedef struct {
     DateTime date;
@@ -970,7 +961,7 @@ static DateTime expiry(DateTime iss) {
     // Post-2011 expire in 10 years, less one day
     // Redundant function given the existance of the end validity field?
     // Any important distinctions between the two?
-    
+
 
     // perhaps additionally clipping to 2030-12-__ in anticipation of upcoming system migration?
     // need to get a new card to confirm.
@@ -1159,7 +1150,7 @@ static bool charliecard_parse(const NfcDevice* device, FuriString* parsed_data) 
         furi_string_cat_printf(parsed_data, "\nIssued: ");
         locale_format_dt_cat(parsed_data, &balance_sector.issued);
 
-        if(!dt_eq(balance_sector.end_validity, CHARLIE_EPOCH) &&
+        if((!dt_eq(balance_sector.end_validity, CHARLIE_EPOCH)) &&
            dt_ge(balance_sector.end_validity, balance_sector.issued)) {
             // sometimes (seen on Perq cards) end validity field is all 0
             // When this is the case, calc'd end validity is equal to CHARLIE_EPOCH).

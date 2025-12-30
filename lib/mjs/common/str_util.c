@@ -258,7 +258,8 @@ int to_wchar(const char* path, wchar_t* wbuf, size_t wbuf_len) {
 
     /* Trim trailing slashes. Leave backslash for paths like "X:\" */
     p = buf + strlen(buf) - 1;
-    while(p > buf && p[-1] != ':' && (p[0] == '\\' || p[0] == '/')) *p-- = '\0';
+    while(p > buf && p[-1] != ':' && (p[0] == '\\' || p[0] == '/'))
+        *p-- = '\0';
 
     memset(wbuf, 0, wbuf_len * sizeof(wchar_t));
     ret = MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, (int)wbuf_len);
@@ -345,7 +346,8 @@ int64_t cs_to64(const char* s) WEAK;
 int64_t cs_to64(const char* s) {
     int64_t result = 0;
     int64_t neg = 1;
-    while(*s && isspace((unsigned char)*s)) s++;
+    while(*s && isspace((unsigned char)*s))
+        s++;
     if(*s == '-') {
         neg = -1;
         s++;
@@ -402,19 +404,21 @@ int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) {
         /* eCos and Windows are not standard-compliant and return -1 when
      * the buffer is too small. Keep allocating larger buffers until we
      * succeed or out of memory. */
-        *buf = NULL; /* LCOV_EXCL_START */
+        char* temp_buf = NULL; /* LCOV_EXCL_START */
+        *buf = NULL;
         while(len < 0) {
-            MG_FREE(*buf);
+            MG_FREE(temp_buf);
             if(size == 0) {
                 size = 5;
             }
             size *= 2;
-            if((*buf = (char*)MG_MALLOC(size)) == NULL) {
+            temp_buf = (char*)MG_MALLOC(size);
+            if(temp_buf == NULL) {
                 len = -1;
                 break;
             }
             va_copy(ap_copy, ap);
-            len = vsnprintf(*buf, size - 1, fmt, ap_copy);
+            len = vsnprintf(temp_buf, size - 1, fmt, ap_copy);
             va_end(ap_copy);
         }
 
@@ -422,9 +426,10 @@ int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) {
      * Microsoft version of vsnprintf() is not always null-terminated, so put
      * the terminator manually. Only do this if buffer allocation succeeded.
      */
-        if(*buf != NULL && len >= 0) {
-            (*buf)[len] = 0;
+        if(temp_buf != NULL && len >= 0) {
+            temp_buf[len] = 0;
         }
+        *buf = temp_buf;
         /* LCOV_EXCL_STOP */
     } else if(len >= (int)size) {
         /* Standard-compliant code path. Allocate a buffer that is large enough. */
@@ -509,7 +514,8 @@ size_t mg_match_prefix_n(const struct mg_str pattern, const struct mg_str str) {
                 len = str.len - j;
             } else {
                 len = 0;
-                while(j + len < str.len && str.p[j + len] != '/') len++;
+                while(j + len < str.len && str.p[j + len] != '/')
+                    len++;
             }
             if(i == pattern.len || (pattern.p[i] == '$' && i == pattern.len - 1)) return j + len;
             do {
