@@ -48,3 +48,6 @@
 	path = lib/uzlib
 	url = https://github.com/joseguzman1337/uzlib.git
 	branch = master
+[submodule "upstream/flipperzero-firmware"]
+	path = upstream/flipperzero-firmware
+	url = https://github.com/flipperdevices/flipperzero-firmware.git
