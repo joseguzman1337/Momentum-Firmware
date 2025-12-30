@@ -1,0 +1,54 @@
+Let me create a summary report for the user:
+
+## Analysis of Code Scanning Alert #21
+
+### Summary
+Alert #21 reports an **invalid pointer dereference** (buffer overflow) in `applications/main/nfc/nfc_cli.c` at line 169. The issue has been **RESOLVED** through a complete code refactoring.
+
+### Original Vulnerability (Commit 354dad4af)
+
+The vulnerable code was:
+```c
+resp_size = bit_buffer_get_size_bytes(apdu_context->rx_buffer) * 2;
+if(!resp_size) {
+    printf("No response\r\n");
+    free(req_buffer);
+    continue;
+}
+resp_buffer = malloc(resp_size);                                    // Line 166
+uint8_to_hex_chars(
+    bit_buffer_get_data(apdu_context->rx_buffer), resp_buffer, resp_size);
+resp_buffer[resp_size] = 0;                                         // Line 169 - OUT OF BOUNDS!
+printf("Response: %s\r\n", resp_buffer);
+```
+
+**The Bug:** 
+- `resp_buffer` is allocated with `malloc(resp_size)` bytes
+- Valid indices are `0` to `resp_size - 1`
+- Writing to `resp_buffer[resp_size]` at line 169 is **one byte past the allocated buffer**
+- This is a classic off-by-one buffer overflow vulnerability (CWE-787, CWE-193)
+
+**Security Impact:**
+- Out-of-bounds write can corrupt adjacent memory
+- Can cause crashes or undefined behavior
+- Potential for exploitation to execute arbitrary code
+- Classified as **CRITICAL** severity by CodeQL
+
+### Current Status
+
+The vulnerable file `applications/main/nfc/nfc_cli.c` **no longer exists**. The code was completely refactored in commit `eea53491d` ([FL-3569] NFC CLI commands):
+
+1. **Old file removed:** `applications/main/nfc/nfc_cli.c` 
+2. **New architecture:** Code split into modular components under `applications/main/nfc/cli/`
+3. **APDU functionality:** Now in `applications/main/nfc/cli/commands/apdu/nfc_cli_command_apdu.c`
+4. **Safe implementation:** The new code uses proper bit buffers and helper functions (`nfc_cli_printf_array`) instead of manual string manipulation
+
+The refactored code at applications/main/nfc/cli/commands/apdu/nfc_cli_command_apdu.c:118-135 correctly handles response printing without buffer overflow vulnerabilities.
+
+### Recommendation
+
+**The vulnerability is fixed by the refactoring**, but the GitHub Code Scanning alert remains open because:
+1. The alert references commit `354dad4af` which still contains the vulnerable code in git history
+2. The alert points to the old file path that no longer exists in the current codebase
+
+**Action Required:** The alert can be **dismissed** with reason "Used in tests" or "Won't fix - code has been refactored" since the vulnerable code path no longer exists in the current codebase.
