@@ -200,7 +200,7 @@ static void hid_keyboard_draw_key(
             key.icon);
     } else {
         // If shift is toggled use the shift key when available
-        strcpy(model->key_string, (model->shift && key.shift_key != 0) ? key.shift_key : key.key);
+        strlcpy(model->key_string, (model->shift && key.shift_key != 0, sizeof(model->key_string)) ? key.shift_key : key.key);
         // Upper case if ctrl or alt was toggled true
         if((model->ctrl && key.value == HID_KEYBOARD_L_CTRL) ||
            (model->alt && key.value == HID_KEYBOARD_L_ALT) ||

@@ -109,7 +109,7 @@ bool nfc_scene_nfcv_sniff_on_event(void* context, SceneManagerEvent event) {
                 text_box_set_text(nfc->text_box, furi_string_get_cstr(nfc->text_box_store));
 
                 /* clear previously logged command */
-                strcpy(nfcv_data->last_command, "");
+                strlcpy(nfcv_data->last_command, "", sizeof(nfcv_data->last_command));
             }
             consumed = true;
         } else if(event.event == NfcCustomEventSaveShadow) {

@@ -1139,7 +1139,7 @@ void nfcv_emu_init(FuriHalNfcDevData* nfc_data, NfcVData* nfcv_data) {
         return;
     }
 
-    strcpy(nfcv_data->last_command, "");
+    strlcpy(nfcv_data->last_command, "", sizeof(nfcv_data->last_command));
     nfcv_data->quiet = false;
     nfcv_data->selected = false;
     nfcv_data->modified = false;
