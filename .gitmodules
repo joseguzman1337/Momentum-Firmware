@@ -42,4 +42,9 @@
 	url = https://github.com/joseguzman1337/doxygen-awesome-css.git
 [submodule "lib/lwip"]
 	path = lib/lwip
-	url = https://github.com/lwip-tcpip/lwip.git
+	url = https://github.com/joseguzman1337/lwip.git
+	branch = master
+[submodule "lib/uzlib"]
+	path = lib/uzlib
+	url = https://github.com/joseguzman1337/uzlib.git
+	branch = master
