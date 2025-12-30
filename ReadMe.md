@@ -12,7 +12,10 @@
   <a href="#Install">Install</a> · <a href="#list-of-changes">Features</a> · <a href="https://discord.gg/momentum">Discord</a> · <a href="#%EF%B8%8F-support">Donate</a>
 </h2>
 
-This custom firmware is based on the [Official Firmware](https://github.com/flipperdevices/flipperzero-firmware) for [Flipper Zero](https://flipperzero.one/), and includes most of the awesome features from [Unleashed](https://github.com/DarkFlippers/unleashed-firmware). It is a direct continuation of the Xtreme firmware, built by the same (and only) developers who made that project special.
+- [Flipper Zero Official Website](https://flipperzero.one) - A simple way to explain to your friends what Flipper Zero can do.
+- [Flipper Zero Firmware Update](https://flipperzero.one/update) - Improvements for your dolphin: latest firmware releases, upgrade tools for PC and mobile devices.
+- [User Documentation](https://docs.flipper.net) - Learn more about your dolphin: specs, usage guides, and anything you want to ask.
+- [Developer Documentation](https://developer.flipper.net/flipperzero/doxygen) - Dive into the Flipper Zero Firmware source code: build system, firmware structure, and more.
 
 <br>
 <h2 align="center">Modus Operandi</h2>
