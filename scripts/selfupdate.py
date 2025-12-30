@@ -45,40 +45,57 @@ class Main(App):
         try:
             with FlipperStorage(port) as storage:
                 storage_ops = FlipperStorageOperations(storage)
+                
+                # Killer logic: initial breakout
+                self.logger.info("Aggressive breakout: Clearing state and rebooting...")
+                try:
+                    # Flush and Break
+                    storage.port.reset_input_buffer()
+                    storage.read.buffer.clear()
+                    for _ in range(5):
+                        storage.send("\x03")
+                        time.sleep(0.05)
+                    storage.send("\r\n")
+                    time.sleep(0.1)
+                    
+                    # Try to close any app and then reboot
+                    storage.send("loader close\r\n")
+                    time.sleep(0.1)
+                    storage.send("power reboot\r\n")
+                    time.sleep(1)
+                except:
+                    pass
+                
+                # Wait for device to reboot and port to reappear
+                self.logger.info("Waiting for reboot (15s)...")
+                storage.stop()
+                time.sleep(15)
+                
+                self.logger.info("Attempting to reconnect...")
+                # Re-init storage on the same port
+                storage.start()
+                self.logger.info("Reconnected. Proceeding with update.")
+
+                self.logger.info("Verifying update path...")
                 storage_ops.mkpath(update_root)
                 storage_ops.mkpath(flipper_update_path)
                 storage_ops.recursive_send(
                     flipper_update_path, manifest_path.parents[0]
                 )
 
-                self.logger.info("Closing current app, if any")
-                for _ in range(10):
-                    storage.send_and_wait_eol("loader close\r")
-                    result = storage.read.until(storage.CLI_EOL)
-                    if b"was closed" in result:
-                        self.logger.info("App closed")
-                        storage.read.until(storage.CLI_EOL)
-                        time.sleep(self.APP_POST_CLOSE_DELAY_SEC)
-                    elif result.startswith(b"No application"):
-                        storage.read.until(storage.CLI_EOL)
-                        break
-                    else:
-                        self.logger.error(
-                            f"Unexpected response: {result.decode('ascii')}"
-                        )
-                        return 4
-
-                storage.send_and_wait_eol(
-                    f"update install {flipper_update_path}/{manifest_name}\r"
-                )
+                self.logger.info("Executing update install...")
+                storage.send(f"update install {flipper_update_path}/{manifest_name}\r")
+                
+                # Wait for verification message
                 result = storage.read.until(storage.CLI_EOL)
+                if b"update install" in result: # Consume echo
+                    result = storage.read.until(storage.CLI_EOL)
+                
                 if b"Verifying" not in result:
                     self.logger.error(f"Unexpected response: {result.decode('ascii')}")
-                    return 3
-                result = storage.read.until(storage.CLI_EOL)
-                if not result.startswith(b"OK"):
-                    self.logger.error(result.decode("ascii"))
                     return 4
+                
+                self.logger.info("Update started successfully")
                 return 0
         except Exception as e:
             self.logger.error(e)

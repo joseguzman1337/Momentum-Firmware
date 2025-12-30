@@ -4,5 +4,16 @@
 			"path": "."
 		}
 	],
+<<<<<<< HEAD
 	"settings": {}
+=======
+	"settings": {
+		"files.associations": {
+			"*.c": "c",
+			"*.h": "c",
+			"*.cpp": "cpp",
+			"*.hpp": "cpp"
+		}
+	}
+>>>>>>> origin/dev
 }

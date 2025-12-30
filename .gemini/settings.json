@@ -1,60 +1,30 @@
 {
-  "general": {
-    "sessionRetention": {
-      "enabled": true,
-      "maxAge": "14d",
-      "maxCount": 25,
-      "minRetention": "1d"
-    },
-    "enablePromptCompletion": true,
-    "vimMode": false
+  "tools": {
+    "autoAccept": false,
+    "exclude": [
+      "run_shell_command(rm -rf)",
+      "run_shell_command(sudo)"
+    ],
+    "sandbox": false
   },
   "model": {
-    "maxSessionTurns": 50,
-    "compressionThreshold": 0.3
+    "compressionThreshold": 0.6
   },
-  "ui": {
-    "showLineNumbers": true,
-    "showCitations": true,
-    "showStatusInTitle": true,
-    "hideContextSummary": false,
-    "footer": {
-      "hideContextPercentage": false
-    }
+  "general": {
+    "checkpointing": {
+      "enabled": true
+    },
+    "vimMode": false
   },
   "context": {
     "fileFiltering": {
-      "respectGitIgnore": true,
-      "respectGeminiIgnore": true,
-      "enableRecursiveFileSearch": true
+      "respectGitIgnore": true
     }
   },
-  "tools": {
-    "autoAccept": false,
-    "useRipgrep": true,
-    "enableToolOutputTruncation": true,
-    "truncateToolOutputThreshold": 15000,
-    "discoveryCommand": "python .gemini/tools/momentum_agent.py --discover",
-    "callCommand": "python .gemini/tools/momentum_agent.py",
-    "shell": {
-      "showColor": true
-    }
+  "ui": {
+    "theme": "GitHub"
   },
-  "security": {
-    "folderTrust": {
-      "enabled": true
-    }
-  },
-  "experimental": {
-    "codebaseInvestigatorSettings": {
-      "enabled": true,
-      "maxNumTurns": 15
-    }
-  },
-  "telemetry": {
-    "enabled": true,
-    "target": "local",
-    "outfile": ".gemini/telemetry.jsonl",
-    "logPrompts": false
+  "privacy": {
+    "usageStatisticsEnabled": false
   }
 }
