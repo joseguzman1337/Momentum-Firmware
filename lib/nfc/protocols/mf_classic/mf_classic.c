@@ -1,9 +1,9 @@
 #include "mf_classic.h"
 
 #include <furi/furi.h>
-#include <toolbox/hex.h>
+#include <hex.h>
 
-#include <lib/bit_lib/bit_lib.h>
+#include <lib/pure/bit_lib.h>
 
 #define MF_CLASSIC_PROTOCOL_NAME "Mifare Classic"
 
@@ -15,6 +15,9 @@ typedef struct {
 } MfClassicFeatures;
 
 static const uint32_t mf_classic_data_format_version = 2;
+
+// MIFARE Plus 2K SL1 has 32 sectors (128 blocks total) per official specification
+#define MF_CLASSIC_PLUS2K_SCAN_SECTORS 32
 
 static const MfClassicFeatures mf_classic_features[MfClassicTypeNum] = {
     [MfClassicTypeMini] =
@@ -31,12 +34,28 @@ static const MfClassicFeatures mf_classic_features[MfClassicTypeNum] = {
             .full_name = "Mifare Classic 1K",
             .type_name = "1K",
         },
+    [MfClassicTypePlus2k] =
+        {
+            // MIFARE Plus 2K SL1 maps like a 2K Classic: 32 sectors x 4 blocks
+            .sectors_total = 32,
+            .blocks_total = 128,
+            .full_name = "Mifare Plus 2K SL1",
+            .type_name = "Plus 2K",
+        },
     [MfClassicType4k] =
         {
             .sectors_total = 40,
             .blocks_total = 256,
             .full_name = "Mifare Classic 4K",
             .type_name = "4K",
+        },
+    [MfClassicTypePlus2k] =
+        {
+            // TODO: need to validate whether 17 or 18 sectors are accessible
+            .sectors_total = 17,
+            .blocks_total = 544,
+            .full_name = "Mifare Plus 2K",
+            .type_name = "Plus 2K",
         },
 };
 
@@ -388,6 +407,14 @@ uint8_t mf_classic_get_total_sectors_num(MfClassicType type) {
     return mf_classic_features[type].sectors_total;
 }
 
+uint8_t mf_classic_get_scannable_sectors_num(MfClassicType type) {
+    uint8_t total = mf_classic_get_total_sectors_num(type);
+    if((type == MfClassicTypePlus2k) && (total > MF_CLASSIC_PLUS2K_SCAN_SECTORS)) {
+        return MF_CLASSIC_PLUS2K_SCAN_SECTORS;
+    }
+    return total;
+}
+
 uint16_t mf_classic_get_total_block_num(MfClassicType type) {
     furi_check(type < MfClassicTypeNum);
     return mf_classic_features[type].blocks_total;
@@ -625,7 +652,7 @@ void mf_classic_get_read_sectors_and_keys(
 
     *sectors_read = 0;
     *keys_found = 0;
-    uint8_t sectors_total = mf_classic_get_total_sectors_num(data->type);
+    uint8_t sectors_total = mf_classic_get_scannable_sectors_num(data->type);
     for(size_t i = 0; i < sectors_total; i++) {
         if(mf_classic_is_key_found(data, i, MfClassicKeyTypeA)) {
             *keys_found += 1;
@@ -649,7 +676,7 @@ void mf_classic_get_read_sectors_and_keys(
 bool mf_classic_is_card_read(const MfClassicData* data) {
     furi_check(data);
 
-    uint8_t sectors_total = mf_classic_get_total_sectors_num(data->type);
+    uint8_t sectors_total = mf_classic_get_scannable_sectors_num(data->type);
     uint8_t sectors_read = 0;
     uint8_t keys_found = 0;
     mf_classic_get_read_sectors_and_keys(data, &sectors_read, &keys_found);

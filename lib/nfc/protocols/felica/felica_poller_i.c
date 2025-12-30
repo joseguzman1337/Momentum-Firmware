@@ -27,11 +27,22 @@ FelicaError felica_poller_frame_exchange(
 
     felica_crc_append(instance->tx_buffer);
 
-    FelicaError ret = FelicaErrorNone;
+    NfcLogger* logger = nfc_get_logger(instance->nfc);
+    nfc_logger_append_request_data(
+        logger,
+        bit_buffer_get_data(instance->tx_buffer),
+        bit_buffer_get_size_bytes(instance->tx_buffer));
 
+    FelicaError ret = FelicaErrorNone;
     do {
         NfcError error =
             nfc_poller_trx(instance->nfc, instance->tx_buffer, instance->rx_buffer, fwt);
+
+        nfc_logger_append_response_data(
+            logger,
+            bit_buffer_get_data(instance->rx_buffer),
+            bit_buffer_get_size_bytes(instance->rx_buffer));
+
         if(error != NfcErrorNone) {
             ret = felica_poller_process_error(error);
             break;
@@ -46,6 +57,7 @@ FelicaError felica_poller_frame_exchange(
         felica_crc_trim(rx_buffer);
     } while(false);
 
+    instance->history_data.error = ret;
     return ret;
 }
 
@@ -90,6 +102,102 @@ FelicaError felica_poller_polling(
 
     } while(false);
 
+    return error;
+}
+
+static void felica_poller_prepare_tx_buffer(
+    const FelicaPoller* instance,
+    const uint8_t command,
+    const uint16_t service_code,
+    const uint8_t block_count,
+    const uint8_t* const blocks,
+    const uint8_t data_block_count,
+    const uint8_t* data) {
+    FelicaCommandHeader cmd = {
+        .code = command,
+        .idm = instance->data->idm,
+        .service_num = 1,
+        .service_code = service_code,
+        .block_count = block_count,
+    };
+
+    FelicaBlockListElement block_list[4] = {{0}, {0}, {0}, {0}};
+    for(uint8_t i = 0; i < block_count; i++) {
+        block_list[i].length = 1;
+        block_list[i].block_number = blocks[i];
+    }
+
+    uint8_t block_list_count = block_count;
+    uint8_t block_list_size = block_list_count * sizeof(FelicaBlockListElement);
+    uint8_t total_size = sizeof(FelicaCommandHeader) + 1 + block_list_size +
+                         data_block_count * FELICA_DATA_BLOCK_SIZE;
+    bit_buffer_reset(instance->tx_buffer);
+    bit_buffer_append_byte(instance->tx_buffer, total_size);
+    bit_buffer_append_bytes(instance->tx_buffer, (uint8_t*)&cmd, sizeof(FelicaCommandHeader));
+    bit_buffer_append_bytes(instance->tx_buffer, (uint8_t*)&block_list, block_list_size);
+
+    if(data_block_count != 0) {
+        bit_buffer_append_bytes(
+            instance->tx_buffer, data, data_block_count * FELICA_DATA_BLOCK_SIZE);
+    }
+}
+
+FelicaError felica_poller_read_blocks(
+    FelicaPoller* instance,
+    const uint8_t block_count,
+    const uint8_t* const block_numbers,
+    FelicaPollerReadCommandResponse** const response_ptr) {
+    furi_assert(instance);
+    furi_assert(block_count <= 4);
+    furi_assert(block_numbers);
+    furi_assert(response_ptr);
+
+    felica_poller_prepare_tx_buffer(
+        instance,
+        FELICA_CMD_READ_WITHOUT_ENCRYPTION,
+        FELICA_SERVICE_RO_ACCESS,
+        block_count,
+        block_numbers,
+        0,
+        NULL);
+    bit_buffer_reset(instance->rx_buffer);
+
+    FelicaError error = felica_poller_frame_exchange(
+        instance, instance->tx_buffer, instance->rx_buffer, FELICA_POLLER_POLLING_FWT);
+    if(error == FelicaErrorNone) {
+        *response_ptr = (FelicaPollerReadCommandResponse*)bit_buffer_get_data(instance->rx_buffer);
+    }
+    return error;
+}
+
+FelicaError felica_poller_write_blocks(
+    FelicaPoller* instance,
+    const uint8_t block_count,
+    const uint8_t* const block_numbers,
+    const uint8_t* data,
+    FelicaPollerWriteCommandResponse** const response_ptr) {
+    furi_assert(instance);
+    furi_assert(block_count <= 2);
+    furi_assert(block_numbers);
+    furi_assert(data);
+    furi_assert(response_ptr);
+
+    felica_poller_prepare_tx_buffer(
+        instance,
+        FELICA_CMD_WRITE_WITHOUT_ENCRYPTION,
+        FELICA_SERVICE_RW_ACCESS,
+        block_count,
+        block_numbers,
+        block_count,
+        data);
+    bit_buffer_reset(instance->rx_buffer);
+
+    FelicaError error = felica_poller_frame_exchange(
+        instance, instance->tx_buffer, instance->rx_buffer, FELICA_POLLER_POLLING_FWT);
+    if(error == FelicaErrorNone) {
+        *response_ptr =
+            (FelicaPollerWriteCommandResponse*)bit_buffer_get_data(instance->rx_buffer);
+    }
     return error;
 }
 
