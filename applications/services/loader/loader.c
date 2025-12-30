@@ -201,10 +201,15 @@ void loader_start_detached_with_gui_error(Loader* loader, const char* name, cons
     furi_check(loader);
     furi_check(name);
 
+    char* name_copy = strdup(name);
+    char* args_copy = args ? strdup(args) : NULL;
+    furi_check(name_copy);
+    if(args) furi_check(args_copy);
+
     LoaderMessage message = {
         .type = LoaderMessageTypeStartByNameDetachedWithGuiError,
-        .start.name = strdup(name),
-        .start.args = args ? strdup(args) : NULL,
+        .start.name = name_copy,
+        .start.args = args_copy,
     };
     furi_message_queue_put(loader->queue, &message, FuriWaitForever);
 }
@@ -294,12 +299,17 @@ void loader_enqueue_launch(
     const char* name,
     const char* args,
     LoaderDeferredLaunchFlag flags) {
+    char* name_copy = strdup(name);
+    char* args_copy = args ? strdup(args) : NULL;
+    furi_check(name_copy);
+    if(args) furi_check(args_copy);
+
     LoaderMessage message = {
         .type = LoaderMessageTypeEnqueueLaunch,
         .defer_start =
             {
-                .name_or_path = strdup(name),
-                .args = args ? strdup(args) : NULL,
+                .name_or_path = name_copy,
+                .args = args_copy,
                 .flags = flags,
             },
     };
@@ -424,6 +434,7 @@ static void loader_start_internal_app(
     furi_assert(loader->app.args == NULL);
     if(args && strlen(args) > 0) {
         loader->app.args = strdup(args);
+        furi_check(loader->app.args);
     }
 
     loader->app.thread =

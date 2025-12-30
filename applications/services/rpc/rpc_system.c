@@ -86,6 +86,7 @@ static void rpc_system_system_device_info_callback(
     furi_assert(value);
     char* str_key = strdup(key);
     char* str_value = strdup(value);
+    furi_check(str_key && str_value);
 
     ctx->response->has_next = !last;
     ctx->response->content.system_device_info_response.key = str_key;
