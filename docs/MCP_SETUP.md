@@ -111,7 +111,7 @@ npm install -g @modelcontextprotocol/server-github
 npm install -g @playwright/mcp
 
 # 3. Copy configuration
-cp .codex/mcp_unified.toml ~/.codex/config.toml
+cp .ai/.codex/mcp_unified.toml ~/.codex/config.toml
 
 # 4. Set environment variables
 export GITHUB_TOKEN="your_token"

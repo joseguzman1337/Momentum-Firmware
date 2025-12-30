@@ -22,7 +22,7 @@ fi
 
 # Copy unified MCP configuration
 echo "📋 Installing unified MCP configuration..."
-cp "$PROJECT_ROOT/.codex/mcp_unified.toml" "$MCP_CONFIG"
+cp "$PROJECT_ROOT/.ai/.codex/mcp_unified.toml" "$MCP_CONFIG"
 
 # Install required Node.js packages for external MCP servers
 echo "📦 Installing external MCP servers..."
@@ -378,7 +378,7 @@ Model Context Protocol (MCP) enables AI agents to access tools and context for a
 
 ## Configuration
 - **Main Config**: `~/.codex/config.toml`
-- **Unified MCP**: `.codex/mcp_unified.toml`
+- **Unified MCP**: `.ai/.codex/mcp_unified.toml`
 - **Agent Scripts**: `.ai/*/agent.py`
 
 ## Available MCP Servers
