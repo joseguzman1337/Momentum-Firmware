@@ -18,11 +18,8 @@ env:
   FBT_GIT_SUBMODULE_SHALLOW: 1
 
 jobs:
-  build:
-    permissions:
-      issues: write
-      pull-requests: write
-    runs-on: ubuntu-latest
+  main:
+    runs-on: [self-hosted, FlipperZeroShellRPI]
     strategy:
       fail-fast: false
       matrix:
