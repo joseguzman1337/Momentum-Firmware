@@ -190,7 +190,7 @@ jobs:
 
       - name: "Find previous comment"
         if: ${{ env.SHOULD_PRBUILD == 'true' }}
-        uses: peter-evans/find-comment@v3
+        uses: peter-evans/find-comment@v4
         id: find-comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
