@@ -1,8 +1,5 @@
 #include "subghz_frequency_analyzer_worker.h"
-#include <lib/drivers/cc1101.h>
-
-#include <lib/drivers/si446x_regs.h>
-#include <lib/drivers/si446x.h>
+#include <lib/drivers/cc112x.h>
 
 #include <furi.h>
 
@@ -13,20 +10,7 @@
 //#define CC1101
 #ifdef CC1101
 
-static const uint8_t subghz_preset_ook_58khz[][2] = {
-    {CC1101_MDMCFG4, 0b11110111}, // Rx BW filter is 58.035714kHz
-    /* End  */
-    {0, 0},
-};
-
-static const uint8_t subghz_preset_ook_650khz[][2] = {
-    {CC1101_MDMCFG4, 0b00010111}, // Rx BW filter is 650.000kHz
-    /* End  */
-    {0, 0},
-};
-#else
-
-#endif
+#define SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD -70.0f
 
 struct SubGhzFrequencyAnalyzerWorker {
     FuriThread* thread;
@@ -107,69 +91,67 @@ static uint32_t subghz_frequency_analyzer_worker_expRunningAverageAdaptive(
 static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
     SubGhzFrequencyAnalyzerWorker* instance = context;
 
-    FrequencyRSSI frequency_rssi = {.frequency = 0, .rssi = 0, .channel = 0};
-    float rssi = 0;
+    FrequencyRSSI frequency_rssi = {.frequency = 0, .rssi = 0};
+    float rssi;
+    uint32_t frequency;
+    uint32_t frequency_start;
+    uint8_t timeout = 0;
 
-#ifdef CC1101
-    uint32_t frequency = 0;
-    CC1101Status status;
-    //Start CC1101
+    //Start CC1120
     furi_hal_subghz_reset();
 
+    furi_hal_subghz_set_frequency(433920000);
     furi_hal_spi_acquire(&furi_hal_spi_bus_handle_subghz);
-    cc1101_flush_rx(&furi_hal_spi_bus_handle_subghz);
-    cc1101_flush_tx(&furi_hal_spi_bus_handle_subghz);
-    cc1101_write_reg(&furi_hal_spi_bus_handle_subghz, CC1101_IOCFG0, CC1101IocfgHW);
-    cc1101_write_reg(&furi_hal_spi_bus_handle_subghz, CC1101_MDMCFG3,
-                     0b01111111); // symbol rate
-    cc1101_write_reg(
+    cc112x_write_reg(&furi_hal_spi_bus_handle_subghz, CC112X_IOCFG0, CC112XIocfgRSSIValid);
+    cc112x_write_reg(&furi_hal_spi_bus_handle_subghz, CC112X_AGC_CFG3, 0b11100000);
+    cc112x_write_reg(&furi_hal_spi_bus_handle_subghz, CC112X_AGC_CFG2, 0b11000000);
+    cc112x_write_reg(&furi_hal_spi_bus_handle_subghz, CC112X_AGC_CFG1, 0b00010111);
+    cc112x_write_reg(
         &furi_hal_spi_bus_handle_subghz,
-        CC1101_AGCCTRL2,
-        0b00000111); // 00 - DVGA all; 000 - MAX LNA+LNA2; 111 - MAGN_TARGET 42 dB
-    cc1101_write_reg(
-        &furi_hal_spi_bus_handle_subghz,
-        CC1101_AGCCTRL1,
-        0b00001000); // 0; 0 - LNA 2 gain is decreased to minimum before decreasing LNA gain; 00 - Relative carrier sense threshold disabled; 1000 - Absolute carrier sense threshold disabled
-    cc1101_write_reg(
-        &furi_hal_spi_bus_handle_subghz,
-        CC1101_AGCCTRL0,
-        0b00110000); // 00 - No hysteresis, medium asymmetric dead zone, medium gain ; 11 - 64 samples agc; 00 - Normal AGC, 00 - 4dB boundary
+        CC112X_AGC_CFG0,
+        0b00110000); //RSSI - 2 samples, AGC_ASK_DECAY - 600 samples
+    cc112x_write_reg(
+        &furi_hal_spi_bus_handle_subghz, CC112X_FS_SPARE, 0xAC); // Frequency Synthesizer Spare
+
+    //ToDo whether it is necessary?
+    // cc112x_calibrate(&furi_hal_spi_bus_handle_subghz);
+    // while(true) {
+    //     CC112XStatus status = cc112x_get_status(&furi_hal_spi_bus_handle_subghz);
+    //     if(status.STATE == CC112XStateIDLE) break;
+    // }
 
     furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
 
+    furi_hal_gpio_init(&gpio_cc1101_g0, GpioModeInput, GpioPullNo, GpioSpeedLow);
+
+    furi_hal_subghz_flush_rx();
     furi_hal_subghz_set_path(FuriHalSubGhzPathIsolate);
 
     while(instance->worker_running) {
         osDelay(10);
-
-        float rssi_min = 26.0f;
-        float rssi_avg = 0;
-        size_t rssi_avg_samples = 0;
-
-        frequency_rssi.rssi = -127.0f;
+        frequency_rssi.rssi = -128.0f;
         furi_hal_subghz_idle();
-        subghz_frequency_analyzer_worker_load_registers(subghz_preset_ook_650khz);
 
-        // First stage: coarse scan
+        furi_hal_spi_acquire(&furi_hal_spi_bus_handle_subghz);
+        cc112x_write_reg(&furi_hal_spi_bus_handle_subghz, CC112X_CHAN_BW, 0b00000001); //200kHz
+        furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
+
         for(size_t i = 0; i < subghz_setting_get_frequency_count(instance->setting); i++) {
             if(furi_hal_subghz_is_frequency_valid(
                    subghz_setting_get_frequency(instance->setting, i))) {
                 furi_hal_spi_acquire(&furi_hal_spi_bus_handle_subghz);
-                cc1101_switch_to_idle(&furi_hal_spi_bus_handle_subghz);
-                frequency = cc1101_set_frequency(
+                cc112x_switch_to_idle(&furi_hal_spi_bus_handle_subghz);
+                frequency = cc112x_set_frequency(
                     &furi_hal_spi_bus_handle_subghz,
                     subghz_setting_get_frequency(instance->setting, i));
-
-                cc1101_calibrate(&furi_hal_spi_bus_handle_subghz);
-                do {
-                    status = cc1101_get_status(&furi_hal_spi_bus_handle_subghz);
-                } while(status.STATE != CC1101StateIDLE);
-
-                cc1101_switch_to_rx(&furi_hal_spi_bus_handle_subghz);
+                cc112x_switch_to_rx(&furi_hal_spi_bus_handle_subghz);
                 furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
 
-                // delay will be in range between 1 and 2ms
-                osDelay(3);
+                timeout = 10;
+                do {
+                    osDelay(1);
+                    timeout--;
+                } while(!furi_hal_gpio_read(&gpio_cc1101_g0) && timeout);
 
                 rssi = furi_hal_subghz_get_rssi();
 
@@ -185,40 +167,32 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
             }
         }
 
-        FURI_LOG_T(
-            TAG,
-            "RSSI: avg %f, max %f at %u, min %f",
-            (double)(rssi_avg / rssi_avg_samples),
-            (double)frequency_rssi.rssi,
-            frequency_rssi.frequency,
-            (double)rssi_min);
-
-        // Second stage: fine scan
         if(frequency_rssi.rssi > SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD) {
-            FURI_LOG_D(TAG, "~:%u:%f", frequency_rssi.frequency, (double)frequency_rssi.rssi);
+            //  -0.5 ... 433.92 ... +0.5
+            frequency_start = frequency_rssi.frequency - 500000;
 
-            frequency_rssi.rssi = -127.0;
+            frequency_rssi.rssi = -128.0;
             furi_hal_subghz_idle();
-            subghz_frequency_analyzer_worker_load_registers(subghz_preset_ook_58khz);
-            //-0.3 ... 433.92 ... +0.3 step 10KHz
-            for(uint32_t i = frequency_rssi.frequency - 300000;
-                i < frequency_rssi.frequency + 300000;
-                i += 20000) {
+
+            furi_hal_spi_acquire(&furi_hal_spi_bus_handle_subghz);
+            //cc112x_write_reg(&furi_hal_spi_bus_handle_subghz, CC112X_CHAN_BW, 0b00000100); //50kHz
+            cc112x_write_reg(&furi_hal_spi_bus_handle_subghz, CC112X_CHAN_BW, 0b00001000); //25kHz
+            furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
+
+            //step 25KHz
+            for(uint32_t i = frequency_start; i < frequency_start + 500000; i += 25000) {
                 if(furi_hal_subghz_is_frequency_valid(i)) {
                     furi_hal_spi_acquire(&furi_hal_spi_bus_handle_subghz);
-                    cc1101_switch_to_idle(&furi_hal_spi_bus_handle_subghz);
-                    frequency = cc1101_set_frequency(&furi_hal_spi_bus_handle_subghz, i);
-
-                    cc1101_calibrate(&furi_hal_spi_bus_handle_subghz);
-                    do {
-                        status = cc1101_get_status(&furi_hal_spi_bus_handle_subghz);
-                    } while(status.STATE != CC1101StateIDLE);
-
-                    cc1101_switch_to_rx(&furi_hal_spi_bus_handle_subghz);
+                    cc112x_switch_to_idle(&furi_hal_spi_bus_handle_subghz);
+                    frequency = cc112x_set_frequency(&furi_hal_spi_bus_handle_subghz, i);
+                    cc112x_switch_to_rx(&furi_hal_spi_bus_handle_subghz);
                     furi_hal_spi_release(&furi_hal_spi_bus_handle_subghz);
 
-                    // delay will be in range between 1 and 2ms
-                    osDelay(3);
+                    timeout = 30;
+                    do {
+                        osDelay(1);
+                        timeout--;
+                    } while(!furi_hal_gpio_read(&gpio_cc1101_g0) && timeout);
 
                     rssi = furi_hal_subghz_get_rssi();
 
@@ -232,11 +206,8 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
             }
         }
 
-        // Deliver results
         if(frequency_rssi.rssi > SUBGHZ_FREQUENCY_ANALYZER_THRESHOLD) {
-            FURI_LOG_D(TAG, "=:%u:%f", frequency_rssi.frequency, (double)frequency_rssi.rssi);
-
-            instance->sample_hold_counter = 20;
+            instance->count_repet = 20;
             if(instance->filVal) {
                 frequency_rssi.frequency =
                     subghz_frequency_analyzer_worker_expRunningAverageAdaptive(
@@ -257,7 +228,8 @@ static int32_t subghz_frequency_analyzer_worker_thread(void* context) {
         }
     }
 
-    //Stop CC1101
+    //Stop CC1120
+    furi_hal_gpio_init(&gpio_cc1101_g0, GpioModeAnalog, GpioPullNo, GpioSpeedLow);
     furi_hal_subghz_idle();
     furi_hal_subghz_sleep();
 #else

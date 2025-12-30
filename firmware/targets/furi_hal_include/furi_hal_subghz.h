@@ -79,8 +79,7 @@ void furi_hal_subghz_load_preset(FuriHalSubGhzPreset preset);
  *
  * @param      data  Registers data
  */
-void furi_hal_subghz_load_registers(const uint8_t data[][2]);
-void furi_hal_subghz_load_config(const uint8_t config[]);
+void furi_hal_subghz_load_registers(const uint16_t data[][2]);
 
 /** Load PATABLE
  *
