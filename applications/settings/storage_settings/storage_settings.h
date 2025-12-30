@@ -29,6 +29,7 @@ typedef struct {
     Gui* gui;
     NotificationApp* notification;
     Storage* fs_api;
+    SDFormatType format_type;
 
     // view management
     SceneManager* scene_manager;

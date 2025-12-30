@@ -1,6 +1,6 @@
 ## Intro
 
-Asset Packs are a feature exclusive to Momentum Firmware (and its predecessor Xtreme Firmware) that allows you to load custom Animation and Icon sets without recompiling the firmware or messing with manifest.txt files (as a user). Here you can find info on how to install Asset Packs and also how to make your own.
+Asset Packs are a feature exclusive to Momentum Firmware (and its predecessor Xtreme Firmware) that allows you to load custom Animations, Icons, and Fonts without recompiling the firmware or messing with manifest.txt files (as a user). Here you can find info on how to install Asset Packs and also how to make your own.
 
 <br>
 
@@ -22,7 +22,7 @@ Installing Asset Packs is quite easy and straightforward. First, make sure you'r
 
 ## How do I make an Asset Pack?
 
-Before we begin, it's better to understand a little on how they work. Asset Packs are made of 2 parts: Anims and Icons.
+Before we begin, it's better to understand a little on how they work. Asset Packs are made of 3 parts: Anims, Icons, and Fonts.
 
 <br>
 
@@ -114,9 +114,25 @@ This system supports **all** internal assets!
 
 <br>
 
+### Fonts
+
+Fonts are optional, but when present they override the default UI fonts. Each font is a u8g2 font stored as a `.u8f` file (or a `.c` file that the packer converts to `.u8f`). The required filenames are:
+
+- `Primary.u8f`
+- `Secondary.u8f`
+- `Keyboard.u8f`
+- `BigNumbers.u8f`
+- `BatteryPercent.u8f`
+
+Only the files you include are overridden; any missing ones fall back to the defaults.
+
+For a step-by-step guide, see: `documentation/CustomFonts.md`.
+
+<br>
+
 ### Cool, I read all that, but how do I make one???
 
-All the .bm and .bmx struggles are dealt with by the packer system, which is in `scripts/asset_packer.py`; when making your Asset Pack you will only be working with .png images and meta.txt/manifest.txt/frame_rate files. As explained above, packs are made of 2 parts, Anims and Icons, but you don't have to include both - if you only include Anims, then the default SFW Icons will be used, and viceversa. You have 2 options: make standalone Asset Packs (recommended), or build them along with the firmware.
+All the .bm and .bmx struggles are dealt with by the packer system, which is in `scripts/mntm-asset-packer.py` (or the `mntm-asset-packer` PyPI package). When making your Asset Pack you will only be working with .png images, optional font `.c`/`.u8f` files, and meta.txt/manifest.txt/frame_rate files. As explained above, packs are made of 3 parts, Anims, Icons, and Fonts, but you don't have to include all of them - if you only include Anims, then the default Icons and Fonts will be used, and vice versa. You have 2 options: make standalone Asset Packs (recommended), or build them along with the firmware.
 
 #### Standalone Asset Packs
 
@@ -139,9 +155,9 @@ All the .bm and .bmx struggles are dealt with by the packer system, which is in 
 
   ![image](https://user-images.githubusercontent.com/49810075/218661220-cdc750bf-1eee-488e-a194-47371529112c.png)
 
-- Copy the `scripts/asset_packer.py` file into your source packs folder, right next to your asset packs.
+- Copy the `scripts/mntm-asset-packer.py` file into your source packs folder, right next to your asset packs.
 
-- Run the asset_packer.py script. You might be able to double click it, if not run in console with `python asset_packer.py`.
+- Run the mntm-asset-packer script. You might be able to double click it, if not run in console with `python mntm-asset-packer.py` or `python scripts/mntm-asset-packer.py`.
 
 - It will explain and ask for confirmation, so press Enter.
 

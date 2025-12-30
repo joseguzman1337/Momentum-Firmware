@@ -515,8 +515,8 @@ void vPortFree(void* pv) {
                     /* Add this block to the list of free blocks. */
                     xFreeBytesRemaining += pxLink->xBlockSize;
                     traceFREE(pv, pxLink->xBlockSize);
-                    prvInsertBlockIntoFreeList(((BlockLink_t*)pxLink));
-                    xNumberOfSuccessfulFrees++;
+                    memset(pv, 0xDD, pxLink->xBlockSize - xHeapStructSize);
+                    prvInsertBlockIntoFreeList((BlockLink_t*)pxLink);
                 }
                 (void)xTaskResumeAll();
             } else {

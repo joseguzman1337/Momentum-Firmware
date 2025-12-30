@@ -60,7 +60,11 @@ Please:
 5. Add appropriate comments and documentation
 6. Generate a commit message that includes "Closes #{issue_number}"
 
+<<<<<<< HEAD
 Use checkpointing to allow easy rollback if needed.
+=======
+Use the /restore command if you need to rollback changes.
+>>>>>>> origin/renovate/node-24.x
 """
     
     print(f"\n{'='*60}")
@@ -68,9 +72,15 @@ Use checkpointing to allow easy rollback if needed.
     print(f"{'='*60}\n")
     
     try:
+<<<<<<< HEAD
         # Run Gemini with checkpointing enabled
         result = subprocess.run(
             ["gemini", "--checkpointing", "-p", prompt],
+=======
+        # Run Gemini with output format for parsing
+        result = subprocess.run(
+            ["gemini", "-p", prompt, "-o", "json"],
+>>>>>>> origin/renovate/node-24.x
             cwd="/Users/x/x/Momentum-Firmware",
             capture_output=True,
             text=True,

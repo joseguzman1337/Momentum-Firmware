@@ -342,7 +342,8 @@ static Iso15693_3Error iso15693_3_listener_write_multi_blocks_handler(
         if(error != Iso15693_3ErrorNone) break;
 
         for(uint32_t i = block_index_start; i < block_count + request->first_block_num; ++i) {
-            const uint8_t* block_data = &request->block_data[block_size * i];
+            const uint32_t block_offset = i - block_index_start;
+            const uint8_t* block_data = &request->block_data[block_size * block_offset];
             iso15693_3_set_block_data(instance->data, i, block_data, block_size);
         }
     } while(false);

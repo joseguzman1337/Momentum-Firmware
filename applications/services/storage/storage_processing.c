@@ -479,13 +479,13 @@ static bool
 // TODO FL-3521: think about implementing a custom storage API to split that kind of api linkage
 #include "storages/storage_ext.h"
 
-static FS_Error storage_process_sd_format(Storage* app) {
+static FS_Error storage_process_sd_format(Storage* app, SDFormatType format_type) {
     FS_Error ret = FSE_OK;
 
     if(storage_data_status(&app->storage[ST_EXT]) == StorageStatusNotReady) {
         ret = FSE_NOT_READY;
     } else {
-        ret = sd_format_card(&app->storage[ST_EXT]);
+        ret = sd_format_card(&app->storage[ST_EXT], format_type);
         storage_data_timestamp(&app->storage[ST_EXT]);
     }
 
@@ -785,7 +785,8 @@ void storage_process_message_internal(Storage* app, StorageMessage* message) {
 
     // SD operations
     case StorageCommandSDFormat:
-        message->return_data->error_value = storage_process_sd_format(app);
+        message->return_data->error_value =
+            storage_process_sd_format(app, message->data->sdformat.format_type);
         break;
     case StorageCommandSDUnmount:
         message->return_data->error_value = storage_process_sd_unmount(app);

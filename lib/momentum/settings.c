@@ -12,7 +12,12 @@ MomentumSettings momentum_settings = {
     .cycle_anims = 0, // Meta.txt
     .unlock_anims = false, // OFF
     .menu_style = MenuStyleDsi, // DSi
-    .lock_on_boot = true, // ON
+    .menu_name = true, // ON
+    .menu_level = true, // ON
+    .menu_time = true, // ON
+    .menu_battery = true, // ON
+    .menu_otg = true, // ON
+    .lock_on_boot = false, // OFF
     .bad_pins_format = false, // OFF
     .allow_locked_rpc_usb = false, // OFF
     .allow_locked_rpc_ble = false, // OFF
@@ -31,14 +36,14 @@ MomentumSettings momentum_settings = {
     .sort_dirs_first = true, // ON
     .show_hidden_files = false, // OFF
     .show_internal_tab = false, // OFF
-    .browser_path_mode = BrowserPathOff, // OFF
+    .selection_indicator_style = SelectionIndicatorStylePlus, // +
     .favorite_timeout = 0, // OFF
     .scroll_marquee = false, // OFF
     .dark_mode = false, // OFF
     .rgb_backlight = false, // OFF
     .butthurt_timer = 21600, // 6 H
+    .charge_cap = 100, // 100%
     .midnight_format_00 = true, // 00:XX
-    .popup_overlay = true, // ON
     .spi_cc1101_handle = SpiDefault, // &furi_hal_spi_bus_handle_external
     .spi_nrf24_handle = SpiDefault, // &furi_hal_spi_bus_handle_external
     .uart_esp_channel = FuriHalSerialIdUsart, // pin 13,14
@@ -86,6 +91,11 @@ static const struct {
     {setting_int(cycle_anims, -1, 86400)},
     {setting_bool(unlock_anims)},
     {setting_enum(menu_style, MenuStyleCount)},
+    {setting_bool(menu_name)},
+    {setting_bool(menu_level)},
+    {setting_bool(menu_time)},
+    {setting_bool(menu_battery)},
+    {setting_bool(menu_otg)},
     {setting_bool(bad_pins_format)},
     {setting_bool(allow_locked_rpc_usb)},
     {setting_bool(allow_locked_rpc_ble)},
@@ -105,14 +115,14 @@ static const struct {
     {setting_bool(sort_dirs_first)},
     {setting_bool(show_hidden_files)},
     {setting_bool(show_internal_tab)},
-    {setting_enum(browser_path_mode, BrowserPathModeCount)},
+    {setting_enum(selection_indicator_style, SelectionIndicatorStyleCount)},
     {setting_uint(favorite_timeout, 0, 60)},
     {setting_bool(scroll_marquee)},
     {setting_bool(dark_mode)},
     {setting_bool(rgb_backlight)},
     {setting_uint(butthurt_timer, 0, 172800)},
+    {setting_uint(charge_cap, 5, 100)},
     {setting_bool(midnight_format_00)},
-    {setting_bool(popup_overlay)},
     {setting_enum(spi_cc1101_handle, SpiCount)},
     {setting_enum(spi_nrf24_handle, SpiCount)},
     {setting_enum(uart_esp_channel, FuriHalSerialIdMax)},

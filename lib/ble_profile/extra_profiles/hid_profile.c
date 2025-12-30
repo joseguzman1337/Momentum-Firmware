@@ -413,7 +413,7 @@ static void ble_profile_hid_get_config(GapConfig* config, FuriHalBleProfileParam
     }
 
     // Set advertise name
-    const char* clicker_str = "Control";
+    const char* clicker_str = "Remote";
     if(hid_profile_params && hid_profile_params->device_name_prefix) {
         clicker_str = hid_profile_params->device_name_prefix;
     }

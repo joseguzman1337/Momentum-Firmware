@@ -1159,7 +1159,7 @@ static bool charliecard_parse(const NfcDevice* device, FuriString* parsed_data) 
         furi_string_cat_printf(parsed_data, "\nIssued: ");
         locale_format_dt_cat(parsed_data, &balance_sector.issued);
 
-        if(!dt_eq(balance_sector.end_validity, CHARLIE_EPOCH) &
+        if(!dt_eq(balance_sector.end_validity, CHARLIE_EPOCH) &&
            dt_ge(balance_sector.end_validity, balance_sector.issued)) {
             // sometimes (seen on Perq cards) end validity field is all 0
             // When this is the case, calc'd end validity is equal to CHARLIE_EPOCH).

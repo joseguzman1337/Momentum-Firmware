@@ -139,6 +139,9 @@ void findmy_state_apply(FindMyState* state) {
     // Start beacon if configured
     if(state->beacon_active) {
         furi_check(furi_hal_bt_extra_beacon_start());
+        furi_hal_power_suppress_charge_enter();
+    } else {
+        furi_hal_power_suppress_charge_exit();
     }
 }
 

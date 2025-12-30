@@ -17,7 +17,7 @@ extern "C" {
 #define JS_SDK_VENDOR_FIRMWARE "momentum"
 #define JS_SDK_VENDOR          "flipperdevices"
 #define JS_SDK_MAJOR           1
-#define JS_SDK_MINOR           0
+#define JS_SDK_MINOR           1
 
 /**
  * @brief Returns the foreign pointer in `obj["_"]`

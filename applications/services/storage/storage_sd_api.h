@@ -16,6 +16,12 @@ typedef enum {
     FST_EXFAT,
 } SDFsType;
 
+typedef enum {
+    SDFormatTypeAuto,
+    SDFormatTypeFAT32,
+    SDFormatTypeExFAT,
+} SDFormatType;
+
 typedef struct {
     SDFsType fs_type;
     uint32_t kb_total;

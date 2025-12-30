@@ -56,12 +56,11 @@ typedef union __attribute__((packed)) {
 } ScreenFrameColor;
 
 typedef enum {
-    BrowserPathOff,
-    BrowserPathCurrent,
-    BrowserPathBrief,
-    BrowserPathFull,
-    BrowserPathModeCount,
-} BrowserPathMode;
+    SelectionIndicatorStylePlus,
+    SelectionIndicatorStyleStar,
+    SelectionIndicatorStyleDash,
+    SelectionIndicatorStyleCount,
+} SelectionIndicatorStyle;
 
 typedef struct {
     char asset_pack[ASSET_PACKS_NAME_LEN];
@@ -69,6 +68,11 @@ typedef struct {
     int32_t cycle_anims;
     bool unlock_anims;
     MenuStyle menu_style;
+    bool menu_name;
+    bool menu_level;
+    bool menu_time;
+    bool menu_battery;
+    bool menu_otg;
     bool lock_on_boot;
     bool bad_pins_format;
     bool allow_locked_rpc_usb;
@@ -88,14 +92,14 @@ typedef struct {
     bool sort_dirs_first;
     bool show_hidden_files;
     bool show_internal_tab;
-    BrowserPathMode browser_path_mode;
+    SelectionIndicatorStyle selection_indicator_style;
     uint32_t favorite_timeout;
     bool scroll_marquee;
     bool dark_mode;
     bool rgb_backlight;
     uint32_t butthurt_timer;
+    uint32_t charge_cap;
     bool midnight_format_00;
-    bool popup_overlay;
     SpiHandle spi_cc1101_handle;
     SpiHandle spi_nrf24_handle;
     FuriHalSerialId uart_esp_channel;

@@ -205,9 +205,22 @@ FS_Error sd_mount_card(StorageData* storage, bool notify) {
     return error;
 }
 
-FS_Error sd_format_card(StorageData* storage) {
+static BYTE sd_format_type_to_mkfs_option(SDFormatType format_type) {
+    switch(format_type) {
+    case SDFormatTypeFAT32:
+        return FM_FAT32;
+    case SDFormatTypeExFAT:
+        return FM_EXFAT;
+    case SDFormatTypeAuto:
+    default:
+        return FM_ANY;
+    }
+}
+
+FS_Error sd_format_card(StorageData* storage, SDFormatType format_type) {
 #ifdef FURI_RAM_EXEC
     UNUSED(storage);
+    UNUSED(format_type);
     return FSE_NOT_READY;
 #else
     uint8_t* work_area;
@@ -215,7 +228,8 @@ FS_Error sd_format_card(StorageData* storage) {
     SDError error;
 
     work_area = malloc(_MAX_SS);
-    error = f_mkfs(sd_data->path, FM_ANY, 0, work_area, _MAX_SS);
+    error = f_mkfs(
+        sd_data->path, sd_format_type_to_mkfs_option(format_type), 0, work_area, _MAX_SS);
     free(work_area);
 
     do {

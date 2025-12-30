@@ -67,8 +67,16 @@ PVS-Studio.log
 /fbt_options_local.py
 
 # JS packages
-node_modules/
+node_modules/realtek/build/
+build/
 
-# cli_perf script output in case of errors
-/block.bin
-/return_block.bin
+# AI Agent Logs
+/logs/
+*.log
+codex*.log
+claude*.log
+gemini*.log
+jules*.log
+
+# Temporary files
+.gemini/settings.json.orig

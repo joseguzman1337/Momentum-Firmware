@@ -320,16 +320,16 @@ MJS_PRIVATE void mjs_gen_stack_trace(struct mjs* mjs, size_t offset) {
 }
 
 void mjs_own(struct mjs* mjs, mjs_val_t* v) {
-    mbuf_append(&mjs->owned_values, &v, sizeof(v));
+    mbuf_append(&mjs->owned_values, &v, sizeof(mjs_val_t*));
 }
 
 int mjs_disown(struct mjs* mjs, mjs_val_t* v) {
-    mjs_val_t** vp = (mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(v));
+    mjs_val_t** vp = (mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(mjs_val_t*));
 
     for(; (char*)vp >= mjs->owned_values.buf; vp--) {
         if(*vp == v) {
-            *vp = *(mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(v));
-            mjs->owned_values.len -= sizeof(v);
+            *vp = *(mjs_val_t**)(mjs->owned_values.buf + mjs->owned_values.len - sizeof(mjs_val_t*));
+            mjs->owned_values.len -= sizeof(mjs_val_t*);
             return 1;
         }
     }

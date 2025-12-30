@@ -33,8 +33,9 @@ typedef struct {
     Light light;
 } NotificationLedLayer;
 
-#define NOTIFICATION_SETTINGS_VERSION 0x02
-#define NOTIFICATION_SETTINGS_MAGIC   0x16
+#define NOTIFICATION_SETTINGS_VERSION_2 0x02
+#define NOTIFICATION_SETTINGS_VERSION   0x03
+#define NOTIFICATION_SETTINGS_MAGIC     0x16
 
 typedef struct {
     uint8_t version;
@@ -44,6 +45,7 @@ typedef struct {
     uint32_t display_off_delay_ms;
     int8_t contrast;
     bool vibro_on;
+    uint8_t speaker_output;
 } NotificationSettings;
 
 struct NotificationApp {
