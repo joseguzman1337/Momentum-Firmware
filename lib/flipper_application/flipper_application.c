@@ -259,6 +259,7 @@ FuriThread* flipper_application_alloc_thread(FlipperApplication* app, const char
 
     if(args) {
         app->ep_thread_args = strdup(args);
+        furi_check(app->ep_thread_args);
     } else {
         app->ep_thread_args = NULL;
     }

@@ -73,9 +73,11 @@ static ELFSection* elf_file_get_section(ELFFile* elf, const char* name) {
 static ELFSection* elf_file_get_or_put_section(ELFFile* elf, const char* name) {
     ELFSection* section_p = elf_file_get_section(elf, name);
     if(!section_p) {
+        char* name_copy = strdup(name);
+        furi_check(name_copy);
         ELFSectionDict_set_at(
             elf->sections,
-            strdup(name),
+            name_copy,
             (ELFSection){
                 .data = NULL,
                 .sec_idx = 0,
