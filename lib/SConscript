@@ -51,7 +51,7 @@ libs = env.BuildModules(
         "heatshrink",
         "ble_profile",
         "datetime",
-        "ieee754_parse_wrap",
+        "softio",
     ],
 )
 
