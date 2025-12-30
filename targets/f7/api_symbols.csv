@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,87.1,,
+Version,+,88.2,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/main/archive/helpers/archive_helpers_ext.h,,
 Header,+,applications/main/subghz/subghz_fap.h,,
@@ -40,6 +40,7 @@ Header,+,applications/services/input/input.h,,
 Header,+,applications/services/loader/firmware_api/firmware_api.h,,
 Header,+,applications/services/loader/loader.h,,
 Header,+,applications/services/locale/locale.h,,
+Header,+,applications/services/network_service/network_service.h,,
 Header,+,applications/services/notification/notification.h,,
 Header,+,applications/services/notification/notification_messages.h,,
 Header,+,applications/services/power/power_service/power.h,,
@@ -1817,6 +1818,9 @@ Function,+,furi_hal_usb_ccid_remove_smartcard,void,
 Function,+,furi_hal_usb_ccid_set_callbacks,void,"CcidCallbacks*, void*"
 Function,+,furi_hal_usb_disable,void,
 Function,+,furi_hal_usb_enable,void,
+Function,+,furi_hal_usb_ethernet_get_mac,void,uint8_t*
+Function,+,furi_hal_usb_ethernet_send,void,"uint8_t*, uint16_t"
+Function,+,furi_hal_usb_ethernet_set_received_callback,void,"FuriHalUsbNetworkReceiveCallback, void*"
 Function,+,furi_hal_usb_get_config,FuriHalUsbInterface*,
 Function,-,furi_hal_usb_init,void,
 Function,+,furi_hal_usb_is_locked,_Bool,
@@ -4657,7 +4661,11 @@ Variable,+,subghz_protocol_registry,const SubGhzProtocolRegistry,
 Variable,-,suboptarg,char*,
 Variable,+,usb_ccid,FuriHalUsbInterface,
 Variable,+,usb_cdc_dual,FuriHalUsbInterface,
+Variable,+,usb_cdc_ecm,FuriHalUsbInterface,
 Variable,+,usb_cdc_single,FuriHalUsbInterface,
 Variable,+,usb_hid,FuriHalUsbInterface,
 Variable,+,usb_hid_u2f,FuriHalUsbInterface,
 Variable,+,usbd_devfs,const usbd_driver,
+Function,+,furi_hal_usb_ethernet_get_mac,void,uint8_t*
+Function,+,furi_hal_usb_ethernet_send,void,"uint8_t*, uint16_t"
+Function,+,furi_hal_usb_ethernet_set_received_callback,void,"FuriHalUsbNetworkReceiveCallback, void*"

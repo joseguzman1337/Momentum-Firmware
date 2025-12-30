@@ -1,0 +1,123 @@
+# Codex Configuration for Momentum Firmware
+# AI-Powered Development Pipeline Configuration
+
+# Default model and provider
+model = "gpt-4o"
+model_provider = "openai"
+model_reasoning_effort = "high"
+
+# Profile for automated development
+profile = "momentum-dev"
+
+# Approval and sandbox settings for YOLO mode
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+[profiles.momentum-dev]
+model = "gpt-4o"
+model_reasoning_effort = "high"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+
+[profiles.security-scan]
+model = "gpt-4o"
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-read"
+
+[profiles.code-review]
+model = "gpt-4o"
+model_reasoning_effort = "high"
+approval_policy = "on-failure"
+sandbox_mode = "workspace-read"
+
+# Feature flags for AI automation
+[features]
+unified_exec = true
+shell_snapshot = true
+web_search_request = true
+parallel = true
+skills = true
+warnings = true
+view_image_tool = true
+apply_patch_freeform = true
+exec_policy = true
+
+# Sandbox configuration for firmware development
+[sandbox_workspace_write]
+exclude_tmpdir_env_var = false
+exclude_slash_tmp = false
+writable_roots = [
+    "/Users/x/x/Momentum-Firmware",
+    "/tmp",
+    "~/.cache"
+]
+network_access = true
+
+# Shell environment for firmware build tools
+[shell_environment_policy]
+inherit = "core"
+include_only = [
+    "PATH", "HOME", "USER", "SHELL",
+    "CC", "CXX", "CFLAGS", "CXXFLAGS",
+    "PYTHONPATH", "PYTHON3_PATH",
+    "FBT_*", "FLIPPER_*",
+    "GIT_*", "GITHUB_*"
+]
+exclude = ["AWS_*", "AZURE_*", "*_SECRET", "*_TOKEN", "*_KEY"]
+
+# MCP servers for AI coordination
+[mcp_servers.momentum-codex]
+command = "python"
+args = [".ai/codex/agent.py"]
+env = {
+    LOG_DIR = "logs/codex",
+    AUTO_MERGE = "true",
+    YOLO_MODE = "true",
+    PROJECT_ROOT = "/Users/x/x/Momentum-Firmware"
+}
+
+[mcp_servers.security-agent]
+command = "python"
+args = [".ai/claude/security_agent.py"]
+env = {
+    LOG_DIR = "logs/claude",
+    AUTO_MERGE = "true",
+    SECURITY_SCAN = "true"
+}
+
+[mcp_servers.quality-agent]
+command = "python"
+args = [".ai/warp/quality_agent.py"]
+env = {
+    LOG_DIR = "logs/warp",
+    QUALITY_CHECK = "true"
+}
+
+# Observability for AI pipeline monitoring
+[otel]
+environment = "momentum-firmware"
+exporter = "none"
+log_user_prompt = false
+
+# Notifications for automation events
+notify = ["python3", ".ai/notify.py"]
+
+# Model providers configuration
+[model_providers.openai]
+name = "OpenAI"
+base_url = "https://api.openai.com/v1"
+env_key = "OPENAI_API_KEY"
+request_max_retries = 3
+stream_max_retries = 5
+stream_idle_timeout_ms = 180000
+
+[model_providers.anthropic]
+name = "Anthropic"
+base_url = "https://api.anthropic.com/v1"
+env_key = "ANTHROPIC_API_KEY"
+
+[model_providers.google]
+name = "Google"
+base_url = "https://generativelanguage.googleapis.com/v1beta"
+env_key = "GOOGLE_API_KEY"

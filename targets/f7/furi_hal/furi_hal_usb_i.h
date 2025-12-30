@@ -5,9 +5,10 @@
 #define USB_EP0_SIZE 8
 
 /* String descriptors */
-enum UsbDevDescStr {
-    UsbDevLang = 0,
-    UsbDevManuf = 1,
-    UsbDevProduct = 2,
-    UsbDevSerial = 3,
+enum {
+    UsbDevLang = 0x00,
+    UsbDevManuf,
+    UsbDevProduct,
+    UsbDevSerial,
+    UsbDevMac,
 };

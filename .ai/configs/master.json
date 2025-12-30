@@ -1,0 +1,139 @@
+{
+    "version": "1.0.0",
+    "agents": {
+        "codex": {
+            "enabled": true,
+            "mode": "yolo",
+            "auto_approve": true,
+            "log_dir": "logs/codex",
+            "config": {
+                "model": "gpt-5.2-codex",
+                "full_auto": true,
+                "search": true,
+                "sandbox": "workspace-write"
+            },
+            "tasks": [
+                "feature_implementation",
+                "bug_fixes",
+                "code_generation"
+            ],
+            "mcp_server": ".ai/mcp/codex_server.json"
+        },
+        "claude": {
+            "enabled": true,
+            "mode": "yolo",
+            "auto_approve": true,
+            "log_dir": "logs/claude",
+            "config": {
+                "model": "claude-sonnet-4-5",
+                "dangerously_skip_permissions": true,
+                "output_format": "json"
+            },
+            "tasks": [
+                "security_fixes",
+                "code_review",
+                "vulnerability_remediation"
+            ],
+            "mcp_server": ".ai/mcp/claude_server.json"
+        },
+        "gemini": {
+            "enabled": true,
+            "mode": "yolo",
+            "auto_approve": true,
+            "log_dir": "logs/gemini",
+            "config": {
+                "model": "gemini-2.5-pro",
+                "approval_mode": "yolo",
+                "output_format": "json"
+            },
+            "tasks": [
+                "architecture",
+                "complex_refactoring",
+                "performance_optimization"
+            ],
+            "mcp_server": ".ai/mcp/gemini_server.json"
+        },
+        "jules": {
+            "enabled": true,
+            "mode": "async",
+            "auto_approve": true,
+            "log_dir": "logs/jules",
+            "config": {
+                "quota_aware": true,
+                "max_concurrent": 15
+            },
+            "tasks": [
+                "async_coding",
+                "pr_generation",
+                "multi_step_tasks"
+            ],
+            "mcp_server": ".ai/mcp/jules_server.json"
+        },
+        "warp": {
+            "enabled": true,
+            "mode": "yolo",
+            "auto_approve": true,
+            "log_dir": "logs/warp",
+            "config": {
+                "task_file": "warp_agent_tasks.md",
+                "auto_execute": true,
+                "batch_mode": true
+            },
+            "tasks": [
+                "code_quality",
+                "documentation",
+                "analysis"
+            ],
+            "mcp_server": ".ai/mcp/warp_server.json"
+        }
+    },
+    "super_agent": {
+        "enabled": true,
+        "name": "orchestrator",
+        "capabilities": [
+            "task_routing",
+            "agent_coordination",
+            "conflict_resolution",
+            "priority_management"
+        ],
+        "decision_model": "gemini-2.5-pro",
+        "rag_enabled": true
+    },
+    "a2a_communication": {
+        "enabled": true,
+        "protocol": "mcp",
+        "message_bus": ".ai/workflows/message_bus.json",
+        "shared_context": ".ai/rag/shared_knowledge.json"
+    },
+    "rag": {
+        "enabled": true,
+        "vector_store": ".ai/rag/embeddings",
+        "knowledge_base": [
+            ".gemini/GEMINI.md",
+            "ReadMe.md",
+            "SKILL.md",
+            "documentation/**/*.md"
+        ],
+        "embedding_model": "text-embedding-004",
+        "chunk_size": 1000,
+        "overlap": 200
+    },
+    "automation": {
+        "auto_pr_creation": true,
+        "auto_merge": true,
+        "auto_issue_close": true,
+        "continuous_mode": true,
+        "health_check_interval": 300
+    },
+    "logging": {
+        "level": "info",
+        "format": "json",
+        "rotation": "daily",
+        "retention_days": 30
+    },
+    "internet_access": {
+        "config_file": ".ai/configs/internet_access.json",
+        "enabled": true,
+        "security_mode": "strict"
+    }
+}
