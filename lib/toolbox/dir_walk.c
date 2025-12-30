@@ -63,7 +63,9 @@ static bool dir_walk_filter(DirWalk* dir_walk, const char* name, FileInfo* filei
 static DirWalkResult
     dir_walk_iter(DirWalk* dir_walk, FuriString* return_path, FileInfo* fileinfo) {
     DirWalkResult result = DirWalkError;
-    char* name = malloc(256); // FIXME: remove magic number
+#define DIR_WALK_NAME_MAX 256
+    char* name = malloc(DIR_WALK_NAME_MAX);
+    furi_check(name);
     FileInfo info;
     bool end = false;
 

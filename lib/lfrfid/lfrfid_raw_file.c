@@ -29,6 +29,7 @@ LFRFIDRawFile* lfrfid_raw_file_alloc(Storage* storage) {
     furi_check(storage);
 
     LFRFIDRawFile* file = malloc(sizeof(LFRFIDRawFile));
+    furi_check(file);
     file->stream = file_stream_alloc(storage);
     file->buffer = NULL;
     return file;
@@ -102,6 +103,7 @@ bool lfrfid_raw_file_read_header(LFRFIDRawFile* file, float* frequency, float* d
             *duty_cycle = header.duty_cycle;
             file->max_buffer_size = header.max_buffer_size;
             file->buffer = malloc(file->max_buffer_size);
+            furi_check(file->buffer);
             file->buffer_size = 0;
             file->buffer_counter = 0;
             return true;

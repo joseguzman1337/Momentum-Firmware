@@ -17,6 +17,7 @@ struct FSKDemod {
 FSKDemod*
     fsk_demod_alloc(uint32_t low_time, uint32_t low_pulses, uint32_t hi_time, uint32_t hi_pulses) {
     FSKDemod* demod = malloc(sizeof(FSKDemod));
+    furi_check(demod);
     demod->invert = false;
 
     if(low_time > hi_time) {

@@ -10,6 +10,7 @@ struct VarintPair {
 
 VarintPair* varint_pair_alloc(void) {
     VarintPair* pair = malloc(sizeof(VarintPair));
+    furi_check(pair);
     pair->data_length = 0;
     return pair;
 }

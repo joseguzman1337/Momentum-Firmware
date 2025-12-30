@@ -2,9 +2,12 @@
 
 const char* str_buffer_make_owned_clone(StrBuffer* buffer, const char* str) {
     char* owned = strdup(str);
+    furi_check(owned);
     buffer->n_owned_strings++;
-    buffer->owned_strings =
-        realloc(buffer->owned_strings, buffer->n_owned_strings * sizeof(const char*)); // -V701
+    char** new_strings =
+        realloc(buffer->owned_strings, buffer->n_owned_strings * sizeof(const char*));
+    furi_check(new_strings);
+    buffer->owned_strings = new_strings;
     buffer->owned_strings[buffer->n_owned_strings - 1] = owned;
     return owned;
 }

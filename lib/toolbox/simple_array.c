@@ -10,6 +10,7 @@ struct SimpleArray {
 
 SimpleArray* simple_array_alloc(const SimpleArrayConfig* config) {
     SimpleArray* instance = malloc(sizeof(SimpleArray));
+    furi_check(instance);
     instance->config = config;
     return instance;
 }
@@ -28,6 +29,7 @@ void simple_array_init(SimpleArray* instance, uint32_t count) {
     simple_array_reset(instance);
 
     instance->data = malloc(count * instance->config->type_size);
+    furi_check(instance->data);
     instance->count = count;
 
     SimpleArrayInit init = instance->config->init;

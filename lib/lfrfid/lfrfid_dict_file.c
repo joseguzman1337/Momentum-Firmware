@@ -14,6 +14,7 @@ bool lfrfid_dict_file_save(ProtocolDict* dict, ProtocolId protocol, const char* 
     FlipperFormat* file = flipper_format_file_alloc(storage);
     size_t data_size = protocol_dict_get_data_size(dict, protocol);
     uint8_t* data = malloc(data_size);
+    furi_check(data);
     bool result = false;
 
     do {
@@ -129,6 +130,7 @@ static ProtocolId lfrfid_dict_protocol_fallback(
         size_t protocol_data_size = protocol_dict_get_data_size(dict, protocol);
         uint8_t* data = malloc(data_size);
         uint8_t* protocol_data = malloc(protocol_data_size);
+        furi_check(data && protocol_data);
         if(flipper_format_read_hex(file, "Data", data, data_size)) {
             lfrfid_dict_protocol_indala_data(data, data_size, protocol_data, protocol_data_size);
             protocol_dict_set_data(dict, protocol, protocol_data, protocol_data_size);
@@ -149,6 +151,7 @@ ProtocolId lfrfid_dict_file_load(ProtocolDict* dict, const char* filename) {
     FlipperFormat* file = flipper_format_file_alloc(storage);
     ProtocolId result = PROTOCOL_NO;
     uint8_t* data = malloc(protocol_dict_get_max_data_size(dict));
+    furi_check(data);
     FuriString* str_result;
     str_result = furi_string_alloc();
 

@@ -42,6 +42,7 @@ PipeSideBundle pipe_alloc_ex(PipeSideReceiveSettings alice, PipeSideReceiveSetti
     FuriStreamBuffer* bob_to_alice = furi_stream_buffer_alloc(alice.capacity, alice.trigger_level);
 
     PipeShared* shared = malloc(sizeof(PipeShared));
+    furi_check(shared);
     *shared = (PipeShared){
         .instance_count = furi_semaphore_alloc(1, 1),
         .state_transition = furi_mutex_alloc(FuriMutexTypeNormal),
@@ -49,6 +50,7 @@ PipeSideBundle pipe_alloc_ex(PipeSideReceiveSettings alice, PipeSideReceiveSetti
 
     PipeSide* alices_side = malloc(sizeof(PipeSide));
     PipeSide* bobs_side = malloc(sizeof(PipeSide));
+    furi_check(alices_side && bobs_side);
 
     *alices_side = (PipeSide){
         .role = PipeRoleAlice,

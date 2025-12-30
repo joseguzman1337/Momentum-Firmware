@@ -139,6 +139,7 @@ static LFRFIDWorkerReadState lfrfid_worker_read_internal(
     size_t last_size = protocol_dict_get_max_data_size(worker->protocols);
     uint8_t* last_data = malloc(last_size);
     uint8_t* protocol_data = malloc(last_size);
+    furi_check(last_data && protocol_data);
     size_t last_read_count = 0;
 
     uint32_t switch_os_tick_last = furi_get_tick();

@@ -15,10 +15,12 @@ BitBuffer* bit_buffer_alloc(size_t capacity_bytes) {
     furi_check(capacity_bytes);
 
     BitBuffer* buf = malloc(sizeof(BitBuffer));
+    furi_check(buf);
 
     buf->data = malloc(capacity_bytes);
     size_t parity_buf_size = (capacity_bytes + BITS_IN_BYTE - 1) / BITS_IN_BYTE;
     buf->parity = malloc(parity_buf_size);
+    furi_check(buf->data && buf->parity);
     buf->capacity_bytes = capacity_bytes;
     buf->size_bits = 0;
 

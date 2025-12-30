@@ -42,6 +42,7 @@ char* strdup(const char* s) {
 
     size_t siz = strlen(s) + 1;
     char* y = pvPortMalloc(siz);
+    furi_check(y);
     memcpy(y, s, siz);
 
     return y;

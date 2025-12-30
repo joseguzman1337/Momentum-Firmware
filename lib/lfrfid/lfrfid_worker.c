@@ -22,6 +22,7 @@ LFRFIDWorker* lfrfid_worker_alloc(ProtocolDict* dict) {
     furi_check(dict);
 
     LFRFIDWorker* worker = malloc(sizeof(LFRFIDWorker));
+    furi_check(worker);
     worker->mode_index = LFRFIDWorkerIdle;
     worker->read_cb = NULL;
     worker->write_cb = NULL;
@@ -82,11 +83,13 @@ void lfrfid_worker_emulate_start(LFRFIDWorker* worker, LFRFIDProtocol protocol) 
 }
 
 void lfrfid_worker_set_filename(LFRFIDWorker* worker, const char* filename) {
+    furi_check(filename);
     if(worker->raw_filename) {
         free(worker->raw_filename);
     }
 
     worker->raw_filename = strdup(filename);
+    furi_check(worker->raw_filename);
 }
 
 void lfrfid_worker_read_raw_start(
