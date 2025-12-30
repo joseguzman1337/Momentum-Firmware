@@ -270,6 +270,8 @@ static usbd_respond usb_descriptor_get(usbd_ctlreq* req, void** address, uint16_
             desc = usb.interface->str_prod_descr;
         } else if((dnumber == UsbDevSerial) && (usb.interface->str_serial_descr != NULL)) {
             desc = usb.interface->str_serial_descr;
+        } else if((dnumber == UsbDevMac) && (usb.interface->str_mac_descr != NULL)) {
+            desc = usb.interface->str_mac_descr;
         } else
             return usbd_fail;
         break;

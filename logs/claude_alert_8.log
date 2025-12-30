@@ -1,0 +1,37 @@
+## Summary
+
+I've successfully fixed **Code Scanning Alert #8** - the uncontrolled arithmetic expression vulnerability in `lib/toolbox/varint.c`.
+
+### The Problem
+At line 47 (and similarly at line 74), the code had:
+```c
+v = (value * -2) - 1;  // or: v = ((uint32_t)(-value) << 1) - 1;
+```
+
+This caused integer overflow when `value` is `INT32_MIN` (-2147483648) because:
+- Multiplying by -2 would give 4294967296, exceeding `uint32_t` range
+- Negating `INT32_MIN` in signed arithmetic is undefined behavior
+
+### The Fix
+I replaced the vulnerable arithmetic with a safe unsigned-domain approach:
+
+```c
+// Cast to unsigned first, then negate to avoid overflow with INT32_MIN
+// -value would overflow for INT32_MIN, so use: ~(value as unsigned) + 1 = -value in unsigned
+uint32_t abs_val = ~(uint32_t)value + 1;
+v = (abs_val << 1) - 1;
+```
+
+This uses two's complement negation (`~x + 1`) entirely in the unsigned domain, preventing any signed overflow.
+
+### Changes Made
+- **lib/toolbox/varint.c:41-56** - Fixed `varint_int32_pack()` function
+- **lib/toolbox/varint.c:71-86** - Fixed `varint_int32_length()` function (had the same pattern)
+
+### Edge Cases Verified
+✓ INT32_MIN (-2147483648) - no longer overflows
+✓ INT32_MAX (2147483647) - works correctly  
+✓ Negative values (-1, -100, etc.) - properly encoded
+✓ Positive values and zero - unchanged behavior
+
+The fix maintains the ZigZag encoding semantics while eliminating the security vulnerability.

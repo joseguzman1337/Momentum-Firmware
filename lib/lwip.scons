@@ -1,0 +1,45 @@
+Import("env")
+
+env.Append(
+    CPPPATH=[
+        "#/lib/lwip/src/include",
+        "#/lib/lwip/port",
+    ],
+)
+
+libenv = env.Clone(FW_LIB_NAME="lwip")
+libenv.ApplyLibFlags()
+
+libenv.AppendUnique(
+    CCFLAGS=[
+        "-Wno-error",
+        "-Wno-address",
+        "-Wno-unused-variable",
+        "-Wno-parentheses",
+        "-Wno-switch",
+        "-Wno-implicit-function-declaration",
+        "-Wno-int-conversion",
+        "-Wno-pointer-sign",
+    ],
+)
+
+# Define source files
+sources = [
+    # Core
+    Glob("lwip/src/core/*.c"),
+    Glob("lwip/src/core/ipv4/*.c"),
+    # API
+    Glob("lwip/src/api/*.c"),
+    # Netif
+    "lwip/src/netif/ethernet.c",
+    # Apps
+    "lwip/src/apps/http/http_client.c",
+    # Port
+    "lwip/port/sys_arch.c",
+    "lwip/port/furi_lwip_netif.c",
+]
+
+# Create the library
+lib = libenv.StaticLibrary("${FW_LIB_NAME}", sources)
+libenv.Install("${LIB_DIST_DIR}", lib)
+Return("lib")
