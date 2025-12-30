@@ -41,6 +41,7 @@ typedef struct {
 
 ProtocolIdteck* protocol_idteck_alloc(void) {
     ProtocolIdteck* protocol = malloc(sizeof(ProtocolIdteck));
+    furi_check(protocol);
     return protocol;
 }
 

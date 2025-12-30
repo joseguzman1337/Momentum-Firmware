@@ -39,6 +39,7 @@ typedef struct {
 
 ProtocolHIDEx* protocol_hid_ex_generic_alloc(void) {
     ProtocolHIDEx* protocol = malloc(sizeof(ProtocolHIDEx));
+    furi_check(protocol);
     protocol->decoder.fsk_demod = fsk_demod_alloc(MIN_TIME, 6, MAX_TIME, 5);
     protocol->encoder.fsk_osc = fsk_osc_alloc(8, 10, 50);
 

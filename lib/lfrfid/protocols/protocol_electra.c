@@ -115,6 +115,7 @@ typedef struct {
 
 ProtocolElectra* protocol_electra_alloc(void) {
     ProtocolElectra* proto = malloc(sizeof(ProtocolElectra));
+    furi_check(proto);
     return (void*)proto;
 }
 

@@ -47,6 +47,7 @@ typedef struct {
 
 ProtocolSecurakey* protocol_securakey_alloc(void) {
     ProtocolSecurakey* protocol = malloc(sizeof(ProtocolSecurakey));
+    furi_check(protocol);
     return (void*)protocol;
 }
 

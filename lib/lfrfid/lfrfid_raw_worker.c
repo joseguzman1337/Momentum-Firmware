@@ -149,6 +149,7 @@ static int32_t lfrfid_raw_read_worker_thread(void* thread_context) {
     bool file_valid = lfrfid_raw_file_open_write(file, filename);
 
     LFRFIDRawWorkerReadData* data = malloc(sizeof(LFRFIDRawWorkerReadData));
+    furi_check(data);
 
     data->stream = buffer_stream_alloc(RFID_DATA_BUFFER_SIZE, READ_DATA_BUFFER_COUNT);
     data->pair = varint_pair_alloc();
@@ -244,6 +245,7 @@ static int32_t lfrfid_raw_emulate_worker_thread(void* thread_context) {
     bool file_valid = true;
 
     LFRFIDRawWorkerEmulateData* data = malloc(sizeof(LFRFIDRawWorkerEmulateData));
+    furi_check(data);
 
     Storage* storage = furi_record_open(RECORD_STORAGE);
     data->ctx.overrun_count = 0;

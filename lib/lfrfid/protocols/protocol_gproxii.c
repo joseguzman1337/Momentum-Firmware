@@ -31,6 +31,7 @@ typedef struct {
 
 ProtocolGProxII* protocol_gproxii_alloc(void) {
     ProtocolGProxII* protocol = malloc(sizeof(ProtocolGProxII));
+    furi_check(protocol);
     return protocol;
 }
 

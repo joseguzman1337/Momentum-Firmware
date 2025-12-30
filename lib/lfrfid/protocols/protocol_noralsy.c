@@ -36,6 +36,7 @@ typedef struct {
 
 ProtocolNoralsy* protocol_noralsy_alloc(void) {
     ProtocolNoralsy* protocol = malloc(sizeof(ProtocolNoralsy));
+    furi_check(protocol);
     return (void*)protocol;
 }
 

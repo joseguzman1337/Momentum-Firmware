@@ -104,18 +104,21 @@ uint16_t protocol_em4100_get_long_time_high(ProtocolEM4100* proto) {
 
 ProtocolEM4100* protocol_em4100_alloc(void) {
     ProtocolEM4100* proto = malloc(sizeof(ProtocolEM4100));
+    furi_check(proto);
     proto->clock_per_bit = 64;
     return (void*)proto;
 }
 
 ProtocolEM4100* protocol_em4100_16_alloc(void) {
     ProtocolEM4100* proto = malloc(sizeof(ProtocolEM4100));
+    furi_check(proto);
     proto->clock_per_bit = 16;
     return (void*)proto;
 }
 
 ProtocolEM4100* protocol_em4100_32_alloc(void) {
     ProtocolEM4100* proto = malloc(sizeof(ProtocolEM4100));
+    furi_check(proto);
     proto->clock_per_bit = 32;
     return (void*)proto;
 }

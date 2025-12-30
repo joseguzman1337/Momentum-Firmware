@@ -32,6 +32,7 @@ typedef struct {
 
 ProtocolPACStanley* protocol_pac_stanley_alloc(void) {
     ProtocolPACStanley* protocol = malloc(sizeof(ProtocolPACStanley));
+    furi_check(protocol);
     return (void*)protocol;
 }
 

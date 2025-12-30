@@ -33,6 +33,7 @@ typedef struct {
 
 ProtocolJablotron* protocol_jablotron_alloc(void) {
     ProtocolJablotron* protocol = malloc(sizeof(ProtocolJablotron));
+    furi_check(protocol);
     return protocol;
 }
 

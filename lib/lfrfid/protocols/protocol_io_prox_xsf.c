@@ -33,6 +33,7 @@ typedef struct {
 
 ProtocolIOProxXSF* protocol_io_prox_xsf_alloc(void) {
     ProtocolIOProxXSF* protocol = malloc(sizeof(ProtocolIOProxXSF));
+    furi_check(protocol);
     protocol->decoder.fsk_demod = fsk_demod_alloc(MIN_TIME, 8, MAX_TIME, 6);
     protocol->encoder.fsk_osc = fsk_osc_alloc(8, 10, 64);
     return protocol;

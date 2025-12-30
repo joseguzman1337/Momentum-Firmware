@@ -35,6 +35,7 @@ typedef struct {
 
 ProtocolGallagher* protocol_gallagher_alloc(void) {
     ProtocolGallagher* proto = malloc(sizeof(ProtocolGallagher));
+    furi_check(proto);
     return (void*)proto;
 }
 

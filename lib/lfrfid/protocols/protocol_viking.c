@@ -34,6 +34,7 @@ typedef struct {
 
 ProtocolViking* protocol_viking_alloc(void) {
     ProtocolViking* proto = malloc(sizeof(ProtocolViking));
+    furi_check(proto);
     return (void*)proto;
 }
 

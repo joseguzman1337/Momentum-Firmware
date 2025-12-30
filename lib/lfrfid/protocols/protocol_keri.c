@@ -36,6 +36,7 @@ typedef struct {
 
 ProtocolKeri* protocol_keri_alloc(void) {
     ProtocolKeri* protocol = malloc(sizeof(ProtocolKeri));
+    furi_check(protocol);
     return protocol;
 }
 

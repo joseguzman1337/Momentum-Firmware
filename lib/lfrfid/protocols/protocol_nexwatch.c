@@ -46,6 +46,7 @@ typedef struct {
 
 ProtocolNexwatch* protocol_nexwatch_alloc(void) {
     ProtocolNexwatch* protocol = malloc(sizeof(ProtocolNexwatch));
+    furi_check(protocol);
     return protocol;
 }
 

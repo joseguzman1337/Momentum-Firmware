@@ -34,6 +34,7 @@ typedef struct {
 
 ProtocolH10301* protocol_h10301_alloc(void) {
     ProtocolH10301* protocol = malloc(sizeof(ProtocolH10301));
+    furi_check(protocol);
     protocol->decoder.fsk_demod = fsk_demod_alloc(MIN_TIME, 6, MAX_TIME, 5);
     protocol->encoder.fsk_osc = fsk_osc_alloc(8, 10, 50);
 

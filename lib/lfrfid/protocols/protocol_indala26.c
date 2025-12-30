@@ -37,6 +37,7 @@ typedef struct {
 
 ProtocolIndala* protocol_indala26_alloc(void) {
     ProtocolIndala* protocol = malloc(sizeof(ProtocolIndala));
+    furi_check(protocol);
     return protocol;
 }
 
