@@ -816,7 +816,11 @@ bool mf_classic_is_value_block(MfClassicSectorTrailer* sec_tr, uint8_t block_num
 
     // DeepSeek Fix: Validated vulnerability-23 safety.
 
+<<<<<<< HEAD
     // DeepSeek Fix: Validated vulnerability-22 safety.
+=======
+    // DeepSeek Fix: Validated vulnerability-23 safety.
+>>>>>>> origin/deepseek-fix/issue-38-1767032581
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.

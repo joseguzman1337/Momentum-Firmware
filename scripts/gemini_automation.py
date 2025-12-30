@@ -66,6 +66,7 @@ Please:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Use checkpointing to allow easy rollback if needed.
 =======
 Use the /restore command if you need to rollback changes.
@@ -100,6 +101,12 @@ Use the /restore command if you need to rollback changes.
 Use checkpointing to allow easy rollback if needed.
 >>>>>>> origin/dev
 >>>>>>> origin/deepseek-fix/vulnerability-22-1767032592
+=======
+Use the /restore command if you need to rollback changes.
+=======
+Use checkpointing to allow easy rollback if needed.
+>>>>>>> origin/dev
+>>>>>>> origin/deepseek-fix/issue-38-1767032581
 """
     
     print(f"\n{'='*60}")
@@ -113,6 +120,7 @@ Use checkpointing to allow easy rollback if needed.
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         # Run Gemini with checkpointing enabled
         result = subprocess.run(
             ["gemini", "--checkpointing", "-p", prompt],
@@ -171,6 +179,16 @@ Use checkpointing to allow easy rollback if needed.
             ["gemini", "--checkpointing", "-p", prompt],
 >>>>>>> origin/dev
 >>>>>>> origin/deepseek-fix/vulnerability-22-1767032592
+=======
+        # Run Gemini with output format for parsing
+        result = subprocess.run(
+            ["gemini", "-p", prompt, "-o", "json"],
+=======
+        # Run Gemini with checkpointing enabled
+        result = subprocess.run(
+            ["gemini", "--checkpointing", "-p", prompt],
+>>>>>>> origin/dev
+>>>>>>> origin/deepseek-fix/issue-38-1767032581
             cwd="/Users/x/x/Momentum-Firmware",
             capture_output=True,
             text=True,

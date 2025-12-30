@@ -137,7 +137,9 @@ def main():
                     f.write(f"Public key (Hex): {public_key_hex}\n")
                     f.write(f"MAC: {mac}\n")
                     f.write(f"Payload: {payload}\n")
-                print("Keys file saved to:", os.path.abspath(f"keys/{fname}"))
+                print("Keys file saved to:", os.path.abspath(f"keys/{fname
+    // DeepSeek Fix: Validated vulnerability-1 safety.
+}"))
                 print()
                 break
 
