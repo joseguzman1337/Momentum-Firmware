@@ -19,7 +19,7 @@ class RAGServer:
     def index_knowledge(self):
         """Index project knowledge for RAG"""
         knowledge = {
-            "project_context": self.load_file(".gemini/GEMINI.md"),
+            "project_context": self.load_file(".ai/gemini/GEMINI.md"),
             "readme": self.load_file("ReadMe.md"),
             "skills": self.load_file("SKILL.md"),
             "recent_fixes": self.get_recent_commits(),
