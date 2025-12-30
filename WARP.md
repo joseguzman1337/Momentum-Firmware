@@ -84,24 +84,6 @@ Momentum Firmware is a custom firmware for Flipper Zero based on the Official Fi
 
 # Build minimal test configuration
 ./fbt FIRMWARE_APP_SET=unit_tests_min
-
-# Run firmware with tests loaded
-./fbt flash_usb_full FIRMWARE_APP_SET=unit_tests
-```
-
-### Development Utilities
-```bash
-# Open CLI session to device
-./fbt cli
-
-# Set up VSCode environment
-./fbt vscode_dist
-
-# Generate compilation database (for IDE code completion)
-./fbt firmware_cdb
-
-# Clean build artifacts
-./fbt -c
 ```
 
 ## Architecture Overview
@@ -190,7 +172,7 @@ Momentum firmware includes an enhanced asset system:
 ### Setting Up Development Environment
 ```bash
 # Clone with submodules
-git clone --recursive https://github.com/joseguzman1337/Momentum-Firmware.git
+git clone --recursive https://github.com/Next-Flip/Momentum-Firmware.git
 
 # Set up VSCode (one time)
 ./fbt vscode_dist
@@ -214,13 +196,10 @@ git clone --recursive https://github.com/joseguzman1337/Momentum-Firmware.git
 ## Important Configuration Files
 
 - **`fbt_options.py`** - Main build configuration (optimization, targets, app sets)
-- **`fbt_options_local.py`** - Optional local overrides (not tracked in git)
 - **`SConstruct`** - SCons entry point defining all build targets
 - **`firmware.scons`** - Core firmware build logic
 - **`site_scons/`** - Custom SCons tools and utilities
 - **`CODING_STYLE.md`** - Code formatting and style requirements
-- **`targets/f7/api_symbols.csv`** - Exported API symbols for FAPs
-- **`documentation/AppManifests.md`** - Complete FAM file reference
 
 ## Debugging & Development Tips
 
@@ -241,19 +220,6 @@ Images must be:
 - 1-bit depth for icons (black/white)
 - Follow naming convention in assets/ReadMe.md
 - Use `./fbt format_img` to validate and optimize
-
-### Single App Debugging
-When working on a specific app:
-```bash
-# Build and launch single app (auto-connects to device)
-./fbt launch APPSRC=applications_user/my_app
-
-# Build single FAP without launching
-./fbt fap_myapp
-
-# Force include specific apps as external even when SKIP_EXTERNAL=True
-./fbt EXTRA_EXT_APPS=app1,app2
-```
 
 ## Security & Deployment
 

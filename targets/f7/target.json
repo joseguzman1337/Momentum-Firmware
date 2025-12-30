@@ -53,6 +53,7 @@
         "bit_lib",
         "toolbox",
         "datetime",
-        "ieee754_parse_wrap"
+        "ieee754_parse_wrap",
+        "lwip"
     ]
 }
