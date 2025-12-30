@@ -407,7 +407,10 @@ int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) {
         char* temp_buf = NULL; /* LCOV_EXCL_START */
         *buf = NULL;
         while(len < 0) {
-            MG_FREE(temp_buf);
+            if(temp_buf != NULL) {
+                MG_FREE(temp_buf);
+                temp_buf = NULL;
+            }
             if(size == 0) {
                 size = 5;
             }

@@ -133,10 +133,8 @@ void ble_beacon_app_update_state(BleBeaconApp* app) {
     furi_check(furi_hal_bt_extra_beacon_set_config(&app->beacon_config));
 
     app->beacon_data_len = 0;
-    while(app->beacon_data_len < sizeof(app->beacon_data)) {
-        if(app->beacon_data[app->beacon_data_len] == 0) {
-            break;
-        }
+    while(app->beacon_data_len < sizeof(app->beacon_data) && 
+          app->beacon_data[app->beacon_data_len] != 0) {
         app->beacon_data_len++;
     }
 

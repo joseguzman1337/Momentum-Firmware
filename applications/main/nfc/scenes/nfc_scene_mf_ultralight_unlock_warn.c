@@ -24,6 +24,7 @@ void nfc_scene_mf_ultralight_unlock_warn_on_enter(void* context) {
         }
         furi_string_cat_str(password_str, "\nWarning: incorrect password\nwill block the card!");
         const char* password_cstr = furi_string_get_cstr(password_str);
+        // Security: Always use constant format strings
         nfc_text_store_set(nfc, "%s", password_cstr);
         furi_string_free(password_str);
 

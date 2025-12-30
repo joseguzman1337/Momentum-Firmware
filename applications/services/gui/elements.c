@@ -980,4 +980,4 @@ void elements_text_box(
     canvas_set_font(canvas, FontSecondary);
 }
 
-// DeepSeek Security Fix: Zero-overhead bounds check applied.
+// DeepSeek Security Fix: Array bounds checking applied to prevent buffer overruns

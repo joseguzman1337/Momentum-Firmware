@@ -1,0 +1,101 @@
+Code scanning
+ CodeQL is reporting errors. Check the status page for help.
+is:open branch:dev 
+
+
+Non-constant format string
+Critical
+#6 opened on Aug 26 • Detected by CodeQL in applications/.../scenes/nfc_scene_mf_ultralight_... :26
+dev
+@joseguzman1337
+
+Non-constant format string
+Critical
+#5 opened on Aug 26 • Detected by CodeQL in applications/.../scenes/nfc_scene_des_auth_unloc... :30
+dev
+@joseguzman1337
+
+Potential use after free
+Critical
+#4 opened on Aug 26 • Detected by CodeQL in lib/.../common/str_util.c :425
+dev
+
+Potential use after free
+Critical
+#3 opened on Aug 26 • Detected by CodeQL in lib/.../common/str_util.c :417
+dev
+@joseguzman1337
+
+Type confusion
+Critical
+#24 opened on Aug 26 • Detected by CodeQL in lib/toolbox/compress.c :292
+dev
+@joseguzman1337
+
+Call to memory access function may overflow buffer
+Critical
+#23 opened on Aug 26 • Detected by CodeQL in lib/.../mf_classic/mf_classic.c :489
+dev
+@joseguzman1337
+
+Call to memory access function may overflow buffer
+Critical
+#22 opened on Aug 26 • Detected by CodeQL in lib/.../mf_classic/mf_classic.c :487
+dev
+@joseguzman1337
+
+Invalid pointer dereference
+Critical
+#21 opened on Aug 26 • Detected by CodeQL in applications/.../nfc/nfc_cli.c :169
+dev
+@joseguzman1337
+
+Uncontrolled data in arithmetic expression
+High
+#8 opened on Aug 26 • Detected by CodeQL in lib/toolbox/varint.c :47
+dev
+
+Uncontrolled data in arithmetic expression
+High
+#7 opened on Aug 26 • Detected by CodeQL in lib/toolbox/varint.c :45
+dev
+
+Use of weak cryptographic key
+High
+#1 opened on Aug 26 • Detected by CodeQL in applications/.../findmy/generate_keys.py :53
+dev
+
+Suspicious 'sizeof' use
+High
+#20 opened on Aug 26 • Detected by CodeQL in lib/mjs/mjs_core.c :332
+dev
+
+Suspicious 'sizeof' use
+High
+#19 opened on Aug 26 • Detected by CodeQL in lib/mjs/mjs_core.c :331
+dev
+
+Suspicious 'sizeof' use
+High
+#18 opened on Aug 26 • Detected by CodeQL in lib/mjs/mjs_core.c :327
+dev
+
+Incorrect 'not' operator usage
+High
+#17 opened on Aug 26 • Detected by CodeQL in applications/.../supported_cards/charliecard.c :1162
+dev
+
+Array offset used before range check
+High
+#16 opened on Aug 26 • Detected by CodeQL in applications/.../gui/elements.c :928
+dev
+
+Array offset used before range check
+High
+#15 opened on Aug 26 • Detected by CodeQL in applications/.../example_ble_beacon/ble_beacon_app.c :136
+dev
+
+Arbitrary file write during tarfile extraction
+High
+#2 opened on Aug 26 • Detected by CodeQL in scripts/wifi_board.py :115
+dev

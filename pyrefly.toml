@@ -32,7 +32,7 @@ infer-with-first-use = true
 ignore-errors-in-generated-code = true
 
 # Import Handling
-# Silencing import errors for common missing stubs if necessary. 
+# Silencing import errors for common missing stubs if necessary.
 # Currently empty, add libraries here if they cause "missing import" errors.
 ignore-missing-imports = []
 
