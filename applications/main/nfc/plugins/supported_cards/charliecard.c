@@ -891,6 +891,7 @@ static Pass* passes_parse(const MfClassicData* data) {
     // something else entirely?
 
     Pass* passes = malloc(sizeof(Pass) * CHARLIE_N_PASSES);
+    furi_check(passes);
 
     for(size_t i = 0; i < CHARLIE_N_PASSES; i++) {
         passes[i] = pass_parse(data, 4 + (i / 2), 0, (i % 2) * 7);
@@ -917,6 +918,7 @@ static Transaction* transactions_parse(const MfClassicData* data) {
     // sequentially. (eg, sorted modulo array rotation)
 
     Transaction* transactions = malloc(sizeof(Transaction) * CHARLIE_N_TRANSACTION_HISTORY);
+    furi_check(transactions);
 
     // Parse each transaction field using some modular math magic to get the offsets:
     // move from sector 6 -> 7 after the first 6 transactions

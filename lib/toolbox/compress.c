@@ -47,6 +47,7 @@ struct CompressIcon {
 
 CompressIcon* compress_icon_alloc(size_t decode_buf_size) {
     CompressIcon* instance = malloc(sizeof(CompressIcon));
+    furi_check(instance);
     instance->decoder = heatshrink_decoder_alloc(
         COMPRESS_ICON_ENCODED_BUFF_SIZE,
         COMPRESS_EXP_BUFF_SIZE_LOG,
@@ -55,6 +56,7 @@ CompressIcon* compress_icon_alloc(size_t decode_buf_size) {
 
     instance->buffer_size = decode_buf_size + 4; /* To account for heatshrink's poller quirks */
     instance->buffer = malloc(instance->buffer_size);
+    furi_check(instance->buffer);
 
     return instance;
 }
@@ -100,6 +102,7 @@ Compress* compress_alloc(CompressType type, const void* config) {
     furi_check(config);
 
     Compress* compress = malloc(sizeof(Compress));
+    furi_check(compress);
     compress->config = config;
     compress->encoder = NULL;
     compress->decoder = NULL;
@@ -237,6 +240,7 @@ static bool compress_decode_stream_internal(
 
     uint8_t* compressed_chunk = malloc(work_buffer_size);
     uint8_t* decompressed_chunk = malloc(work_buffer_size);
+    furi_check(compressed_chunk && decompressed_chunk);
 
     /* Sink data to decoding buffer */
     do {
@@ -479,6 +483,7 @@ CompressStreamDecoder* compress_stream_decoder_alloc(
     furi_check(config);
 
     CompressStreamDecoder* instance = malloc(sizeof(CompressStreamDecoder));
+    furi_check(instance);
     instance->type = type;
     instance->stream_position = 0;
     instance->decode_buffer_position = 0;
@@ -489,6 +494,7 @@ CompressStreamDecoder* compress_stream_decoder_alloc(
         const CompressConfigHeatshrink* hs_config = config;
         instance->decode_buffer_size = hs_config->input_buffer_sz;
         instance->decode_buffer = malloc(hs_config->input_buffer_sz);
+        furi_check(instance->decode_buffer);
 
         heatshrink_decoder* hs_decoder = heatshrink_decoder_alloc(
             hs_config->input_buffer_sz, hs_config->window_sz2, hs_config->lookahead_sz2);
@@ -503,8 +509,10 @@ CompressStreamDecoder* compress_stream_decoder_alloc(
         const CompressConfigGzip* gz_config = config;
         instance->decode_buffer_size = gz_config->input_buffer_sz;
         instance->decode_buffer = malloc(gz_config->input_buffer_sz);
+        furi_check(instance->decode_buffer);
 
         gzip_decoder* gz_decoder = malloc(sizeof(gzip_decoder) + gz_config->dict_sz);
+        furi_check(gz_decoder);
         gz_decoder->sd = instance;
         gz_decoder->dict_sz = gz_config->dict_sz;
         if(!gzip_decoder_reset(gz_decoder)) {
@@ -656,6 +664,7 @@ bool compress_stream_decoder_seek(CompressStreamDecoder* instance, size_t positi
 
     /* Read and discard data up to requested position */
     uint8_t* dummy_buffer = malloc(instance->decode_buffer_size);
+    furi_check(dummy_buffer);
     bool success = true;
 
     while(instance->stream_position < position) {

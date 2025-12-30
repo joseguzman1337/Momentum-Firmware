@@ -58,6 +58,7 @@ const NfcDeviceBase nfc_device_mf_classic = {
 
 MfClassicData* mf_classic_alloc(void) {
     MfClassicData* data = malloc(sizeof(MfClassicData));
+    furi_check(data);
     data->iso14443_3a_data = iso14443_3a_alloc();
     return data;
 }
@@ -814,13 +815,6 @@ bool mf_classic_is_value_block(MfClassicSectorTrailer* sec_tr, uint8_t block_num
             mf_classic_is_allowed_access_data_block(
                 sec_tr, block_num, MfClassicKeyTypeB, MfClassicActionDataDec));
 
-    // DeepSeek Fix: Validated vulnerability-23 safety.
-
-<<<<<<< HEAD
-    // DeepSeek Fix: Validated vulnerability-22 safety.
-=======
-    // DeepSeek Fix: Validated vulnerability-23 safety.
->>>>>>> origin/deepseek-fix/issue-38-1767032581
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.

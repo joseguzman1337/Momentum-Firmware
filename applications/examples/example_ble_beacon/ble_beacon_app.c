@@ -59,6 +59,7 @@ static void ble_beacon_app_restore_beacon_state(BleBeaconApp* app) {
 
 static BleBeaconApp* ble_beacon_app_alloc(void) {
     BleBeaconApp* app = malloc(sizeof(BleBeaconApp));
+    furi_check(app);
 
     app->gui = furi_record_open(RECORD_GUI);
 

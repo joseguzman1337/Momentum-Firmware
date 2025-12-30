@@ -77,6 +77,7 @@ static bool nfc_cli_desktop_app_is_running() {
 
 static NfcCliContext* nfc_cli_alloc(PipeSide* pipe) {
     NfcCliContext* instance = malloc(sizeof(NfcCliContext));
+    furi_check(instance);
     instance->nfc = nfc_alloc();
     instance->processor_context = nfc_cli_command_processor_alloc(instance->nfc);
 
