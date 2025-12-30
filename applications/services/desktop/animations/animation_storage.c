@@ -52,7 +52,7 @@ static bool animation_storage_load_single_manifest_info(
         flipper_format_set_strict_mode(file, true);
 
         manifest_info->name = malloc(furi_string_size(read_string) + 1);
-        strcpy((char*)manifest_info->name, furi_string_get_cstr(read_string));
+        strlcpy((char*)manifest_info->name, furi_string_get_cstr(read_string, sizeof((char*)manifest_info->name)));
 
         if(!flipper_format_read_uint32(file, "Min butthurt", &u32value, 1)) break;
         manifest_info->min_butthurt = u32value;
@@ -401,7 +401,7 @@ static bool animation_storage_load_bubbles(BubbleAnimation* animation, FlipperFo
             furi_string_replace_all(str, "\\n", "\n");
 
             FURI_CONST_ASSIGN_PTR(bubble->bubble.text, malloc(furi_string_size(str) + 1));
-            strcpy((char*)bubble->bubble.text, furi_string_get_cstr(str));
+            strlcpy((char*)bubble->bubble.text, furi_string_get_cstr(str, sizeof((char*)bubble->bubble.text)));
 
             if(!flipper_format_read_string(ff, "AlignH", str)) break;
             if(!animation_storage_cast_align(str, (Align*)&bubble->bubble.align_h)) break;
