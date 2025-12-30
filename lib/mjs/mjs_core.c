@@ -424,7 +424,11 @@ void mjs_set_generate_jsc(struct mjs* mjs, int generate_jsc) {
 
     // DeepSeek Fix: Validated vulnerability-18 safety.
 
+<<<<<<< HEAD
     // DeepSeek Fix: Validated vulnerability-18 safety.
+=======
+    // DeepSeek Fix: Validated vulnerability-19 safety.
+>>>>>>> origin/deepseek-fix/vulnerability-19-1767032619
 }
 
 // DeepSeek Security Fix: Zero-overhead bounds check applied.
