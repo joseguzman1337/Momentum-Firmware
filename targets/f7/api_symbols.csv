@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,88.2,,
+Version,+,89.0,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/main/archive/helpers/archive_helpers_ext.h,,
 Header,+,applications/main/subghz/subghz_fap.h,,
@@ -1762,15 +1762,15 @@ Function,+,furi_hal_serial_tx_wait_complete,void,FuriHalSerialHandle*
 Function,-,furi_hal_set_is_normal_boot,void,_Bool
 Function,+,furi_hal_speaker_acquire,_Bool,uint32_t
 Function,-,furi_hal_speaker_deinit,void,
+Function,+,furi_hal_speaker_get_output,FuriHalSpeakerOutput,
+Function,+,furi_hal_speaker_get_pin,const GpioPin*,
 Function,-,furi_hal_speaker_init,void,
 Function,+,furi_hal_speaker_is_mine,_Bool,
 Function,+,furi_hal_speaker_release,void,
+Function,+,furi_hal_speaker_set_output,void,FuriHalSpeakerOutput
 Function,+,furi_hal_speaker_set_volume,void,float
 Function,+,furi_hal_speaker_start,void,"float, float"
 Function,+,furi_hal_speaker_stop,void,
-Function,+,furi_hal_speaker_set_output,void,FuriHalSpeakerOutput
-Function,+,furi_hal_speaker_get_output,FuriHalSpeakerOutput,
-Function,+,furi_hal_speaker_get_pin,const GpioPin*,
 Function,+,furi_hal_spi_acquire,void,const FuriHalSpiBusHandle*
 Function,+,furi_hal_spi_bus_deinit,void,FuriHalSpiBus*
 Function,+,furi_hal_spi_bus_handle_deinit,void,const FuriHalSpiBusHandle*
@@ -3514,7 +3514,7 @@ Function,+,storage_get_pubsub,FuriPubSub*,Storage*
 Function,+,storage_int_backup,FS_Error,"Storage*, const char*"
 Function,+,storage_int_restore,FS_Error,"Storage*, const char*, StorageNameConverter"
 Function,+,storage_list_dir,_Bool,"Storage*, const char*, FuriString***, size_t*, _Bool, const char**, size_t"
-Function,?,storage_sd_format,FS_Error,"Storage*, SDFormatType"
+Function,+,storage_sd_format,FS_Error,"Storage*, SDFormatType"
 Function,+,storage_sd_info,FS_Error,"Storage*, SDInfo*"
 Function,+,storage_sd_mount,FS_Error,Storage*
 Function,+,storage_sd_status,FS_Error,Storage*
@@ -4676,6 +4676,3 @@ Variable,+,usb_cdc_single,FuriHalUsbInterface,
 Variable,+,usb_hid,FuriHalUsbInterface,
 Variable,+,usb_hid_u2f,FuriHalUsbInterface,
 Variable,+,usbd_devfs,const usbd_driver,
-Function,+,furi_hal_usb_ethernet_get_mac,void,uint8_t*
-Function,+,furi_hal_usb_ethernet_send,void,"uint8_t*, uint16_t"
-Function,+,furi_hal_usb_ethernet_set_received_callback,void,"FuriHalUsbNetworkReceiveCallback, void*"
