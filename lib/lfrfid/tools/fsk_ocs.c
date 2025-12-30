@@ -1,5 +1,6 @@
 #include "fsk_osc.h"
 #include <stdlib.h>
+#include <furi.h>
 
 struct FSKOsc {
     uint16_t freq[2];
@@ -11,6 +12,7 @@ struct FSKOsc {
 
 FSKOsc* fsk_osc_alloc(uint32_t freq_low, uint32_t freq_hi, uint32_t osc_phase_max) {
     FSKOsc* osc = malloc(sizeof(FSKOsc));
+    furi_check(osc);
     osc->freq[0] = freq_low;
     osc->freq[1] = freq_hi;
     osc->osc_phase_max = osc_phase_max;
