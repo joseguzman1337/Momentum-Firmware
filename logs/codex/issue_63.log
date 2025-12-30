@@ -1,0 +1,16 @@
+OpenAI Codex v0.77.0 (research preview)
+--------
+workdir: /Users/x/x/Momentum-Firmware
+model: gpt-5.2-codex
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: none
+reasoning summaries: auto
+session id: 019b68a1-e910-7c62-b9d7-3acbbfc6d4a3
+--------
+user
+Fix and resolve Issue #63: SubGHZ : Io Homecontrol. Make sure to generate a Pull Request (or commit) message that includes 'Closes #63' to auto-close the issue on merge.
+mcp startup: no servers
+2025-12-29T05:43:20.711376Z ERROR codex_api::endpoint::responses: error=http 429 Too Many Requests: Some("{\"error\":{\"type\":\"usage_limit_reached\",\"message\":\"The usage limit has been reached\",\"plan_type\":\"plus\",\"resets_at\":1766992322,\"resets_in_seconds\":5322}}")
+ERROR: You've hit your usage limit. Upgrade to Pro (https://openai.com/chatgpt/pricing), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 2:12 AM.

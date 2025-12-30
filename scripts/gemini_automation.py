@@ -60,7 +60,7 @@ Please:
 5. Add appropriate comments and documentation
 6. Generate a commit message that includes "Closes #{issue_number}"
 
-Use the /restore command if you need to rollback changes.
+Use checkpointing to allow easy rollback if needed.
 """
     
     print(f"\n{'='*60}")
@@ -68,9 +68,9 @@ Use the /restore command if you need to rollback changes.
     print(f"{'='*60}\n")
     
     try:
-        # Run Gemini with output format for parsing
+        # Run Gemini with checkpointing enabled
         result = subprocess.run(
-            ["gemini", "-p", prompt, "-o", "json"],
+            ["gemini", "--checkpointing", "-p", prompt],
             cwd="/Users/x/x/Momentum-Firmware",
             capture_output=True,
             text=True,
