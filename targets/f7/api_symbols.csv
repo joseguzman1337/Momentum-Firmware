@@ -1,5 +1,5 @@
 entry,status,name,type,params
-Version,+,80.2,,
+Version,+,69.0,,
 Header,+,applications/drivers/subghz/cc1101_ext/cc1101_ext_interconnect.h,,
 Header,+,applications/drivers/subghz/si4463_ext/si4463_ext_interconnect.h,,
 Header,+,applications/services/bt/bt_service/bt.h,,
@@ -2466,7 +2466,8 @@ Function,+,memchr,void*,"const void*, int, size_t"
 Function,+,memcmp,int,"const void*, const void*, size_t"
 Function,+,memcpy,void*,"void*, const void*, size_t"
 Function,-,memmem,void*,"const void*, size_t, const void*, size_t"
-Function,-,memmgr_alloc_from_pool,void*,size_t
+Function,-,memmgr_aux_pool_alloc,void*,size_t
+Function,-,memmgr_aux_pool_get_free,size_t,
 Function,+,memmgr_get_free_heap,size_t,
 Function,+,memmgr_get_minimum_free_heap,size_t,
 Function,+,memmgr_get_total_heap,size_t,
