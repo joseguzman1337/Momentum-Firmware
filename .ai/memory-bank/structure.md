@@ -41,11 +41,11 @@
 - **`logs/`** - AI agent execution logs organized by agent type
 
 ### IDE & Editor Integration
-- **`.codex/`** - Codex AI integration configuration
-- **`.claude/`** - Claude AI project settings
-- **`.gemini/`** - Gemini AI commands and policies
-- **`.amazonq/`** - Amazon Q rules and memory bank
-- **`.cursor/`** - Cursor editor rules
+- **`.ai/.codex/`** - Codex AI integration configuration
+- **`.ai/.claude/`** - Claude AI project settings
+- **`.ai/.gemini/`** - Gemini AI commands and policies
+- **`.ai/.amazonq/`** - Amazon Q rules and memory bank (moved to .ai/memory-bank/)
+- **`.ai/.cursor/`** - Cursor editor rules
 
 ## Architectural Patterns
 

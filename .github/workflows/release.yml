@@ -30,7 +30,7 @@ jobs:
           wget "${{ secrets.INDEXER_URL }}"/builds/firmware/${{ github.event.release.tag_name }}/flipper-z-f7-sdk-${{ github.event.release.tag_name }}.zip
 
       - name: "Update release with assets and notes"
-        uses: "softprops/action-gh-release@v2"
+        uses: "softprops/action-gh-release@v3"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
@@ -46,7 +46,7 @@ jobs:
               "${{ secrets.INDEXER_URL }}"/firmware/reindex;
 
       - name: "Force deploy website to refresh releases"
-        uses: peter-evans/repository-dispatch@v4
+        uses: peter-evans/repository-dispatch@v5
         with:
           token: ${{ secrets.REPO_DISPATCH_TOKEN }}
           repository: Next-Flip/v2.momentum-fw.dev
