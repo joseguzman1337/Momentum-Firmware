@@ -1076,9 +1076,9 @@ void transaction_format_cat(FuriString* out, Transaction transaction) {
     const char* sta;
 
     locale_format_dt_cat(out, &transaction.date);
-    furi_string_cat_printf(out, "\n%s", !!(transaction.g_flag & 0x1) ? "-" : "+");
+    furi_string_cat_printf(out, "\n%s", (transaction.g_flag & 0x1) ? "-" : "+");
     money_format_cat(out, transaction.fare);
-    if(!!(transaction.g_flag & 0x1) && (transaction.fare.dollars == FARE_BUS.dollars) &&
+    if((transaction.g_flag & 0x1) && (transaction.fare.dollars == FARE_BUS.dollars) &&
        (transaction.fare.cents == FARE_BUS.cents)) {
         // if not a refill, and the fare amount is equal to bus fare (any better approach? flag bits for modality?)
         // format for bus — supposedly some correlation between gate ID & bus #, haven't investigated
