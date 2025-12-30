@@ -48,7 +48,7 @@ jobs:
 
       - name: Upload test results
         if: failure() && steps.flashing.outcome == 'success' && steps.run_units.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: unit-tests_output
           path: unit_tests*.txt
@@ -99,7 +99,7 @@ jobs:
 
       - name: Upload test results
         if: failure() && steps.flashing.outcome == 'success' && steps.run_units.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: unit-tests_output
           path: unit_tests*.txt
