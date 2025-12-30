@@ -188,6 +188,7 @@
   - Fix slashes in prefilled filename (by @WillyJL)
 - FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
 - UL: Sub-GHz: Fix crash in add manually menu (by @xMasterX)
+- Clangd: Add clangd parameters in IDE agnostic config file (by @WillyJL)
 - OFW: GUI: Fix Number Input Save Icon (by @zinongli)
 - OFW: JS: Stop PWM on exit (by @portasynthinca3)
 - OFW: Sub-GHz: Fix TIM17 config not applied immediately (by @Aerosnail)
