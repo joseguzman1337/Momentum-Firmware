@@ -40,3 +40,6 @@
 [submodule "documentation/doxygen/doxygen-awesome-css"]
 	path = documentation/doxygen/doxygen-awesome-css
 	url = https://github.com/joseguzman1337/doxygen-awesome-css.git
+[submodule "lib/lwip"]
+	path = lib/lwip
+	url = https://github.com/lwip-tcpip/lwip.git
