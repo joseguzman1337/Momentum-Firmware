@@ -29,7 +29,9 @@ extern "C" {
 DICT_DEF2(map_str, const char*, M_CSTR_OPLIST, const char*, M_CSTR_OPLIST)
 
 struct BadUsbScript {
-    FuriHalUsbHidConfig hid_cfg;
+    BadUsbHidInterface* interface;
+    BadUsbHidConfig* hid_cfg;
+    bool load_id_cfg;
     const BadUsbHidApi* hid;
     void* hid_inst;
     FuriThread* thread;

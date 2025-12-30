@@ -336,7 +336,7 @@ static void gap_init_svc(Gap* gap) {
     // Initialize GATT interface
     aci_gatt_init();
     // Initialize GAP interface
-    // Skip fist symbol AD_TYPE_COMPLETE_LOCAL_NAME
+    // Skip first symbol AD_TYPE_COMPLETE_LOCAL_NAME
     char* name = gap->service.adv_name + 1;
     aci_gap_init(
         GAP_PERIPHERAL_ROLE,
@@ -488,7 +488,7 @@ void gap_stop_advertising() {
     osMutexRelease(gap->state_mutex);
 }
 
-static void gap_advetise_timer_callback(void* context) {
+static void gap_advertise_timer_callback(void* context) {
     UNUSED(context);
     GapCommand command = GapCommandAdvLowPower;
     furi_check(osMessageQueuePut(gap->command_queue, &command, 0, 0) == osOK);
@@ -503,7 +503,7 @@ bool gap_init(GapConfig* config, GapEventCallback on_event_cb, void* context) {
     gap->config = config;
     srand(DWT->CYCCNT);
     // Create advertising timer
-    gap->advertise_timer = osTimerNew(gap_advetise_timer_callback, osTimerOnce, NULL, NULL);
+    gap->advertise_timer = furi_timer_alloc(gap_advertise_timer_callback, FuriTimerTypeOnce, NULL);
     // Initialization of GATT & GAP layer
     gap->service.adv_name = config->adv_name;
     gap_init_svc(gap);
