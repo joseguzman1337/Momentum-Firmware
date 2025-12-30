@@ -928,6 +928,8 @@ void elements_text_box(
             // Process format symbols
             if(j < line[i].len - 1 && line[i].text[j] == '\e') { //-V781
                 ++j;
+                // j is now at most line[i].len - 1, which is a valid index
+                furi_assert(j < line[i].len);
                 if(line[i].text[j] == ELEMENTS_BOLD_MARKER) {
                     if(bold) {
                         current_font = FontSecondary;
