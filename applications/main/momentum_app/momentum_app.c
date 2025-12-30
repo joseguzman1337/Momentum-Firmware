@@ -1,4 +1,5 @@
 #include "momentum_app.h"
+#include <power/power_service/power_settings_api_i.h>
 #include <string.h>
 
 static bool momentum_app_custom_event_callback(void* context, uint32_t event) {
@@ -11,6 +12,19 @@ void callback_reboot(void* context) {
     UNUSED(context);
     Power* power = furi_record_open(RECORD_POWER);
     power_reboot(power, PowerBootModeNormal);
+}
+
+static void momentum_app_apply_charge_cap(void) {
+    Power* power = furi_record_open(RECORD_POWER);
+    PowerSettings settings;
+    power_api_get_settings(power, &settings);
+    uint8_t charge_cap = (uint8_t)momentum_settings.charge_cap;
+    uint8_t supress_percent = (charge_cap >= 100) ? 0 : charge_cap;
+    if(settings.charge_supress_percent != supress_percent) {
+        settings.charge_supress_percent = supress_percent;
+        power_api_set_settings(power, &settings);
+    }
+    furi_record_close(RECORD_POWER);
 }
 
 bool momentum_app_apply(MomentumApp* app) {
@@ -118,6 +132,7 @@ bool momentum_app_apply(MomentumApp* app) {
     }
 
     if(app->save_settings) {
+        momentum_app_apply_charge_cap();
         momentum_settings_save();
     }
 
@@ -322,6 +337,10 @@ MomentumApp* momentum_app_alloc() {
     view_dispatcher_add_view(
         app->view_dispatcher, MomentumAppViewDialogEx, dialog_ex_get_view(app->dialog_ex));
 
+    app->widget = widget_alloc();
+    view_dispatcher_add_view(
+        app->view_dispatcher, MomentumAppViewWidget, widget_get_view(app->widget));
+
     // Settings init
 
     app->asset_pack_index = 0;
@@ -450,6 +469,8 @@ void momentum_app_free(MomentumApp* app) {
     popup_free(app->popup);
     view_dispatcher_remove_view(app->view_dispatcher, MomentumAppViewDialogEx);
     dialog_ex_free(app->dialog_ex);
+    view_dispatcher_remove_view(app->view_dispatcher, MomentumAppViewWidget);
+    widget_free(app->widget);
 
     // View Dispatcher and Scene Manager
     view_dispatcher_free(app->view_dispatcher);

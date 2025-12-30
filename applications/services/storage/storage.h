@@ -274,6 +274,27 @@ bool storage_dir_rewind(File* file);
  */
 bool storage_dir_exists(Storage* storage, const char* path);
 
+/**
+ * @brief List the contents of a directory.
+ * 
+ * @param storage pointer to a storage API instance.
+ * @param path pointer to a zero-terminated string containing the path of the directory in question.
+ * @param files pointer to an array of FuriString pointers to contain the file names.
+ * @param num_files pointer to the number of files in the directory.
+ * @param ignore_dirs if true, only files will be returned, not directories.
+ * @param include_ext pointer to an array of zero-terminated strings of extensions to include.
+ * @param ext_count the number of extensions in the include_ext array.
+ * @return true if the directory was successfully listed, false otherwise.
+ */
+bool storage_list_dir(
+    Storage* storage,
+    const char* path,
+    FuriString*** files,
+    size_t* num_files,
+    bool ignore_dirs,
+    const char** include_ext,
+    size_t ext_count);
+
 /******************* Common Functions *******************/
 
 /**
@@ -495,9 +516,10 @@ const char* storage_file_get_error_desc(File* file);
  * @brief Format the SD Card.
  *
  * @param storage pointer to a storage API instance.
+ * @param format_type filesystem type to use for formatting.
  * @return FSE_OK if the card was successfully formatted, any other error code on failure.
  */
-FS_Error storage_sd_format(Storage* storage);
+FS_Error storage_sd_format(Storage* storage, SDFormatType format_type);
 
 /**
  * @brief Unmount the SD card.

@@ -1,0 +1,148 @@
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+xcuserdata/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+*.xcuserstate
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+*.swiftpm
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/
+Cartfile.resolved
+
+# Build artifacts
+*.dext
+*.kext
+*.o
+*.a
+*.dylib
+*.framework
+*.app
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Code signing
+*.mobileprovision
+*.certSigningRequest
+*.p12
+*.cer
+*.provisionprofile
+
+# Archives
+*.zip
+*.tar.gz
+*.tar.bz2
+*.dmg
+*.pkg
+
+# Distribution
+Distribution/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Documentation
+docs/_build/
+site/
+
+# Testing
+.coverage
+coverage.lcov
+*.gcda
+*.gcno
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Backup files
+*.bak
+*.orig
+*~
+
+# Local configuration
+local.mk
+config.local
+
+# Secrets (important!)
+*.key
+*.pem
+*.crt
+secrets.yml
+credentials.json
+
+# Firmware binaries (download separately)
+*.bin
+*.fw
+
+# Development
+scratch/
+playground/
+notes.txt
+
+# System Extensions
+*.systemextension
+
+# Installer
+*.installer
+
+# Code coverage
+*.profdata
+*.profraw
+
+# Swift
+.swiftpm/
+.netrc

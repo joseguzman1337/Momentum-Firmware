@@ -1,0 +1,47 @@
+Fix issue #64: NFC: Desfire Poller furi_check failed
+Fix issue #63: SubGHZ : Io Homecontrol
+Fix issue #62: FindMyFlipper battery management
+Fix issue #61: Dickert_MAHS not reading correctly
+Fix issue #60: Play Sound for Find My Flipper
+Fix issue #59: Flipper Crashing in BLESpam
+Fix issue #58: Sub-GHz App freezes when I use Frequency Analyzer and select the found signal when Modulation FM238 is set
+Fix issue #57: NFC I2C+ 2k broken
+Fix issue #56: Storage: Choose filesystem when formatting SD
+Fix issue #55: Power: Add charging current limit setting
+Fix issue #54: Archive: Allow selecting multiple files
+Fix issue #53: Unable to use my Chamberlain garage door with recent FW versions
+Fix issue #52: Esp32 wifi Marauder crash
+Fix issue #51: Feature Request: Extra settings for external speaker
+Fix issue #50: JS : BADUSB Bluetooth configuration function for js
+Fix issue #49: Charge cap not working.
+Fix issue #48: Are you able to keybind to a specific folder? (say NFC cards folder)
+Fix issue #47: NULL pointer dereference
+Fix issue #46: Adding custom fonts guide in wiki
+Fix issue #45: Change BLE Remote Name
+Fix issue #44: NFC emulate ISO15693-3 Flipper crash and reboot
+Fix issue #43: Is there a possibility to run cron job on FZ0?
+Fix issue #42: iButton, RFID, NFC in JS
+Fix issue #41: NFC: magic tag write/wipe crash
+Fix issue #40: Mifare Plus X 2k SL 1 can be read as Mifare Classic 2k
+Fix issue #39: GuiSrv crash while decompressing bitmap icon
+Fix issue #38: Show more details about signals
+Fix issue #37: add support for the IKEA smart lock "ROTHULT"
+Fix issue #36: USB serial spoofing switch
+Fix issue #35: Coupling spamming BLE option with keyboard attack
+Fix issue #34: Add Blackmagic camera controls to the HID Bluetooth Remote APP (Commands included in request)
+Fix issue #33: Question about disk image
+Fix issue #32: BadUSB JavaScript execution over Bluetooth HID
+Fix issue #31: Xiaomi Air filter reset
+Fix issue #30: New usbdisk js module function: identity spoofing like Mass Storage app
+Fix issue #29: Duress PIN (panic/erase) to wipe device + SD
+Fix issue #28: Bad KB Bluetooth Device type spoofing
+Fix issue #27: bit_lib Library Extension
+Fix issue #26: dev version: space plaground
+Fix issue #25: SDcard issues and crashing
+Fix issue #24: subghz add Beninca HEADY
+Fix issue #23: Combine favorite directories.
+Fix issue #22: Problems during normal usage and even when idle
+Fix issue #21: nfc mifare write to original card crash
+Fix issue #20: Possibly broken ISO14443-4A?
+Fix issue #19: Add DS2431 support to 1-wire
+Fix issue #7: Dependency Dashboard

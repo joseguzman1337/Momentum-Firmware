@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>com.yourorg.RTL8814AUDriverKit</string>
+  <key>CFBundleName</key>
+  <string>RTL8814AU DriverKit</string>
+  <key>CFBundleExecutable</key>
+  <string>RTL8814AUDriverKit</string>
+  <key>CFBundlePackageType</key>
+  <string>XPC!</string>
+  <key>CFBundleShortVersionString</key>
+  <string>0.1.0</string>
+  <key>CFBundleVersion</key>
+  <string>0.1.0</string>
+
+  <key>IOKitPersonalities</key>
+  <dict>
+    <key>RTL8814AU</key>
+    <dict>
+      <key>CFBundleIdentifier</key>
+      <string>com.yourorg.RTL8814AUDriverKit</string>
+      <key>IOClass</key>
+      <string>RTL8814AU_Driver</string>
+      <key>IOProviderClass</key>
+      <string>IOUSBHostDevice</string>
+      <key>idVendor</key>
+      <integer>3034</integer>
+    </dict>
+  </dict>
+</dict>
+</plist>

@@ -96,7 +96,9 @@ static int32_t mass_thread_worker(void* context) {
             }
             buf_len = buf_cap = buf_sent = 0;
             state = StateReadCBW;
-            mass->fn.eject(mass->fn.ctx);
+            // Do not call fn.eject() here; true ejection is signaled via
+            // SCSI_START_STOP_UNIT in scsi_cmd_end(). Treating every USB
+            // reset as an eject breaks wasEjected() semantics on some hosts.
         }
         if(flags & EventRxTx) do {
                 switch(state) {

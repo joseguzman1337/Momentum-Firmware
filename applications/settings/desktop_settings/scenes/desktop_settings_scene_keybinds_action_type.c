@@ -6,6 +6,13 @@
 #include <flipper_application/flipper_application.h>
 #include <momentum/momentum.h>
 
+static const char* desktop_keybind_path_cstr(FuriString* keybind) {
+    if(desktop_keybind_is_dir(keybind)) {
+        return desktop_keybind_dir_path_cstr(keybind);
+    }
+    return furi_string_get_cstr(keybind);
+}
+
 static bool keybinds_fap_selector_item_callback(
     FuriString* file_path,
     void* context,
@@ -56,12 +63,23 @@ static void
             .select_right = true,
         };
         FuriString* temp_path = furi_string_alloc_set_str(base_path);
-        if(storage_common_exists(furi_record_open(RECORD_STORAGE), furi_string_get_cstr(keybind))) {
-            furi_string_set(temp_path, keybind);
+        Storage* storage = furi_record_open(RECORD_STORAGE);
+        const char* keybind_path = desktop_keybind_path_cstr(keybind);
+        if(desktop_keybind_is_dir(keybind) || storage_common_exists(storage, keybind_path)) {
+            furi_string_set(temp_path, keybind_path);
         }
         furi_record_close(RECORD_STORAGE);
         if(dialog_file_browser_show(app->dialogs, temp_path, temp_path, &browser_options)) {
-            desktop_settings_app_set_keybind(app, furi_string_get_cstr(temp_path));
+            storage = furi_record_open(RECORD_STORAGE);
+            if(storage_dir_exists(storage, furi_string_get_cstr(temp_path))) {
+                FuriString* dir_keybind = furi_string_alloc_printf(
+                    "%s%s", DESKTOP_KEYBIND_DIR_PREFIX, furi_string_get_cstr(temp_path));
+                desktop_settings_app_set_keybind(app, furi_string_get_cstr(dir_keybind));
+                furi_string_free(dir_keybind);
+            } else {
+                desktop_settings_app_set_keybind(app, furi_string_get_cstr(temp_path));
+            }
+            furi_record_close(RECORD_STORAGE);
             scene_manager_search_and_switch_to_previous_scene(
                 app->scene_manager, DesktopSettingsAppSceneStart);
         }
@@ -133,13 +151,17 @@ void desktop_settings_scene_keybinds_action_type_on_enter(void* context) {
         }
 
         Storage* storage = furi_record_open(RECORD_STORAGE);
-        if(storage_file_exists(storage, furi_string_get_cstr(keybind))) {
+        const char* keybind_path = desktop_keybind_path_cstr(keybind);
+        if(storage_file_exists(storage, keybind_path)) {
             if(furi_string_end_with_str(keybind, ".fap")) {
                 selected = DesktopSettingsAppKeybindActionTypeExternalApp;
             } else {
                 selected = DesktopSettingsAppKeybindActionTypeOpenFileOrDirectory;
             }
-        } else if(storage_dir_exists(storage, furi_string_get_cstr(keybind))) {
+        } else if(storage_dir_exists(storage, keybind_path)) {
+            selected = DesktopSettingsAppKeybindActionTypeOpenFileOrDirectory;
+        }
+        if(desktop_keybind_is_dir(keybind)) {
             selected = DesktopSettingsAppKeybindActionTypeOpenFileOrDirectory;
         }
         furi_record_close(RECORD_STORAGE);

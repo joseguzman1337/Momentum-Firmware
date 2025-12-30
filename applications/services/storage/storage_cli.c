@@ -1,5 +1,6 @@
 #include <furi.h>
 #include <furi_hal.h>
+#include <strings.h>
 
 #include <toolbox/cli/cli_command.h>
 #include <toolbox/cli/cli_ansi.h>
@@ -17,6 +18,52 @@
 #define MAX_NAME_LENGTH 254
 
 static void storage_cli_print_usage(void);
+static void storage_cli_print_format_usage(void);
+
+static const char* storage_cli_format_type_to_text(SDFormatType format_type) {
+    switch(format_type) {
+    case SDFormatTypeFAT32:
+        return "FAT32";
+    case SDFormatTypeExFAT:
+        return "exFAT";
+    case SDFormatTypeAuto:
+    default:
+        return "Auto";
+    }
+}
+
+static bool storage_cli_parse_format_type(FuriString* args, SDFormatType* format_type) {
+    furi_assert(format_type);
+
+    if(args_length(args) == 0) {
+        *format_type = SDFormatTypeAuto;
+        return true;
+    }
+
+    FuriString* format = furi_string_alloc();
+    bool ok = args_read_string_and_trim(args, format);
+    if(!ok) {
+        furi_string_free(format);
+        *format_type = SDFormatTypeAuto;
+        return true;
+    }
+
+    const char* format_str = furi_string_get_cstr(format);
+    if(strcasecmp(format_str, "auto") == 0 || strcasecmp(format_str, "any") == 0) {
+        *format_type = SDFormatTypeAuto;
+    } else if(strcasecmp(format_str, "fat32") == 0 || strcasecmp(format_str, "fat") == 0) {
+        *format_type = SDFormatTypeFAT32;
+    } else if(strcasecmp(format_str, "exfat") == 0) {
+        *format_type = SDFormatTypeExFAT;
+    } else {
+        ok = false;
+    }
+
+    bool has_extra_args = args_length(args) > 0;
+    furi_string_free(format);
+
+    return ok && !has_extra_args;
+}
 
 static void storage_cli_print_error(FS_Error error) {
     printf("Storage error: %s\r\n", storage_error_get_desc(error));
@@ -74,17 +121,24 @@ static void storage_cli_info(PipeSide* pipe, FuriString* path, FuriString* args)
 
 static void storage_cli_format(PipeSide* pipe, FuriString* path, FuriString* args) {
     UNUSED(pipe);
-    UNUSED(args);
     if(furi_string_cmp_str(path, STORAGE_INT_PATH_PREFIX) == 0) {
         storage_cli_print_error(FSE_NOT_IMPLEMENTED);
     } else if(furi_string_cmp_str(path, STORAGE_EXT_PATH_PREFIX) == 0) {
-        printf("Formatting SD card, All data will be lost! Are you sure (y/n)?\r\n");
+        SDFormatType format_type = SDFormatTypeAuto;
+        if(!storage_cli_parse_format_type(args, &format_type)) {
+            storage_cli_print_format_usage();
+            return;
+        }
+
+        printf(
+            "Formatting SD card (%s), All data will be lost! Are you sure (y/n)?\r\n",
+            storage_cli_format_type_to_text(format_type));
         char answer = getchar();
         if(answer == 'y' || answer == 'Y') {
             Storage* api = furi_record_open(RECORD_STORAGE);
             printf("Formatting, please wait...\r\n");
 
-            FS_Error error = storage_sd_format(api);
+            FS_Error error = storage_sd_format(api, format_type);
 
             if(error != FSE_OK) {
                 storage_cli_print_error(error);
@@ -647,7 +701,7 @@ static const StorageCliCommand storage_cli_commands[] = {
     },
     {
         "format",
-        "format filesystem",
+        "format filesystem [auto|fat32|exfat]",
         &storage_cli_format,
     },
 };
@@ -664,6 +718,11 @@ static void storage_cli_print_usage(void) {
         printf(
             "\t%s%s - %s\r\n", cli_cmd, strlen(cli_cmd) > 8 ? "\t" : "\t\t", command_descr->help);
     }
+}
+
+static void storage_cli_print_format_usage(void) {
+    printf("Usage:\r\n");
+    printf("storage format /ext [auto|fat32|exfat]\r\n");
 }
 
 void storage_cli(PipeSide* pipe, FuriString* args, void* context) {

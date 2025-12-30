@@ -28,8 +28,34 @@ badusb.setup({ vid: 0xAAAA, pid: 0xBBBB, mfrName: "Flipper Devices", prodName: "
 
 <br>
 
+## setupBle()
+Start Bluetooth LE HID with optional parameters. Should be called before all other methods.
+
+**Parameters**
+
+Configuration object *(optional)*:
+- name (string): BLE device name, optional
+- mac (string | Uint8Array): BLE MAC address (AA:BB:CC:DD:EE:FF), optional
+- bonding (boolean): Persist pairing keys, optional (default: true)
+- pairing (number | string): Pairing mode, optional (0 = YesNo, 1 = PinType, 2 = PinYesNo)
+- layoutPath (string): Path to keyboard layout file, optional
+
+MAC addresses use the standard byte order (AA first).
+
+**Examples**
+```js
+// Start BLE HID with default parameters
+badusb.setupBle();
+// Start BLE HID with custom name and MAC address
+badusb.setupBle({ name: "BadKB JS", mac: "AA:BB:CC:DD:EE:FF" });
+// Start BLE HID with custom pairing mode and layout
+badusb.setupBle({ pairing: "PinYesNo", layoutPath: "/ext/badusb/assets/layouts/en-US.kl" });
+```
+
+<br>
+
 ## isConnected()
-Returns USB connection state.
+Returns connection state for the active interface (USB or BLE).
 
 **Example**
 ```js
@@ -37,6 +63,30 @@ if (badusb.isConnected()) {
     // Do something
 } else {
     // Show an error
+}
+```
+
+<br>
+
+## getLockState()
+Returns the current state of keyboard lock LEDs (Caps Lock, Num Lock, Scroll Lock).
+BLE HID does not report lock LEDs, so values may be false when using `setupBle()`.
+
+**Return value**
+
+An object with boolean fields:
+- `caps` – Caps Lock LED state
+- `num` – Num Lock LED state
+- `scroll` – Scroll Lock LED state
+
+**Examples**
+```js
+let locks = badusb.getLockState();
+if (locks.caps) {
+    // CAPSLOCK LED is on
+}
+if (!locks.num) {
+    // Enable Num Lock before doing ALT+Numpad tricks
 }
 ```
 
