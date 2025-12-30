@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Wrapper script for fbt in reorganized structure
+cd "$(dirname "$0")"
+exec ./upstream/momentum-fork/scripts/fbt "$@"
