@@ -35,6 +35,7 @@ static void rpc_command_callback(const RpcAppSystemEvent* event, void* context) 
 
 static LfRfid* lfrfid_alloc(void) {
     LfRfid* lfrfid = malloc(sizeof(LfRfid));
+    furi_check(lfrfid);
 
     lfrfid->storage = furi_record_open(RECORD_STORAGE);
     lfrfid->dialogs = furi_record_open(RECORD_DIALOGS);
@@ -48,6 +49,7 @@ static LfRfid* lfrfid_alloc(void) {
     size_t size = protocol_dict_get_max_data_size(lfrfid->dict);
     lfrfid->new_key_data = (uint8_t*)malloc(size);
     lfrfid->old_key_data = (uint8_t*)malloc(size);
+    furi_check(lfrfid->new_key_data && lfrfid->old_key_data);
 
     lfrfid->lfworker = lfrfid_worker_alloc(lfrfid->dict);
 

@@ -153,6 +153,7 @@ static void infrared_find_vacant_remote_name(FuriString* name, const char* path)
 
 static InfraredApp* infrared_alloc(void) {
     InfraredApp* infrared = malloc(sizeof(InfraredApp));
+    furi_check(infrared);
 
     infrared->task_thread =
         furi_thread_alloc_ex("InfraredTask", INFRARED_TASK_STACK_SIZE, NULL, infrared);

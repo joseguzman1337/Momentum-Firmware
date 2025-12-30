@@ -40,6 +40,7 @@ typedef InfraredErrorCode (
 
 InfraredRemote* infrared_remote_alloc(void) {
     InfraredRemote* remote = malloc(sizeof(InfraredRemote));
+    furi_check(remote);
     StringArray_init(remote->signal_names);
     remote->name = furi_string_alloc();
     remote->path = furi_string_alloc();
@@ -358,6 +359,7 @@ InfraredErrorCode
 
     InfraredSignal* signal = infrared_signal_alloc();
     char* signal_name = strdup(infrared_remote_get_signal_name(remote, index));
+    furi_check(signal_name);
 
     do {
         error = infrared_remote_load_signal(remote, signal, index);

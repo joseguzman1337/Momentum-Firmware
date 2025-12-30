@@ -38,6 +38,7 @@ static void nfc_app_rpc_command_callback(const RpcAppSystemEvent* event, void* c
 
 NfcApp* nfc_app_alloc(void) {
     NfcApp* instance = malloc(sizeof(NfcApp));
+    furi_check(instance);
 
     instance->view_dispatcher = view_dispatcher_alloc();
     instance->scene_manager = scene_manager_alloc(&nfc_scene_handlers, instance);
