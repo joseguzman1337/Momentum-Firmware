@@ -53,6 +53,7 @@ static bool animation_storage_load_single_manifest_info(
         flipper_format_set_strict_mode(file, true);
 
         manifest_info->name = strdup(furi_string_get_cstr(read_string));
+        furi_check(manifest_info->name);
 
         if(!flipper_format_read_uint32(file, "Min butthurt", &u32value, 1)) break;
         manifest_info->min_butthurt = u32value;

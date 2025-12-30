@@ -36,11 +36,14 @@ ValidatorIsFile* validator_is_file_alloc_init(
     const char* app_extension,
     const char* current_name) {
     ValidatorIsFile* instance = malloc(sizeof(ValidatorIsFile));
+    furi_check(instance);
 
     instance->app_path_folder = strdup(app_path_folder);
+    furi_check(instance->app_path_folder);
     instance->app_extension = app_extension;
     if(current_name != NULL) {
         instance->current_name = strdup(current_name);
+        furi_check(instance->current_name);
     }
 
     return instance;
