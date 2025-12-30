@@ -15,8 +15,8 @@ mkdir -p "$PROJECT_ROOT/.ai/security"
 mkdir -p "$PROJECT_ROOT/.ai/configs"
 
 # Set permissions
-chmod +x "$PROJECT_ROOT/.ai/security/internet_validator.py"
-chmod +x "$PROJECT_ROOT/.ai/security/agent_wrapper.py"
+chmod +x "$PROJECT_ROOT/.ai/security/scripts/internet_validator.py"
+chmod +x "$PROJECT_ROOT/.ai/security/scripts/agent_wrapper.py"
 
 # Create environment variables file
 cat > "$PROJECT_ROOT/.ai/configs/internet_env.sh" << 'EOF'
@@ -52,7 +52,7 @@ chmod +x "$PROJECT_ROOT/.ai/configs/internet_env.sh"
 # Test the configuration
 echo "🧪 Testing internet access configuration..."
 cd "$PROJECT_ROOT"
-python3 .ai/security/internet_validator.py
+python3 .ai/security/scripts/internet_validator.py
 
 # Create systemd-style service file for monitoring
 cat > "$PROJECT_ROOT/.ai/security/internet_monitor.service" << EOF
@@ -64,7 +64,7 @@ After=network.target
 Type=simple
 User=$(whoami)
 WorkingDirectory=$PROJECT_ROOT
-ExecStart=/usr/bin/python3 $PROJECT_ROOT/.ai/security/internet_validator.py
+ExecStart=/usr/bin/python3 $PROJECT_ROOT/.ai/security/scripts/internet_validator.py
 Restart=always
 RestartSec=10
 
@@ -92,6 +92,6 @@ echo "  - Response size limits"
 echo ""
 echo "📁 Configuration Files:"
 echo "  - .ai/configs/internet_access.json"
-echo "  - .ai/security/internet_validator.py"
-echo "  - .ai/security/agent_wrapper.py"
+echo "  - .ai/security/scripts/internet_validator.py"
+echo "  - .ai/security/scripts/agent_wrapper.py"
 echo "  - .ai/configs/internet_env.sh"

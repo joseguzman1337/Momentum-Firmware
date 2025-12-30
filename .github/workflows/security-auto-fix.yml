@@ -60,7 +60,7 @@ jobs:
           VULN_RULE: ${{ steps.vuln.outputs.rule }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          python3 .ai/security/ai_fix_generator.py
+          python3 .ai/security/scripts/ai_fix_generator.py
       
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7

@@ -8,7 +8,7 @@ mkdir -p .ai/codex
 mkdir -p logs/codex
 
 # Set permissions
-chmod +x .ai/codex/slack_integration.py
+chmod +x .ai/codex/scripts/slack_integration.py
 
 # Install dependencies if needed
 if command -v pip3 &> /dev/null; then
