@@ -1,3 +1,0 @@
-scons
-pillow
-ansi
