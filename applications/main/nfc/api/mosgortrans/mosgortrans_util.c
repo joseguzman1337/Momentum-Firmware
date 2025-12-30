@@ -1112,7 +1112,7 @@ bool mosgortrans_parse_transport_block(const MfClassicBlock* block, FuriString* 
                 2016);
             furi_string_cat_printf(
                 result,
-                "Trip from: %02d.%02d.%04d %02d:%02d\n",
+                "\nTrip from: %02d.%02d.%04d %02d:%02d",
                 card_start_trip_minutes_s.day,
                 card_start_trip_minutes_s.month,
                 card_start_trip_minutes_s.year,
