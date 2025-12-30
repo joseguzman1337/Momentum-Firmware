@@ -1,0 +1,3 @@
+# This directory contains the official Flipper Zero firmware as a git submodule
+# Submodule: https://github.com/flipperdevices/flipperzero-firmware.git
+# See README.md for usage instructions
