@@ -1,49 +1,57 @@
-# Momentum Firmware - Claude Code Context
+# Momentum Firmware - Claude AI Security Agent
 
-## Project Overview
-Custom firmware for Flipper Zero based on Official Firmware with enhanced features.
+## Overview
+Claude AI Security Agent is responsible for automated security vulnerability detection and remediation in the Momentum Firmware codebase.
 
-## Build System
-- Uses `fbt` (Flipper Build Tool) - Python-based SCons wrapper
-- Target: `f7` (Flipper Zero hardware)
-- ARM Cortex-M4 architecture
+## Core Capabilities
 
-## Key Commands
+### Security Scanning
+- **CodeQL Analysis**: Automated static analysis for security vulnerabilities
+- **Dependency Scanning**: Monitor third-party libraries for known CVEs
+- **Memory Safety**: Detect buffer overflows, use-after-free, and memory leaks
+- **Input Validation**: Identify injection vulnerabilities and path traversal issues
+
+### Automated Remediation
+- **Auto-Fix Generation**: Generate secure code patches for common vulnerability patterns
+- **PR Creation**: Automatically create and submit pull requests for security fixes
+- **Compliance Checking**: Ensure fixes meet security standards and coding guidelines
+
+### Integration Points
+- **GitHub Security Advisories**: Monitor and respond to security alerts
+- **CI/CD Pipeline**: Integrate security checks into build process  
+- **MCP Server**: Expose security capabilities via Model Context Protocol
+
+## Security Focus Areas
+
+### Memory Safety (C/C++)
+- Buffer overflow prevention
+- Null pointer dereference protection
+- Use-after-free detection
+- Memory leak identification
+
+### Input Validation
+- File path sanitization
+- User input validation
+- Protocol message parsing safety
+- Configuration parameter validation
+
+### Cryptographic Security
+- Strong key generation (256-bit minimum)
+- Secure random number generation
+- Proper certificate validation
+- Side-channel attack prevention
+
+## Agent Configuration
+Located in `.ai/claude/security_agent.py` and `.ai/claude/mcp_server.json`
+
+## Usage
 ```bash
-# Full firmware build and flash
-./fbt flash_usb_full
+# Run security scan
+python .ai/claude/security_agent.py
 
-# Build updater package
-./fbt updater_package
-
-# Build single app
-./fbt launch APPSRC=app_name
-
-# Run tests
-./fbt test
-
-# Format code
-./fbt format
+# Via orchestrator
+bash scripts/ai_orchestrator.sh
 ```
 
-## Directory Structure
-- `applications/` - Apps and services
-- `firmware/` - Core firmware code
-- `lib/` - Libraries and drivers
-- `scripts/` - Build and utility scripts
-- `assets/` - Graphics and resources
-
-## Development Notes
-- Code style: Follow existing patterns
-- Testing: Run `./fbt test` before commits
-- Dependencies: ARM toolchain, Python 3.8+, Git submodules
-- Build artifacts in `build/` directory
-
-## AI Agent Integration
-This project includes automated AI agents for:
-- Issue resolution (Codex, Claude, Jules, Gemini, DeepSeek)
-- Security scanning and fixes
-- Code quality improvements
-- Documentation updates
-
-@AmazonQ.md
+## Logging
+Security scan results and remediation actions are logged to `logs/claude/` directory.

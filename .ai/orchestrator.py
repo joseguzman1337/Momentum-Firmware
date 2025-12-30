@@ -5,21 +5,16 @@ import asyncio
 import subprocess
 import sys
 from pathlib import Path
-import os
 
 def start_agent(agent_path):
     """Start an AI agent process"""
     try:
-        # Sanitize path to prevent traversal attacks
-        safe_path = Path(agent_path).resolve()
-        if not safe_path.is_relative_to(Path.cwd()):
-            raise ValueError(f"Path outside project directory: {agent_path}")
-        if not safe_path.exists():
-            raise FileNotFoundError(f"Agent script not found: {safe_path}")
-        return subprocess.Popen([sys.executable, str(safe_path)], 
-                              stdout=subprocess.DEVNULL, 
-                              stderr=subprocess.DEVNULL)
-    except (FileNotFoundError, PermissionError, OSError, ValueError) as e:
+        if not Path(agent_path).exists():
+            raise FileNotFoundError(f"Agent script not found: {agent_path}")
+        return subprocess.Popen([sys.executable, agent_path], 
+                              stdout=subprocess.PIPE, 
+                              stderr=subprocess.PIPE)
+    except (FileNotFoundError, PermissionError, OSError) as e:
         print(f"Failed to start {agent_path}: {e}")
         return None
     except Exception as e:
@@ -32,10 +27,8 @@ async def main():
         return
     
     # Ensure log directories exist
-    agents_list = ["codex", "codex-cloud", "claude", "jules", "gemini", "deepseek", "warp", "amazonq", "kiro"]
-    for agent in agents_list:
-        log_dir = Path("logs") / agent
-        log_dir.mkdir(parents=True, exist_ok=True)
+    for agent in ["codex", "codex-cloud", "claude", "jules", "gemini", "deepseek", "warp", "amazonq", "kiro"]:
+        Path(f"logs/{agent}").mkdir(parents=True, exist_ok=True)
     
     # Start all agents
     agents = []
@@ -60,20 +53,7 @@ async def main():
     except KeyboardInterrupt:
         print("Shutting down agents...")
         for process in agents:
-            try:
-                process.terminate()
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                print(f"Force killing process {process.pid}")
-                try:
-                    process.kill()
-                    process.wait(timeout=2)
-                except (ProcessLookupError, OSError) as e:
-                    print(f"Process {process.pid} already terminated: {e}")
-            except (ProcessLookupError, OSError) as e:
-                print(f"Process {process.pid} not found: {e}")
-            except Exception as e:
-                print(f"Error shutting down process {process.pid}: {e}")
+            process.terminate()
 
 if __name__ == "__main__":
     asyncio.run(main())

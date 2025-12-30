@@ -6,6 +6,7 @@
 
 #include "usb.h"
 #include "usb_cdc.h"
+#include "usb_cdce.h"
 
 #define CDC0_RXD_EP 0x01
 #define CDC0_TXD_EP 0x82
@@ -172,6 +173,26 @@ static const struct CdcConfigDescriptorSingle cdc_cfg_desc_single = {
                     .bInterval = 0x01,
                 },
         },
+};
+
+#include "cdc_ecm_desc.i"
+
+/* Device descriptor */
+static const struct usb_device_descriptor cdc_ecm_device_desc = {
+    .bLength = sizeof(struct usb_device_descriptor),
+    .bDescriptorType = USB_DTYPE_DEVICE,
+    .bcdUSB = VERSION_BCD(2, 0, 0),
+    .bDeviceClass = USB_CLASS_IAD,
+    .bDeviceSubClass = USB_SUBCLASS_IAD,
+    .bDeviceProtocol = USB_PROTO_IAD,
+    .bMaxPacketSize0 = USB_EP0_SIZE,
+    .idVendor = 0x0483, // STMicroelectronics
+    .idProduct = 0x5740, // STM32 Virtual COM Port
+    .bcdDevice = VERSION_BCD(1, 0, 0),
+    .iManufacturer = 1,
+    .iProduct = 2,
+    .iSerialNumber = 3,
+    .bNumConfigurations = 1,
 };
 
 /* Device configuration descriptor - dual mode*/
@@ -429,6 +450,23 @@ FuriHalUsbInterface usb_cdc_dual = {
     .cfg_descr = (void*)&cdc_cfg_desc_dual,
 };
 
+static void cdc_init_ecm(usbd_device* dev, FuriHalUsbInterface* intf, void* ctx);
+
+FuriHalUsbInterface usb_cdc_ecm = {
+    .init = cdc_init_ecm, // We use a wrapper to init both
+    .deinit = cdc_deinit,
+    .wakeup = cdc_on_wakeup,
+    .suspend = cdc_on_suspend,
+
+    .dev_descr = (struct usb_device_descriptor*)&cdc_ecm_device_desc,
+
+    .str_manuf_descr = (void*)&dev_manuf_desc,
+    .str_prod_descr = NULL,
+    .str_serial_descr = NULL,
+
+    .cfg_descr = (void*)&cdc_ecm_cfg_desc,
+};
+
 static void cdc_init(usbd_device* dev, FuriHalUsbInterface* intf, void* ctx) {
     UNUSED(ctx);
     usb_dev = dev;
@@ -462,6 +500,41 @@ static void cdc_init(usbd_device* dev, FuriHalUsbInterface* intf, void* ctx) {
     usbd_connect(dev, true);
 }
 
+// Special Init for ECM Composite
+static uint8_t mac_addr_bytes[6] = {0x02, 0x00, 0x00, 0x00, 0x00, 0x00};
+static struct usb_string_descriptor* mac_addr_desc = NULL;
+static void cdc_init_ecm(usbd_device* dev, FuriHalUsbInterface* intf, void* ctx) {
+    // Standard CDC init
+    cdc_init(dev, intf, ctx);
+
+    // Additional MAC generation
+    const char* name = (char*)furi_hal_version_get_device_name_ptr();
+    uint8_t len = (name == NULL) ? (0) : (strlen(name));
+
+    // MAC Address
+    if(mac_addr_desc) free(mac_addr_desc);
+    struct usb_string_descriptor* mac = malloc(12 * 2 + 2);
+    mac->bLength = 12 * 2 + 2;
+    mac->bDescriptorType = USB_DTYPE_STRING;
+
+    mac_addr_bytes[0] = 0x02; // Locally Administered
+    for(int i = 1; i < 6; i++)
+        mac_addr_bytes[i] = 0x00;
+
+    for(int i = 0; i < len; i++) {
+        mac_addr_bytes[(i % 5) + 1] ^= name[i];
+    }
+
+    for(int i = 0; i < 6; i++) {
+        uint8_t hi = (mac_addr_bytes[i] >> 4) & 0x0F;
+        uint8_t lo = mac_addr_bytes[i] & 0x0F;
+        mac->wString[i * 2] = (hi < 10) ? ('0' + hi) : ('A' + hi - 10);
+        mac->wString[i * 2 + 1] = (lo < 10) ? ('0' + lo) : ('A' + lo - 10);
+    }
+    mac_addr_desc = mac;
+    cdc_if_cur->str_mac_descr = mac_addr_desc;
+}
+
 static void cdc_deinit(usbd_device* dev) {
     usbd_reg_config(dev, NULL);
     usbd_reg_control(dev, NULL);
@@ -470,6 +543,10 @@ static void cdc_deinit(usbd_device* dev) {
     free(cdc_if_cur->str_serial_descr);
 
     cdc_if_cur = NULL;
+    if(mac_addr_desc) {
+        free(mac_addr_desc);
+        mac_addr_desc = NULL;
+    }
 }
 
 void furi_hal_cdc_set_callbacks(uint8_t if_num, CdcCallbacks* cb, void* context) {
@@ -564,6 +641,22 @@ static void cdc_rx_ep_callback(usbd_device* dev, uint8_t event, uint8_t ep) {
     }
 }
 
+// ECM RX Handler
+static FuriHalUsbNetworkReceiveCallback net_rx_callback = NULL;
+static void* net_rx_context = NULL;
+static uint8_t net_rx_buf[CDC_DATA_SZ];
+
+static void ecm_rx_ep_callback(usbd_device* dev, uint8_t event, uint8_t ep) {
+    UNUSED(event);
+    UNUSED(ep);
+    if(net_rx_callback) {
+        int32_t len = usbd_ep_read(dev, CDC1_RXD_EP, net_rx_buf, CDC_DATA_SZ);
+        if(len > 0) {
+            net_rx_callback(net_rx_buf, (uint16_t)len, net_rx_context);
+        }
+    }
+}
+
 static void cdc_tx_ep_callback(usbd_device* dev, uint8_t event, uint8_t ep) {
     UNUSED(dev);
     UNUSED(event);
@@ -595,7 +688,14 @@ static usbd_respond cdc_ep_config(usbd_device* dev, uint8_t cfg) {
     switch(cfg) {
     case 0:
         /* deconfiguring device */
-        if(if_cnt == 4) {
+        // ECM Deconfig
+        if(cdc_if_cur == &usb_cdc_ecm) {
+            usbd_ep_deconfig(dev, CDC1_NTF_EP);
+            usbd_ep_deconfig(dev, CDC1_TXD_EP);
+            usbd_ep_deconfig(dev, CDC1_RXD_EP);
+            usbd_reg_endpoint(dev, CDC1_RXD_EP, 0);
+            usbd_reg_endpoint(dev, CDC1_TXD_EP, 0);
+        } else if(if_cnt == 4) {
             usbd_ep_deconfig(dev, CDC1_NTF_EP);
             usbd_ep_deconfig(dev, CDC1_TXD_EP);
             usbd_ep_deconfig(dev, CDC1_RXD_EP);
@@ -626,6 +726,16 @@ static usbd_respond cdc_ep_config(usbd_device* dev, uint8_t cfg) {
             usbd_reg_endpoint(dev, CDC0_TXD_EP, cdc_txrx_ep_callback);
         }
         usbd_ep_write(dev, CDC0_TXD_EP, 0, 0);
+
+        // ECM Config
+        if(cdc_if_cur == &usb_cdc_ecm) {
+            usbd_ep_config(dev, CDC1_RXD_EP, USB_EPTYPE_BULK, CDC_DATA_SZ);
+            usbd_ep_config(dev, CDC1_TXD_EP, USB_EPTYPE_BULK, CDC_DATA_SZ);
+            usbd_ep_config(dev, CDC1_NTF_EP, USB_EPTYPE_INTERRUPT, CDC_NTF_SZ);
+            usbd_reg_endpoint(dev, CDC1_RXD_EP, ecm_rx_ep_callback);
+            usbd_ep_write(dev, CDC1_TXD_EP, 0, 0);
+            return usbd_ack;
+        }
 
         if(if_cnt == 4) {
             if((CDC1_TXD_EP & 0x7F) != (CDC1_RXD_EP & 0x7F)) {
@@ -663,6 +773,20 @@ static usbd_respond cdc_control(usbd_device* dev, usbd_ctlreq* req, usbd_rqc_cal
             if_num = 1;
         }
 
+        // ECM uses Interface 2/3 but Control is on 2.
+        // For furi_hal_cdc context, if_num 1 maps to Dual CDC 1.
+        // ECM is separate.
+
+        // ECM Specific Request Handling
+        if((cdc_if_cur == &usb_cdc_ecm) && (req->wIndex == 2)) {
+            switch(req->bRequest) {
+            case USB_CDC_SET_ETH_PACKET_FILTER:
+                return usbd_ack;
+            default:
+                return usbd_fail;
+            }
+        }
+
         switch(req->bRequest) {
         case USB_CDC_SET_CONTROL_LINE_STATE:
             if(callbacks[if_num] != NULL) {
@@ -690,4 +814,24 @@ static usbd_respond cdc_control(usbd_device* dev, usbd_ctlreq* req, usbd_rqc_cal
         }
     }
     return usbd_fail;
+}
+
+// Ethernet Extension Impl
+void furi_hal_usb_ethernet_set_received_callback(
+    FuriHalUsbNetworkReceiveCallback callback,
+    void* context) {
+    net_rx_callback = callback;
+    net_rx_context = context;
+}
+void furi_hal_usb_ethernet_send(uint8_t* buffer, uint16_t len) {
+    if(usb_dev) {
+        usbd_ep_write(usb_dev, CDC1_TXD_EP, buffer, len);
+    }
+}
+void furi_hal_usb_ethernet_get_mac(uint8_t* mac) {
+    memcpy(mac, mac_addr_bytes, 6);
+}
+void furi_hal_usb_ethernet_set_network_down(void) {
+}
+void furi_hal_usb_ethernet_set_network_up(void) {
 }
