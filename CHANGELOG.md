@@ -192,6 +192,7 @@
   - Fix slashes in prefilled filename (by @WillyJL)
   - Handle PPS request in ISO14443-4 layer (by @WillyJL)
 - FBT: Fix redundant decl for apps using an icon disabled in API (by @WillyJL)
+- CLI: Fix missing cleanup for subghz chat on region restricted frequencies (by @WillyJL)
 - UL: Sub-GHz: Fix crash in add manually menu (by @xMasterX)
 - Clangd: Add clangd parameters in IDE agnostic config file (by @WillyJL)
 - OFW: GUI: Fix Number Input Save Icon (by @zinongli)
