@@ -52,6 +52,7 @@
     - Sub Analyzer (by @RocketGod-git)
     - Sub-GHz Scheduler (by @shalebridge, fixes by @xMasterX)
   - Tools:
+    - CAN Tools (by @MatthewKuKanich)
     - FlipCrypt (by @Tyl3rA)
     - IconEdit (by @rdefeo)
     - Programmer Calculator (by @armixz)
