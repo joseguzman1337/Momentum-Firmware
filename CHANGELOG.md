@@ -43,6 +43,7 @@
     - Video Player (by @LTVA1)
   - NFC:
     - NFC-Eink (by @RebornedBrain)
+    - NFC Login (by @Play2BReal)
     - SaFlip (by @aaronjamt)
   - RFID: Simultaneous UHF RFID Reader (by @haffnerriley)
   - Sub-GHz:
