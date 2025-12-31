@@ -26,6 +26,7 @@
     - FlipBoard Simon (by @jamisonderek)
   - GPIO/FlipperHTTP:
     - FlipMap (by @jblanked)
+    - FlipTelegram (by @jblanked)
     - Free Roam (by @jblanked)
   - GPIO/GPS: [NMEA] Nearby Files (by @Stichoza)
   - GPIO/Sensors: [MH-Z19] CO2 Logger (by @harryob2)
