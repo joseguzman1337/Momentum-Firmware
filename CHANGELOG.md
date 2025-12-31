@@ -43,6 +43,7 @@
     - Space Playground (by @alanfortlink)
     - Video Player (by @LTVA1)
   - NFC:
+    - Amiibo Toolkit (by @Firefox2100)
     - NFC-Eink (by @RebornedBrain)
     - NFC Login (by @Play2BReal)
     - SaFlip (by @aaronjamt)
