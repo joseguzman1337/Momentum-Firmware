@@ -149,7 +149,7 @@
   - RFID/iButton Fuzzer: Fix prev navigation for custom UIDs (by @ahnilica)
   - Seader: Fix ATS handling (by @NVX), reset SAM on error, support config card, code optimizations, use same commands as Proxmark3, distinguish SIO SE/SR (by @bettse)
   - Sentry Safe: New interface, settings & help page (by @H4ckd4ddy)
-  - Seos Compatible: Add keys v2 support with per-device encryption, improve logging (by @bettse), BLE fixes (by @aaronjamt)
+  - Seos Compatible: Add keys v2 support with per-device encryption, improve logging (by @bettse), BLE fixes, code cleanup (by @aaronjamt), compatibility with NFC Type 4 PR 4242 (by @WillyJL)
   - Sub-GHz Playlist: Fix crash on disallowed frequencies (by @WillyJL)
   - Weather Station: Added support for solight TE44 (by @fersingb)
   - Weebo: Prevent 0x88 in UID[3], add more figures to the database (by @bettse)
