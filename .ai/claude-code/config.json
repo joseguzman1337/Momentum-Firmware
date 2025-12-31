@@ -1,8 +1,0 @@
-{
-  "project": "Momentum-Firmware",
-  "description": "Custom Flipper Zero firmware with advanced features",
-  "auto_commit": true,
-  "git_integration": true,
-  "mcp_integration": true,
-  "log_dir": "logs/claude-code"
-}

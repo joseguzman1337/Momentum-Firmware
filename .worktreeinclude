@@ -1,9 +1,0 @@
-.env
-.env.local
-.env.*
-**/.claude/settings.local.json
-.ai/*/config.json
-logs/**
-build/**
-dist/**
-.vscode/settings.json

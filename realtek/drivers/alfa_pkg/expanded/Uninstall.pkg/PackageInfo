@@ -1,7 +1,0 @@
-<pkg-info format-version="2" identifier="com.alfa-network-inc.Uninstall" version="1.0" relocatable="false" overwrite-permissions="false" followSymLinks="false" install-location="/" auth="root">
-<payload installKBytes="0" numberOfFiles="1"/>
-<scripts>
-    <preinstall file="./preinstall_1"/>
-    <postinstall file="./postinstall_1"/>
-</scripts>
-</pkg-info>

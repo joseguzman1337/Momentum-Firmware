@@ -1,9 +1,0 @@
-description = "Generate TGZ package for distribution"
-prompt = """
-Generate a TGZ package for the Momentum firmware.
-
-Execute the package command:
-!{./fbt updater_package}
-
-Show the generated package location and provide installation instructions.
-"""

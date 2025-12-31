@@ -1,4 +1,0 @@
-#pragma once
-#include "protocols/protocol.h"
-
-extern const ProtocolBase ibutton_protocol_misc_metakom;
