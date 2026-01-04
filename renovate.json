@@ -1,6 +1,43 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
-  ]
+    "config:recommended",
+    ":automergeMinor",
+    ":automergePr",
+    ":automergeRequireAllStatusChecksMustPass"
+  ],
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "platformAutomerge": true,
+  "rebaseWhen": "conflicted",
+  "prCreation": "immediate",
+  "packageRules": [
+    {
+      "description": "Auto-merge patch and minor updates",
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    },
+    {
+      "description": "Auto-merge GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Require approval for major updates",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["major-update", "needs-review"]
+    },
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "automerge": true,
+    "labels": ["security"]
+  }
 }
