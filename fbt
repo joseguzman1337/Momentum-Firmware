@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
 # Wrapper script for fbt in reorganized structure
-# NOTE: This wrapper expects ./upstream/momentum-fork/scripts/fbt to exist.
-# If that tree is not present in the working copy, ./fbt will fail until the
-# upstream layout is restored or this wrapper is updated accordingly.
 cd "$(dirname "$0")"
-exec ./upstream/momentum-fork/scripts/fbt "$@"
+exec ./upstream/flipperzero-firmware/scripts/fbt "$@"

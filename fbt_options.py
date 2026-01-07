@@ -5,5 +5,5 @@ import sys
 
 # Import from actual location
 sys.path.insert(
-    0, os.path.join(os.getcwd(), "upstream", "momentum-fork", "scripts")
+    0, os.path.join(os.getcwd(), "upstream", "flipperzero-firmware", "scripts")
 )

@@ -50,4 +50,4 @@
 	branch = master
 [submodule "upstream/flipperzero-firmware"]
 	path = upstream/flipperzero-firmware
-	url = https://github.com/flipperdevices/flipperzero-firmware.git
+	url = https://github.com/joseguzman1337/flipperzero-firmware
