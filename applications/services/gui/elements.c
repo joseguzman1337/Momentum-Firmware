@@ -779,6 +779,7 @@ void elements_text_box(
     const char* text,
     bool strip_to_dots) {
     furi_check(canvas);
+    furi_check(text);
 
     ElementTextBoxLine line[ELEMENTS_MAX_LINES_NUM];
     bool bold = false;
@@ -881,6 +882,9 @@ void elements_text_box(
             }
             line[line_num].y = total_height_min;
             line_num++;
+            if(line_num >= ELEMENTS_MAX_LINES_NUM) {
+                break;
+            }
             if(!full_text_processed) {
                 line[line_num].text = &text[i + 1];
             }

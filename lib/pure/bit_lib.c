@@ -38,9 +38,10 @@ uint8_t bit_lib_get_bits(const uint8_t* data, size_t position, uint8_t length) {
     if(shift == 0) {
         return data[position / 8] >> (8 - length);
     } else {
-        // TODO FL-3534: fix read out of bounds
         uint8_t value = (data[position / 8] << (shift));
-        value |= data[position / 8 + 1] >> (8 - shift);
+        if(shift + length > 8) {
+            value |= data[position / 8 + 1] >> (8 - shift);
+        }
         value = value >> (8 - length);
         return value;
     }

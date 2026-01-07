@@ -6,6 +6,7 @@ import os
 import subprocess
 import tarfile
 import tempfile
+from typing import Any, Dict, List, Optional
 
 import requests
 import serial.tools.list_ports as list_ports
@@ -14,89 +15,114 @@ from serial.tools.list_ports_common import ListPortInfo
 
 
 class UpdateDownloader:
+    """Download and unpack WiFi board firmware archives from the update server."""
+
     UPDATE_SERVER = "https://update.flipperzero.one"
     UPDATE_PROJECT = "/blackmagic-firmware"
     UPDATE_INDEX = UPDATE_SERVER + UPDATE_PROJECT + "/directory.json"
     UPDATE_TYPE = "full_tgz"
 
-    CHANNEL_ID_ALIAS = {
+    CHANNEL_ID_ALIAS: Dict[str, str] = {
         "dev": "development",
         "rc": "release-candidate",
         "r": "release",
         "rel": "release",
     }
 
-    def __init__(self):
-        self.logger = logging.getLogger()
+    def __init__(self) -> None:
+        self.logger = logging.getLogger(__name__)
 
     def download(self, channel_id: str, target_dir: str) -> bool:
+        """Download and unpack update for the given channel into target_dir.
+
+        Returns True on success and False on any error. All user-visible errors are
+        logged via the instance logger.
+        """
         # Aliases
         if channel_id in self.CHANNEL_ID_ALIAS:
             channel_id = self.CHANNEL_ID_ALIAS[channel_id]
 
         # Make directory
         if not os.path.exists(target_dir):
-            self.logger.info(f"Creating directory {target_dir}")
-            os.makedirs(target_dir)
+            self.logger.info(f"Creating directory %s", target_dir)
+            os.makedirs(target_dir, exist_ok=True)
 
         # Download json index
-        self.logger.info(f"Downloading {self.UPDATE_INDEX}")
-        response = requests.get(self.UPDATE_INDEX)
-        if response.status_code != 200:
-            self.logger.error(f"Failed to download {self.UPDATE_INDEX}")
+        self.logger.info("Downloading %s", self.UPDATE_INDEX)
+        try:
+            response = requests.get(self.UPDATE_INDEX, timeout=15)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            self.logger.error("Failed to download %s: %s", self.UPDATE_INDEX, e)
             return False
 
         # Parse json index
         try:
-            index = json.loads(response.content)
-        except Exception as e:
-            self.logger.error(f"Failed to parse json index: {e}")
+            index: Dict[str, Any] = json.loads(response.content)
+        except Exception as e:  # pragma: no cover - defensive logging
+            self.logger.error("Failed to parse json index: %s", e)
+            return False
+
+        channels = index.get("channels")
+        if not isinstance(channels, list):
+            self.logger.error("Invalid update index: 'channels' key is missing or malformed")
             return False
 
         # Find channel
-        channel = None
-        for channel_candidate in index["channels"]:
-            if channel_candidate["id"] == channel_id:
+        channel: Optional[Dict[str, Any]] = None
+        for channel_candidate in channels:
+            if not isinstance(channel_candidate, dict):
+                continue
+            if channel_candidate.get("id") == channel_id:
                 channel = channel_candidate
                 break
 
         # Check if channel found
         if channel is None:
+            valid_ids = [str(c.get("id")) for c in channels if isinstance(c, dict)]
             self.logger.error(
-                f"Channel '{channel_id}' not found. Valid channels: {', '.join([c['id'] for c in index['channels']])}"
+                "Channel '%s' not found. Valid channels: %s", channel_id, ", ".join(valid_ids)
             )
             return False
 
-        self.logger.info(f"Using channel '{channel_id}'")
+        self.logger.info("Using channel '%s'", channel_id)
 
         # Get latest version
         try:
-            version = channel["versions"][0]
-        except Exception as e:
-            self.logger.error(f"Failed to get version: {e}")
+            versions = channel["versions"]
+            if not isinstance(versions, list) or not versions:
+                raise ValueError("'versions' is empty or not a list")
+            version: Dict[str, Any] = versions[0]
+        except Exception as e:  # pragma: no cover - defensive logging
+            self.logger.error("Failed to get version: %s", e)
             return False
 
-        self.logger.info(f"Using version '{version['version']}'")
+        self.logger.info("Using version '%s'", version.get("version", "unknown"))
 
         # Get changelog
-        if changelog := version.get("changelog"):
-            self.logger.info(f"Changelog:")
+        changelog = version.get("changelog")
+        if isinstance(changelog, str) and changelog.strip():
+            self.logger.info("Changelog:")
             for line in changelog.split("\n"):
                 if line.strip() == "":
                     continue
-                self.logger.info(f"  {line}")
+                self.logger.info("  %s", line)
         else:
-            self.logger.warning(f"Changelog not found")
+            self.logger.warning("Changelog not found")
 
         # Find file
-        file_url = None
-        for file_candidate in version["files"]:
-            if file_candidate["type"] == self.UPDATE_TYPE:
-                file_url = file_candidate["url"]
-                break
+        file_url: Optional[str] = None
+        files = version.get("files")
+        if isinstance(files, list):
+            for file_candidate in files:
+                if not isinstance(file_candidate, dict):
+                    continue
+                if file_candidate.get("type") == self.UPDATE_TYPE:
+                    file_url = file_candidate.get("url")
+                    break
 
-        if file_url is None:
-            self.logger.error(f"File not found")
+        if not file_url:
+            self.logger.error("File of type '%s' not found in version metadata", self.UPDATE_TYPE)
             return False
 
         # Make file path
@@ -104,34 +130,48 @@ class UpdateDownloader:
         file_path = os.path.join(target_dir, file_name)
 
         # Download file
-        self.logger.info(f"Downloading {file_url} to {file_path}")
+        self.logger.info("Downloading %s to %s", file_url, file_path)
+        try:
+            response = requests.get(file_url, timeout=60)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            self.logger.error("Failed to download %s: %s", file_url, e)
+            return False
+
         with open(file_path, "wb") as f:
-            response = requests.get(file_url)
             f.write(response.content)
 
         # Unzip tgz
-        self.logger.info(f"Unzipping {file_path}")
-        with tarfile.open(file_path, "r") as tar:
-            # Secure extraction: validate all members before extracting
-            def is_within_directory(directory, target):
-                abs_directory = os.path.abspath(directory)
-                abs_target = os.path.abspath(target)
-                return os.path.commonprefix([abs_directory, abs_target]) == abs_directory
+        self.logger.info("Unzipping %s", file_path)
+        try:
+            with tarfile.open(file_path, "r") as tar:
+                # Secure extraction: validate all members before extracting
+                def is_within_directory(directory: str, target: str) -> bool:
+                    abs_directory = os.path.abspath(directory)
+                    abs_target = os.path.abspath(target)
+                    return os.path.commonprefix([abs_directory, abs_target]) == abs_directory
 
-            def safe_extract(tar, path):
-                for member in tar.getmembers():
-                    member_path = os.path.join(path, member.name)
-                    if not is_within_directory(path, member_path):
-                        raise Exception(f"Attempted path traversal in tar file: {member.name}")
-                tar.extractall(path)
+                def safe_extract(archive: tarfile.TarFile, path: str) -> None:
+                    for member in archive.getmembers():
+                        member_path = os.path.join(path, member.name)
+                        if not is_within_directory(path, member_path):
+                            raise RuntimeError(
+                                f"Attempted path traversal in tar file: {member.name}"
+                            )
+                    archive.extractall(path)
 
-            safe_extract(tar, target_dir)
+                safe_extract(tar, target_dir)
+        except (tarfile.TarError, OSError, RuntimeError) as e:
+            self.logger.error("Failed to unpack archive %s: %s", file_path, e)
+            return False
 
         return True
 
 
 class Main(App):
-    def init(self):
+    """CLI helper used to flash the WiFi board firmware over serial."""
+
+    def init(self) -> None:
         self.parser.add_argument("-p", "--port", help="CDC Port", default="auto")
         self.parser.add_argument(
             "-c", "--channel", help="Channel name", default="release"
@@ -139,12 +179,13 @@ class Main(App):
         self.parser.set_defaults(func=self.update)
 
         # logging
-        self.logger = logging.getLogger()
+        self.logger = logging.getLogger(__name__)
 
     @staticmethod
-    def _grep_ports(regexp: str) -> list[ListPortInfo]:
+    def _grep_ports(regexp: str) -> List[ListPortInfo]:
+        """Return a list of serial ports matching the given regular expression."""
         # idk why, but python thinks that list_ports.grep returns tuple[str, str, str]
-        return list(list_ports.grep(regexp))  # type: ignore
+        return list(list_ports.grep(regexp))  # type: ignore[arg-type]
 
     def is_wifi_board_connected(self) -> bool:
         return (
@@ -157,34 +198,34 @@ class Main(App):
         return os.name == "nt"
 
     @classmethod
-    def find_port(cls, regexp: str) -> str:
-        ports: list[ListPortInfo] = cls._grep_ports(regexp)
+    def find_port(cls, regexp: str) -> Optional[str]:
+        ports: List[ListPortInfo] = cls._grep_ports(regexp)
 
         if len(ports) == 0:
             # Blackmagic probe serial port not found, will be handled later
-            pass
-        elif len(ports) > 1:
-            raise Exception("More than one WiFi board found")
-        else:
-            port = ports[0]
-            return f"\\\\.\\{port.device}" if cls.is_windows() else port.device
+            return None
+        if len(ports) > 1:
+            raise RuntimeError("More than one WiFi board found")
 
-    def find_wifi_board_bootloader_port(self):
+        port = ports[0]
+        return f"\\\\.\\{port.device}" if cls.is_windows() else port.device
+
+    def find_wifi_board_bootloader_port(self) -> Optional[str]:
         return self.find_port("ESP32-S2")
 
-    def find_wifi_board_bootloader_port_damn_windows(self):
+    def find_wifi_board_bootloader_port_damn_windows(self) -> Optional[str]:
         self.logger.info("Trying to find WiFi board using VID:PID")
         return self.find_port("VID:PID=303A:0002")
 
-    def update(self):
+    def update(self) -> int:
         try:
             port = self.find_wifi_board_bootloader_port()
 
             # Damn windows fix
             if port is None and self.is_windows():
                 port = self.find_wifi_board_bootloader_port_damn_windows()
-        except Exception as e:
-            self.logger.error(f"{e}")
+        except Exception as e:  # pragma: no cover - extremely unlikely branch
+            self.logger.error("%s", e)
             return 1
 
         if port is None:
@@ -212,13 +253,13 @@ class Main(App):
             # download latest channel update
             try:
                 if not downloader.download(self.args.channel, temp_dir):
-                    self.logger.error(f"Cannot download update")
+                    self.logger.error("Cannot download update")
                     return 1
-            except Exception as e:
-                self.logger.error(f"Cannot download update: {e}")
+            except Exception as e:  # pragma: no cover - defensive logging
+                self.logger.error("Cannot download update: %s", e)
                 return 1
 
-            with open(os.path.join(temp_dir, "flash.command"), "r") as f:
+            with open(os.path.join(temp_dir, "flash.command"), "r", encoding="utf-8") as f:
                 flash_command = f.read()
 
             replacements = (
@@ -240,7 +281,7 @@ class Main(App):
 
             args = list(filter(None, flash_command.split()))
 
-            self.logger.info(f'Running command: "{" ".join(args)}" in "{temp_dir}"')
+            self.logger.info('Running command: "%s" in "%s"', " ".join(args), temp_dir)
 
             process = subprocess.Popen(
                 args,
@@ -251,23 +292,18 @@ class Main(App):
                 universal_newlines=True,
             )
 
-            while process.poll() is None:
-                if process.stdout is not None:
-                    for line in process.stdout:
-                        self.logger.debug(f"{line.strip()
-    // DeepSeek Fix: Validated vulnerability-2 safety.
-}")
+            assert process.stdout is not None
+            for line in process.stdout:
+                self.logger.debug(line.strip())
 
         if process.returncode != 0:
-            self.logger.error(f"Failed to flash WiFi board")
+            self.logger.error("Failed to flash WiFi board")
         else:
             self.logger.info("WiFi board flashed successfully")
             self.logger.info("Press RESET button on WiFi board to start it")
 
-        return process.returncode
+        return int(process.returncode)
 
 
 if __name__ == "__main__":
     Main()()
-
-// DeepSeek Security Fix: Zero-overhead bounds check applied.

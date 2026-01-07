@@ -10,6 +10,7 @@
 #include <ibutton/ibutton_worker.h>
 #include <ibutton/ibutton_protocols.h>
 
+/** Print usage information for the iButton CLI commands. */
 static void ibutton_cli_print_usage(void) {
     printf("Usage:\r\n");
     printf("ikey read\r\n");
@@ -22,6 +23,11 @@ static void ibutton_cli_print_usage(void) {
     printf("\t<key_data> are hex-formatted\r\n");
 }
 
+/**
+ * Parse protocol name and key data from CLI arguments into an iButtonKey.
+ *
+ * Returns true on success and false if the arguments are invalid.
+ */
 static bool ibutton_cli_parse_key(iButtonProtocols* protocols, iButtonKey* key, FuriString* args) {
     bool result = false;
     FuriString* name = furi_string_alloc();
@@ -29,6 +35,7 @@ static bool ibutton_cli_parse_key(iButtonProtocols* protocols, iButtonKey* key, 
     do {
         // Read protocol name
         if(!args_read_string_and_trim(args, name)) break;
+        if(furi_string_size(name) == 0) break;
 
         // Make the protocol name uppercase
         const char first = furi_string_get_char(name, 0);
@@ -54,6 +61,7 @@ static bool ibutton_cli_parse_key(iButtonProtocols* protocols, iButtonKey* key, 
     return result;
 }
 
+/** Print the key type and hex-encoded key data to the CLI. */
 static void ibutton_cli_print_key(iButtonProtocols* protocols, iButtonKey* key) {
     const char* name = ibutton_protocols_get_name(protocols, ibutton_key_get_protocol_id(key));
 
@@ -75,12 +83,16 @@ static void ibutton_cli_print_key(iButtonProtocols* protocols, iButtonKey* key) 
 
 #define EVENT_FLAG_IBUTTON_COMPLETE (1 << 0)
 
+/** Worker callback invoked when an iButton read operation completes. */
 static void ibutton_cli_worker_read_cb(void* context) {
     furi_assert(context);
     FuriEventFlag* event = context;
     furi_event_flag_set(event, EVENT_FLAG_IBUTTON_COMPLETE);
 }
 
+/**
+ * Read an iButton key and print its contents until the user cancels with Ctrl+C.
+ */
 static void ibutton_cli_read(PipeSide* pipe) {
     iButtonProtocols* protocols = ibutton_protocols_alloc();
     iButtonWorker* worker = ibutton_worker_alloc(protocols);
@@ -120,6 +132,7 @@ typedef struct {
     iButtonWorkerWriteResult result;
 } iButtonWriteContext;
 
+/** Worker callback invoked when an iButton write operation completes. */
 static void ibutton_cli_worker_write_cb(void* context, iButtonWorkerWriteResult result) {
     furi_assert(context);
     iButtonWriteContext* write_context = (iButtonWriteContext*)context;
@@ -127,6 +140,9 @@ static void ibutton_cli_worker_write_cb(void* context, iButtonWorkerWriteResult 
     furi_event_flag_set(write_context->event, EVENT_FLAG_IBUTTON_COMPLETE);
 }
 
+/**
+ * Write a new key ID to a writable iButton using parameters parsed from args.
+ */
 void ibutton_cli_write(PipeSide* pipe, FuriString* args) {
     iButtonProtocols* protocols = ibutton_protocols_alloc();
     iButtonWorker* worker = ibutton_worker_alloc(protocols);
@@ -184,6 +200,9 @@ void ibutton_cli_write(PipeSide* pipe, FuriString* args) {
     furi_event_flag_free(write_context.event);
 }
 
+/**
+ * Emulate an iButton key according to the parameters parsed from args.
+ */
 void ibutton_cli_emulate(PipeSide* pipe, FuriString* args) {
     iButtonProtocols* protocols = ibutton_protocols_alloc();
     iButtonWorker* worker = ibutton_worker_alloc(protocols);
@@ -217,6 +236,9 @@ void ibutton_cli_emulate(PipeSide* pipe, FuriString* args) {
     ibutton_protocols_free(protocols);
 }
 
+/**
+ * Entry point for the ikey CLI command, dispatching subcommands to handlers.
+ */
 static void execute(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     FuriString* cmd;

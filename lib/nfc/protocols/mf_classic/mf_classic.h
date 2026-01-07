@@ -48,9 +48,11 @@ typedef enum {
 typedef enum {
     MfClassicTypeMini,
     MfClassicType1k,
+    // MIFARE Plus 2K SL1 mapped as Classic: 32 sectors x 4 blocks
     MfClassicTypePlus2k,
     MfClassicType4k,
-    MfClassicTypePlus2k,
+    // Native MIFARE Plus 2K mapping (non-SL1), reserved/experimental
+    MfClassicTypePlus2kNative,
 
     MfClassicTypeNum,
 } MfClassicType;

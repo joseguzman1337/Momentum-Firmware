@@ -424,6 +424,9 @@ int calculate_msb_tables(
 
 void** allocate_blocks(const size_t* block_sizes, int num_blocks) {
     void** block_pointers = malloc(num_blocks * sizeof(void*));
+    if(!block_pointers) {
+        return NULL;
+    }
 
     for(int i = 0; i < num_blocks; i++) {
         if(memmgr_heap_get_max_free_block() < block_sizes[i]) {
@@ -436,6 +439,14 @@ void** allocate_blocks(const size_t* block_sizes, int num_blocks) {
         }
 
         block_pointers[i] = malloc(block_sizes[i]);
+        if(!block_pointers[i]) {
+            // Allocation failed despite max-free-block check; clean up and abort
+            for(int j = 0; j < i; j++) {
+                free(block_pointers[j]);
+            }
+            free(block_pointers);
+            return NULL;
+        }
     }
 
     return block_pointers;
@@ -566,6 +577,11 @@ void mfkey(ProgramState* program_state) {
     MfClassicKey found_key; // Recovered key
     size_t keyarray_size = 0;
     MfClassicKey* keyarray = malloc(sizeof(MfClassicKey) * 1);
+    if(!keyarray) {
+        program_state->err = InsufficientRAM;
+        program_state->mfkey_state = Error;
+        return;
+    }
     uint32_t i = 0, j = 0;
     //FURI_LOG_I(TAG, "Free heap before alloc(): %zub", memmgr_get_free_heap());
     Storage* storage = furi_record_open(RECORD_STORAGE);
@@ -657,17 +673,18 @@ void mfkey(ProgramState* program_state) {
             nt_xor_uid = next_nonce.uid_xor_nt0;
             cuid_dict_path = furi_string_alloc_printf(
                 "%s/mf_classic_dict_%08lx.nfc", EXT_PATH("nfc/assets"), next_nonce.uid);
-            // May need RECORD_STORAGE?
             program_state->cuid_dict = keys_dict_alloc(
                 furi_string_get_cstr(cuid_dict_path),
                 KeysDictModeOpenAlways,
                 sizeof(MfClassicKey));
+            furi_string_free(cuid_dict_path);
             break;
         }
 
         if(!recover(&next_nonce, ks_enc, nt_xor_uid, program_state)) {
             if((next_nonce.attack == static_encrypted) && (program_state->cuid_dict)) {
                 keys_dict_free(program_state->cuid_dict);
+                program_state->cuid_dict = NULL;
             }
             if(program_state->close_thread_please) {
                 break;
@@ -675,6 +692,10 @@ void mfkey(ProgramState* program_state) {
             // No key found in recover() or static encrypted
             (program_state->num_completed)++;
             continue;
+        }
+        if((next_nonce.attack == static_encrypted) && (program_state->cuid_dict)) {
+            keys_dict_free(program_state->cuid_dict);
+            program_state->cuid_dict = NULL;
         }
         (program_state->cracked)++;
         (program_state->num_completed)++;
@@ -704,6 +725,7 @@ void mfkey(ProgramState* program_state) {
     if(keyarray_size > 0) {
         dolphin_deed(DolphinDeedNfcMfcAdd);
     }
+    free(nonce_arr->remaining_nonce_array);
     free(nonce_arr);
     keys_dict_free(user_dict);
     free(keyarray);

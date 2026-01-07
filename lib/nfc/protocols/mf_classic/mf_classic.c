@@ -49,13 +49,14 @@ static const MfClassicFeatures mf_classic_features[MfClassicTypeNum] = {
             .full_name = "Mifare Classic 4K",
             .type_name = "4K",
         },
-    [MfClassicTypePlus2k] =
+    [MfClassicTypePlus2kNative] =
         {
-            // TODO: need to validate whether 17 or 18 sectors are accessible
+            // Native MIFARE Plus 2K mapping (non-SL1); layout still under validation.
+            // Kept separate from MfClassicTypePlus2k (SL1 Classic mapping) to avoid ambiguity.
             .sectors_total = 17,
             .blocks_total = 544,
-            .full_name = "Mifare Plus 2K",
-            .type_name = "Plus 2K",
+            .full_name = "Mifare Plus 2K (native)",
+            .type_name = "Plus 2K Native",
         },
 };
 
@@ -493,9 +494,13 @@ bool mf_classic_block_to_value(const MfClassicBlock* block, int32_t* value, uint
     furi_check(block);
     furi_check(value);
 
-    uint32_t v = *(uint32_t*)&block->data[0];
-    uint32_t v_inv = *(uint32_t*)&block->data[sizeof(uint32_t)];
-    uint32_t v1 = *(uint32_t*)&block->data[sizeof(uint32_t) * 2];
+    uint32_t v;
+    uint32_t v_inv;
+    uint32_t v1;
+
+    memcpy(&v, &block->data[0], sizeof(uint32_t));
+    memcpy(&v_inv, &block->data[sizeof(uint32_t)], sizeof(uint32_t));
+    memcpy(&v1, &block->data[sizeof(uint32_t) * 2], sizeof(uint32_t));
 
     bool val_checks =
         ((v == v1) && (v == ~v_inv) && (block->data[12] == (~block->data[13] & 0xFF)) &&

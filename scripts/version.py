@@ -1,24 +1,37 @@
-#!/usb/bin/env python3
+#!/usr/bin/env python3
 
 import json
 import os
 import subprocess
 from datetime import date, datetime
+from typing import Any, Dict, Set
 
 from flipper.app import App
 
 
 class GitVersion:
+    """Helper for extracting Git-based version metadata for the firmware build."""
+
     REVISION_SUFFIX_LENGTH = 8
 
-    def __init__(self, source_dir):
+    def __init__(self, source_dir: str) -> None:
         self.source_dir = source_dir
 
-    def get_version_info(self):
-        commit = (
-            self._exec_git(f"rev-parse --short={self.REVISION_SUFFIX_LENGTH} HEAD")
-            or "unknown"
-        )
+    def get_version_info(self) -> Dict[str, Any]:
+        """Return a dictionary with version information derived from git.
+
+        This is designed to be resilient when git metadata is partially unavailable
+        (for example when running from a source tree without remotes or tags).
+        """
+        try:
+            commit = (
+                self._exec_git(
+                    f"rev-parse --short={self.REVISION_SUFFIX_LENGTH} HEAD"
+                )
+                or "unknown"
+            )
+        except subprocess.CalledProcessError:
+            commit = "unknown"
 
         dirty = False
         try:
@@ -27,13 +40,13 @@ class GitVersion:
             if e.returncode == 1:
                 dirty = True
 
-        # If WORKFLOW_BRANCH_OR_TAG is set in environment, is has precedence
-        # (set by CI)
-        branch = (
-            os.environ.get("WORKFLOW_BRANCH_OR_TAG", None)
-            or self._exec_git("rev-parse --abbrev-ref HEAD")
-            or "unknown"
-        )
+        # If WORKFLOW_BRANCH_OR_TAG is set in environment, it has precedence (set by CI)
+        branch = os.environ.get("WORKFLOW_BRANCH_OR_TAG")
+        if not branch:
+            try:
+                branch = self._exec_git("rev-parse --abbrev-ref HEAD") or "unknown"
+            except subprocess.CalledProcessError:
+                branch = "unknown"
 
         try:
             version = self._exec_git("describe --tags --abbrev=0 --exact-match")
@@ -45,26 +58,34 @@ class GitVersion:
                 int(os.environ["SOURCE_DATE_EPOCH"])
             )
         else:
-            commit_date = datetime.strptime(
-                self._exec_git("log -1 --format=%cd --date=default").strip(),
-                "%a %b %d %H:%M:%S %Y %z",
-            )
+            try:
+                raw_date = self._exec_git(
+                    "log -1 --format=%cd --date=default"
+                ).strip()
+                commit_date = datetime.strptime(
+                    raw_date,
+                    "%a %b %d %H:%M:%S %Y %z",
+                )
+            except (subprocess.CalledProcessError, ValueError):
+                # Fall back to a deterministic value rather than failing hard
+                commit_date = datetime.utcfromtimestamp(0)
 
         return {
             "GIT_COMMIT": commit,
             "GIT_BRANCH": branch,
             "VERSION": version,
-            "BUILD_DIRTY": dirty and 1 or 0,
+            "BUILD_DIRTY": 1 if dirty else 0,
             "GIT_ORIGIN": ",".join(self._get_git_origins()),
             "GIT_COMMIT_DATE": commit_date,
         }
 
-    def _get_git_origins(self):
+    def _get_git_origins(self) -> Set[str]:
+        """Return a set of remote URLs configured for this repository."""
         try:
             remotes = self._exec_git("remote -v")
         except subprocess.CalledProcessError:
             return set()
-        origins = set()
+        origins: Set[str] = set()
         for line in remotes.split("\n"):
             if not line:
                 continue
@@ -73,18 +94,23 @@ class GitVersion:
             origins.add(url)
         return origins
 
-    def _exec_git(self, args):
+    def _exec_git(self, args: str) -> str:
+        """Execute a git command in the source directory and return stdout as text."""
         cmd = ["git"]
         cmd.extend(args.split(" "))
         return (
-            subprocess.check_output(cmd, cwd=self.source_dir, stderr=subprocess.STDOUT)
+            subprocess.check_output(
+                cmd, cwd=self.source_dir, stderr=subprocess.STDOUT
+            )
             .strip()
             .decode()
         )
 
 
 class Main(App):
-    def init(self):
+    """CLI entrypoint used by FBT to generate version headers and metadata."""
+
+    def init(self) -> None:
         self.subparsers = self.parser.add_subparsers(help="sub-command help")
 
         # generate
@@ -110,7 +136,8 @@ class Main(App):
         self.parser_generate.add_argument("--dir", dest="sourcedir", required=True)
         self.parser_generate.set_defaults(func=self.generate)
 
-    def generate(self):
+    def generate(self) -> int:
+        """Generate version header and JSON metadata for the current build."""
         current_info = GitVersion(self.args.sourcedir).get_version_info()
 
         build_date = (
@@ -127,10 +154,11 @@ class Main(App):
             }
         )
 
+        # Drop datetime object before generating C header
         del current_info["GIT_COMMIT_DATE"]
 
-        version_values = []
-        for key in current_info:
+        version_values: list[str] = []
+        for key in sorted(current_info):
             val = current_info[key]
             if isinstance(val, str):
                 val = f'"{val}"'
@@ -138,27 +166,27 @@ class Main(App):
 
         new_version_info_fmt = "\n".join(version_values) + "\n"
 
-        current_version_info = None
+        current_version_info: str | None = None
         version_header_name = os.path.join(self.args.outdir, "version.inc.h")
         version_json_name = os.path.join(self.args.outdir, "version.json")
 
         try:
-            with open(version_header_name, "r") as file:
+            with open(version_header_name, "r", encoding="utf-8") as file:
                 current_version_info = file.read()
         except EnvironmentError as e:
-            if self.args.debug:
+            if getattr(self.args, "debug", False):
                 print(e)
 
         if current_version_info != new_version_info_fmt:
-            if self.args.debug:
+            if getattr(self.args, "debug", False):
                 print("old: ", current_version_info)
                 print("new: ", new_version_info_fmt)
-            with open(version_header_name, "w", newline="\n") as file:
+            with open(version_header_name, "w", newline="\n", encoding="utf-8") as file:
                 file.write(new_version_info_fmt)
             # os.utime("../lib/version.c", None)
             print("Version information updated")
         else:
-            if self.args.debug:
+            if getattr(self.args, "debug", False):
                 print("Version information hasn't changed")
 
         version_json = {
@@ -167,7 +195,7 @@ class Main(App):
             "firmware_branch": current_info["GIT_BRANCH"],
             "firmware_target": current_info["TARGET"],
         }
-        with open(version_json_name, "w", newline="\n") as file:
+        with open(version_json_name, "w", newline="\n", encoding="utf-8") as file:
             json.dump(version_json, file, indent=4)
         return 0
 
