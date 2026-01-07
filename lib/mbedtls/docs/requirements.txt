@@ -47,7 +47,7 @@ pyyaml==6.0.1
     # via readthedocs-cli
 readthedocs-cli==4
     # via -r requirements.in
-requests==2.32.3
+requests==2.32.4
     # via
     #   readthedocs-cli
     #   sphinx
