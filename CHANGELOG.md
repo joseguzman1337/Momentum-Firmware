@@ -1,3 +1,15 @@
+### Technical Improvements & Maintenance (Jan 2026)
+- **Build System:**
+  - Reorganized upstream dependencies: Pointed build scripts (`fbt`, `SConstruct`) to `upstream/flipperzero-firmware`
+  - Documented missing upstream dependencies in build wrappers to aid debugging
+  - Merged upstream content into root while preserving Momentum-Firmware priority
+- **Code Quality & Safety:**
+  - **MIFARE Classic:** Fixed duplicate `MfClassicTypePlus2k` enum value by introducing `MfClassicTypePlus2kNative`
+  - **MFKey:** Hardened memory allocation in `mfkey.c` with null checks to prevent crashes
+  - **iButton:** Added defensive checks in `ibutton_cli.c` to handle empty protocol names safely
+  - **GUI:** Added `furi_check(text)` in `elements_text_box` to prevent null pointer dereferences
+  - **Scripts:** Added type hints, docstrings, and robust error handling to `version.py` and `wifi_board.py`
+
 ### Massive Submodule & Fork Synchronization (Dec 2025)
 - Synchronized all 100+ forked repositories with upstream
 - Merged 1000+ open PRs across all forks
