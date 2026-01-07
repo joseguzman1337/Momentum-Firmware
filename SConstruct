@@ -6,4 +6,4 @@ import os
 sys.path.insert(0, os.path.join(os.getcwd(), "upstream", "flipperzero-firmware", "scripts"))
 
 # Load the actual SConstruct
-SConscript("upstream/flipperzero-firmware/scripts/SConstruct")
+SConscript("upstream/flipperzero-firmware/SConstruct")
