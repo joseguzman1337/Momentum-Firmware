@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/scripts/flippigator/async_protopy/flipperzero_protobuf_compiled/system_pb2.py

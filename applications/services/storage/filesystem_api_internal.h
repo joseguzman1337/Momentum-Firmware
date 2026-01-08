@@ -1,4 +1,5 @@
 #pragma once
+
 #include <furi.h>
 #include "filesystem_api_defines.h"
 
@@ -26,57 +27,57 @@ struct File {
  *  @var FS_File_Api::open
  *      @brief Open file
  *      @param file pointer to file object, filled by api
- *      @param path path to file 
- *      @param access_mode access mode from FS_AccessMode 
- *      @param open_mode open mode from FS_OpenMode 
+ *      @param path path to file
+ *      @param access_mode access mode from FS_AccessMode
+ *      @param open_mode open mode from FS_OpenMode
  *      @return success flag
- * 
- *  @var FS_File_Api::close 
+ *
+ *  @var FS_File_Api::close
  *      @brief Close file
  *      @param file pointer to file object
  *      @return success flag
- * 
+ *
  *  @var FS_File_Api::read
  *      @brief Read bytes from file to buffer
  *      @param file pointer to file object
  *      @param buff pointer to buffer for reading
- *      @param bytes_to_read how many bytes to read, must be smaller or equal to buffer size 
+ *      @param bytes_to_read how many bytes to read, must be smaller or equal to buffer size
  *      @return how many bytes actually has been read
- * 
+ *
  *  @var FS_File_Api::write
  *      @brief Write bytes from buffer to file
  *      @param file pointer to file object
  *      @param buff pointer to buffer for writing
- *      @param bytes_to_read how many bytes to write, must be smaller or equal to buffer size 
+ *      @param bytes_to_read how many bytes to write, must be smaller or equal to buffer size
  *      @return how many bytes actually has been written
- * 
+ *
  *  @var FS_File_Api::seek
- *      @brief Move r/w pointer 
+ *      @brief Move r/w pointer
  *      @param file pointer to file object
  *      @param offset offset to move r/w pointer
  *      @param from_start set offset from start, or from current position
  *      @return success flag
- * 
+ *
  *  @var FS_File_Api::tell
  *      @brief Get r/w pointer position
  *      @param file pointer to file object
  *      @return current r/w pointer position
- * 
+ *
  *  @var FS_File_Api::truncate
  *      @brief Truncate file size to current r/w pointer position
  *      @param file pointer to file object
  *      @return success flag
- * 
+ *
  *  @var FS_File_Api::size
  *      @brief Fet file size
  *      @param file pointer to file object
  *      @return file size
- * 
+ *
  *  @var FS_File_Api::sync
  *      @brief Write file cache to storage
  *      @param file pointer to file object
  *      @return success flag
- * 
+ *
  *  @var FS_File_Api::eof
  *      @brief Checks that the r/w pointer is at the end of the file
  *      @param file pointer to file object
@@ -104,14 +105,14 @@ typedef struct {
  *  @var FS_Dir_Api::open
  *      @brief Open directory to get objects from
  *      @param file pointer to file object, filled by api
- *      @param path path to directory 
+ *      @param path path to directory
  *      @return success flag
- * 
- *  @var FS_Dir_Api::close 
+ *
+ *  @var FS_Dir_Api::close
  *      @brief Close directory
  *      @param file pointer to file object
  *      @return success flag
- * 
+ *
  *  @var FS_Dir_Api::read
  *      @brief Read next object info in directory
  *      @param file pointer to file object
@@ -119,7 +120,7 @@ typedef struct {
  *      @param name pointer to name buffer, can be NULL
  *      @param name_length name buffer length
  *      @return success flag (if next object not exist also returns false and set error_id to FSE_NOT_EXIST)
- * 
+ *
  *  @var FS_Dir_Api::rewind
  *      @brief Rewind to first object info in directory
  *      @param file pointer to file object
@@ -145,20 +146,20 @@ typedef struct {
  *      @param name pointer to name buffer, can be NULL
  *      @param name_length name buffer length
  *      @return FS_Error error info
- * 
+ *
  *  @var FS_Common_Api::remove
- *      @brief Remove file/directory from storage, 
+ *      @brief Remove file/directory from storage,
  *          directory must be empty,
  *          file/directory must not be opened,
  *          file/directory must not have FSF_READ_ONLY flag
  *      @param path path to file/directory
  *      @return FS_Error error info
- * 
+ *
  *  @var FS_Common_Api::mkdir
  *      @brief Create new directory
  *      @param path path to new directory
  *      @return FS_Error error info
- * 
+ *
  *  @var FS_Common_Api::fs_info
  *      @brief Get total and free space storage values
  *      @param fs_path path of fs

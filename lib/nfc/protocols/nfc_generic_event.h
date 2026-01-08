@@ -43,6 +43,8 @@ typedef void NfcGenericInstance;
  */
 typedef void NfcGenericEventData;
 
+typedef struct NfcLogger NfcLogger;
+
 /**
  * @brief Generic Nfc event type.
  *

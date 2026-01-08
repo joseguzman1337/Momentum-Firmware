@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/main/subghz/helpers/subghz_error_type.h

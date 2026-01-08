@@ -1,4 +1,7 @@
 #pragma once
+#ifndef LFRFID_PROTOCOLS_H
+#define LFRFID_PROTOCOLS_H
+
 #include <protocols/protocol.h>
 #include "../tools/t5577.h"
 #include "../tools/em4305.h"
@@ -47,3 +50,5 @@ typedef struct {
         LFRFIDEM4305 em4305;
     };
 } LFRFIDWriteRequest;
+
+#endif

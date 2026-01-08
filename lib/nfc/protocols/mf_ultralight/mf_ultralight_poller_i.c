@@ -33,8 +33,11 @@ MfUltralightError mf_ultralight_process_error(Iso14443_3aError error) {
 MfUltralightError mf_ultralight_poller_auth_pwd(
     MfUltralightPoller* instance,
     MfUltralightPollerAuthContext* data) {
+    furi_check(instance);
+    furi_check(data);
+
     uint8_t auth_cmd[5] = {MF_ULTRALIGHT_CMD_PWD_AUTH}; //-V1009
-    memccpy(&auth_cmd[1], data->password.data, 0, MF_ULTRALIGHT_AUTH_PASSWORD_SIZE);
+    memcpy(&auth_cmd[1], data->password.data, MF_ULTRALIGHT_AUTH_PASSWORD_SIZE);
     bit_buffer_copy_bytes(instance->tx_buffer, auth_cmd, sizeof(auth_cmd));
 
     MfUltralightError ret = MfUltralightErrorNone;
@@ -59,42 +62,43 @@ MfUltralightError mf_ultralight_poller_auth_pwd(
     return ret;
 }
 
-MfUltralightError mf_ultralight_poller_send_authenticate_cmd(
+static MfUltralightError mf_ultralight_poller_send_authenticate_cmd(
     MfUltralightPoller* instance,
-    const uint8_t* auth_cmd,
-    size_t auth_cmd_len,
-    bool send_standard,
+    const uint8_t* cmd,
+    const uint8_t length,
+    const bool initial_cmd,
     uint8_t* response) {
-    bit_buffer_copy_bytes(instance->tx_buffer, auth_cmd, auth_cmd_len);
+    furi_check(instance);
+    furi_check(cmd);
+    furi_check(response);
+
+    bit_buffer_copy_bytes(instance->tx_buffer, cmd, length);
 
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
     do {
-        if(send_standard) {
-            error = iso14443_3a_poller_send_standard_frame(
-                instance->iso14443_3a_poller,
-                instance->tx_buffer,
-                instance->rx_buffer,
-                MF_ULTRALIGHT_POLLER_STANDARD_FWT_FC);
-        } else {
-            error = iso14443_3a_poller_txrx(
-                instance->iso14443_3a_poller,
-                instance->tx_buffer,
-                instance->rx_buffer,
-                MF_ULTRALIGHT_POLLER_STANDARD_FWT_FC);
-        }
-
+        error = iso14443_3a_poller_send_standard_frame(
+            instance->iso14443_3a_poller,
+            instance->tx_buffer,
+            instance->rx_buffer,
+            MF_ULTRALIGHT_POLLER_STANDARD_FWT_FC);
         if(error != Iso14443_3aErrorNone) {
             ret = mf_ultralight_process_error(error);
             break;
         }
-        if((bit_buffer_get_size_bytes(instance->rx_buffer) != MF_ULTRALIGHT_C_AUTH_RESPONSE_SIZE) &&
-           (bit_buffer_get_byte(instance->rx_buffer, 0) != 0xAF)) {
+
+        const uint8_t expected_response_code = initial_cmd ? 0xAF : 0x00;
+        if((bit_buffer_get_byte(instance->rx_buffer, 0) != expected_response_code) ||
+           (bit_buffer_get_size_bytes(instance->rx_buffer) !=
+            MF_ULTRALIGHT_C_AUTH_RESPONSE_SIZE)) {
             ret = MfUltralightErrorAuth;
             break;
         }
 
-        memcpy(response, bit_buffer_get_data(instance->rx_buffer) + 1, 8);
+        memcpy(
+            response,
+            bit_buffer_get_data(instance->rx_buffer) + 1,
+            MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE);
     } while(false);
 
     return ret;
@@ -105,16 +109,8 @@ MfUltralightError mf_ultralight_poller_authentication_test(MfUltralightPoller* i
 
     uint8_t auth_cmd[2] = {MF_ULTRALIGHT_CMD_AUTH, 0x00};
     uint8_t dummy[MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE];
-
-    MfUltralightError error = mf_ultralight_poller_send_authenticate_cmd(
+    return mf_ultralight_poller_send_authenticate_cmd(
         instance, auth_cmd, sizeof(auth_cmd), true, dummy);
-
-    instance->history_data.state = instance->state;
-    instance->history_data.command = NfcCommandContinue;
-    instance->history_data.error = error;
-    instance->history.base.modified = true;
-
-    return error;
 }
 
 MfUltralightError mf_ultralight_poller_authenticate_start(
@@ -138,7 +134,7 @@ MfUltralightError mf_ultralight_poller_authenticate_start(
         uint8_t* RndB = output + MF_ULTRALIGHT_C_AUTH_RND_B_BLOCK_OFFSET;
         mf_ultralight_3des_decrypt(
             &instance->des_context,
-            instance->mfu_event.data->auth_context.tdes_key.data,
+            instance->auth_context.tdes_key.data,
             iv,
             encRndB,
             sizeof(encRndB),
@@ -149,7 +145,7 @@ MfUltralightError mf_ultralight_poller_authenticate_start(
 
         mf_ultralight_3des_encrypt(
             &instance->des_context,
-            instance->mfu_event.data->auth_context.tdes_key.data,
+            instance->auth_context.tdes_key.data,
             encRndB,
             output,
             MF_ULTRALIGHT_C_AUTH_DATA_SIZE,
@@ -183,7 +179,7 @@ MfUltralightError mf_ultralight_poller_authenticate_end(
 
         mf_ultralight_3des_decrypt(
             &instance->des_context,
-            instance->mfu_event.data->auth_context.tdes_key.data,
+            instance->auth_context.tdes_key.data,
             RndB,
             bit_buffer_get_data(instance->rx_buffer) + 1,
             MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE,
@@ -198,6 +194,9 @@ MfUltralightError mf_ultralight_poller_read_page_from_sector(
     uint8_t sector,
     uint8_t tag,
     MfUltralightPageReadCommandData* data) {
+    furi_check(instance);
+    furi_check(data);
+
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
 
@@ -239,6 +238,9 @@ MfUltralightError mf_ultralight_poller_read_page(
     MfUltralightPoller* instance,
     uint8_t start_page,
     MfUltralightPageReadCommandData* data) {
+    furi_check(instance);
+    furi_check(data);
+
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
 
@@ -269,6 +271,9 @@ MfUltralightError mf_ultralight_poller_write_page(
     MfUltralightPoller* instance,
     uint8_t page,
     const MfUltralightPage* data) {
+    furi_check(instance);
+    furi_check(data);
+
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
 
@@ -290,11 +295,6 @@ MfUltralightError mf_ultralight_poller_write_page(
             break;
         }
         if(!bit_buffer_starts_with_byte(instance->rx_buffer, MF_ULTRALIGHT_CMD_ACK)) {
-            FURI_LOG_D(
-                TAG,
-                "Write page %u NAK'd with %u",
-                page,
-                bit_buffer_get_byte(instance->rx_buffer, 0));
             ret = MfUltralightErrorProtocol;
             break;
         }
@@ -305,6 +305,9 @@ MfUltralightError mf_ultralight_poller_write_page(
 
 MfUltralightError
     mf_ultralight_poller_read_version(MfUltralightPoller* instance, MfUltralightVersion* data) {
+    furi_check(instance);
+    furi_check(data);
+
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
 
@@ -334,6 +337,9 @@ MfUltralightError
 
 MfUltralightError
     mf_ultralight_poller_read_signature(MfUltralightPoller* instance, MfUltralightSignature* data) {
+    furi_check(instance);
+    furi_check(data);
+
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
 
@@ -363,6 +369,9 @@ MfUltralightError mf_ultralight_poller_read_counter(
     MfUltralightPoller* instance,
     uint8_t counter_num,
     MfUltralightCounter* data) {
+    furi_check(instance);
+    furi_check(data);
+
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
 
@@ -392,6 +401,9 @@ MfUltralightError mf_ultralight_poller_read_tearing_flag(
     MfUltralightPoller* instance,
     uint8_t tearing_falg_num,
     MfUltralightTearingFlag* data) {
+    furi_check(instance);
+    furi_check(data);
+
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
 

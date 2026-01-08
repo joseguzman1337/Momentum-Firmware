@@ -73,6 +73,13 @@ def make_emit_compilation_DB_entry(comstr):
         command = env.subst(comstr, target=target, source=source)
         dbtarget = env.File(str(target[0]) + ".json")
 
+        # Avoid registering multiple builders for the same compilation DB entry target.
+        # This can happen when two different SCons environments try to emit entries for
+        # the same object file, which would otherwise trigger a
+        # "Multiple ways to build the same target" error in SCons.
+        if hasattr(dbtarget, "has_builder") and dbtarget.has_builder():
+            return target, source
+
         config = {
             "cmd": command,
             "abspath": env.get("COMPILATIONDB_USE_BINARY_ABSPATH"),

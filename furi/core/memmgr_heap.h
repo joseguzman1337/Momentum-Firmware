@@ -40,6 +40,9 @@ size_t memmgr_heap_get_thread_memory(FuriThreadId thread_id);
  */
 size_t memmgr_heap_get_max_free_block(void);
 
+/** Print the address and size of all free blocks to stdout */
+void memmgr_heap_printf_free_blocks(void);
+
 typedef bool (*BlockWalker)(void* pointer, size_t size, bool used, void* context);
 
 /**

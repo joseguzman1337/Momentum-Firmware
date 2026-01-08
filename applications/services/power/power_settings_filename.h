@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/services/power/power_settings_filename.h

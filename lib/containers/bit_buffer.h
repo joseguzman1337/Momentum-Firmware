@@ -6,9 +6,6 @@
  */
 #pragma once
 
-#ifndef _BIT_BUFFER_H
-#define _BIT_BUFFER_H
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -115,204 +112,252 @@ void bit_buffer_copy_bits(BitBuffer* buf, const uint8_t* data, size_t size_bits)
  */
 void bit_buffer_copy_bytes_with_parity(BitBuffer* buf, const uint8_t* data, size_t size_bits);
 
-/** Copy data from BitBuffer to a byte array.
+/** Write a BitBuffer instance's entire contents to an arbitrary memory location.
  *
- * @param[in]  buf         pointer to a BitBuffer instance
- * @param[out] dest        pointer to the destination byte array
- * @param[in]  size_bytes  size of the data to be copied, in bytes
+ * @warning    The destination memory must be allocated. Additionally, the
+ *             destination capacity must be no less than the source data size.
+ *
+ * @param[in]  buf         pointer to a BitBuffer instance to write from
+ * @param[out] dest        pointer to the destination memory location
+ * @param[in]  size_bytes  maximum destination data size, in bytes
  */
 void bit_buffer_write_bytes(const BitBuffer* buf, void* dest, size_t size_bytes);
 
-/** Copy data from BitBuffer to a byte array, extracting parity bits into a separate buffer.
+/** Write a BitBuffer instance's entire contents to an arbitrary memory location.
  *
- * @param[in]  buf         pointer to a BitBuffer instance
- * @param[out] dest        pointer to the destination byte array
- * @param[in]  size_bits   size of the data to be copied, in bits
- * @param[out] parity_buf  pointer to the destination parity buffer
+ * Additionally, place a parity bit after each byte.
+ *
+ * @warning    The destination memory must be allocated. Additionally, the
+ *             destination capacity must be no less than the source data size
+ *             plus parity.
+ *
+ * @param[in]  buf           pointer to a BitBuffer instance to write from
+ * @param[out] dest          pointer to the destination memory location
+ * @param[in]  size_bytes    maximum destination data size, in bytes
+ * @param[out] bits_written  actual number of bits written, in bits
+ * @note       Parity bits are placed starting with the most significant bit of
+ *             each byte and moving up.
+ * @note       Example: DDDDDDDD PDDDDDDD DPDDDDDD DDP...
  */
 void bit_buffer_write_bytes_with_parity(
     const BitBuffer* buf,
     void* dest,
-    size_t size_bits,
-    size_t* parity_buf);
+    size_t size_bytes,
+    size_t* bits_written);
 
-/** Copy data from BitBuffer to a byte array, starting from middle.
+/** Write a slice of BitBuffer instance's contents to an arbitrary memory
+ * location.
  *
- * @param[in]  buf         pointer to a BitBuffer instance
- * @param[out] dest        pointer to the destination byte array
- * @param[in]  size_bits   size of the data to be copied, in bits
- * @param[in]  start_index bit index to start copying from
+ * @warning    The destination memory must be allocated. Additionally, the
+ *             destination capacity must be no less than the requested slice
+ *             size.
+ *
+ * @param[in]  buf          pointer to a BitBuffer instance to write from
+ * @param[out] dest         pointer to the destination memory location
+ * @param[in]  start_index  index to begin copying source data from
+ * @param[in]  size_bytes   data slice size, in bytes
  */
 void bit_buffer_write_bytes_mid(
     const BitBuffer* buf,
     void* dest,
-    size_t size_bits,
-    size_t start_index);
+    size_t start_index,
+    size_t size_bytes);
 
-/** Check if the BitBuffer instance contains at least one partial byte.
+// Checks
+
+/** Check whether a BitBuffer instance contains a partial byte (i.e.\ the bit
+ * count is not divisible by 8).
  *
- * @param[in]  buf   pointer to a BitBuffer instance
+ * @param[in]  buf   pointer to a BitBuffer instance to be checked
  *
- * @return     true if at least one partial byte is present, false otherwise
+ * @return     true if the instance contains a partial byte, false otherwise
  */
 bool bit_buffer_has_partial_byte(const BitBuffer* buf);
 
-/** Check if the BitBuffer instance starts with a specific byte.
+/** Check whether a BitBuffer instance's contents start with the designated byte.
  *
- * @param[in]  buf   pointer to a BitBuffer instance
- * @param[in]  byte  byte to check for
+ * @param[in]  buf   pointer to a BitBuffer instance to be checked
+ * @param[in]  byte  byte value to be checked against
  *
- * @return     true if the BitBuffer instance starts with the specific byte, false otherwise
+ * @return     true if data starts with designated byte, false otherwise
  */
 bool bit_buffer_starts_with_byte(const BitBuffer* buf, uint8_t byte);
 
-// Getter and setters
+// Getters
 
-/** Get the capacity of a BitBuffer instance, in bytes.
+/** Get a BitBuffer instance's capacity (i.e.\ the maximum possible amount of
+ * data), in bytes.
  *
- * @param[in]  buf   pointer to a BitBuffer instance
+ * @param[in]  buf   pointer to a BitBuffer instance to be queried
  *
- * @return     the capacity, in bytes
+ * @return     capacity, in bytes
  */
 size_t bit_buffer_get_capacity_bytes(const BitBuffer* buf);
 
-/** Get the size of a BitBuffer instance, in bits.
+/** Get a BitBuffer instance's data size (i.e.\ the amount of stored data), in
+ * bits.
  *
- * @param[in]  buf   pointer to a BitBuffer instance
+ * @warning    Might be not divisible by 8 (see bit_buffer_is_partial_byte).
  *
- * @return     the size, in bits
+ * @param[in]  buf   pointer to a BitBuffer instance to be queried
+ *
+ * @return     data size, in bits.
  */
 size_t bit_buffer_get_size(const BitBuffer* buf);
 
-/** Get the size of a BitBuffer instance, in bytes (rounded up).
+/**
+ * Get a BitBuffer instance's data size (i.e.\ the amount of stored data), in
+ * bytes.
  *
- * @param[in]  buf   pointer to a BitBuffer instance
+ * @warning    If a partial byte is present, it is also counted.
  *
- * @return     the size, in bytes
+ * @param[in]  buf   pointer to a BitBuffer instance to be queried
+ *
+ * @return     data size, in bytes.
  */
 size_t bit_buffer_get_size_bytes(const BitBuffer* buf);
 
-/** Get a byte from a BitBuffer instance at a specific bit index.
+/** Get a byte value at a specified index in a BitBuffer instance.
  *
- * @param[in]  buf    pointer to a BitBuffer instance
- * @param[in]  index  bit index to get the byte from
+ * @warning    The index must be valid (i.e.\ less than the instance's data size
+ *             in bytes).
  *
- * @return     the byte value
+ * @param[in]  buf    pointer to a BitBuffer instance to be queried
+ * @param[in]  index  index of the byte in question
+ *
+ * @return     byte value
  */
 uint8_t bit_buffer_get_byte(const BitBuffer* buf, size_t index);
 
-/** Get a byte from a BitBuffer instance at a specific bit index.
+/** Get a byte value starting from the specified bit index in a BitBuffer
+ * instance.
  *
- * @param[in]  buf         pointer to a BitBuffer instance
- * @param[in]  index_bits  bit index to get the byte from
+ * @warning    The resulting byte might correspond to a single byte (if the
+ *             index is a multiple of 8), or two overlapping bytes combined. The
+ *             index must be valid (i.e.\ less than the instance's data size in
+ *             bits).
  *
- * @return     the byte value
+ * @param[in]  buf         pointer to a BitBuffer instance to be queried
+ * @param[in]  index_bits  bit index of the byte in question
+ *
+ * @return     byte value
  */
 uint8_t bit_buffer_get_byte_from_bit(const BitBuffer* buf, size_t index_bits);
 
-/** Get a pointer to the internal data buffer of a BitBuffer instance.
+/** Get the pointer to a BitBuffer instance's underlying data.
  *
- * @param[in]  buf   pointer to a BitBuffer instance
+ * @param[in]  buf   pointer to a BitBuffer instance to be queried
  *
- * @return     pointer to the internal data buffer
+ * @return     pointer to the underlying data
  */
 const uint8_t* bit_buffer_get_data(const BitBuffer* buf);
 
-/** Get a pointer to the internal parity buffer of a BitBuffer instance.
+/** Get the pointer to the parity data of a BitBuffer instance.
  *
- * @param[in]  buf   pointer to a BitBuffer instance
+ * @param[in]  buf   pointer to a BitBuffer instance to be queried
  *
- * @return     pointer to the internal parity buffer
+ * @return     pointer to the parity data
  */
 const uint8_t* bit_buffer_get_parity(const BitBuffer* buf);
 
-/** Set a byte in a BitBuffer instance at a specific bit index.
+// Setters
+
+/** Set byte value at a specified index in a BitBuffer instance.
  *
- * @param[in,out] buf    pointer to a BitBuffer instance
- * @param[in]     index  bit index to set the byte at
- * @param[in]     byte   byte value to set
+ * @warning       The index must be valid (i.e.\ less than the instance's data
+ *                size in bytes).
+ *
+ * @param[in,out] buf    pointer to a BitBuffer instance to be modified
+ * @param[in]     index  index of the byte in question
+ * @param[in]     byte   byte value to be set at index
  */
 void bit_buffer_set_byte(BitBuffer* buf, size_t index, uint8_t byte);
 
-/** Set a byte with a parity bit in a BitBuffer instance at a specific bit index.
+/** Set byte and parity bit value at a specified index in a BitBuffer instance.
  *
- * @param[in,out] buff    pointer to a BitBuffer instance
- * @param[in]     index   bit index to set the byte at
- * @param[in]     byte    byte value to set
- * @param[in]     parity  parity bit value to set
+ * @warning       The index must be valid (i.e.\ less than the instance's data
+ *                size in bytes).
+ *
+ * @param[in,out] buff    pointer to a BitBuffer instance to be modified
+ * @param[in]     index   index of the byte in question
+ * @param[in]     byte    byte value to be set at index
+ * @param[in]     parity  parity bit value to be set at index
  */
 void bit_buffer_set_byte_with_parity(BitBuffer* buff, size_t index, uint8_t byte, bool parity);
 
-/** Set the size of a BitBuffer instance, in bits.
+/** Resize a BitBuffer instance to a new size, in bits.
  *
- * @param[in,out] buf       pointer to a BitBuffer instance
- * @param[in]     new_size  new size, in bits
+ * @warning       May cause bugs. Use only if absolutely necessary.
+ *
+ * @param[in,out] buf       pointer to a BitBuffer instance to be resized
+ * @param[in]     new_size  the new size of the buffer, in bits
  */
 void bit_buffer_set_size(BitBuffer* buf, size_t new_size);
 
-/** Set the size of a BitBuffer instance, in bytes.
+/** Resize a BitBuffer instance to a new size, in bytes.
  *
- * @param[in,out] buf             pointer to a BitBuffer instance
- * @param[in]     new_size_bytes  new size, in bytes
+ * @warning       May cause bugs. Use only if absolutely necessary.
+ *
+ * @param[in,out] buf             pointer to a BitBuffer instance to be resized
+ * @param[in]     new_size_bytes  the new size of the buffer, in bytes
  */
 void bit_buffer_set_size_bytes(BitBuffer* buf, size_t new_size_bytes);
 
-// Append
+// Modification
 
-/** Append another BitBuffer instance's contents to this one.
+/** Append all BitBuffer's instance contents to this one.
  *
- * @warning       The destination capacity must be no less than the sum of the
- *                original and appended data sizes.
+ * @warning       The destination capacity must be no less than its original
+ *                data size plus source data size.
  *
- * @param[in,out] buf    pointer to a BitBuffer instance to append into
- * @param[in]     other  pointer to a BitBuffer instance to append from
+ * @param[in,out] buf    pointer to a BitBuffer instance to be appended to
+ * @param[in]     other  pointer to a BitBuffer instance to be appended
  */
 void bit_buffer_append(BitBuffer* buf, const BitBuffer* other);
 
-/** Append a BitBuffer instance's contents to this one, starting from start_index.
+/** Append a BitBuffer's instance contents to this one, starting from
+ * start_index.
  *
- * @warning       The destination capacity must be no less than the sum of the
- *                original and appended data sizes.
+ * @warning       The destination capacity must be no less than the source data
+ *                size counting from start_index.
  *
- * @param[in,out] buf          pointer to a BitBuffer instance to append into
- * @param[in]     other        pointer to a BitBuffer instance to append from
- * @param[in]     start_index  bit index to begin appending source data from
+ * @param[in,out] buf          pointer to a BitBuffer instance to be appended to
+ * @param[in]     other        pointer to a BitBuffer instance to be appended
+ * @param[in]     start_index  index to begin copying source data from
  */
 void bit_buffer_append_right(BitBuffer* buf, const BitBuffer* other, size_t start_index);
 
 /** Append a byte to a BitBuffer instance.
  *
- * @warning       The destination capacity must be no less than the sum of the
- *                original data size and 8 bits.
+ * @warning       The destination capacity must be no less its original data
+ *                size plus one.
  *
- * @param[in,out] buf   pointer to a BitBuffer instance to append into
- * @param[in]     byte  byte value to append
+ * @param[in,out] buf   pointer to a BitBuffer instance to be appended to
+ * @param[in]     byte  byte value to be appended
  */
 void bit_buffer_append_byte(BitBuffer* buf, uint8_t byte);
 
-/** Append multiple bytes to a BitBuffer instance.
+/** Append a byte array to a BitBuffer instance.
  *
- * @warning       The destination capacity must be no less than the sum of the
- *                original and appended data sizes.
+ * @warning       The destination capacity must be no less its original data
+ *                size plus source data size.
  *
- * @param[in,out] buf         pointer to a BitBuffer instance to append into
+ * @param[in,out] buf         pointer to a BitBuffer instance to be appended to
  * @param[in]     data        pointer to the byte array to be appended
  * @param[in]     size_bytes  size of the data to be appended, in bytes
  */
 void bit_buffer_append_bytes(BitBuffer* buf, const uint8_t* data, size_t size_bytes);
 
-/** Append a single bit to a BitBuffer instance.
+/** Append a bit to a BitBuffer instance.
  *
- * @warning       The destination capacity must be no less than the sum of the
- *                original data size and 1 bit.
+ * @warning       The destination capacity must be sufficient to accommodate the
+ *                additional bit.
  *
- * @param[in,out] buf  pointer to a BitBuffer instance to append into
- * @param[in]     bit  bit value to append
+ * @param[in,out] buf   pointer to a BitBuffer instance to be appended to
+ * @param[in]     bit   bit value to be appended
  */
 void bit_buffer_append_bit(BitBuffer* buf, bool bit);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // _BIT_BUFFER_H

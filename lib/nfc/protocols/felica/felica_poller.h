@@ -19,9 +19,9 @@ typedef struct FelicaPoller FelicaPoller;
  */
 typedef enum {
     FelicaPollerEventTypeError, /**< An error occured during activation procedure. */
-    FelicaPollerEventTypeReady, /**< The card was activated by the poller. */
-    FelicaPollerEventTypeIncomplete,
-    FelicaPollerEventTypeRequestAuthContext,
+    FelicaPollerEventTypeReady, /**< The card was activated and fully read by the poller. */
+    FelicaPollerEventTypeIncomplete, /**< The card was activated and partly read by the poller. */
+    FelicaPollerEventTypeRequestAuthContext, /**< Authentication context was requested by poller. */
 } FelicaPollerEventType;
 
 /**
@@ -29,7 +29,7 @@ typedef enum {
  */
 typedef union {
     FelicaError error; /**< Error code indicating card activation fail reason. */
-    FelicaAuthenticationContext* auth_context;
+    FelicaAuthenticationContext* auth_context; /**< Authentication context to be filled by user. */
 } FelicaPollerEventData;
 
 /**
@@ -57,24 +57,19 @@ typedef struct {
 FelicaError felica_poller_activate(FelicaPoller* instance, FelicaData* data);
 
 /**
- * @brief Transmit and receive Felica frames in poller mode.
- *
- * Must ONLY be used inside the callback function.
- *
- * The rx_buffer will be filled with any data received as a response to data
- * sent from tx_buffer, with a timeout defined by the fwt parameter.
+ * @brief Performs felica read operation for blocks provided as parameters
  *
  * @param[in, out] instance pointer to the instance to be used in the transaction.
- * @param[in] tx_buffer pointer to the buffer containing the data to be transmitted.
- * @param[out] rx_buffer pointer to the buffer to be filled with received data.
- * @param[in] fwt frame wait time (response timeout), in carrier cycles.
+ * @param[in] block_count Amount of blocks involved in reading procedure
+ * @param[in] block_numbers Array with block indexes according to felica docs
+ * @param[out] response_ptr Pointer to the response structure
  * @return FelicaErrorNone on success, an error code on failure.
  */
-FelicaError felica_poller_frame_exchange(
+FelicaError felica_poller_read_blocks(
     FelicaPoller* instance,
-    const BitBuffer* tx_buffer,
-    BitBuffer* rx_buffer,
-    uint32_t fwt);
+    const uint8_t block_count,
+    const uint8_t* const block_numbers,
+    FelicaPollerReadCommandResponse** const response_ptr);
 
 #ifdef __cplusplus
 }

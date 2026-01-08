@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/targets/f7/startup_stm32wb55xx_cm4.s

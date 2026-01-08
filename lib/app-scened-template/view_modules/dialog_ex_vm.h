@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/app-scened-template/view_modules/dialog_ex_vm.h

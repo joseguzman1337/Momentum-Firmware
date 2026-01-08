@@ -26,6 +26,13 @@ typedef struct {
 static const uint32_t mf_ultralight_data_format_version = 2;
 
 static const MfUltralightFeatures mf_ultralight_features[MfUltralightTypeNum] = {
+    [MfUltralightTypeUnknown] =
+        {
+            .device_name = "Unknown Ultralight",
+            .total_pages = 0,
+            .config_page = 0,
+            .feature_set = 0,
+        },
     [MfUltralightTypeOrigin] =
         {
             .device_name = "Mifare Ultralight",

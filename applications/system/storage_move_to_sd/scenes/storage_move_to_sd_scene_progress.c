@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/system/storage_move_to_sd/scenes/storage_move_to_sd_scene_progress.c
