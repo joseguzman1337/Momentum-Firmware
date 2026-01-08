@@ -19,7 +19,7 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.9'
+          python-version: '3.14'
 
       - name: Setup protobuf
         run: |
