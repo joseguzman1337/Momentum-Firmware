@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+typedef struct SimpleArray SimpleArray;
+
 #define FELICA_IDM_SIZE        (8U)
 #define FELICA_PMM_SIZE        (8U)
 #define FELICA_DATA_BLOCK_SIZE (16U)
@@ -145,6 +147,12 @@ typedef union {
     uint8_t dump[sizeof(FelicaFileSystem)];
 } FelicaFSUnion;
 
+typedef enum {
+    FelicaUnknown,
+    FelicaStandard,
+    FelicaLite,
+} FelicaWorkflowType;
+
 /** @brief Structure used to store Felica data and additional values about reading */
 typedef struct {
     FelicaIDm idm;
@@ -152,6 +160,9 @@ typedef struct {
     uint8_t blocks_total;
     uint8_t blocks_read;
     FelicaFSUnion data;
+    SimpleArray* services;
+    SimpleArray* systems;
+    FelicaWorkflowType workflow_type;
 } FelicaData;
 
 #pragma pack(push, 1)
@@ -194,6 +205,17 @@ typedef struct {
     uint8_t block_count;
     uint8_t data[];
 } FelicaListenerReadCommandResponse;
+
+typedef struct {
+    FelicaCommandResponseHeader header;
+    uint8_t data[];
+} FelicaListServiceCommandResponse;
+
+typedef struct {
+    FelicaCommandResponseHeader header;
+    uint8_t system_count;
+    uint8_t system_code[256];
+} FelicaListSystemCodeCommandResponse;
 
 typedef FelicaCommandResponseHeader FelicaListenerWriteCommandResponse;
 
@@ -255,6 +277,48 @@ void felica_calculate_mac_write(
     const uint8_t* wcnt,
     const uint8_t* data,
     uint8_t* mac);
+
+typedef struct {
+    uint16_t code;
+    uint16_t first_idx;
+    uint16_t last_idx;
+} FelicaArea;
+
+typedef struct {
+    uint16_t service_code;
+    uint8_t block_idx;
+    FelicaBlockData block;
+} FelicaPublicBlock;
+
+#define FELICA_STANDARD_MAX_BLOCK_COUNT 255
+
+typedef struct {
+    uint16_t system_code;
+    uint8_t system_code_idx;
+    SimpleArray* services;
+    SimpleArray* areas;
+    SimpleArray* public_blocks;
+} FelicaSystem;
+
+#define FELICA_SERVICE_ATTRIBUTE_RANDOM_ACCESS  (0x01U)
+#define FELICA_SERVICE_ATTRIBUTE_READ_ONLY      (0x02U)
+#define FELICA_SERVICE_ATTRIBUTE_UNAUTH_READ    (0x04U)
+#define FELICA_SERVICE_ATTRIBUTE_PURSE          (0x08U)
+#define FELICA_SERVICE_ATTRIBUTE_PURSE_SUBFIELD (0x06U)
+
+typedef struct {
+    uint16_t code;
+    uint16_t attr;
+} FelicaService;
+
+void felica_get_workflow_type(FelicaData* data);
+
+void felica_get_ic_name(const FelicaData* data, FuriString* ic_name);
+
+void felica_service_get_attribute_string(const FelicaService* service, FuriString* str);
+
+void felica_write_directory_tree(const FelicaSystem* system, FuriString* str);
+
 #ifdef __cplusplus
 }
 #endif

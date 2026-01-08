@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/lfrfid/tools/fsk_osc.h

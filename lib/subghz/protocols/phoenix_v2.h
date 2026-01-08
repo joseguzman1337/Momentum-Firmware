@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/subghz/protocols/phoenix_v2.h

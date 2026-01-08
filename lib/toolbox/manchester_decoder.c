@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/toolbox/manchester_decoder.c

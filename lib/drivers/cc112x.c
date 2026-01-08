@@ -1,6 +1,5 @@
 #include "cc112x.h"
-#include <cmsis_os2.h>
-#include <furi_hal_delay.h>
+#include <furi_hal_cortex.h>
 #include <assert.h>
 #include <string.h>
 
@@ -177,68 +176,26 @@ uint32_t cc112x_set_frequency(FuriHalSpiBusHandle* handle, uint32_t value) {
 }
 
 uint32_t cc112x_set_intermediate_frequency(FuriHalSpiBusHandle* handle, uint32_t value) {
-    // uint64_t real_value = value * CC112X_IFDIV / CC112X_QUARTZ;
-    // assert((real_value & 0xFF) == real_value);
-
-    // cc112x_write_reg(handle, CC112X_FSCTRL0, (real_value >> 0) & 0xFF);
-
-    // uint64_t real_frequency = real_value * CC112X_QUARTZ / CC112X_IFDIV;
-
-    // return (uint32_t)real_frequency;
+    (void)handle;
+    (void)value;
     return 0;
 }
 
 void cc112x_set_pa_table(FuriHalSpiBusHandle* handle, const uint8_t value[8]) {
-    // uint8_t tx[9] = {CC112X_PATABLE | CC112X_BURST};
-    // CC112XStatus rx[9] = {0};
-
-    // memcpy(&tx[1], &value[0], 8);
-
-    // while(furi_hal_gpio_read(handle->miso))
-    //     ;
-    // furi_hal_spi_bus_trx(handle, tx, (uint8_t*)rx, sizeof(rx), CC112X_TIMEOUT);
-
-    // assert((rx[0].CHIP_RDYn | rx[8].CHIP_RDYn) == 0);
+    (void)handle;
+    (void)value;
 }
 
 uint8_t cc112x_write_fifo(FuriHalSpiBusHandle* handle, const uint8_t* data, uint8_t size) {
-    // uint8_t buff_tx[64];
-    // uint8_t buff_rx[64];
-    // buff_tx[0] = CC112X_FIFO | CC112X_BURST;
-    // memcpy(&buff_tx[1], data, size);
-
-    // // Start transaction
-    // // Wait IC to become ready
-    // while(furi_hal_gpio_read(handle->miso))
-    //     ;
-    // // Tell IC what we want
-    // furi_hal_spi_bus_trx(handle, buff_tx, (uint8_t*)buff_rx, size + 1, CC112X_TIMEOUT);
-
-    // return size;
+    (void)handle;
+    (void)data;
+    (void)size;
     return 0;
 }
 
 uint8_t cc112x_read_fifo(FuriHalSpiBusHandle* handle, uint8_t* data, uint8_t* size) {
-    // uint8_t buff_tx[64];
-    // buff_tx[0] = CC112X_FIFO | CC112X_READ | CC112X_BURST;
-    // uint8_t buff_rx[2];
-
-    // // Start transaction
-    // // Wait IC to become ready
-    // while(furi_hal_gpio_read(handle->miso))
-    //     ;
-
-    // // First byte - packet length
-    // furi_hal_spi_bus_trx(handle, buff_tx, buff_rx, 2, CC112X_TIMEOUT);
-
-    // // Check that the packet is placed in the receive buffer
-    // if(buff_rx[1] > 64) {
-    //     *size = 64;
-    // } else {
-    //     *size = buff_rx[1];
-    // }
-    // furi_hal_spi_bus_trx(handle, &buff_tx[1], data, *size, CC112X_TIMEOUT);
-
-    // return *size;
+    (void)handle;
+    (void)data;
+    (void)size;
     return 0;
 }

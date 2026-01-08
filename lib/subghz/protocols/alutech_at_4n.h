@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/subghz/protocols/alutech_at_4n.h

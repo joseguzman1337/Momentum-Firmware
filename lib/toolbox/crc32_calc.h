@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/toolbox/crc32_calc.h

@@ -1,0 +1,1 @@
+../upstream/flipperzero-firmware/documentation/AppsOnSDCard.md

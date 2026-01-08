@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/toolbox/name_generator.h

@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/subghz/protocols/star_line.c

@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/targets/f7/application_ext.ld

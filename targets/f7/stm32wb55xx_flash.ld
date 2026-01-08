@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/targets/f7/stm32wb55xx_flash.ld

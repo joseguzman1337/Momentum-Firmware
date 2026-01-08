@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/littlefs/SPEC.md

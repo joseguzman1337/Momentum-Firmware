@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/subghz/protocols/nice_flor_s.h

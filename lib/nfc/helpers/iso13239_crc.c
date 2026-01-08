@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/nfc/helpers/iso13239_crc.c

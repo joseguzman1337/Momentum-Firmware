@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/flipper_application/application_manifest.c

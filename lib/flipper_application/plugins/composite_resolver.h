@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/flipper_application/plugins/composite_resolver.h

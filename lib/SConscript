@@ -46,6 +46,7 @@ libs = env.BuildModules(
         "flipper_application",
         "music_worker",
         "mjs",
+        "tlsf",
         "nanopb",
         "update_util",
         "heatshrink",

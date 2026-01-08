@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/targets/f7/ble_glue/services/dev_info_service.h

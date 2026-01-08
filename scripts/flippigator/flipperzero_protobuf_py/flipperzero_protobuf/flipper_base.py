@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/scripts/flippigator/flipperzero_protobuf_py/flipperzero_protobuf/flipper_base.py

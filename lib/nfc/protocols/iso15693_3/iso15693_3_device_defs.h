@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/nfc/protocols/iso15693_3/iso15693_3_device_defs.h

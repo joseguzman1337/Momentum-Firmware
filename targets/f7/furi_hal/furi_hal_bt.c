@@ -165,6 +165,7 @@ bool furi_hal_bt_check_profile_type(
 FuriHalBleProfileBase* furi_hal_bt_start_app(
     const FuriHalBleProfileTemplate* profile_template,
     FuriHalBleProfileParams params,
+    const GapRootSecurityKeys* root_keys,
     GapEventCallback event_cb,
     void* context) {
     furi_check(event_cb);
@@ -183,7 +184,7 @@ FuriHalBleProfileBase* furi_hal_bt_start_app(
 
         profile_template->get_gap_config(&current_config, params);
 
-        if(!gap_init(&current_config, event_cb, context)) {
+        if(!gap_init(&current_config, root_keys, event_cb, context)) {
             gap_thread_stop();
             FURI_LOG_E(TAG, "Failed to init GAP");
             break;
@@ -236,12 +237,13 @@ void furi_hal_bt_reinit(void) {
 FuriHalBleProfileBase* furi_hal_bt_change_app(
     const FuriHalBleProfileTemplate* profile_template,
     FuriHalBleProfileParams profile_params,
+    const GapRootSecurityKeys* root_keys,
     GapEventCallback event_cb,
     void* context) {
     furi_check(event_cb);
 
     furi_hal_bt_reinit();
-    return furi_hal_bt_start_app(profile_template, profile_params, event_cb, context);
+    return furi_hal_bt_start_app(profile_template, profile_params, root_keys, event_cb, context);
 }
 
 bool furi_hal_bt_is_active(void) {

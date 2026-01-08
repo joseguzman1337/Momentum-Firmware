@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/subghz/protocols/smc5326.h

@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/drivers/lp5562.h

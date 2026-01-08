@@ -1,0 +1,24 @@
+Import("env")
+
+env.Append(
+    CPPPATH=[
+        "#/lib/tlsf",
+    ],
+    LINT_SOURCES=[
+        Dir("."),
+    ],
+    SDK_HEADERS=[
+        File("tlsf.h"),
+        File("tlsf_common.h"),
+        File("tlsf_block_functions.h"),
+    ],
+)
+
+libenv = env.Clone(FW_LIB_NAME="tlsf")
+libenv.ApplyLibFlags()
+
+sources = [File("tlsf.c")]
+
+lib = libenv.StaticLibrary("${FW_LIB_NAME}", sources)
+libenv.Install("${LIB_DIST_DIR}", lib)
+Return("lib")

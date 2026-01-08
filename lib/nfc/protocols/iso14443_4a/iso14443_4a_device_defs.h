@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/nfc/protocols/iso14443_4a/iso14443_4a_device_defs.h

@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/signal_reader/parsers/iso15693/iso15693_parser.h

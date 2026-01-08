@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/subghz/subghz_protocol_registry.h

@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/documentation/js/js_gui__file_picker.md

@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/ibutton/protocols/protocol_common_i.h

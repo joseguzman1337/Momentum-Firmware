@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/documentation/file_formats/TarHeatshrinkFormat.md

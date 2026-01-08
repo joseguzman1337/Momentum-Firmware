@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/ble_profile/extra_profiles/hid_profile.h

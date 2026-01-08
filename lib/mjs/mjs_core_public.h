@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/mjs/mjs_core_public.h

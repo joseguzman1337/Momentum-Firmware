@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/subghz/devices/cc1101_configs.c

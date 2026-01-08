@@ -7,3 +7,5 @@ import sys
 sys.path.insert(
     0, os.path.join(os.getcwd(), "upstream", "flipperzero-firmware", "scripts")
 )
+
+FBT_TOOLCHAIN_VERSIONS = (" 10.3.", " 12.3.")

@@ -59,32 +59,42 @@ MfUltralightError mf_ultralight_poller_auth_pwd(
     return ret;
 }
 
-MfUltralightError mf_ultralight_poller_authenticate(MfUltralightPoller* instance) {
-    uint8_t auth_cmd[2] = {MF_ULTRALIGHT_CMD_AUTH, 0x00};
-    bit_buffer_copy_bytes(instance->tx_buffer, auth_cmd, sizeof(auth_cmd));
+MfUltralightError mf_ultralight_poller_send_authenticate_cmd(
+    MfUltralightPoller* instance,
+    const uint8_t* auth_cmd,
+    size_t auth_cmd_len,
+    bool send_standard,
+    uint8_t* response) {
+    bit_buffer_copy_bytes(instance->tx_buffer, auth_cmd, auth_cmd_len);
 
     MfUltralightError ret = MfUltralightErrorNone;
     Iso14443_3aError error = Iso14443_3aErrorNone;
     do {
-        error = iso14443_3a_poller_send_standard_frame(
-            instance->iso14443_3a_poller,
-            instance->tx_buffer,
-            instance->rx_buffer,
-            MF_ULTRALIGHT_POLLER_STANDARD_FWT_FC);
+        if(send_standard) {
+            error = iso14443_3a_poller_send_standard_frame(
+                instance->iso14443_3a_poller,
+                instance->tx_buffer,
+                instance->rx_buffer,
+                MF_ULTRALIGHT_POLLER_STANDARD_FWT_FC);
+        } else {
+            error = iso14443_3a_poller_txrx(
+                instance->iso14443_3a_poller,
+                instance->tx_buffer,
+                instance->rx_buffer,
+                MF_ULTRALIGHT_POLLER_STANDARD_FWT_FC);
+        }
+
         if(error != Iso14443_3aErrorNone) {
             ret = mf_ultralight_process_error(error);
             break;
         }
-        if((bit_buffer_get_size_bytes(instance->rx_buffer) != MF_ULTRALIGHT_AUTH_RESPONSE_SIZE) &&
+        if((bit_buffer_get_size_bytes(instance->rx_buffer) != MF_ULTRALIGHT_C_AUTH_RESPONSE_SIZE) &&
            (bit_buffer_get_byte(instance->rx_buffer, 0) != 0xAF)) {
             ret = MfUltralightErrorAuth;
             break;
         }
 
-        memcpy(
-            response,
-            bit_buffer_get_data(instance->rx_buffer) + 1,
-            MF_ULTRALIGHT_C_AUTH_RND_BLOCK_SIZE);
+        memcpy(response, bit_buffer_get_data(instance->rx_buffer) + 1, 8);
     } while(false);
 
     return ret;

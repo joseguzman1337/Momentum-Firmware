@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/drivers/bq27220_data_memory.h

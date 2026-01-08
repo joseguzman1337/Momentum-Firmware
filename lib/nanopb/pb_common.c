@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/nanopb/pb_common.c

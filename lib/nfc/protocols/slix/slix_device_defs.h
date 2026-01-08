@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/nfc/protocols/slix/slix_device_defs.h

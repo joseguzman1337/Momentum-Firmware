@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/targets/f7/furi_hal/furi_hal_version_device.c

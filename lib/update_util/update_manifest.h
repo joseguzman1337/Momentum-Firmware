@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/update_util/update_manifest.h

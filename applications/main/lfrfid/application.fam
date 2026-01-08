@@ -21,3 +21,12 @@ App(
     requires=["cli"],
     sources=["lfrfid_cli.c"],
 )
+
+App(
+    appid="lfrfid_start",
+    apptype=FlipperAppType.STARTUP,
+    targets=["f7"],
+    entry_point="lfrfid_on_system_start",
+    sources=["lfrfid_cli.c"],
+    order=20,
+)

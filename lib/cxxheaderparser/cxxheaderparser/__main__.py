@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/cxxheaderparser/cxxheaderparser/__main__.py

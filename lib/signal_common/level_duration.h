@@ -1,6 +1,10 @@
 #pragma once
 
+#ifndef _LEVEL_DURATION_H
+#define _LEVEL_DURATION_H
+
 #include <stdint.h>
+#include <stdbool.h>
 
 #define LEVEL_DURATION_BIG
 
@@ -80,3 +84,5 @@ static inline uint32_t level_duration_get_duration(LevelDuration level_duration)
 }
 
 #endif
+
+#endif // _LEVEL_DURATION_H

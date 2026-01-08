@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/nfc/nfc_device_i.h

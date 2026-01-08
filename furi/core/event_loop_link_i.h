@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/furi/core/event_loop_link_i.h

@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/lfrfid/lfrfid_worker.c

@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/targets/f7/ble_glue/services/serial_service.c

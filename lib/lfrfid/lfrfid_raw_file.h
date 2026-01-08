@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/lfrfid/lfrfid_raw_file.h

@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/cxxheaderparser/cxxheaderparser/errors.py

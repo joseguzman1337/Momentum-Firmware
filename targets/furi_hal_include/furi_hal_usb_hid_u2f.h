@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/targets/furi_hal_include/furi_hal_usb_hid_u2f.h

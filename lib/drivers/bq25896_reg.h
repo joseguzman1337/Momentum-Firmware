@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/drivers/bq25896_reg.h

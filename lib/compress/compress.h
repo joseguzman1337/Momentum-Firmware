@@ -52,17 +52,25 @@ typedef struct Compress Compress;
 /** Supported compression types */
 typedef enum {
     CompressTypeHeatshrink = 0,
+    CompressTypeGzip = 1,
+    CompressTypeMAX,
 } CompressType;
 
 /** Configuration for heatshrink compression */
 typedef struct {
+    uint16_t input_buffer_sz;
     uint16_t window_sz2;
     uint16_t lookahead_sz2;
-    uint16_t input_buffer_sz;
 } CompressConfigHeatshrink;
 
 /** Default configuration for heatshrink compression. Used for image assets. */
 extern const CompressConfigHeatshrink compress_config_heatshrink_default;
+
+/** Configuration for gzip compression */
+typedef struct {
+    uint16_t input_buffer_sz;
+    uint32_t dict_sz;
+} CompressConfigGzip;
 
 /** Allocate encoder and decoder
  *

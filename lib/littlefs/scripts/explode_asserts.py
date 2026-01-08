@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/littlefs/scripts/explode_asserts.py

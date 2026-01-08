@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/cxxheaderparser/tests/test_class.py

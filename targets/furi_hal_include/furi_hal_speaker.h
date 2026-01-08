@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/targets/furi_hal_include/furi_hal_speaker.h

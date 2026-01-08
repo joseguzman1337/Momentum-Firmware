@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/furi/core/log.h

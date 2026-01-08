@@ -20,6 +20,8 @@ typedef struct FelicaPoller FelicaPoller;
 typedef enum {
     FelicaPollerEventTypeError, /**< An error occured during activation procedure. */
     FelicaPollerEventTypeReady, /**< The card was activated by the poller. */
+    FelicaPollerEventTypeIncomplete,
+    FelicaPollerEventTypeRequestAuthContext,
 } FelicaPollerEventType;
 
 /**
@@ -27,6 +29,7 @@ typedef enum {
  */
 typedef union {
     FelicaError error; /**< Error code indicating card activation fail reason. */
+    FelicaAuthenticationContext* auth_context;
 } FelicaPollerEventData;
 
 /**

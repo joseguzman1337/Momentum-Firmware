@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/scripts/flippigator/flipperzero_protobuf_py/Makefile

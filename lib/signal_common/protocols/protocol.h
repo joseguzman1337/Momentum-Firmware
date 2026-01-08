@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef _PROTOCOL_BASE_H
+#define _PROTOCOL_BASE_H
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -45,3 +49,5 @@ typedef struct {
     ProtocolRenderData render_brief_data;
     ProtocolWriteData write_data;
 } ProtocolBase;
+
+#endif // _PROTOCOL_BASE_H

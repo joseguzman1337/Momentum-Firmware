@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/subghz/subghz_tx_rx_worker.h

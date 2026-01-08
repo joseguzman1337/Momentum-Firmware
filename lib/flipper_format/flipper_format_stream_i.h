@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/flipper_format/flipper_format_stream_i.h

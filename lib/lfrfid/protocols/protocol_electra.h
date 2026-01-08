@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/lfrfid/protocols/protocol_electra.h

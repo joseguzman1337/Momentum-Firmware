@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/lfrfid/tools/em4305.c

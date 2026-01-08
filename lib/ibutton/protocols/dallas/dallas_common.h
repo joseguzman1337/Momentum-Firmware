@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/ibutton/protocols/dallas/dallas_common.h

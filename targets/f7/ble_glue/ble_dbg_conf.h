@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/targets/f7/ble_glue/ble_dbg_conf.h

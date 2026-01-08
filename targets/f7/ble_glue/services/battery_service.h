@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/targets/f7/ble_glue/services/battery_service.h

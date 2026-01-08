@@ -10,9 +10,13 @@ extern "C" {
 typedef enum {
     FelicaPollerStateIdle,
     FelicaPollerStateActivated,
+    FelicaPollerStateListSystem,
+    FelicaPollerStateSelectSystemIndex,
     FelicaPollerStateAuthenticateInternal,
     FelicaPollerStateAuthenticateExternal,
-    FelicaPollerStateReadBlocks,
+    FelicaPollerStateTraverseStandardSystem,
+    FelicaPollerStateReadStandardBlocks,
+    FelicaPollerStateReadLiteBlocks,
     FelicaPollerStateReadSuccess,
     FelicaPollerStateReadFailed,
 

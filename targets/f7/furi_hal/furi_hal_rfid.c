@@ -563,7 +563,7 @@ void furi_hal_rfid_rtf_carrier_out_stop() {
     FURI_CRITICAL_EXIT();
 }
 
-static void furi_hal_rfid_rtf_carrier_in_IC_mode();
+static void furi_hal_rfid_rtf_carrier_in_IC_mode(void);
 
 static void furi_hal_rfid_rtf_carrier_in_isr(void* capture_context) {
     uint32_t TIMval = 0;

@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/subghz/devices/cc1101_int/cc1101_int_interconnect.h

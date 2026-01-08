@@ -47,7 +47,7 @@ const iButtonProtocolDallasBase ibutton_protocol_ds1904 = {
     .name = DS1904_FAMILY_NAME,
 
     .read = dallas_ds1904_read,
-    .write_blank = NULL,
+    .write_id = NULL,
     .write_copy = NULL, /* No data to write a copy */
     .emulate = dallas_ds1904_emulate,
     .save = dallas_ds1904_save,

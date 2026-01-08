@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/nfc/protocols/mf_desfire/mf_desfire_poller_defs.h

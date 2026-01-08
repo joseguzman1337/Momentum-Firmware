@@ -1,6 +1,5 @@
 #include "si446x.h"
-#include <cmsis_os2.h>
-#include <furi_hal_delay.h>
+#include <furi_hal_cortex.h>
 #include <furi.h>
 #include <assert.h>
 #include <string.h>
@@ -17,7 +16,7 @@ bool si446x_wait_cts_spi(FuriHalSpiBusHandle* handle) {
             return true;
         } else {
             timeout--;
-            furi_hal_delay_ms(1);
+            furi_delay_ms(1);
             if(!timeout) {
                 break;
             }

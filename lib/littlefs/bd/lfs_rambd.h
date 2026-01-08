@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/littlefs/bd/lfs_rambd.h

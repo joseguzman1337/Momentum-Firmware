@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/flipper_application/plugins/plugin_manager.h

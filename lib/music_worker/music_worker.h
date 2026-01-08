@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/music_worker/music_worker.h

@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/drivers/cc1101.c

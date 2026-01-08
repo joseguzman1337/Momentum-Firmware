@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/ibutton/protocols/protocol_group_defs.h

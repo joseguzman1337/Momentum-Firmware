@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/targets/f7/furi_hal/furi_hal_nfc_iso14443a.c

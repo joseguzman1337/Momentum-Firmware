@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/mjs/common/platforms/platform_flipper.h
