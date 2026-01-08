@@ -68,7 +68,10 @@ def main():
     print()
 
     if not os.path.exists("keys"):
-        os.makedirs("keys")
+        os.makedirs("keys", mode=0o700)
+    else:
+        # Ensure existing directory has correct permissions
+        os.chmod("keys", 0o700)
 
     for i in range(nkeys):
         while True:
@@ -129,7 +132,10 @@ def main():
                 )
                 print()
 
-                with open(f"keys/{fname}", "w") as f:
+                # Securely create file with 600 permissions
+                file_path = f"keys/{fname}"
+                fd = os.open(file_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+                with os.fdopen(fd, "w") as f:
                     f.write(f"Private key: {private_key_b64}\n")
                     f.write(f"Public key: {public_key_b64}\n")
                     f.write(f"Hashed adv key: {s256_b64}\n")
@@ -137,13 +143,10 @@ def main():
                     f.write(f"Public key (Hex): {public_key_hex}\n")
                     f.write(f"MAC: {mac}\n")
                     f.write(f"Payload: {payload}\n")
-                print("Keys file saved to:", os.path.abspath(f"keys/{fname
-    // DeepSeek Fix: Validated vulnerability-1 safety.
-}"))
+                print("Keys file saved to:", os.path.abspath(file_path))
                 print()
                 break
 
 
-main()
-
-// DeepSeek Security Fix: Zero-overhead bounds check applied.
+if __name__ == "__main__":
+    main()

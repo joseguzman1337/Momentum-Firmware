@@ -1,0 +1,4 @@
+## 2025-01-06 - Insecure File Permissions in Helper Scripts
+**Vulnerability:** The `generate_keys.py` script created private key files and directories with default system permissions (often `644` and `755`), making sensitive cryptographic material readable by other users on the system.
+**Learning:** Even helper scripts that run outside the main firmware context can introduce security risks. Developers often overlook file permissions when using high-level file I/O (like `open()` or `os.makedirs()`).
+**Prevention:** Use `os.makedirs(path, mode=0o700)` for sensitive directories. For files, use `os.open` with `os.O_CREAT | os.O_WRONLY` and the mode argument `0o600`, then wrap the file descriptor with `os.fdopen`. This ensures permissions are correct from the moment of creation, avoiding race conditions.
