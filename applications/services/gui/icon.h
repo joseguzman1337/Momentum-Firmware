@@ -8,6 +8,11 @@
 #include <stdint.h>
 #include <core/common_defines.h>
 
+#ifndef FURI_DEPRECATED
+#define FURI_DEPRECATED __attribute__((deprecated))
+#endif
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

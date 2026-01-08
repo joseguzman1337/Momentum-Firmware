@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/main/gpio/scenes/gpio_scene_exit_confirm.c

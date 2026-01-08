@@ -1,0 +1,1 @@
+../upstream/flipperzero-firmware/scripts/distfap.py

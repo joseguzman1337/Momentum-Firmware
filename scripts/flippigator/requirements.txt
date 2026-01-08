@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/scripts/flippigator/requirements.txt

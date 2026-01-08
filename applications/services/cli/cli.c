@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/services/cli/cli.c

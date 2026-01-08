@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/services/storage/storages/storage_int.h
