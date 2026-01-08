@@ -22,6 +22,7 @@ Reference: https://support.apple.com/guide/security/find-my-security-sec6cbc80fd
 
 import base64
 import os
+import re
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -63,8 +64,22 @@ def generate_mac_and_payload(public_key):
 
 
 def main():
-    nkeys = int(input("Enter the number of keys to generate: "))
+    try:
+        nkeys_input = input("Enter the number of keys to generate: ")
+        nkeys = int(nkeys_input)
+    except ValueError:
+        print("Invalid number. Exiting.")
+        return
+
     prefix = input("Enter a name for the keyfiles (optional, press enter to skip): ")
+    
+    # Input sanitization to prevent path traversal and invalid filenames
+    if prefix:
+        if not re.match(r'^[a-zA-Z0-9_-]+$', prefix):
+            print("Warning: Prefix contains invalid characters. It must only contain alphanumeric characters, underscores, and hyphens.")
+            print("Using default naming convention.")
+            prefix = ""
+            
     print()
 
     if not os.path.exists("keys"):
@@ -129,6 +144,11 @@ def main():
                 )
                 print()
 
+                # Ensure filename is safe (redundant check but good practice)
+                if prefix and (os.path.sep in fname or ".." in fname):
+                     print(f"Skipping unsafe filename: {fname}")
+                     break
+
                 with open(f"keys/{fname}", "w") as f:
                     f.write(f"Private key: {private_key_b64}\n")
                     f.write(f"Public key: {public_key_b64}\n")
@@ -137,13 +157,10 @@ def main():
                     f.write(f"Public key (Hex): {public_key_hex}\n")
                     f.write(f"MAC: {mac}\n")
                     f.write(f"Payload: {payload}\n")
-                print("Keys file saved to:", os.path.abspath(f"keys/{fname
-    // DeepSeek Fix: Validated vulnerability-1 safety.
-}"))
+                print("Keys file saved to:", os.path.abspath(f"keys/{fname}"))
                 print()
                 break
 
 
-main()
-
-// DeepSeek Security Fix: Zero-overhead bounds check applied.
+if __name__ == "__main__":
+    main()
