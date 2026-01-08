@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/scripts/flippigator/flippigator/extensions/scenarios_parser.py

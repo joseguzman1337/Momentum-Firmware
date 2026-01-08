@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/main/subghz/scenes/subghz_scene_show_only_rx.c

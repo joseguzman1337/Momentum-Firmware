@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/scripts/flippigator/testing/test_nfc.py

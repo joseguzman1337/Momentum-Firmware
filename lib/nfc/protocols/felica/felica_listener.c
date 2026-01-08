@@ -28,7 +28,12 @@ FelicaListener* felica_listener_alloc(Nfc* nfc, FelicaData* data) {
     nfc_config(instance->nfc, NfcModeListener, NfcTechFelica);
     const uint16_t system_code = *(uint16_t*)data->data.fs.sys_c.data;
     nfc_felica_listener_set_sensf_res_data(
-        nfc, data->idm.data, sizeof(data->idm), data->pmm.data, sizeof(data->pmm), system_code);
+        nfc,
+        data->idm.data,
+        sizeof(data->idm),
+        data->pmm.data,
+        sizeof(data->pmm),
+        system_code);
 
     instance->history.base.protocol = NfcProtocolFelica;
     instance->history.base.data_block_size = sizeof(FelicaListenerHistoryData);

@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/services/desktop/scenes/desktop_scene_i.h

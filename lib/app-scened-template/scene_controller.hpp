@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/app-scened-template/scene_controller.hpp

@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/scripts/flippigator/async_protopy/commands/gui_commands.py

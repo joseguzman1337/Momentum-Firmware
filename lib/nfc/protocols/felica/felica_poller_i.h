@@ -48,6 +48,10 @@ typedef struct {
     uint8_t request_data[2];
 } FelicaPollerPollingResponse;
 
+typedef union {
+    FelicaData* data;
+} FelicaPollerContextData;
+
 const FelicaData* felica_poller_get_data(FelicaPoller* instance);
 
 /**

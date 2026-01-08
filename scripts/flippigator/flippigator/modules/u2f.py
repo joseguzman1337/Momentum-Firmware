@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/scripts/flippigator/flippigator/modules/u2f.py

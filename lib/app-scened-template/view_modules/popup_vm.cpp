@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/app-scened-template/view_modules/popup_vm.cpp
