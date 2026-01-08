@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout flipperzero-protobuf
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Checkout nanopb
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           repository: nanopb/nanopb
           path: nanopb
