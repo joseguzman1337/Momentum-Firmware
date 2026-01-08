@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/scripts/flippigator/fontRecut.py

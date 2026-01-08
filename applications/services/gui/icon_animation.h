@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <gui/icon.h>
 
 #ifdef __cplusplus
@@ -20,7 +20,7 @@ typedef struct IconAnimation IconAnimation;
 typedef void (*IconAnimationCallback)(IconAnimation* instance, void* context);
 
 /** Allocate icon animation instance with const icon data.
- * 
+ *
  * always returns Icon or stops system if not enough memory
  *
  * @param[in]  icon  pointer to Icon data

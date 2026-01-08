@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/lfrfid/tools/bit_lib.h

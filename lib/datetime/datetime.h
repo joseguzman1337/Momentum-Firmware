@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +28,7 @@ typedef struct {
 bool datetime_validate_datetime(DateTime* datetime);
 
 /** Convert DateTime to UNIX timestamp
- * 
+ *
  * @warning    Mind timezone when perform conversion
  *
  * @param      datetime  The datetime (UTC)

@@ -1,4 +1,7 @@
 #pragma once
+#ifndef LFRFID_HITAG_WORKER_H
+#define LFRFID_HITAG_WORKER_H
+
 #include <furi.h>
 #include <furi_hal.h>
 #include <furi_hal_rfid.h>
@@ -85,4 +88,6 @@ void lfrfid_hitag_worker_stop(LFRFIDHitagWorker* worker);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

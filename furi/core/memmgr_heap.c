@@ -4,6 +4,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <m-dict.h>
+#include <stdio.h>
 
 extern const void __heap_start__;
 extern const void __heap_end__;
@@ -151,6 +152,13 @@ size_t memmgr_heap_get_max_free_block(void) {
     memmgr_unlock();
 
     return max_free_block_size;
+}
+
+void memmgr_heap_printf_free_blocks(void) {
+    // TLSF does not expose individual free blocks as directly as the
+    // FreeRTOS heap implementation. For now, print a concise summary
+    // based on the largest free block size.
+    printf("Largest free heap block: %lu bytes\r\n", (unsigned long)memmgr_heap_get_max_free_block());
 }
 
 typedef struct {

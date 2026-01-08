@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/debug/text_box_test/text_box_test.c

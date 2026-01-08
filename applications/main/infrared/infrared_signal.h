@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/main/infrared/infrared_signal.h

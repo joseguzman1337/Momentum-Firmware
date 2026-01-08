@@ -1,88 +1,65 @@
 #pragma once
-#include <stdint.h>
-#include <m-list.h>
-#include "views/bubble_animation_view.h"
 
-/** Main structure to handle animation data.
- * Contains all, including animation playing data (BubbleAnimation),
- * data for random animation selection (StorageAnimationMeta) and
- * flag of location internal/external */
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#include <furi/core/core_defines.h>
+#include <gui/canvas.h>
+#include <gui/icon_i.h>
+#include <m-list.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct StorageAnimation StorageAnimation;
 
 typedef struct {
     const char* name;
-    uint8_t min_butthurt;
-    uint8_t max_butthurt;
-    uint8_t min_level;
-    uint8_t max_level;
-    uint8_t weight;
+    uint32_t min_butthurt;
+    uint32_t max_butthurt;
+    uint32_t min_level;
+    uint32_t max_level;
+    uint32_t weight;
 } StorageAnimationManifestInfo;
 
-/** Container to return available animations list */
-LIST_DEF(StorageAnimationList, StorageAnimation*, M_PTR_OPLIST)
-#define M_OPL_StorageAnimationList_t() LIST_OPLIST(StorageAnimationList)
+typedef struct {
+    uint32_t x;
+    uint32_t y;
+    const char* text;
+    Align align_h;
+    Align align_v;
+} Bubble;
 
-/**
- * Fill list of available animations.
- * List will contain all idle animations on inner flash
- * and all available on SD-card, mentioned in manifest.txt.
- * Performs caching of animation. If fail - falls back to
- * inner animation.
- * List has to be initialized.
- *
- * @list        list to fill with animations data
- */
-void animation_storage_fill_animation_list(StorageAnimationList_t* list);
+typedef struct FrameBubble {
+    Bubble bubble;
+    uint32_t start_frame;
+    uint32_t end_frame;
+    const struct FrameBubble* next_bubble;
+} FrameBubble;
 
-/**
- * Get bubble animation of storage animation.
- * Bubble Animation is a structure which describes animation
- * independent of it's place of storage and meta data.
- * It contain all what is need to be played.
- * If storage_animation is not cached - caches it.
- *
- * @storage_animation       animation from which extract bubble animation
- * @return                  bubble_animation, NULL if failed to cache data.
- */
-const BubbleAnimation* animation_storage_get_bubble_animation(StorageAnimation* storage_animation);
+typedef struct {
+    struct Icon icon_animation;
+    const uint8_t* frame_order;
+    uint8_t passive_frames;
+    uint8_t active_frames;
+    uint8_t active_cycles;
+    uint32_t duration;
+    uint32_t active_cooldown;
+    const FrameBubble* const* frame_bubble_sequences;
+    uint8_t frame_bubble_sequences_count;
+} BubbleAnimation;
 
-/**
- * Performs caching animation data (Bubble Animation)
- * if this is not done yet.
- *
- * @storage_animation       animation to cache
- */
-void animation_storage_cache_animation(StorageAnimation* storage_animation);
+LIST_DEF(StorageAnimationList, StorageAnimation*, M_PTR_OPLIST);
 
-/**
- * Find animation by name.
- * Search through the inner flash, and SD-card if has.
- *
- * @name        name of animation
- * @return      found animation. NULL if nothing found.
- */
+void animation_storage_fill_animation_list(StorageAnimationList_t* animation_list);
 StorageAnimation* animation_storage_find_animation(const char* name);
-
-/**
- * Get meta information of storage animation.
- * This information allows to randomly select animation.
- * Also it contains name. Never returns NULL.
- *
- * @storage_animation       item of whom we have to extract meta.
- * @return                  meta itself
- */
 StorageAnimationManifestInfo* animation_storage_get_meta(StorageAnimation* storage_animation);
-
-/**
- * Free storage_animation, which previously acquired
- * by Animation Storage.
- *
- * @storage_animation   item to free. NULL-ed after all.
- */
+const BubbleAnimation* animation_storage_get_bubble_animation(StorageAnimation* storage_animation);
+void animation_storage_cache_animation(StorageAnimation* storage_animation);
 void animation_storage_free_storage_animation(StorageAnimation** storage_animation);
 
-/**
- * Has to be called at least 1 time to initialize runtime structures
- * of animations in inner flash.
- */
-void animation_storage_initialize_internal_animations(void);
+#ifdef __cplusplus
+}
+#endif

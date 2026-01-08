@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/scripts/flippigator/nfc/test_emulate_ultralight.py

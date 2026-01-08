@@ -146,7 +146,6 @@ FelicaError felica_poller_read_blocks(
     FelicaPoller* instance,
     const uint8_t block_count,
     const uint8_t* const block_numbers,
-    const uint16_t service_code,
     FelicaPollerReadCommandResponse** const response_ptr) {
     furi_assert(instance);
     furi_assert(block_count <= 4);
@@ -156,7 +155,7 @@ FelicaError felica_poller_read_blocks(
     felica_poller_prepare_tx_buffer(
         instance,
         FELICA_CMD_READ_WITHOUT_ENCRYPTION,
-        service_code,
+        FELICA_SERVICE_RO_ACCESS,
         block_count,
         block_numbers,
         0,
@@ -234,22 +233,4 @@ FelicaError felica_poller_activate(FelicaPoller* instance, FelicaData* data) {
     } while(false);
 
     return ret;
-}
-
-FelicaError felica_poller_list_service_by_cursor(
-    FelicaPoller* instance,
-    uint16_t cursor,
-    FelicaListServiceCommandResponse** response) {
-    UNUSED(instance);
-    UNUSED(cursor);
-    UNUSED(response);
-    return FelicaErrorProtocol;
-}
-
-FelicaError felica_poller_list_system_code(
-    FelicaPoller* instance,
-    FelicaListSystemCodeCommandResponse** response) {
-    UNUSED(instance);
-    UNUSED(response);
-    return FelicaErrorProtocol;
 }

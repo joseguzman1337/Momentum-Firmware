@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/lib/nfc/protocols/mf_classic/crypto1.h

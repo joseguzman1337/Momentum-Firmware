@@ -6,10 +6,19 @@ import shutil
 
 from fbt.sdk.cache import SdkCache
 from fbt.sdk.collector import SdkCollector
-from fbt.util import PosixPathWrapper
 from SCons.Action import Action
 from SCons.Builder import Builder
 from SCons.Errors import UserError
+
+class PosixPathWrapper:
+    @staticmethod
+    def fix_path(path):
+        return path.replace(os.sep, '/')
+
+    @staticmethod
+    def fixup_separators(path):
+        return path.replace(os.sep, '/')
+
 
 # from SCons.Scanner import C
 from SCons.Script import Entry

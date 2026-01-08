@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/debug/unit_tests/furi_hal/furi_hal_crypto_tests.c

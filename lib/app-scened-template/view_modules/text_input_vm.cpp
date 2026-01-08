@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/app-scened-template/view_modules/text_input_vm.cpp
