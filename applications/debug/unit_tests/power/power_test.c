@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/debug/unit_tests/power/power_test.c

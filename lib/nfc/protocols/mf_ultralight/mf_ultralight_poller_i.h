@@ -4,6 +4,7 @@
 #include "mf_ultralight_poller_history_data.h"
 #include <lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
 #include <helpers/logger/nfc_logger_i.h>
+#include <helpers/nfc_util.h>
 #include <lib/bit_lib/bit_lib.h>
 
 #ifdef __cplusplus

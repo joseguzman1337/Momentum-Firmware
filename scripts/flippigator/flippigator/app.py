@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/scripts/flippigator/flippigator/app.py

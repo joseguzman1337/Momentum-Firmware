@@ -1,1 +1,3 @@
-../../upstream/flipperzero-firmware/lib/toolbox/bit_buffer.h
+#pragma once
+
+#include <lib/containers/bit_buffer.h>

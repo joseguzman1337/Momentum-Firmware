@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/settings/power_settings_app/scenes/power_settings_scene_shutdown_idle.c

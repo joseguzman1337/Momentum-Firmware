@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/main/bad_usb/bad_usb_settings_filename.h

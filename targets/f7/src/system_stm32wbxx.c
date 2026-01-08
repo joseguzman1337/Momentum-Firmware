@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/targets/f7/src/system_stm32wbxx.c

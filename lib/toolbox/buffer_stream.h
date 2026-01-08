@@ -1,1 +1,3 @@
-../../upstream/flipperzero-firmware/lib/toolbox/buffer_stream.h
+#pragma once
+
+#include <lib/containers/buffer_stream.h>

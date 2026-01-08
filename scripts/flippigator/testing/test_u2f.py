@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/scripts/flippigator/testing/test_u2f.py
