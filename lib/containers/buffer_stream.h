@@ -9,10 +9,6 @@
  * This will speed up sending large chunks of data between threads, compared to using a stream directly.
  */
 #pragma once
-
-#ifndef _BUFFER_STREAM_H
-#define _BUFFER_STREAM_H
-
 #include <furi.h>
 
 #ifdef __cplusplus
@@ -91,5 +87,3 @@ void buffer_stream_reset(BufferStream* buffer_stream);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // _BUFFER_STREAM_H

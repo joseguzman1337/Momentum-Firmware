@@ -1,0 +1,1 @@
+../../upstream/flipperzero-firmware/lib/callback-connector/callback-connector.h

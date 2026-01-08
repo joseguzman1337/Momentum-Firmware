@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/main/infrared/infrared_brute_force.h

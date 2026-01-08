@@ -1,0 +1,1 @@
+../../../../upstream/flipperzero-firmware/applications/drivers/subghz/si4463_ext/.!64235!si4463_ext.h

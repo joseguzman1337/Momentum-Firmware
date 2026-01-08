@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/services/input/input_i.h

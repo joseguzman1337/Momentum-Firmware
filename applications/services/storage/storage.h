@@ -86,7 +86,7 @@ FuriPubSub* storage_get_pubsub(Storage* storage);
  * @param file pointer to the file instance to be opened.
  * @param path pointer to a zero-terminated string containing the path to the file to be opened.
  * @param access_mode access mode from FS_AccessMode.
- * @param open_mode open mode from FS_OpenMode 
+ * @param open_mode open mode from FS_OpenMode
  * @return true if the file was successfully opened, false otherwise.
  */
 bool storage_file_open(
@@ -191,7 +191,7 @@ bool storage_file_eof(File* file);
 
 /**
  * @brief Check whether a file exists.
- * 
+ *
  * @param storage pointer to a storage API instance.
  * @param path pointer to a zero-terminated string containing the path to the file in question.
  * @return true if the file exists, false otherwise.
@@ -205,7 +205,7 @@ bool storage_file_exists(Storage* storage, const char* path);
  *
  * The requested amount of bytes will be copied from the current access position
  * in the source file to the current access position in the destination file.
- * 
+ *
  * @param source pointer to a source file instance.
  * @param destination pointer to a destination file instance.
  * @param size data size to be copied, in bytes.
@@ -260,7 +260,7 @@ bool storage_dir_rewind(File* file);
 
 /**
  * @brief Check whether a directory exists.
- * 
+ *
  * @param storage pointer to a storage API instance.
  * @param path pointer to a zero-terminated string containing the path of the directory in question.
  * @return true if the directory exists, false otherwise.
@@ -367,7 +367,7 @@ FS_Error storage_common_fs_info(
  * @brief Parse aliases in a path and replace them with the real path.
  *
  * Necessary special directories will be created automatically if they did not exist.
- * 
+ *
  * @param storage pointer to a storage API instance.
  * @param path pointer to a zero-terminated string containing the path in question.
  */
@@ -377,17 +377,17 @@ void storage_common_resolve_path_and_ensure_app_directory(Storage* storage, Furi
  * @brief Move the contents of source folder to destination one and rename all conflicting files.
  *
  * Source folder will be deleted if the migration was successful.
- * 
+ *
  * @param storage pointer to a storage API instance.
  * @param source pointer to a zero-terminated string containing the source path.
  * @param dest pointer to a zero-terminated string containing the destination path.
- * @return FSE_OK if the migration was successfull completed, any other error code on failure.
+ * @return FSE_OK if the migration was successfully completed, any other error code on failure.
  */
 FS_Error storage_common_migrate(Storage* storage, const char* source, const char* dest);
 
 /**
  * @brief Check whether a file or a directory exists.
- * 
+ *
  * @param storage pointer to a storage API instance.
  * @param path pointer to a zero-terminated string containing the path in question.
  * @return true if a file or a directory exists, false otherwise.
@@ -405,26 +405,31 @@ bool storage_common_exists(Storage* storage, const char* path);
  * - /int/Test and /int/test -> false (Case-sensitive storage),
  * - /ext/Test and /ext/test -> true (Case-insensitive storage).
  *
- * If the truncate parameter is set to true, the second path will be
- * truncated to be no longer than the first one. It is useful to determine
- * whether path2 is a subdirectory of path1.
- *
  * @param storage pointer to a storage API instance.
  * @param path1 pointer to a zero-terminated string containing the first path.
  * @param path2 pointer to a zero-terminated string containing the second path.
- * @param truncate whether to truncate path2 to be no longer than path1.
  * @return true if paths are equivalent, false otherwise.
  */
-bool storage_common_equivalent_path(
-    Storage* storage,
-    const char* path1,
-    const char* path2,
-    bool truncate);
+bool storage_common_equivalent_path(Storage* storage, const char* path1, const char* path2);
+
+/**
+ * @brief Check whether a path is a subpath of another path.
+ *
+ * This function respects storage-defined equivalence rules
+ * (see `storage_common_equivalent_path`).
+ *
+ * @param storage pointer to a storage API instance.
+ * @param parent pointer to a zero-terminated string containing the parent path.
+ * @param child pointer to a zero-terminated string containing the child path.
+ * @return true if `child` is a subpath of `parent`, or if `child` is equivalent
+ *         to `parent`; false otherwise.
+ */
+bool storage_common_is_subdir(Storage* storage, const char* parent, const char* child);
 
 /******************* Error Functions *******************/
 
 /**
- * @brief Get the textual description of a numeric error identifer.
+ * @brief Get the textual description of a numeric error identifier.
  *
  * @param error_id numeric identifier of the error in question.
  * @return pointer to a statically allocated zero-terminated string containing the respective error text.
@@ -508,7 +513,7 @@ FS_Error storage_sd_info(Storage* storage, SDInfo* info);
  */
 FS_Error storage_sd_status(Storage* storage);
 
-/******************* Internal LFS Functions *******************/
+/************ Internal Storage Backup/Restore ************/
 
 typedef void (*StorageNameConverter)(FuriString*);
 
@@ -593,7 +598,7 @@ bool storage_simply_mkdir(Storage* storage, const char* path);
  *
  * @note If the resulting next file name length is greater than set by the max_len
  * parameter, the original filename will be returned instead.
- * 
+ *
  * @param storage pointer to a storage API instance.
  * @param dirname pointer to a zero-terminated string containing the directory path.
  * @param filename pointer to a zero-terminated string containing the file name.

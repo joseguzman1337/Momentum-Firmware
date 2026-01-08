@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/scripts/flippigator/nfc/repair_test_emulate_mifare_classic.py

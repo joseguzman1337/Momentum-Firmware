@@ -1,0 +1,1 @@
+../upstream/flipperzero-firmware/scripts/map_mariadb_insert.py
