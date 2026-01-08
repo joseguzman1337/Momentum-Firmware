@@ -1,7 +1,6 @@
 #include "mf_ultralight_poller_i.h"
 
 #include <nfc/protocols/nfc_poller_base.h>
-#include <nfc/helpers/nfc_util.h>
 
 #include <furi.h>
 

@@ -24,15 +24,8 @@ App(
     fap_libs=["infrared"],
 )
 
-App(
-    appid="infrared_start",
-    apptype=FlipperAppType.STARTUP,
-    targets=["f7"],
-    entry_point="infrared_on_system_start",
-    sources=[
-        "infrared_cli.c",
-        "infrared_brute_force.c",
-        "infrared_signal.c",
-    ],
-    order=20,
-)
+# NOTE: The former 'infrared_start' startup app referenced non-existent
+# sources (infrared_brute_force.c, infrared_signal.c) and had no
+# implementation of 'infrared_on_system_start'. It has been removed to
+# restore a consistent build; infrared functionality remains available via
+# the main 'infrared' app and 'cli_ir' plugin.

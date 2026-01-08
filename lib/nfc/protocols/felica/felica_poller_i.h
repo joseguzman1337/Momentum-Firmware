@@ -31,8 +31,6 @@ struct FelicaPoller {
     NfcGenericCallback callback;
     NfcGenericLogHistoryCallback log_callback;
     uint8_t block_index;
-    uint8_t systems_read;
-    uint8_t systems_total;
     NfcHistoryItem history;
     FelicaPollerHistoryData history_data;
     void* context;
@@ -82,21 +80,23 @@ FelicaError felica_poller_write_blocks(
     const uint8_t* data,
     FelicaPollerWriteCommandResponse** const response_ptr);
 
-FelicaError felica_poller_read_blocks(
+/**
+ * @brief Perform frame exchange procedure.
+ *
+ * Prepares data for sending by adding crc, after that performs
+ * low level calls to send package data to the card
+ *
+ * @param[in, out] instance pointer to the instance to be used in the transaction.
+ * @param[in] tx_buffer pointer to the buffer with data to be transmitted
+ * @param[out] rx_buffer pointer to the buffer with received data from card
+ * @param[in] fwt timeout window
+ * @return FelicaErrorNone on success, an error code on failure.
+ */
+FelicaError felica_poller_frame_exchange(
     FelicaPoller* instance,
-    uint8_t block_count,
-    const uint8_t* block_list,
-    uint16_t service_code,
-    FelicaPollerReadCommandResponse** response);
-
-FelicaError felica_poller_list_service_by_cursor(
-    FelicaPoller* instance,
-    uint16_t cursor,
-    FelicaListServiceCommandResponse** response);
-
-FelicaError felica_poller_list_system_code(
-    FelicaPoller* instance,
-    FelicaListSystemCodeCommandResponse** response);
+    const BitBuffer* tx_buffer,
+    BitBuffer* rx_buffer,
+    uint32_t fwt);
 
 #ifdef __cplusplus
 }

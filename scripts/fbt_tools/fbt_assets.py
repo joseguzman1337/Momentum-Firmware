@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 
 from ansi.color import fg
@@ -110,7 +111,15 @@ def _proto_ver_generator(target, source, env):
     if not git_describe:
         raise StopError("Failed to process git tags for protobuf versioning")
 
-    git_major, git_minor = git_describe.split(".")
+    # Expect tags in a numeric MAJOR[.MINOR] form. If the tag doesn't match
+    # that pattern (e.g. "mntm-dev-..."), fall back to 0.0 so that the
+    # generated header always contains valid C integer constants.
+    match = re.match(r"^(\d+)(?:\.(\d+))?$", git_describe)
+    if match:
+        git_major, git_minor = match.group(1), match.group(2) or "0"
+    else:
+        git_major, git_minor = "0", "0"
+
     version_file_data = (
         "#pragma once",
         f"#define PROTOBUF_MAJOR_VERSION {git_major}",
