@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/lib/app-scened-template/view_modules/generic_view_module.h

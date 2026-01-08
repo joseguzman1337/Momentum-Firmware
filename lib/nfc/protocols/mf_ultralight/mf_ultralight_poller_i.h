@@ -4,6 +4,7 @@
 #include "mf_ultralight_poller_history_data.h"
 #include <lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_i.h>
 #include <helpers/logger/nfc_logger_i.h>
+#include <helpers/nfc_util.h>
 #include <lib/bit_lib/bit_lib.h>
 
 #ifdef __cplusplus
@@ -93,16 +94,7 @@ bool mf_ultralight_poller_ntag_i2c_addr_lin_to_tag(
     uint8_t* tag,
     uint8_t* pages_left);
 
-MfUltralightError mf_ultralight_poller_authenticate(MfUltralightPoller* instance);
-
 MfUltralightError mf_ultralight_poller_authentication_test(MfUltralightPoller* instance);
-
-MfUltralightError mf_ultralight_poller_send_authenticate_cmd(
-    MfUltralightPoller* instance,
-    const uint8_t* auth_cmd,
-    size_t auth_cmd_len,
-    bool send_standard,
-    uint8_t* response);
 
 #ifdef __cplusplus
 }

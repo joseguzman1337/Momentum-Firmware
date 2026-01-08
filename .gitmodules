@@ -51,3 +51,15 @@
 [submodule "upstream/flipperzero-firmware"]
 	path = upstream/flipperzero-firmware
 	url = https://github.com/joseguzman1337/flipperzero-firmware
+[submodule "upstream/flipperzero-firmware/lib/cxxheaderparser"]
+        path = upstream/flipperzero-firmware/lib/cxxheaderparser
+        url = https://github.com/robotpy/cxxheaderparser.git
+[submodule "upstream/flipperzero-firmware/lib/littlefs"]
+        path = upstream/flipperzero-firmware/lib/littlefs
+        url = https://github.com/littlefs-project/littlefs.git
+[submodule "upstream/flipperzero-firmware/lib/uzlib"]
+        path = upstream/flipperzero-firmware/lib/uzlib
+        url = https://github.com/pfalcon/uzlib.git
+[submodule "upstream/flipperzero-firmware/scripts/flippigator/flipperzero_protobuf_py"]
+        path = upstream/flipperzero-firmware/scripts/flippigator/flipperzero_protobuf_py
+        url = https://github.com/flipperdevices/flipperzero_protobuf_py.git

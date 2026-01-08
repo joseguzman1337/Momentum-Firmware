@@ -13,10 +13,14 @@ struct Submenu {
 typedef struct {
     FuriString* label;
     uint32_t index;
+    union {
+        SubmenuItemCallback callback;
+        SubmenuItemCallbackEx callback_ex;
+    };
+    void* callback_context;
+    bool has_extended_events;
     bool locked;
     FuriString* locked_message;
-    SubmenuItemCallback callback;
-    void* callback_context;
 } SubmenuItem;
 
 static void SubmenuItem_init(SubmenuItem* item) {
@@ -24,6 +28,7 @@ static void SubmenuItem_init(SubmenuItem* item) {
     item->index = 0;
     item->callback = NULL;
     item->callback_context = NULL;
+    item->has_extended_events = false;
     item->locked = false;
     item->locked_message = furi_string_alloc();
 }
@@ -33,6 +38,7 @@ static void SubmenuItem_init_set(SubmenuItem* item, const SubmenuItem* src) {
     item->index = src->index;
     item->callback = src->callback;
     item->callback_context = src->callback_context;
+    item->has_extended_events = src->has_extended_events;
     item->locked = src->locked;
     item->locked_message = furi_string_alloc_set(src->locked_message);
 }
@@ -42,6 +48,7 @@ static void SubmenuItem_set(SubmenuItem* item, const SubmenuItem* src) {
     item->index = src->index;
     item->callback = src->callback;
     item->callback_context = src->callback_context;
+    item->has_extended_events = src->has_extended_events;
     item->locked = src->locked;
     furi_string_set(item->locked_message, src->locked_message);
 }
@@ -70,7 +77,7 @@ typedef struct {
 
 static void submenu_process_up(Submenu* submenu);
 static void submenu_process_down(Submenu* submenu);
-static void submenu_process_ok(Submenu* submenu);
+static void submenu_process_ok(Submenu* submenu, InputType input_type);
 
 static size_t submenu_items_on_screen(SubmenuModel* model) {
     size_t res = (model->is_vertical) ? 8 : 4;
@@ -183,6 +190,11 @@ static bool submenu_view_input_callback(InputEvent* event, void* context) {
         with_view_model(
             submenu->view, SubmenuModel * model, { model->locked_message_visible = false; }, true);
         consumed = true;
+    } else if(
+        event->key == InputKeyOk &&
+        (event->type == InputTypeShort || event->type == InputTypeLong)) {
+        consumed = true;
+        submenu_process_ok(submenu, event->type);
     } else if(event->type == InputTypeShort) {
         switch(event->key) {
         case InputKeyUp:
@@ -192,10 +204,6 @@ static bool submenu_view_input_callback(InputEvent* event, void* context) {
         case InputKeyDown:
             consumed = true;
             submenu_process_down(submenu);
-            break;
-        case InputKeyOk:
-            consumed = true;
-            submenu_process_ok(submenu);
             break;
         default:
             break;
@@ -276,6 +284,32 @@ void submenu_add_item(
     submenu_add_lockable_item(submenu, label, index, callback, callback_context, false, NULL);
 }
 
+void submenu_add_item_ex(
+    Submenu* submenu,
+    const char* label,
+    uint32_t index,
+    SubmenuItemCallbackEx callback,
+    void* callback_context) {
+    SubmenuItem* item = NULL;
+    furi_check(label);
+    furi_check(submenu);
+
+    with_view_model(
+        submenu->view,
+        SubmenuModel * model,
+        {
+            item = SubmenuItemArray_push_new(model->items);
+            furi_string_set_str(item->label, label);
+            item->index = index;
+            item->callback_ex = callback;
+            item->callback_context = callback_context;
+            item->has_extended_events = true;
+            item->locked = false;
+            furi_string_reset(item->locked_message);
+        },
+        true);
+}
+
 void submenu_add_lockable_item(
     Submenu* submenu,
     const char* label,
@@ -300,9 +334,12 @@ void submenu_add_lockable_item(
             item->index = index;
             item->callback = callback;
             item->callback_context = callback_context;
+            item->has_extended_events = false;
             item->locked = locked;
             if(locked) {
                 furi_string_set_str(item->locked_message, locked_message);
+            } else {
+                furi_string_reset(item->locked_message);
             }
         },
         true);
@@ -452,7 +489,7 @@ void submenu_process_down(Submenu* submenu) {
         true);
 }
 
-void submenu_process_ok(Submenu* submenu) {
+void submenu_process_ok(Submenu* submenu, InputType input_type) {
     SubmenuItem* item = NULL;
 
     with_view_model(
@@ -470,8 +507,12 @@ void submenu_process_ok(Submenu* submenu) {
         },
         true);
 
-    if(item && !item->locked && item->callback) {
-        item->callback(item->callback_context, item->index);
+    if(item && !item->locked) {
+        if(item->has_extended_events && item->callback_ex) {
+            item->callback_ex(item->callback_context, input_type, item->index);
+        } else if(item->callback) {
+            item->callback(item->callback_context, item->index);
+        }
     }
 }
 

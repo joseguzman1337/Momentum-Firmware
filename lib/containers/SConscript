@@ -11,15 +11,20 @@ env.Append(
         File("bit_buffer.h"),
         File("buffer_stream.h"),
         File("m_cstr_dup.h"),
-        File("pipe.h"),
-        File("simple_array.h"),
+        # pipe.h and simple_array.h are provided by the upstream toolbox library.
     ],
 )
 
 libenv = env.Clone(FW_LIB_NAME="containers")
 libenv.ApplyLibFlags()
 
-sources = libenv.GlobRecursive("*.c")
+# Exclude simple_array.c and pipe.c here to avoid duplicate implementations;
+# the upstream toolbox library provides the canonical implementations.
+sources = [
+    src
+    for src in libenv.GlobRecursive("*.c")
+    if src.name not in ("simple_array.c", "pipe.c")
+]
 
 lib = libenv.StaticLibrary("${FW_LIB_NAME}", sources)
 libenv.Install("${LIB_DIST_DIR}", lib)

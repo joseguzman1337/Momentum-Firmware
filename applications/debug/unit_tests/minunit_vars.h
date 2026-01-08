@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/applications/debug/unit_tests/minunit_vars.h

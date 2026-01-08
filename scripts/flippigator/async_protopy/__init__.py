@@ -1,0 +1,1 @@
+../../../upstream/flipperzero-firmware/scripts/flippigator/async_protopy/__init__.py
