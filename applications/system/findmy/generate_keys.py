@@ -22,6 +22,7 @@ Reference: https://support.apple.com/guide/security/find-my-security-sec6cbc80fd
 
 import base64
 import os
+import stat
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -68,7 +69,11 @@ def main():
     print()
 
     if not os.path.exists("keys"):
-        os.makedirs("keys")
+        # Create directory with strict permissions (rwx------)
+        os.makedirs("keys", mode=0o700)
+    else:
+        # Ensure existing directory has strict permissions
+        os.chmod("keys", 0o700)
 
     for i in range(nkeys):
         while True:
@@ -129,7 +134,12 @@ def main():
                 )
                 print()
 
-                with open(f"keys/{fname}", "w") as f:
+                # Open file with strict permissions (rw-------)
+                # Use os.open to ensure atomic creation with correct mode
+                fd = os.open(
+                    f"keys/{fname}", os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600
+                )
+                with os.fdopen(fd, "w") as f:
                     f.write(f"Private key: {private_key_b64}\n")
                     f.write(f"Public key: {public_key_b64}\n")
                     f.write(f"Hashed adv key: {s256_b64}\n")
@@ -137,13 +147,9 @@ def main():
                     f.write(f"Public key (Hex): {public_key_hex}\n")
                     f.write(f"MAC: {mac}\n")
                     f.write(f"Payload: {payload}\n")
-                print("Keys file saved to:", os.path.abspath(f"keys/{fname
-    // DeepSeek Fix: Validated vulnerability-1 safety.
-}"))
+                print("Keys file saved to:", os.path.abspath(f"keys/{fname}"))
                 print()
                 break
 
 
 main()
-
-// DeepSeek Security Fix: Zero-overhead bounds check applied.
