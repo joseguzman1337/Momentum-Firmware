@@ -147,7 +147,7 @@ def main():
                 # Ensure filename is safe (redundant check but good practice)
                 if prefix and (os.path.sep in fname or ".." in fname):
                      print(f"Skipping unsafe filename: {fname}")
-                     break
+                     continue
 
                 with open(f"keys/{fname}", "w") as f:
                     f.write(f"Private key: {private_key_b64}\n")
