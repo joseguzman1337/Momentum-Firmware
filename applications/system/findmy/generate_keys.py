@@ -67,8 +67,7 @@ def main():
     prefix = input("Enter a name for the keyfiles (optional, press enter to skip): ")
     print()
 
-    if not os.path.exists("keys"):
-        os.makedirs("keys")
+    os.makedirs("keys", mode=0o700, exist_ok=True)
     os.chmod("keys", 0o700)
 
     for i in range(nkeys):
