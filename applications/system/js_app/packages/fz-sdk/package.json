@@ -20,7 +20,7 @@
   "type": "module",
   "dependencies": {
     "esbuild": "^0.24.0",
-    "esbuild-plugin-tsc": "^0.4.0",
+    "esbuild-plugin-tsc": "^0.5.0",
     "json5": "^2.2.3",
     "typedoc": "^0.26.10",
     "typedoc-material-theme": "^1.1.0",
