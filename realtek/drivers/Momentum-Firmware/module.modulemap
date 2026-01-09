@@ -1,0 +1,17 @@
+// Module map to work around macOS 26.2 SDK cyclic dependency
+// CoreServices -> DiskArbitration -> IOKit -> CoreServices
+
+module RTL8814AUDriver {
+    // Explicitly import only what we need, avoiding the cycle
+    
+    // Import Foundation without CoreServices dependency
+    use Foundation
+    
+    // Import DriverKit frameworks
+    use DriverKit
+    use NetworkingDriverKit  
+    use USBDriverKit
+    
+    // System Extensions
+    use SystemExtensions
+}

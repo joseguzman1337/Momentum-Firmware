@@ -1,0 +1,41 @@
+name: 'Updater test'
+on:
+  pull_request:
+env:
+  TARGETS: f7
+  DEFAULT_TARGET: f7
+  FBT_TOOLCHAIN_PATH: /opt
+  FBT_GIT_SUBMODULE_SHALLOW: 1
+
+jobs:
+  test_updater_on_bench:
+    runs-on: [self-hosted, FlipperZeroTest ]
+    steps:
+      - name: 'Wipe workspace'
+        run: find ./ -mount -maxdepth 1 -exec rm -rf {} \;
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          submodules: false
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: 'Flashing target firmware'
+        id: first_full_flash
+        timeout-minutes: 10
+        run: |
+          source scripts/toolchain/fbtenv.sh
+          python3 scripts/testops.py -t=180 await_flipper
+          ./fbt flash_usb_full FORCE=1
+          
+
+      - name: 'Validating updater'
+        id: second_full_flash
+        timeout-minutes: 5
+        if: success()
+        run: |
+          source scripts/toolchain/fbtenv.sh
+          python3 scripts/testops.py -t=180 await_flipper
+          ./fbt flash_usb FORCE=1
+          python3 scripts/testops.py -t=180 await_flipper
+

@@ -1,0 +1,24 @@
+{
+  "name": "Momentum Firmware",
+  "description": "Flipper Zero custom firmware development",
+  "environments": {
+    "local": {
+      "type": "local",
+      "workingDirectory": "/Users/x/x/Momentum-Firmware",
+      "environmentVariables": {
+        "FBT_TOOLCHAIN_PATH": "/opt/flipperzero-toolchain",
+        "FLIPPER_FIRMWARE_PATH": "/Users/x/x/Momentum-Firmware",
+        "DEBUG": "true"
+      }
+    },
+    "cloud": {
+      "type": "remote",
+      "preset": "development"
+    }
+  },
+  "defaultEnvironment": "local",
+  "gitWorktrees": {
+    "enabled": true,
+    "location": "~/.claude-worktrees/momentum-firmware"
+  }
+}

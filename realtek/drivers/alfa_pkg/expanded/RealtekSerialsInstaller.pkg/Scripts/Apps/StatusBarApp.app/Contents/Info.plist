@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BuildMachineOSBuild</key>
+	<string>13F1911</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>StatusBarApp</string>
+	<key>CFBundleIconFile</key>
+	<string>ModelIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.realtek.utility.statusbar</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>StatusBarApp</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.0.8.b5</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>DTPlatformBuild</key>
+	<string>5A2053</string>
+	<key>DTPlatformVersion</key>
+	<string>GM</string>
+	<key>DTSDKBuild</key>
+	<string>12F37</string>
+	<key>DTSDKName</key>
+	<string>macosx10.8</string>
+	<key>DTXcode</key>
+	<string>0501</string>
+	<key>DTXcodeBuild</key>
+	<string>5A2053</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.8</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>SupportURL</key>
+	<string>http://www.realtek.com.tw</string>
+	<key>UtilityMappingTable</key>
+	<dict>
+		<key>DLink-DWA121</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-121 Utility</string>
+			<key>idProduct</key>
+			<integer>13064</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA123</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-123 Utility</string>
+			<key>idProduct</key>
+			<integer>13067</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA130</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-130 Utility</string>
+			<key>idProduct</key>
+			<integer>13063</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA131B1</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-131 Utility</string>
+			<key>idProduct</key>
+			<integer>13069</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA131C1</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-131 Utility</string>
+			<key>idProduct</key>
+			<integer>13074</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA131E</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-131 Utility</string>
+			<key>idProduct</key>
+			<integer>13081</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA132</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-132 Utility</string>
+			<key>idProduct</key>
+			<integer>13063</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA133</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-133 Utility</string>
+			<key>idProduct</key>
+			<integer>13066</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA135</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-135 Utility</string>
+			<key>idProduct</key>
+			<integer>13065</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA171</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-171 Utility</string>
+			<key>idProduct</key>
+			<integer>13076</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA171C</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-171C Utility</string>
+			<key>idProduct</key>
+			<integer>13085</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA172</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-172 Utility</string>
+			<key>idProduct</key>
+			<integer>13080</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA180A1</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-180A1 Utility</string>
+			<key>idProduct</key>
+			<integer>13078</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA182</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-182 Utility</string>
+			<key>idProduct</key>
+			<integer>13075</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA182C1</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-182C1 Utility</string>
+			<key>idProduct</key>
+			<integer>13077</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA182D</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-182D Utility</string>
+			<key>idProduct</key>
+			<integer>13084</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA183</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-183 Utility</string>
+			<key>idProduct</key>
+			<integer>13070</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>DLink-DWA192</key>
+		<dict>
+			<key>Utility</key>
+			<string>D-Link DWA-192 Wi-Fi USB3.0 Adapter</string>
+			<key>idProduct</key>
+			<integer>13082</integer>
+			<key>idVendor</key>
+			<integer>8193</integer>
+		</dict>
+		<key>Netgear-A6150</key>
+		<dict>
+			<key>Utility</key>
+			<string>Netgear WLAN Utility</string>
+			<key>idProduct</key>
+			<integer>36949</integer>
+			<key>idVendor</key>
+			<integer>2118</integer>
+		</dict>
+		<key>Netgear-A7000</key>
+		<dict>
+			<key>Utility</key>
+			<string>Netgear WLAN Utility</string>
+			<key>idProduct</key>
+			<integer>36948</integer>
+			<key>idVendor</key>
+			<integer>2118</integer>
+		</dict>
+		<key>TPLink_8812</key>
+		<dict>
+			<key>Utility</key>
+			<string>TP-LINK Wireless Configuration Utility</string>
+			<key>idProduct</key>
+			<integer>257</integer>
+			<key>idVendor</key>
+			<integer>9047</integer>
+		</dict>
+		<key>TPLink_T4UH</key>
+		<dict>
+			<key>Utility</key>
+			<string>TP-LINK Wireless Configuration Utility</string>
+			<key>idProduct</key>
+			<integer>259</integer>
+			<key>idVendor</key>
+			<integer>9047</integer>
+		</dict>
+		<key>ZyXEL_8812AU_NWD6605</key>
+		<dict>
+			<key>Utility</key>
+			<string>ZyXEL NWD6605 Utility</string>
+			<key>idProduct</key>
+			<integer>13350</integer>
+			<key>idVendor</key>
+			<integer>1414</integer>
+		</dict>
+		<key>ZyXEL_92CU_NWD2205</key>
+		<dict>
+			<key>Utility</key>
+			<string>ZyXEL NWD2205 Utility</string>
+			<key>idProduct</key>
+			<integer>13343</integer>
+			<key>idVendor</key>
+			<integer>1414</integer>
+		</dict>
+	</dict>
+	<key>bCheckID</key>
+	<integer>0</integer>
+</dict>
+</plist>

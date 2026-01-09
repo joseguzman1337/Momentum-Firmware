@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundleExecutable</key>
+    <string>RTL88xxAU</string>
+    <key>CFBundleGetInfoString</key>
+    <string>RTL88xxAU USB WiFi Driver for macOS</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.realtek.driver.RTL88xxAU</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>RTL88xxAU</string>
+    <key>CFBundlePackageType</key>
+    <string>KEXT</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+    <key>IOKitPersonalities</key>
+    <dict>
+        <key>RTL88xxAU USB WiFi Adapter</key>
+        <dict>
+            <key>CFBundleIdentifier</key>
+            <string>com.realtek.driver.RTL88xxAU</string>
+            <key>IOClass</key>
+            <string>RTL88xxAU</string>
+            <key>IOProviderClass</key>
+            <string>IOUSBInterface</string>
+            <key>bConfigurationValue</key>
+            <integer>1</integer>
+            <key>bInterfaceNumber</key>
+            <integer>0</integer>
+            <key>idProduct</key>
+            <array>
+                <integer>33322</integer> <!-- 0x821A - RTL8812AU -->
+                <integer>33074</integer> <!-- 0x8112 - RTL8812AU -->
+                <integer>33073</integer> <!-- 0x8111 - RTL8811AU -->
+                <integer>33075</integer> <!-- 0x8113 - RTL8814AU -->
+                <integer>33552</integer> <!-- 0x8330 - RTL8821AU -->
+            </array>
+            <key>idVendor</key>
+            <integer>3034</integer> <!-- 0x0BDA - Realtek -->
+        </dict>
+        <key>RTL88xxAU USB WiFi Adapter - Alfa</key>
+        <dict>
+            <key>CFBundleIdentifier</key>
+            <string>com.realtek.driver.RTL88xxAU</string>
+            <key>IOClass</key>
+            <string>RTL88xxAU</string>
+            <key>IOProviderClass</key>
+            <string>IOUSBInterface</string>
+            <key>bConfigurationValue</key>
+            <integer>1</integer>
+            <key>bInterfaceNumber</key>
+            <integer>0</integer>
+            <key>idProduct</key>
+            <array>
+                <integer>32801</integer> <!-- 0x8021 - Alfa AWUS1900 -->
+                <integer>32802</integer> <!-- 0x8022 - Alfa AWUS036ACS -->
+            </array>
+            <key>idVendor</key>
+            <integer>3034</integer> <!-- 0x0BDA - Realtek -->
+        </dict>
+    </dict>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2024 Realtek. All rights reserved.</string>
+    <key>OSBundleLibraries</key>
+    <dict>
+        <key>com.apple.kpi.bsd</key>
+        <string>12.0</string>
+        <key>com.apple.kpi.iokit</key>
+        <string>12.0</string>
+        <key>com.apple.kpi.libkern</key>
+        <string>12.0</string>
+        <key>com.apple.kpi.mach</key>
+        <string>12.0</string>
+        <key>com.apple.iokit.IOUSBFamily</key>
+        <string>3.0</string>
+        <key>com.apple.iokit.IONetworkingFamily</key>
+        <string>3.0</string>
+    </dict>
+</dict>
+</plist>

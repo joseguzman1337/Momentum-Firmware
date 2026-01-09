@@ -1,0 +1,172 @@
+# Makefile for RTL8814AU Driver
+
+.PHONY: all build clean install uninstall sign test lint format help
+
+# Configuration
+PROJECT_NAME = RTL8814AUDriver
+SCHEME = RTL8814AUDriver
+CONFIGURATION = Release
+BUILD_DIR = build
+DEXT_NAME = $(PROJECT_NAME).dext
+BUNDLE_ID = com.opensource.RTL8814AUDriver
+
+# Code signing
+CODESIGN_IDENTITY ?= Developer ID Application
+TEAM_ID ?= YOUR_TEAM_ID
+
+# Colors
+RED = \033[0;31m
+GREEN = \033[0;32m
+YELLOW = \033[1;33m
+NC = \033[0m
+
+all: build ## Build the driver (default target)
+
+help: ## Show this help message
+	@echo "RTL8814AU Driver Makefile"
+	@echo ""
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Targets:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-15s$(NC) %s\n", $$1, $$2}'
+
+build: ## Build the driver
+	@echo "$(YELLOW)Building $(PROJECT_NAME)...$(NC)"
+	@./build.sh
+	@echo "$(GREEN)Build complete!$(NC)"
+
+clean: ## Clean build artifacts
+	@echo "$(YELLOW)Cleaning build artifacts...$(NC)"
+	@rm -rf $(BUILD_DIR)
+	@rm -rf DerivedData
+	@xcodebuild clean -project $(PROJECT_NAME).xcodeproj -scheme $(SCHEME) 2>/dev/null || true
+	@echo "$(GREEN)Clean complete!$(NC)"
+
+sign: build ## Sign the driver extension
+	@echo "$(YELLOW)Signing driver...$(NC)"
+	@./sign.sh
+	@echo "$(GREEN)Signing complete!$(NC)"
+
+install: sign ## Install the driver (requires sudo)
+	@echo "$(YELLOW)Installing driver...$(NC)"
+	@sudo ./install.sh
+	@echo "$(GREEN)Installation complete!$(NC)"
+
+uninstall: ## Uninstall the driver (requires sudo)
+	@echo "$(YELLOW)Uninstalling driver...$(NC)"
+	@sudo systemextensionsctl uninstall $(BUNDLE_ID) $(BUNDLE_ID) || true
+	@sudo rm -rf /Library/SystemExtensions/*/$(BUNDLE_ID).dext || true
+	@echo "$(GREEN)Uninstall complete!$(NC)"
+
+test: ## Run tests
+	@echo "$(YELLOW)Running tests...$(NC)"
+	@swift test
+	@echo "$(GREEN)Tests complete!$(NC)"
+
+lint: ## Run SwiftLint
+	@echo "$(YELLOW)Running SwiftLint...$(NC)"
+	@if command -v swiftlint >/dev/null 2>&1; then \
+		swiftlint lint; \
+	else \
+		echo "$(RED)SwiftLint not installed. Run: brew install swiftlint$(NC)"; \
+		exit 1; \
+	fi
+
+format: ## Format code with swift-format
+	@echo "$(YELLOW)Formatting code...$(NC)"
+	@if command -v swift-format >/dev/null 2>&1; then \
+		find RTL8814AUDriver -name "*.swift" -exec swift-format -i {} \; ; \
+		echo "$(GREEN)Formatting complete!$(NC)"; \
+	else \
+		echo "$(RED)swift-format not installed. Run: brew install swift-format$(NC)"; \
+		exit 1; \
+	fi
+
+status: ## Check driver status
+	@echo "$(YELLOW)System Extensions:$(NC)"
+	@systemextensionsctl list | grep -E "($(BUNDLE_ID)|System)" || echo "Driver not installed"
+	@echo ""
+	@echo "$(YELLOW)USB Devices:$(NC)"
+	@system_profiler SPUSBDataType | grep -A 10 "Realtek" || echo "No Realtek devices found"
+	@echo ""
+	@echo "$(YELLOW)Network Interfaces:$(NC)"
+	@ifconfig | grep -E "^(en|wlan)" || echo "No interfaces"
+
+logs: ## Stream driver logs
+	@echo "$(YELLOW)Streaming driver logs (Ctrl+C to stop)...$(NC)"
+	@log stream --predicate 'subsystem == "$(BUNDLE_ID)"' --level debug
+
+check-deps: ## Check for required dependencies
+	@echo "$(YELLOW)Checking dependencies...$(NC)"
+	@echo -n "Xcode: "
+	@command -v xcodebuild >/dev/null 2>&1 && echo "$(GREEN)✓$(NC)" || echo "$(RED)✗ (install Xcode)$(NC)"
+	@echo -n "Swift: "
+	@command -v swift >/dev/null 2>&1 && echo "$(GREEN)✓$(NC)" || echo "$(RED)✗ (install Xcode)$(NC)"
+	@echo -n "Homebrew: "
+	@command -v brew >/dev/null 2>&1 && echo "$(GREEN)✓$(NC)" || echo "$(RED)✗ (install from brew.sh)$(NC)"
+	@echo -n "codesign: "
+	@command -v codesign >/dev/null 2>&1 && echo "$(GREEN)✓$(NC)" || echo "$(RED)✗ (install Xcode)$(NC)"
+	@echo -n "SwiftLint: "
+	@command -v swiftlint >/dev/null 2>&1 && echo "$(GREEN)✓ (optional)$(NC)" || echo "$(YELLOW)○ (brew install swiftlint)$(NC)"
+	@echo -n "swift-format: "
+	@command -v swift-format >/dev/null 2>&1 && echo "$(GREEN)✓ (optional)$(NC)" || echo "$(YELLOW)○ (brew install swift-format)$(NC)"
+
+dev-mode-on: ## Enable system extension developer mode
+	@echo "$(YELLOW)Enabling developer mode...$(NC)"
+	@sudo systemextensionsctl developer on
+	@echo "$(GREEN)Developer mode enabled$(NC)"
+
+dev-mode-off: ## Disable system extension developer mode
+	@echo "$(YELLOW)Disabling developer mode...$(NC)"
+	@sudo systemextensionsctl developer off
+	@echo "$(GREEN)Developer mode disabled$(NC)"
+
+dist: sign ## Create distribution package
+	@echo "$(YELLOW)Creating distribution package...$(NC)"
+	@mkdir -p $(BUILD_DIR)/Distribution
+	@cp -R $(BUILD_DIR)/$(DEXT_NAME) $(BUILD_DIR)/Distribution/
+	@cp README.md LICENSE BUILDING.md $(BUILD_DIR)/Distribution/
+	@cd $(BUILD_DIR) && tar -czf $(PROJECT_NAME)-$(CONFIGURATION).tar.gz Distribution/
+	@echo "$(GREEN)Distribution package created: $(BUILD_DIR)/$(PROJECT_NAME)-$(CONFIGURATION).tar.gz$(NC)"
+
+verify: ## Verify driver signature
+	@echo "$(YELLOW)Verifying driver signature...$(NC)"
+	@if [ -d "$(BUILD_DIR)/$(DEXT_NAME)" ]; then \
+		codesign -vvv --deep --strict $(BUILD_DIR)/$(DEXT_NAME); \
+		echo "$(GREEN)Signature valid!$(NC)"; \
+	else \
+		echo "$(RED)Driver not built. Run 'make build' first.$(NC)"; \
+		exit 1; \
+	fi
+
+info: ## Show driver information
+	@echo "$(GREEN)RTL8814AU Driver Information$(NC)"
+	@echo ""
+	@echo "Project: $(PROJECT_NAME)"
+	@echo "Bundle ID: $(BUNDLE_ID)"
+	@echo "Build Directory: $(BUILD_DIR)"
+	@echo "Configuration: $(CONFIGURATION)"
+	@echo "Signing Identity: $(CODESIGN_IDENTITY)"
+	@echo "Team ID: $(TEAM_ID)"
+	@echo ""
+	@if [ -d "$(BUILD_DIR)/$(DEXT_NAME)" ]; then \
+		echo "$(YELLOW)Built Driver Info:$(NC)"; \
+		codesign -dvv $(BUILD_DIR)/$(DEXT_NAME) 2>&1 | grep -E "Authority|Identifier|TeamIdentifier|Format"; \
+	else \
+		echo "$(YELLOW)Driver not yet built$(NC)"; \
+	fi
+
+setup: check-deps ## Setup development environment
+	@echo "$(YELLOW)Setting up development environment...$(NC)"
+	@chmod +x build.sh sign.sh install.sh
+	@if [ ! -d "$(BUILD_DIR)" ]; then mkdir -p $(BUILD_DIR); fi
+	@sudo systemextensionsctl developer on
+	@echo "$(GREEN)Setup complete!$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Next steps:$(NC)"
+	@echo "1. Update TEAM_ID in Makefile and scripts"
+	@echo "2. Install signing certificate from developer.apple.com"
+	@echo "3. Run 'make build' to build the driver"
+	@echo "4. Run 'make install' to install (requires sudo)"
+
+.DEFAULT_GOAL := help

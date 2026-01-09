@@ -1,0 +1,3 @@
+<pkg-info format-version="2" identifier="com.alfa-network-inc.RealtekSerialsInstaller" version="1.0" relocatable="false" overwrite-permissions="false" followSymLinks="false" install-location="/" auth="root">
+<payload installKBytes="0" numberOfFiles="1"/>
+</pkg-info>

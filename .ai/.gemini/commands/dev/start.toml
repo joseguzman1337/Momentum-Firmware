@@ -1,0 +1,17 @@
+description = "Start a new development session with context"
+prompt = """
+Starting a new Momentum Firmware development session.
+
+Current project status:
+!{git status --porcelain}
+
+Recent commits:
+!{git log --oneline -3}
+
+Current branch: !{git branch --show-current}
+
+Build status:
+!{./fbt --help | head -1}
+
+Ready to assist with Flipper Zero firmware development. What would you like to work on?
+"""

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "gemini-super": {
+      "command": "python",
+      "args": [".ai/gemini/super_agent.py"],
+      "env": {
+        "LOG_DIR": "logs/gemini",
+        "AUTO_MERGE": "true",
+        "CHECKPOINTING": "true",
+        "YOLO_MODE": "true"
+      }
+    }
+  }
+}

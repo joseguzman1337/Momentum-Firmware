@@ -1,0 +1,50 @@
+{
+    "mcpServers": {
+        "codex_tools": {
+            "command": "node",
+            "args": [
+                ".ai/mcp/servers/codex_tools.js"
+            ],
+            "env": {
+                "REPO_ROOT": "/Users/x/x/Momentum-Firmware",
+                "LOG_DIR": "logs/codex"
+            },
+            "trust": true,
+            "description": "Codex-specific tools for code generation and bug fixes"
+        },
+        "github_integration": {
+            "command": "node",
+            "args": [
+                ".ai/mcp/servers/github_tools.js"
+            ],
+            "env": {
+                "GH_TOKEN": "$GITHUB_TOKEN"
+            },
+            "trust": true,
+            "description": "GitHub API integration for PR/issue management"
+        },
+        "rag_knowledge": {
+            "command": "python3",
+            "args": [
+                ".ai/mcp/servers/rag_server.py"
+            ],
+            "env": {
+                "VECTOR_STORE": ".ai/rag/embeddings",
+                "KNOWLEDGE_BASE": ".ai/rag/shared_knowledge.json"
+            },
+            "trust": true,
+            "description": "RAG system for shared knowledge across agents"
+        },
+        "agent_communication": {
+            "command": "python3",
+            "args": [
+                ".ai/mcp/servers/a2a_server.py"
+            ],
+            "env": {
+                "MESSAGE_BUS": ".ai/workflows/message_bus.json"
+            },
+            "trust": true,
+            "description": "Agent-to-agent communication protocol"
+        }
+    }
+}
