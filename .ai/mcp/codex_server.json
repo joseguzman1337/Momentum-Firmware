@@ -45,6 +45,11 @@
             },
             "trust": true,
             "description": "Agent-to-agent communication protocol"
+        },
+        "warp_docs": {
+            "url": "https://docs.warp.dev/~gitbook/mcp",
+            "trust": true,
+            "description": "Warp documentation MCP server for agent access to Warp docs"
         }
     }
 }
