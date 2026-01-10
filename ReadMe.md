@@ -180,7 +180,7 @@ There are 4 methods to install Momentum, we recommend you use the **Web Updater*
 
 ```bash
 To download the repository:
-$ git clone --recursive --jobs 8 https://github.com/Next-Flip/Momentum-Firmware.git
+$ git clone --recursive --jobs 8 https://github.com/joseguzman1337/Momentum-Firmware.git
 $ cd Momentum-Firmware/
 
 To flash directly to the Flipper (Needs to be connected via USB, qFlipper closed)
