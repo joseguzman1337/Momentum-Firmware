@@ -180,6 +180,8 @@ if GetOption("fullenv") or any(
         ENV={
             "REPO_ROOT": "${ROOT_DIR.abspath}",
             "ESP_PROJECT_PATH": "${ROOT_DIR.abspath}/.ai/esp_projects/default",
+            "ESP_MCP_PYTHON": "${PYTHON3}",
+            "IDF_PATH": os.path.join(os.environ.get("HOME", ""), "esp/esp-idf"),
             "PATH": os.environ.get("PATH", ""),
         },
     )

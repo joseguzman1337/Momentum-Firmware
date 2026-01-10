@@ -45,21 +45,96 @@ fn main() -> Result<()> {
     // Optional serial port override (auto-detect if not set).
     let port_override = std::env::var("ESP_PORT").ok();
 
-    // 1. Start esp_mcp server (python3 main.py in .ai/mcp/servers/esp_mcp)
+    // 1. Start esp_mcp server (python main.py in .ai/mcp/servers/esp_mcp)
     let repo_root = std::env::var("REPO_ROOT").unwrap_or_else(|_| ".".to_string());
-    let mut child = Command::new("python3")
+    let server_dir = format!("{}/.ai/mcp/servers/esp_mcp", repo_root);
+
+    // Prefer explicit interpreter passed from SCons/FBT; fall back to PATH search.
+    let python_cmd = std::env::var("ESP_MCP_PYTHON").unwrap_or_else(|_| "python3".to_string());
+
+    let mut child = Command::new(&python_cmd)
         .arg("main.py")
-        .current_dir(format!("{}/.ai/mcp/servers/esp_mcp", repo_root))
+        .current_dir(&server_dir)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .context("failed to start esp_mcp server")?;
+        .with_context(|| format!(
+            "failed to start esp_mcp server using '{}' in {}",
+            python_cmd, server_dir
+        ))?;
 
     let mut stdin = child.stdin.take().context("no stdin on esp_mcp process")?;
     let stdout = child.stdout.take().context("no stdout on esp_mcp process")?;
     let mut reader = BufReader::new(stdout);
 
     let mut next_id = 1u64;
+
+    // Perform MCP initialize handshake before calling any tools.
+    {
+        let id = next_id;
+        next_id += 1;
+
+        let init_req = RpcRequest {
+            jsonrpc: "2.0",
+            id,
+            method: "initialize",
+            params: Some(json!({
+                "protocolVersion": "2024-11-05",
+                "capabilities": {
+                    "sampling": {},
+                    "logging": {},
+                },
+                "clientInfo": {
+                    "name": "esp_mcp_orchestrator",
+                    "version": "0.1.0",
+                },
+            })),
+        };
+
+        let line = serde_json::to_string(&init_req)? + "\n";
+        stdin
+            .write_all(line.as_bytes())
+            .context("failed to write initialize request")?;
+        stdin.flush().ok();
+
+        let mut buf = String::new();
+        reader
+            .read_line(&mut buf)
+            .context("failed to read initialize response line")?;
+
+        if buf.trim().is_empty() {
+            return Err(anyhow!("empty response from esp_mcp during initialize"));
+        }
+
+        let resp: RpcResponse = serde_json::from_str(&buf).context("failed to parse JSON-RPC initialize response")?;
+        match resp {
+            RpcResponse::Result { id: resp_id, .. } => {
+                if resp_id != id {
+                    return Err(anyhow!("mismatched id in initialize response: got {}, expected {}", resp_id, id));
+                }
+            }
+            RpcResponse::Error { id: resp_id, error, .. } => {
+                if resp_id != id {
+                    return Err(anyhow!(
+                        "mismatched id in initialize error response: got {}, expected {} ({:?})",
+                        resp_id, id, error
+                    ));
+                }
+                return Err(anyhow!("esp_mcp initialize error {}: {}", error.code, error.message));
+            }
+        }
+
+        // Send notifications/initialized to complete MCP handshake.
+        let initialized_notification = json!({
+            "jsonrpc": "2.0",
+            "method": "notifications/initialized",
+        });
+        let line = serde_json::to_string(&initialized_notification)? + "\n";
+        stdin
+            .write_all(line.as_bytes())
+            .context("failed to write notifications/initialized")?;
+        stdin.flush().ok();
+    }
 
     let mut call_tool = |name: &str, args: serde_json::Value| -> Result<serde_json::Value> {
         let id = next_id;
