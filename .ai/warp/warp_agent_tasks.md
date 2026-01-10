@@ -7,7 +7,8 @@ Tasks to be executed in Warp Terminal's AI Agent Mode for the Momentum-Firmware 
 1. Open Warp Terminal
 2. Navigate to: `cd /Users/x/x/Momentum-Firmware`
 3. Type `#` to activate Warp AI Agent Mode
-4. Copy and paste each task below
+4. If you plan to use interactive tools (psql, dev servers, vim, debuggers, etc.), review `.ai/docs/full-terminal-use.md` so the agent can safely use Full Terminal Use inside those sessions.
+5. Copy and paste each task below
 
 ---
 

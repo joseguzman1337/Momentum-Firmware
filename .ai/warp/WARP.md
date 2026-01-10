@@ -204,6 +204,19 @@ git clone --recursive https://github.com/Next-Flip/Momentum-Firmware.git
 - **`site_scons/`** - Custom SCons tools and utilities
 - **`CODING_STYLE.md`** - Code formatting and style requirements
 
+## Full Terminal Use
+
+Warp in this repository is configured to support Warp's Full Terminal Use capability, which allows the agent to operate inside interactive terminal applications (database shells, debuggers, REPLs, dev servers, editors, etc.).
+
+See the internal doc for behavior and usage details:
+- `.ai/docs/full-terminal-use.md`
+
+When using Full Terminal Use, prefer to:
+- Let the agent handle mechanical/iterative commands.
+- Take over manually for sensitive operations (credentials, production systems), then hand control back.
+
+For global permission defaults and credit usage, refer to the online Warp docs.
+
 ## Debugging & Development Tips
 
 ### Memory Profiling
