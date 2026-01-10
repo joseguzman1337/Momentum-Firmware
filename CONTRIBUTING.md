@@ -2,7 +2,7 @@
 
 Welcome to Momentum. We are pushing the boundaries of what the Flipper Zero can do.
 
-## 🤖 AI Usage Policy: "AI-First"
+## 🤖 AI Usage Policy: "AI-Fully-Allowed"
 
 **ANY AND ALL USE OF AI IS FULLY PERMITTED, ENCOURAGED, AND EXPECTED.**
 
@@ -90,7 +90,7 @@ We are actively seeking contributions in these high-impact areas:
     * **Test:** Flash the firmware to your device and verify it works on real hardware.
     * **Sanity Check:** Ensure your agents are not hallucinating APIs that don't exist in the current Firmware version.
 4.  **Pull Request:** Submit your PR.
-    * *Note:* You are free to mention which AI tools you used (e.g., "Refactored via Claude 3.5 Sonnet").
+    * *Note:* You are free to mention which AI tools you used (e.g., "Refactored via Claude").
     * **Closing:** Simply state what your PR achieves and how it improves the firmware.
 
 ---
