@@ -195,6 +195,20 @@ To build and launch a single app:
 $ ./fbt launch APPSRC=your_appid
 ```
 
+<h2 align="center">AI Automation</h2>
+
+This repository includes a dedicated `.ai` folder containing automation scripts and agent configurations to streamline development.
+
+### Submodule Synchronization
+We use a forked submodule workflow. To automatically sync all submodules to your personal fork:
+
+```bash
+$ python3 .ai/scripts/sync_submodules.py
+```
+
+For more details, see [Forked Development Documentation](documentation/ForkedDevelopment.md).
+
+
 <h2 align="center">Stargazers over time</h2>
 
 [![Stargazers over time](https://starchart.cc/Next-Flip/Momentum-Firmware.svg?variant=adaptive)](https://starchart.cc/Next-Flip/Momentum-Firmware)
