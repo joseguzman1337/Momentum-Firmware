@@ -1,6 +1,7 @@
 #include <furi_hal_version.h>
 #include <furi_hal_usb_i.h>
 #include <furi_hal_usb.h>
+#include <furi_hal_usb_eth.h>
 #include <furi_hal_power.h>
 
 #include <stm32wbxx_ll_pwr.h>
@@ -113,7 +114,7 @@ void furi_hal_usb_init(void) {
     // Reset callback will be enabled after first mode change to avoid getting false reset events
 
     usb.enabled = false;
-    usb.interface = NULL;
+    usb.interface = &usb_eth;
     NVIC_SetPriority(USB_LP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 5, 0));
     NVIC_SetPriority(USB_HP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 15, 0));
     NVIC_EnableIRQ(USB_LP_IRQn);
@@ -270,6 +271,8 @@ static usbd_respond usb_descriptor_get(usbd_ctlreq* req, void** address, uint16_
             desc = usb.interface->str_prod_descr;
         } else if((dnumber == UsbDevSerial) && (usb.interface->str_serial_descr != NULL)) {
             desc = usb.interface->str_serial_descr;
+        } else if((dnumber == UsbDevEthMac) && (usb.interface->str_eth_mac_descr != NULL)) {
+            desc = usb.interface->str_eth_mac_descr;
         } else
             return usbd_fail;
         break;

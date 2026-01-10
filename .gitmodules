@@ -41,3 +41,6 @@
 [submodule "lib/uzlib"]
 	path = lib/uzlib
 	url = https://github.com/pfalcon/uzlib.git
+[submodule "lib/lwip"]
+	path = lib/lwip
+	url = https://github.com/flipperdevices/lwip
