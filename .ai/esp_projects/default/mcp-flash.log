@@ -1,0 +1,42 @@
+Flash operation - Return code: 2
+STDOUT:
+Checking "python3" ...
+Python 3.13.9
+"python3" has been detected
+WARNING: Failed to load shell autocompletion for bash version: 3.2.57(1)-release!
+
+Done! You can now compile ESP-IDF projects.
+Go to the project directory and run:
+
+  idf.py build
+Adding "flash"'s dependency "all" to list of commands with default set of options.
+Executing action: all (aliases: build)
+Running ninja in directory /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build
+Executing "ninja all"...
+[1/4] cd /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build && /Users/x/.espressif/python_env/idf6.1_py3.13_env/bin/python /Users/x/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/partition_table/partition-table.bin /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/momentum_esp_bridge.bin
+momentum_esp_bridge.bin binary size 0x215a0 bytes. Smallest app partition is 0x100000 bytes. 0xdea60 bytes (87%) free.
+[2/4] Performing build step for 'bootloader'
+[1/1] cd /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader && /Users/x/.espressif/python_env/idf6.1_py3.13_env/bin/python /Users/x/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader/bootloader.bin
+Bootloader binary size 0x66b0 bytes. 0x950 bytes (8%) free.
+[3/4] No install step for 'bootloader'
+[4/4] Completed 'bootloader'
+Executing action: flash
+Serial port /dev/cu.usbmodemflip_Asch1rp1:
+Connecting.......................
+Serial port /dev/cu.xb2p:
+Connecting...
+
+STDERR:
+Activating ESP-IDF 6.1
+Setting IDF_PATH to '/Users/x/esp/esp-idf'.
+* Checking python version ... 3.13.9
+* Checking python dependencies ... OK
+* Deactivating the current ESP-IDF environment (if any) ... OK
+* Establishing a new ESP-IDF environment ... OK
+* Identifying shell ... bash
+* Detecting outdated tools in system ... OK - no outdated tools found
+* Shell completion ... Autocompletion code generated
+[1;31m/dev/cu.usbmodemflip_Asch1rp1 failed to connect: Failed to connect to Espressif device: No serial data received.
+For troubleshooting steps visit: https://docs.espressif.com/projects/esptool/en/latest/troubleshooting.html[0m
+[1;31m/dev/cu.xb2p failed to connect: [Errno 2] could not open port /dev/cu.xb2p: [Errno 2] No such file or directory: '/dev/cu.xb2p'[0m
+No serial ports found. Connect a device, or use '-p PORT' option to set a specific port.

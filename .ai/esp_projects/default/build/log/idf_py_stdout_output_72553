@@ -1,0 +1,57 @@
+Command: cmake -G Ninja -B /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/Users/x/.espressif/python_env/idf6.1_py3.13_env/bin/python -DESP_PLATFORM=1 -DIDF_TARGET=esp32 -DCCACHE_ENABLE=False /Users/x/x/Momentum-Firmware/.ai/esp_projects/default
+-- Found Git: /opt/homebrew/bin/git (found version "2.51.0")
+-- Component directory /Users/x/esp/esp-idf/components/idf_test does not contain a CMakeLists.txt file. No component will be added
+-- Component directory /Users/x/esp/esp-idf/components/mqtt does not contain a CMakeLists.txt file. No component will be added
+-- Minimal build - OFF
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: /Users/x/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Users/x/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32-elf-gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Users/x/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32-elf-g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Building ESP-IDF components for target esp32
+-- ESP-TEE is currently supported only on the esp32c6;esp32h2;esp32c5;esp32c61 SoCs
+-- KCONFIG_REPORT_VERBOSITY not set, using default
+-- Project sdkconfig file /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/sdkconfig
+-- Compiler supported targets: xtensa-esp-elf
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- App "momentum_esp_bridge" version: mntm-011-494-g3888a476d
+-- Found Python3: /Users/x/.espressif/python_env/idf6.1_py3.13_env/bin/python (found version "3.13.9") found components: Interpreter
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS - Success
+-- Setting up mbedtls configuration
+-- Linkage type is PUBLIC
+-- Adding linker script /Users/x/esp/esp-idf/components/esp_system/ld/esp32/memory.ld.in
+--   -> Preprocessing .in script: /Users/x/esp/esp-idf/components/esp_system/ld/esp32/memory.ld.in
+-- Adding linker script /Users/x/esp/esp-idf/components/esp_system/ld/esp32/sections.ld.in
+--   -> Preprocessing .in script: /Users/x/esp/esp-idf/components/esp_system/ld/esp32/sections.ld.in
+--   -> Applying ldgen processing: /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/esp-idf/esp_system/ld/sections.ld.in
+-- Adding linker script /Users/x/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.ld
+-- Adding linker script /Users/x/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.api.ld
+-- Adding linker script /Users/x/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.libgcc.ld
+-- Adding linker script /Users/x/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.libc-funcs.ld
+-- Adding linker script /Users/x/esp/esp-idf/components/soc/esp32/ld/esp32.peripherals.ld
+-- Component idf::esp_trace will be linked with -Wl,--whole-archive
+-- Components: app_trace app_update bootloader bootloader_support bt cmock console cxx driver efuse esp-tls esp_adc esp_app_format esp_blockdev esp_bootloader_format esp_coex esp_common esp_driver_ana_cmpr esp_driver_bitscrambler esp_driver_cam esp_driver_dac esp_driver_gpio esp_driver_gptimer esp_driver_i2c esp_driver_i2s esp_driver_i3c esp_driver_isp esp_driver_jpeg esp_driver_ledc esp_driver_mcpwm esp_driver_parlio esp_driver_pcnt esp_driver_ppa esp_driver_rmt esp_driver_sd_intf esp_driver_sdio esp_driver_sdm esp_driver_sdmmc esp_driver_sdspi esp_driver_spi esp_driver_touch_sens esp_driver_tsens esp_driver_twai esp_driver_uart esp_driver_usb_serial_jtag esp_eth esp_event esp_gdbstub esp_hal_ana_cmpr esp_hal_ana_conv esp_hal_cam esp_hal_dma esp_hal_emac esp_hal_gpio esp_hal_gpspi esp_hal_i2c esp_hal_i2s esp_hal_i3c esp_hal_jpeg esp_hal_lcd esp_hal_ledc esp_hal_mcpwm esp_hal_mspi esp_hal_parlio esp_hal_pcnt esp_hal_pmu esp_hal_ppa esp_hal_rmt esp_hal_rtc_timer esp_hal_timg esp_hal_touch_sens esp_hal_twai esp_hal_uart esp_hal_usb esp_hal_wdt esp_hid esp_http_client esp_http_server esp_https_ota esp_https_server esp_hw_support esp_lcd esp_libc esp_local_ctrl esp_mm esp_netif esp_netif_stack esp_partition esp_phy esp_pm esp_psram esp_ringbuf esp_rom esp_security esp_stdio esp_system esp_timer esp_trace esp_usb_cdc_rom_console esp_wifi espcoredump esptool_py fatfs freertos hal heap http_parser ieee802154 log lwip main mbedtls nvs_flash nvs_sec_provider openthread partition_table perfmon protobuf-c protocomm pthread rt sdmmc soc spi_flash spiffs tcp_transport ulp unity vfs wear_levelling wpa_supplicant xtensa
+-- Component paths: /Users/x/esp/esp-idf/components/app_trace /Users/x/esp/esp-idf/components/app_update /Users/x/esp/esp-idf/components/bootloader /Users/x/esp/esp-idf/components/bootloader_support /Users/x/esp/esp-idf/components/bt /Users/x/esp/esp-idf/components/cmock /Users/x/esp/esp-idf/components/console /Users/x/esp/esp-idf/components/cxx /Users/x/esp/esp-idf/components/driver /Users/x/esp/esp-idf/components/efuse /Users/x/esp/esp-idf/components/esp-tls /Users/x/esp/esp-idf/components/esp_adc /Users/x/esp/esp-idf/components/esp_app_format /Users/x/esp/esp-idf/components/esp_blockdev /Users/x/esp/esp-idf/components/esp_bootloader_format /Users/x/esp/esp-idf/components/esp_coex /Users/x/esp/esp-idf/components/esp_common /Users/x/esp/esp-idf/components/esp_driver_ana_cmpr /Users/x/esp/esp-idf/components/esp_driver_bitscrambler /Users/x/esp/esp-idf/components/esp_driver_cam /Users/x/esp/esp-idf/components/esp_driver_dac /Users/x/esp/esp-idf/components/esp_driver_gpio /Users/x/esp/esp-idf/components/esp_driver_gptimer /Users/x/esp/esp-idf/components/esp_driver_i2c /Users/x/esp/esp-idf/components/esp_driver_i2s /Users/x/esp/esp-idf/components/esp_driver_i3c /Users/x/esp/esp-idf/components/esp_driver_isp /Users/x/esp/esp-idf/components/esp_driver_jpeg /Users/x/esp/esp-idf/components/esp_driver_ledc /Users/x/esp/esp-idf/components/esp_driver_mcpwm /Users/x/esp/esp-idf/components/esp_driver_parlio /Users/x/esp/esp-idf/components/esp_driver_pcnt /Users/x/esp/esp-idf/components/esp_driver_ppa /Users/x/esp/esp-idf/components/esp_driver_rmt /Users/x/esp/esp-idf/components/esp_driver_sd_intf /Users/x/esp/esp-idf/components/esp_driver_sdio /Users/x/esp/esp-idf/components/esp_driver_sdm /Users/x/esp/esp-idf/components/esp_driver_sdmmc /Users/x/esp/esp-idf/components/esp_driver_sdspi /Users/x/esp/esp-idf/components/esp_driver_spi /Users/x/esp/esp-idf/components/esp_driver_touch_sens /Users/x/esp/esp-idf/components/esp_driver_tsens /Users/x/esp/esp-idf/components/esp_driver_twai /Users/x/esp/esp-idf/components/esp_driver_uart /Users/x/esp/esp-idf/components/esp_driver_usb_serial_jtag /Users/x/esp/esp-idf/components/esp_eth /Users/x/esp/esp-idf/components/esp_event /Users/x/esp/esp-idf/components/esp_gdbstub /Users/x/esp/esp-idf/components/esp_hal_ana_cmpr /Users/x/esp/esp-idf/components/esp_hal_ana_conv /Users/x/esp/esp-idf/components/esp_hal_cam /Users/x/esp/esp-idf/components/esp_hal_dma /Users/x/esp/esp-idf/components/esp_hal_emac /Users/x/esp/esp-idf/components/esp_hal_gpio /Users/x/esp/esp-idf/components/esp_hal_gpspi /Users/x/esp/esp-idf/components/esp_hal_i2c /Users/x/esp/esp-idf/components/esp_hal_i2s /Users/x/esp/esp-idf/components/esp_hal_i3c /Users/x/esp/esp-idf/components/esp_hal_jpeg /Users/x/esp/esp-idf/components/esp_hal_lcd /Users/x/esp/esp-idf/components/esp_hal_ledc /Users/x/esp/esp-idf/components/esp_hal_mcpwm /Users/x/esp/esp-idf/components/esp_hal_mspi /Users/x/esp/esp-idf/components/esp_hal_parlio /Users/x/esp/esp-idf/components/esp_hal_pcnt /Users/x/esp/esp-idf/components/esp_hal_pmu /Users/x/esp/esp-idf/components/esp_hal_ppa /Users/x/esp/esp-idf/components/esp_hal_rmt /Users/x/esp/esp-idf/components/esp_hal_rtc_timer /Users/x/esp/esp-idf/components/esp_hal_timg /Users/x/esp/esp-idf/components/esp_hal_touch_sens /Users/x/esp/esp-idf/components/esp_hal_twai /Users/x/esp/esp-idf/components/esp_hal_uart /Users/x/esp/esp-idf/components/esp_hal_usb /Users/x/esp/esp-idf/components/esp_hal_wdt /Users/x/esp/esp-idf/components/esp_hid /Users/x/esp/esp-idf/components/esp_http_client /Users/x/esp/esp-idf/components/esp_http_server /Users/x/esp/esp-idf/components/esp_https_ota /Users/x/esp/esp-idf/components/esp_https_server /Users/x/esp/esp-idf/components/esp_hw_support /Users/x/esp/esp-idf/components/esp_lcd /Users/x/esp/esp-idf/components/esp_libc /Users/x/esp/esp-idf/components/esp_local_ctrl /Users/x/esp/esp-idf/components/esp_mm /Users/x/esp/esp-idf/components/esp_netif /Users/x/esp/esp-idf/components/esp_netif_stack /Users/x/esp/esp-idf/components/esp_partition /Users/x/esp/esp-idf/components/esp_phy /Users/x/esp/esp-idf/components/esp_pm /Users/x/esp/esp-idf/components/esp_psram /Users/x/esp/esp-idf/components/esp_ringbuf /Users/x/esp/esp-idf/components/esp_rom /Users/x/esp/esp-idf/components/esp_security /Users/x/esp/esp-idf/components/esp_stdio /Users/x/esp/esp-idf/components/esp_system /Users/x/esp/esp-idf/components/esp_timer /Users/x/esp/esp-idf/components/esp_trace /Users/x/esp/esp-idf/components/esp_usb_cdc_rom_console /Users/x/esp/esp-idf/components/esp_wifi /Users/x/esp/esp-idf/components/espcoredump /Users/x/esp/esp-idf/components/esptool_py /Users/x/esp/esp-idf/components/fatfs /Users/x/esp/esp-idf/components/freertos /Users/x/esp/esp-idf/components/hal /Users/x/esp/esp-idf/components/heap /Users/x/esp/esp-idf/components/http_parser /Users/x/esp/esp-idf/components/ieee802154 /Users/x/esp/esp-idf/components/log /Users/x/esp/esp-idf/components/lwip /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/main /Users/x/esp/esp-idf/components/mbedtls /Users/x/esp/esp-idf/components/nvs_flash /Users/x/esp/esp-idf/components/nvs_sec_provider /Users/x/esp/esp-idf/components/openthread /Users/x/esp/esp-idf/components/partition_table /Users/x/esp/esp-idf/components/perfmon /Users/x/esp/esp-idf/components/protobuf-c /Users/x/esp/esp-idf/components/protocomm /Users/x/esp/esp-idf/components/pthread /Users/x/esp/esp-idf/components/rt /Users/x/esp/esp-idf/components/sdmmc /Users/x/esp/esp-idf/components/soc /Users/x/esp/esp-idf/components/spi_flash /Users/x/esp/esp-idf/components/spiffs /Users/x/esp/esp-idf/components/tcp_transport /Users/x/esp/esp-idf/components/ulp /Users/x/esp/esp-idf/components/unity /Users/x/esp/esp-idf/components/vfs /Users/x/esp/esp-idf/components/wear_levelling /Users/x/esp/esp-idf/components/wpa_supplicant /Users/x/esp/esp-idf/components/xtensa
+-- Configuring done (14.5s)
+-- Generating done (0.6s)
+-- Build files have been written to: /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build
