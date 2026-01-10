@@ -159,6 +159,23 @@ def generate(env):
                 action=[
                     [
                         "${PYTHON3}",
+                        "-m",
+                        "pip",
+                        "install",
+                        "--upgrade",
+                        "pip",
+                    ],
+                    [
+                        "${PYTHON3}",
+                        "-m",
+                        "pip",
+                        "install",
+                        "--user",
+                        "colorlog",
+                        "pyserial",
+                    ],
+                    [
+                        "${PYTHON3}",
                         "${SELFUPDATE_SCRIPT}",
                         "-p",
                         "${FLIP_PORT}",

@@ -38,6 +38,21 @@ Momentum Firmware uses a multi-agent AI system for 24/7 development, security, a
 ## Communication Protocol (MCP)
 Agents coordinate via Model Context Protocol servers located in `.ai/*/mcp_server.json`. The shared knowledge base is maintained in `.ai/rag/`.
 
+### ESP/Embedded MCP Servers
+
+- **esp_mcp** (vendored from `horw/esp-mcp`):
+  - Location: `.ai/mcp/servers/esp_mcp`
+  - Registered in: `.ai/mcp/codex_server.json` under the `esp_mcp` key.
+  - Responsibilities:
+    - Install and manage ESP-IDF toolchains (`run_esp_idf_install`).
+    - Create and configure ESP-IDF projects (`create_esp_project`, `setup_project_esp_target`).
+    - Build and flash ESP firmware (`build_esp_project`, `flash_esp_project`).
+    - Discover ESP serial ports (`list_esp_serial_ports`).
+    - Run pytest / pytest-embedded test flows on ESP targets (`run_pytest`).
+  - Usage notes:
+    - Prefer these tools over raw `idf.py` shell commands when automating ESP32 workflows.
+    - `IDF_PATH` is configured via MCP env; agents can override per-call with the `idf_path` parameter when different ESP-IDF versions are needed.
+
 ## Core AI Technologies and Focus Areas
 
 **1. Generative AI and Large Language Models (LLMs)**

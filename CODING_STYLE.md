@@ -34,6 +34,13 @@ Try to make code self-explanatory and add comments if needed.
 Leave references to standards that you are implementing.
 Use project wiki to document new/reverse engineered standards.
 
+## Language inclusivity
+
+We welcome contributions in any programming language when it makes sense for the task.
+Follow existing patterns for similar components, and use standard formatters/linters
+for the language you introduce. If the language is new to this repo, include brief
+build/run notes in the relevant documentation.
+
 ## Variable and function names must clearly define what it's doing
 
 It's ok if it will be long, but it should clearly state what it's doing, without need to dive into code.
@@ -82,7 +89,8 @@ file `subghz_keystore.h` we have type `SubGhzKeystore` and function `subghz_keys
 - File names: `^[0-9A-Za-z_]+\.[a-z]+$`
 - File extensions: `[ ".h", ".c", ".cpp", ".cxx", ".hpp" ]`
 
-Enforced by linter.
+Enforced by linter for firmware sources. For tools/scripts in other languages,
+use conventional extensions and naming that match the language ecosystem.
 
 ### Standard function/method names
 

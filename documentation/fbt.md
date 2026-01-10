@@ -68,7 +68,7 @@ To use language servers other than the default VS Code C/C++ language server, us
 - `copro_dist` — bundle Core2 FUS+stack binaries for qFlipper.
 - `flash` — flash the attached device over SWD interface with supported probes. Probe is detected automatically; you can override it with `SWD_TRANSPORT=...` variable. If multiple probes are attached, you can specify the serial number of the probe to use with `SWD_TRANSPORT_SERIAL=...`.
 - `flash_usb`, `flash_usb_full` — build, upload and install the update package to the device over USB. See details on `updater_package` and `updater_minpackage`.
-- `smart_flash` — convenience alias that builds the full updater package and installs it over USB using the pretty, AI-style `selfupdate.py` output (equivalent to `flash_usb_full` but with enhanced CLI UX).
+- `smart_flash` — convenience alias that builds the full updater package and installs it over USB using the pretty, AI-style `selfupdate.py` output (equivalent to `flash_usb_full` but with enhanced CLI UX). It bootstraps the Python deps used by `selfupdate.py` (`colorlog`, `pyserial`) and then runs the ESP MCP orchestrator (`.ai/esp_mcp_orchestrator`) when `cargo` is available.
 - `debug` — build and flash firmware, then attach with gdb with firmware's .elf loaded.
 - `debug_other`, `debug_other_blackmagic` — attach GDB without loading any `.elf`. It will allow you to manually add external `.elf` files with `add-symbol-file` in GDB.
 - `updater_debug` — attach GDB with the updater's `.elf` loaded.

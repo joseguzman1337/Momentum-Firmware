@@ -9,6 +9,9 @@
     - Effort required to update scripts using `gui/widget`: very minimal
 
 ### Added:
+- USB Ethernet: HAL HTTP download helper over usb_eth (HTTP-only, writes response body to Storage)
+- Build: smart_flash target (full updater package + USB selfupdate with enhanced CLI output)
+- USB selfupdate: abort early when an app must be closed manually
 - Apps:
   - Games: Geometry Flip (by @goosedev72-projects)
   - GPIO:

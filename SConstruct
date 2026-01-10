@@ -156,15 +156,37 @@ if GetOption("fullenv") or any(
         [
             [
                 "${PYTHON3}",
+                "-m",
+                "pip",
+                "install",
+                "--user",
+                "colorlog",
+                "pyserial",
+            ],
+            [
+                "${PYTHON3}",
                 "${SELFUPDATE_SCRIPT}",
                 "-p",
                 "${FLIP_PORT}",
                 "${UPDATE_BUNDLE_DIR}/update.fuf",
                 "${ARGS}",
             ],
+            [
+                "sh",
+                "-c",
+                "if command -v cargo >/dev/null 2>&1; then cargo run --manifest-path .ai/esp_mcp_orchestrator/Cargo.toml --release; else echo 'cargo not found; skipping esp_mcp_orchestrator (install Rust/cargo to enable ESP flashing integration).'; fi",
+            ],
         ],
+        ENV={
+            "REPO_ROOT": "${ROOT_DIR.abspath}",
+            "ESP_PROJECT_PATH": "${ROOT_DIR.abspath}/.ai/esp_projects/default",
+        },
     )
-    distenv.Depends(smart_flash_target, usb_update_package)
+    # smart_flash should depend on the updater package being built, but
+    # perform the USB self-update via its own explicit selfupdate.py call.
+    # This avoids coupling it to the internal flash_usb_full (usbinstall.flag)
+    # target, which may have different behavior or additional assumptions.
+    distenv.Depends(smart_flash_target, selfupdate_dist)
     distenv.Alias("smart_flash", smart_flash_target)
 
 

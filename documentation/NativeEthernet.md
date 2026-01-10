@@ -97,6 +97,13 @@ The current Momentum Firmware tree already includes a working native USB Etherne
     - Unlocks USB mode, calls `furi_hal_usb_set_config(&usb_eth, NULL)` and `furi_hal_usb_enable()`, then locks again to enforce the new mode.
     - Disabling restores the previous interface.
 
+- `targets/f7/furi_hal/furi_hal_usb_eth.c` + `targets/furi_hal_include/furi_hal_usb_eth.h`
+  - Adds a blocking HTTP helper over `usb_eth` that writes the response body to Storage:
+    - Public API: `furi_hal_usb_eth_http_download_to_file(url, dest_path, timeout_ms)`.
+    - Supports **plain HTTP only** (`http://`); use a host-side proxy for HTTPS.
+    - Requires the USB Ethernet link to be up; otherwise it fails fast.
+    - Uses lwIP's `http_client` with callback API and waits for completion before returning.
+
 In summary, native USB Ethernet over USB-C is wired in at the HAL level and is the default USB mode for this firmware build.
 
 #### 6.2 What "Auto-Connect to Internet" Means
@@ -150,10 +157,10 @@ Given the working USB Ethernet and lwIP stack, there are two main directions for
    - This corresponds to the automation concepts originally described in `ethernet.md`.
 
 2. **On-device HTTP download service over Ethernet**
-   - Implement a small firmware service (not a FAP) on top of lwIP that can:
-     - Perform HTTP GET requests over `eth_netif`.
-     - Save downloaded files to locations such as `apps_data/esp_flasher/...`.
-   - Integrate this service with ESP Flasher so it can automatically download, store, and then flash updated firmware (for example, ESP32 Marauder images) whenever the USB Ethernet link is online.
+   - **Now available** as a HAL helper:
+     - `furi_hal_usb_eth_http_download_to_file()` performs a blocking HTTP GET over `usb_eth` and writes the response body to Storage.
+     - Use it to fetch assets or firmware payloads into locations like `apps_data/esp_flasher/...`.
+   - **Next step**: integrate the helper into higher-level services (e.g., ESP Flasher) so downloads can be triggered automatically when the USB Ethernet link is online.
 
 
 Here’s where you stand right now with “native Ethernet over USB‑C” and “auto‑connect to internet” in ~/x/x/Momentum-Firmware:

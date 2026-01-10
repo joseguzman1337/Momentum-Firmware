@@ -4,6 +4,23 @@ Central documentation for the AI agent ecosystem.
 
 See individual agent directories for detailed documentation.
 
+## ESP/Embedded Tooling
+
+### esp_mcp (ESP-IDF MCP server)
+
+This repository vendors the `horw/esp-mcp` MCP server under `.ai/mcp/servers/esp_mcp`. It exposes ESP-IDF workflows (install, build, flash, pytest) as MCP tools that agents can call without manual shell interaction.
+
+Key tools:
+- `run_esp_idf_install(idf_path?)` – install ESP-IDF toolchain via `install.sh`.
+- `create_esp_project(project_path, project_name)` – scaffold a new ESP-IDF project.
+- `setup_project_esp_target(project_path, target, idf_path?)` – set the target chip (e.g. `esp32`, `esp32c3`, `esp32s3`).
+- `build_esp_project(project_path, idf_path?, sdkconfig_defaults?)` – incremental or full builds.
+- `list_esp_serial_ports()` – discover available ESP serial ports.
+- `flash_esp_project(project_path, port?)` – flash firmware to a connected ESP.
+- `run_pytest(project_path, test_path, pytest_args, idf_path?)` – run pytest/pytest-embedded test suites for ESP projects.
+
+The `esp_mcp` server is registered in `.ai/mcp/codex_server.json` and runs via `python3 main.py` with `cwd` set to `.ai/mcp/servers/esp_mcp`. Agents should prefer these tools for ESP32 automation instead of invoking `idf.py` directly.
+
 ### Core AI Technologies and Focus Areas
 
 **1. Generative AI and Large Language Models (LLMs)**

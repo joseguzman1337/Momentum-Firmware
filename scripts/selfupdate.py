@@ -91,30 +91,42 @@ class Main(App):
         try:
             with FlipperStorage(port) as storage:
                 storage_ops = FlipperStorageOperations(storage)
-                storage_ops.mkpath(update_root)
-                storage_ops.mkpath(flipper_update_path)
-                storage_ops.recursive_send(
-                    flipper_update_path, manifest_path.parents[0]
-                )
 
+                # Pre-requisite: ensure no app is running before we bother sending update data.
                 if self.pretty:
                     self._log_step("Loader", "Closing current app, if any")
                 self.logger.info("Closing current app, if any")
                 for _ in range(10):
                     storage.send_and_wait_eol("loader close\r")
                     result = storage.read.until(storage.CLI_EOL)
-                    if b"was closed" in result:
+                    # Decode once for easier matching/logging
+                    result_str = result.decode("ascii", errors="ignore").strip()
+                    if "was closed" in result_str:
                         self.logger.info("App closed")
                         storage.read.until(storage.CLI_EOL)
                         time.sleep(self.APP_POST_CLOSE_DELAY_SEC)
-                    elif result.startswith(b"No application"):
+                    elif result_str.startswith("No application"):
                         storage.read.until(storage.CLI_EOL)
                         break
-                    else:
-                        self.logger.error(
-                            f"Unexpected response: {result.decode('ascii')}"
-                        )
+                    elif "has to be closed manually" in result_str:
+                        # Some apps (like Passport) ignore the exit signal.
+                        # Abort early so we don't waste time pushing an update
+                        # we already know will fail on the device side.
+                        msg = f"App requires manual close ({result_str}); aborting update"
+                        self._log_err(msg)
+                        self.logger.error(msg)
+                        storage.read.until(storage.CLI_EOL)
                         return 4
+                    else:
+                        self.logger.error(f"Unexpected response from loader close: {result_str}")
+                        return 4
+
+                # With no app running, proceed to send update data.
+                storage_ops.mkpath(update_root)
+                storage_ops.mkpath(flipper_update_path)
+                storage_ops.recursive_send(
+                    flipper_update_path, manifest_path.parents[0]
+                )
 
                 storage.send_and_wait_eol(
                     f"update install {flipper_update_path}/{manifest_name}\r"

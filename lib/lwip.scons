@@ -41,6 +41,7 @@ sources = [
     "lwip/src/netif/ethernet.c",
     "lwip/src/api/tcpip.c",
     "lwip/src/api/err.c",
+    "lwip/src/apps/http/http_client.c",
     "lwip/contrib/ports/freertos/sys_arch.c",
 ]
 

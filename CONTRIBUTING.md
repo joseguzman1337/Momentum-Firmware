@@ -22,6 +22,13 @@ We explicitly welcome the use of Generative AI tools (LLMs, Copilots, Agents) fo
 
 Momentum is a high-performance custom firmware. We do not just "allow" advanced tools; we build *with* them.
 
+### Language Inclusivity
+We warmly welcome contributions in any programming language, as long as they serve the project well.
+* **Fit first:** Use the language that best matches the scope (firmware core, host tooling, docs, tests, or automation).
+* **Keep it maintainable:** Follow existing patterns in the codebase for similar components.
+* **Format and lint:** Provide or reference a standard formatter/linter for the language you introduce.
+* **Document it:** Add or update build/run instructions when a new language/toolchain is required.
+
 ### 1. Firmware & Embedded Engineering
 * **Code Style:** We generally follow the existing Flipper Zero C coding style. If your AI generates code, ensure it aligns with our formatting (clang-format).
 * **Memory Management:** This is an embedded environment. Agents should be instructed to prioritize `malloc`/`free` safety and avoid stack overflows.

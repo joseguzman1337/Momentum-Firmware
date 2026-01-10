@@ -27,6 +27,10 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 <br>
 
+<h2 align="center">Contributing</h2>
+
+We politely welcome contributions in any programming language, as long as they help the project and are well documented. For guidance on style, tooling, and build requirements, see <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>.
+
 Note that mentioned below are only a few of our staple additions to the firmware. For a full list check [down here](https://github.com/Next-Flip/Momentum-Firmware#List-of-Changes).
 
 <br>
@@ -99,6 +103,7 @@ Note that this repo is always updated with the great work from our friends at [U
 - Momentum App (Easy configuration of features and behavior of the firmware)
 - Asset Packs (Unparalleled theming and customization)
 - Native USB Ethernet support (CDC-ECM) - [Read Docs](documentation/NativeEthernet.md)
+- USB Ethernet HTTP download helper (HTTP GET to Storage via lwIP)
 - Automated Submodule Sync (Forked Development Workflow) - [Read Docs](documentation/ForkedDevelopment.md)
 - More UI customization, redesigns and optimizations
 - Bad-Keyboard App
@@ -193,6 +198,7 @@ $ cd Momentum-Firmware/
 
 To flash directly to the Flipper over USB (pretty, AI-styled output; Flipper connected via USB, qFlipper closed)
 $ ./fbt smart_flash
+  (Installs `colorlog`/`pyserial` and runs the ESP MCP orchestrator if `cargo` is available)
 
 To flash via USB with the classic target
 $ ./fbt flash_usb_full

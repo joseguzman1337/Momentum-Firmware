@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 #include <furi_hal_version.h>
 #include "furi_hal_usb_i.h"
 #include <furi_hal_usb.h>
@@ -18,6 +19,9 @@
 #include <lwip/dhcp.h>
 #include <lwip/tcpip.h>
 #include <netif/ethernet.h>
+#include <lwip/apps/http_client.h>
+
+#include <furi/core/semaphore.h>
 
 #define TAG "FuriHalUsbEth"
 
@@ -327,14 +331,238 @@ static usbd_respond eth_control(usbd_device* dev, usbd_ctlreq* req, usbd_rqc_cal
 
 /* ---------------- HTTP-over-usb_eth helper implementation ---------------- */
 
+#if LWIP_TCP && LWIP_CALLBACK_API
+
+typedef struct {
+    Storage* storage;
+    File* file;
+    FuriSemaphore* done_sem;
+
+    httpc_connection_t settings;
+
+    httpc_result_t result;
+    u32_t rx_content_len;
+    u32_t server_response;
+    err_t lwip_err;
+} UsbEthHttpDownloadContext;
+
+static err_t usb_eth_http_recv(void* arg, struct altcp_pcb* pcb, struct pbuf* p, err_t err) {
+    UsbEthHttpDownloadContext* ctx = arg;
+    LWIP_UNUSED_ARG(pcb);
+
+    if(err != ERR_OK) {
+        if(p != NULL) {
+            pbuf_free(p);
+        }
+        return err;
+    }
+
+    if(!p || !ctx || !ctx->file) {
+        if(p) pbuf_free(p);
+        return ERR_OK;
+    }
+
+    struct pbuf* q = p;
+    while(q) {
+        if(q->len) {
+            if(storage_file_write(ctx->file, q->payload, q->len) != q->len) {
+                FURI_LOG_E(TAG, "usb_eth_http: storage write failed");
+                pbuf_free(p);
+                return ERR_MEM;
+            }
+        }
+        q = q->next;
+    }
+
+    altcp_recved(pcb, p->tot_len);
+    pbuf_free(p);
+    return ERR_OK;
+}
+
+static void usb_eth_http_result_cb(
+    void* arg,
+    httpc_result_t httpc_result,
+    u32_t rx_content_len,
+    u32_t srv_res,
+    err_t err) {
+    UsbEthHttpDownloadContext* ctx = arg;
+    if(!ctx) return;
+
+    ctx->result = httpc_result;
+    ctx->rx_content_len = rx_content_len;
+    ctx->server_response = srv_res;
+    ctx->lwip_err = err;
+
+    /* Signal completion to waiting thread. */
+    if(ctx->done_sem) {
+        furi_semaphore_release(ctx->done_sem);
+    }
+}
+
+static bool usb_eth_http_parse_url(
+    const char* url,
+    char* host,
+    size_t host_size,
+    u16_t* port,
+    const char** out_uri) {
+    if(!url || !host || !port || !out_uri) return false;
+
+    const char* prefix = "http://";
+    size_t prefix_len = strlen(prefix);
+    const char* p = NULL;
+
+    if(strncmp(url, prefix, prefix_len) == 0) {
+        p = url + prefix_len;
+    } else {
+        /* Enforce plain HTTP only; HTTPS is not supported here. */
+        FURI_LOG_E(TAG, "usb_eth_http: only http:// URLs are supported");
+        return false;
+    }
+
+    const char* path = strchr(p, '/');
+    if(!path) {
+        /* No explicit path -> use root. */
+        path = "/";
+    }
+
+    const char* host_start = p;
+    const char* host_end = path;
+
+    const char* colon = memchr(host_start, ':', (size_t)(host_end - host_start));
+    if(colon) {
+        host_end = colon;
+        long parsed_port = strtol(colon + 1, NULL, 10);
+        if(parsed_port <= 0 || parsed_port > 65535) {
+            FURI_LOG_E(TAG, "usb_eth_http: invalid port in URL");
+            return false;
+        }
+        *port = (u16_t)parsed_port;
+    } else {
+        *port = HTTP_DEFAULT_PORT;
+    }
+
+    size_t host_len = (size_t)(host_end - host_start);
+    if(host_len == 0 || host_len >= host_size) {
+        FURI_LOG_E(TAG, "usb_eth_http: host too long or empty");
+        return false;
+    }
+
+    memcpy(host, host_start, host_len);
+    host[host_len] = '\0';
+
+    *out_uri = path;
+    return true;
+}
+
+bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_path, uint32_t timeout_ms) {
+    UNUSED(timeout_ms); /* Currently unused: we wait until HTTP client finishes internally. */
+
+    if(!url || !dest_path) return false;
+
+    if(!eth_connected) {
+        FURI_LOG_E(TAG, "usb_eth_http: ethernet link not up");
+        return false;
+    }
+
+    char host[128];
+    u16_t port;
+    const char* uri = NULL;
+
+    if(!usb_eth_http_parse_url(url, host, sizeof(host), &port, &uri)) {
+        return false;
+    }
+
+    Storage* storage = furi_record_open(RECORD_STORAGE);
+    if(!storage) {
+        FURI_LOG_E(TAG, "usb_eth_http: failed to open storage record");
+        return false;
+    }
+
+    File* file = storage_file_alloc(storage);
+    if(!file) {
+        FURI_LOG_E(TAG, "usb_eth_http: failed to alloc file object");
+        furi_record_close(RECORD_STORAGE);
+        return false;
+    }
+
+    if(!storage_file_open(file, dest_path, FSAM_WRITE, FSOM_CREATE_ALWAYS)) {
+        FURI_LOG_E(TAG, "usb_eth_http: failed to open dest file %s", dest_path);
+        storage_file_free(file);
+        furi_record_close(RECORD_STORAGE);
+        return false;
+    }
+
+    UsbEthHttpDownloadContext ctx = {0};
+    ctx.storage = storage;
+    ctx.file = file;
+    ctx.done_sem = furi_semaphore_alloc(1, 0);
+    ctx.settings.use_proxy = 0;
+    ctx.settings.result_fn = usb_eth_http_result_cb;
+    ctx.settings.headers_done_fn = NULL;
+
+    if(!ctx.done_sem) {
+        FURI_LOG_E(TAG, "usb_eth_http: failed to alloc semaphore");
+        storage_file_close(file);
+        storage_file_free(file);
+        furi_record_close(RECORD_STORAGE);
+        return false;
+    }
+
+    httpc_state_t* connection = NULL;
+    err_t err = httpc_get_file_dns(host, port, uri, &ctx.settings, usb_eth_http_recv, &ctx, &connection);
+    if(err != ERR_OK) {
+        FURI_LOG_E(TAG, "usb_eth_http: httpc_get_file_dns failed (%d)", err);
+        furi_semaphore_free(ctx.done_sem);
+        storage_file_close(file);
+        storage_file_free(file);
+        furi_record_close(RECORD_STORAGE);
+        return false;
+    }
+
+    /* Wait until HTTP client signals completion. Internal HTTP timeouts apply. */
+    if(furi_semaphore_acquire(ctx.done_sem, FuriWaitForever) != FuriStatusOk) {
+        FURI_LOG_E(TAG, "usb_eth_http: wait for completion failed");
+        furi_semaphore_free(ctx.done_sem);
+        storage_file_close(file);
+        storage_file_free(file);
+        furi_record_close(RECORD_STORAGE);
+        return false;
+    }
+
+    furi_semaphore_free(ctx.done_sem);
+
+    storage_file_sync(file);
+    storage_file_close(file);
+    storage_file_free(file);
+    furi_record_close(RECORD_STORAGE);
+
+    if(ctx.result != HTTPC_RESULT_OK || ctx.lwip_err != ERR_OK) {
+        FURI_LOG_E(
+            TAG,
+            "usb_eth_http: transfer failed (res=%d, lwip=%d, http=%lu)",
+            (int)ctx.result,
+            (int)ctx.lwip_err,
+            (unsigned long)ctx.server_response);
+        return false;
+    }
+
+    if(ctx.rx_content_len == 0) {
+        FURI_LOG_E(TAG, "usb_eth_http: zero-length payload");
+        return false;
+    }
+
+    return true;
+}
+
+#else /* LWIP_TCP && LWIP_CALLBACK_API */
+
 bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_path, uint32_t timeout_ms) {
     UNUSED(url);
     UNUSED(dest_path);
     UNUSED(timeout_ms);
 
-    /* NOTE: lwIP HTTP client / sockets APIs are not enabled in this build,
-     * so this helper is currently a stub. It always returns false.
-     */
-    FURI_LOG_E(TAG, "usb_eth_http: HTTP download helper not available in this build");
+    FURI_LOG_E(TAG, "usb_eth_http: HTTP client not enabled in lwIP config");
     return false;
 }
+
+#endif /* LWIP_TCP && LWIP_CALLBACK_API */

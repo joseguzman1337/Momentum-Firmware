@@ -50,6 +50,18 @@
             "url": "https://docs.warp.dev/~gitbook/mcp",
             "trust": true,
             "description": "Warp documentation MCP server for agent access to Warp docs"
+        },
+        "esp_mcp": {
+            "command": "python3",
+            "args": [
+                "main.py"
+            ],
+            "env": {
+                "IDF_PATH": "${HOME}/esp/esp-idf"
+            },
+            "cwd": ".ai/mcp/servers/esp_mcp",
+            "trust": true,
+            "description": "ESP-IDF MCP server for building, flashing, and testing ESP32 projects via tools like build_esp_project and flash_esp_project"
         }
     }
 }
