@@ -90,6 +90,9 @@ There are too many to name them all, this is a **non-comprehensive** list of the
 
 Note that this repo is always updated with the great work from our friends at [Unleashed](https://github.com/DarkFlippers/unleashed-firmware) and the latest changes from [OFW](https://github.com/flipperdevices/flipperzero-firmware). Below are mentioned only **our** changes that we can actually be credited for, so make sure to check their fantastic additions aswell. And a huge thank you to both teams!
 
+<details>
+<summary><b>📋 View detailed changes (Added, Updated, Removed)</b></summary>
+
 ```txt
 [Added]
 
@@ -134,6 +137,9 @@ Note that this repo is always updated with the great work from our friends at [U
 - Unused Dummy Mode
 - Broken or Superfluous apps
 ```
+
+</details>
+
 
 <br>
 
@@ -200,6 +206,9 @@ $ ./fbt launch APPSRC=your_appid
 
 This repository hosts a sophisticated **Multi-Agent AI System** designed for 24/7 autonomous development, security operations, and architectural governance.
 
+<details>
+<summary><b>🤖 View Agent Roster & Automation Scripts</b></summary>
+
 ### Agent Roster
 The system is orchestrated by a collaborative fleet of specialized AI agents:
 
@@ -219,6 +228,9 @@ The system is orchestrated by a collaborative fleet of specialized AI agents:
 - **`sync_submodules.py`**: Automates the management of forked dependencies.
 - **`task_router.py`**: Intelligent routing of development tasks to the most suitable agent.
 - **`notify.py`**: System-wide notification bus.
+
+</details>
+
 
 ### Submodule Synchronization
 We use a forked submodule workflow to verify integrity and compile-time stability.
