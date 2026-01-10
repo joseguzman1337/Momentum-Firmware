@@ -115,6 +115,16 @@ if GetOption("fullenv") or any(
         ],
     )
 
+    # Allow overriding the radio address and minimal C2 gap from the environment
+    # without forcing command-line flags every time.
+    if os.environ.get("FBT_RADIOADDR_HEX"):
+        dist_basic_arguments.extend(
+            [
+                "--radioaddr",
+                os.environ.get("FBT_RADIOADDR_HEX"),
+            ]
+        )
+
     selfupdate_min_dist = distenv.DistCommand(
         "updater_minpackage",
         distenv["DIST_DEPENDS"],

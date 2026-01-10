@@ -208,7 +208,46 @@ fn main() -> Result<()> {
 
     println!("[esp_mcp_orchestrator] Flashing ESP32 via esp_mcp.flash_esp_project");
 
-    let flash_args = if let Some(port) = port_override {
+    // Determine port: prefer explicit ESP_PORT override; otherwise try list_esp_serial_ports.
+    let selected_port = if let Some(port) = port_override {
+        println!("[esp_mcp_orchestrator] Using ESP_PORT override: {}", port);
+        Some(port)
+    } else {
+        println!("[esp_mcp_orchestrator] No ESP_PORT override set, calling list_esp_serial_ports");
+        let ports_result = call_tool("list_esp_serial_ports", json!({}))?;
+        // list_esp_serial_ports returns [stdout, stderr]; parse stdout for first non-empty token.
+        let auto_port = if let Some(arr) = ports_result.as_array() {
+            let stdout = arr.get(0).and_then(|v| v.as_str()).unwrap_or("");
+            let first_line = stdout
+                .lines()
+                .find(|l| !l.trim().is_empty())
+                .unwrap_or("")
+                .trim();
+            if !first_line.is_empty() {
+                // Take the first whitespace-separated token as device path.
+                let dev = first_line.split_whitespace().next().unwrap_or("");
+                if !dev.is_empty() {
+                    Some(dev.to_string())
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        if let Some(ref p) = auto_port {
+            println!("[esp_mcp_orchestrator] Auto-detected ESP port: {}", p);
+        } else {
+            eprintln!("[esp_mcp_orchestrator] WARNING: Could not auto-detect ESP serial port; flash_esp_project will rely on esp_mcp defaults.");
+        }
+
+        auto_port
+    };
+
+    let flash_args = if let Some(port) = selected_port {
         json!({
             "project_path": project_path.to_string_lossy(),
             "port": port,
