@@ -250,7 +250,7 @@ Right now, your code base covers (1) fully, but (2) is still manual unless you a
 
 3. How to use this right now
 
-With the current firmware in Momentum-Firmware:
+With the current firmware in ~/x/x/Momentum-Firmware:
 
 1. Build and flash the firmware to your Flipper.
 2. Plug Flipper into a host via USB‑C.
