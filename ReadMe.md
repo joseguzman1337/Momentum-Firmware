@@ -195,17 +195,37 @@ To build and launch a single app:
 $ ./fbt launch APPSRC=your_appid
 ```
 
-<h2 align="center">AI Automation</h2>
 
-This repository includes a dedicated `.ai` folder containing automation scripts and agent configurations to streamline development.
+<h2 align="center">AI Automation Ecosystem</h2>
+
+This repository hosts a sophisticated **Multi-Agent AI System** designed for 24/7 autonomous development, security operations, and architectural governance.
+
+### Agent Roster
+The system is orchestrated by a collaborative fleet of specialized AI agents:
+
+| Agent | Role | Focus Area |
+|-------|------|------------|
+| **Gemini** | **Architect** | Strategic planning, System Design, Orchestration |
+| **Codex** | **Engineer** | Feature implementation, Bug fixes, Refactoring |
+| **Claude** | **Security** | CVE patching, Vulnerability scanning, Hardening |
+| **Jules** | **Ops** | Async Cloud tasks, Submodule synchronization |
+| **DeepSeek** | **Performance** | Optimization, Latency reduction |
+| **Warp** | **QA** | Code quality analysis, Test generation |
+| **Amazon Q** | **Infra** | Cloud infrastructure, AWS/GCP integrations |
+| **Kiro** | **Build** | FBT (Flipper Build Tool) workflow automation |
+
+### Automation Scripts (`.ai/scripts/`)
+- **`orchestrator.py`**: The central nervous system. Run with `--yolo-mode` to activate all agents for autonomous operation.
+- **`sync_submodules.py`**: Automates the management of forked dependencies.
+- **`task_router.py`**: Intelligent routing of development tasks to the most suitable agent.
+- **`notify.py`**: System-wide notification bus.
 
 ### Submodule Synchronization
-We use a forked submodule workflow. To automatically sync all submodules to your personal fork:
-
+We use a forked submodule workflow to verify integrity and compile-time stability.
+To sync all submodules to your personal fork:
 ```bash
-$ python3 .ai/scripts/sync_submodules.py
+python3 .ai/scripts/sync_submodules.py
 ```
-
 For more details, see [Forked Development Documentation](documentation/ForkedDevelopment.md).
 
 
