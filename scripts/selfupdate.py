@@ -32,8 +32,8 @@ class Main(App):
         # logging
         self.logger = logging.getLogger()
 
-        # output mode flags
-        self.pretty = sys.stdout.isatty() and not self.args.plain
+        # output mode flag; finalized in install() after args are parsed
+        self.pretty = False
 
     def _log_step(self, label: str, detail: str = ""):
         if self.pretty:
@@ -58,6 +58,9 @@ class Main(App):
             print(f"[ERR] {msg}")
 
     def install(self):
+        # Determine pretty mode now that arguments are parsed
+        self.pretty = sys.stdout.isatty() and not self.args.plain
+
         if not (port := resolve_port(self.logger, self.args.port)):
             return 1
 

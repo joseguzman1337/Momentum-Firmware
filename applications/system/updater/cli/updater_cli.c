@@ -58,7 +58,7 @@ static void updater_log_info_kv(const char* key, const char* value) {
     }
 }
 
-static void updater_log_debug(const char* key, const char* value) {
+static void __attribute__((unused)) updater_log_debug(const char* key, const char* value) {
     if(!updater_verbose_mode) return;
     if(updater_plain_mode) {
         printf("[DBG] %s: %s\r\n", key, value);

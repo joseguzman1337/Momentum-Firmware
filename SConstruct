@@ -56,8 +56,16 @@ firmware_env = distenv.AddFwProject(
 )
 
 # If enabled, initialize updater-related targets
+# Also enable when invoking USB/self-update helpers like flash_usb_* or smart_flash.
 if GetOption("fullenv") or any(
-    filter(lambda target: "updater" in target or "flash_usb" in target, BUILD_TARGETS)
+    filter(
+        lambda target: (
+            "updater" in target
+            or "flash_usb" in target
+            or "smart_flash" in target
+        ),
+        BUILD_TARGETS,
+    )
 ):
     updater_env = distenv.AddFwProject(
         base_env=coreenv,
@@ -70,6 +78,7 @@ if GetOption("fullenv") or any(
         "${ARGS}",
         "--bundlever",
         "${UPDATE_VERSION_STRING}",
+        "--I-understand-what-I-am-doing=yes",
     ]
     dist_radio_arguments = [
         "--radio",
