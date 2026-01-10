@@ -43,4 +43,4 @@
 	url = https://github.com/pfalcon/uzlib.git
 [submodule "lib/lwip"]
 	path = lib/lwip
-	url = https://github.com/flipperdevices/lwip
+	url = https://github.com/joseguzman1337/lwip
