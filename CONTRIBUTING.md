@@ -40,7 +40,7 @@ We encourage the use of advanced AI architecture to improve the firmware ecosyst
 
 **1. Generative AI and Large Language Models (LLMs)**
 
-- **LLMs/Generative AI:** Extensive knowledge and experience with Large Language Models (LLMs) such as Llama 3 and GPT-4.
+- **LLMs/Generative AI:** Extensive knowledge and experience with Large Language Models (LLMs).
 - **GenAI Infrastructure:** Building a proxy-first "AI Gateway" intermediary layer and a unified API endpoint to abstract LLM complexities for centralized control and security.
 - **Multi-Agent Systems:** Deep experience with multi-agent systems, agent-to-agent (A2A) communication, and orchestration frameworks.
 
