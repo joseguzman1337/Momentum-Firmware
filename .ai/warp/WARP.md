@@ -31,7 +31,10 @@ Momentum Firmware is a custom firmware for Flipper Zero based on the Official Fi
 
 ### Flashing & Debugging
 ```bash
-# Flash via USB (recommended)
+# Smart USB flash with updater package + AI-style CLI output (recommended)
+./fbt smart_flash
+
+# Classic USB flash
 ./fbt flash_usb_full
 
 # Flash via SWD

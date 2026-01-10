@@ -191,7 +191,10 @@ To download the repository:
 $ git clone --recursive --jobs 8 https://github.com/joseguzman1337/Momentum-Firmware.git
 $ cd Momentum-Firmware/
 
-To flash directly to the Flipper (Needs to be connected via USB, qFlipper closed)
+To flash directly to the Flipper over USB (pretty, AI-styled output; Flipper connected via USB, qFlipper closed)
+$ ./fbt smart_flash
+
+To flash via USB with the classic target
 $ ./fbt flash_usb_full
 
 To compile a TGZ package

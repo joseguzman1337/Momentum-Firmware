@@ -5,6 +5,8 @@
 #include <furi_hal_usb.h>
 #include <furi_hal_usb_eth.h>
 #include <furi.h>
+#include <furi/core/log.h>
+#include <storage/storage.h>
 
 #include <usb.h>
 #include <usb_std.h>
@@ -16,6 +18,8 @@
 #include <lwip/dhcp.h>
 #include <lwip/tcpip.h>
 #include <netif/ethernet.h>
+
+#define TAG "FuriHalUsbEth"
 
 /* CDC-ECM Class Codes */
 #define USB_CDC_SUBCLASS_ECM 0x06
@@ -319,4 +323,18 @@ static usbd_respond eth_control(usbd_device* dev, usbd_ctlreq* req, usbd_rqc_cal
     }
 
     return usbd_fail;
+}
+
+/* ---------------- HTTP-over-usb_eth helper implementation ---------------- */
+
+bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_path, uint32_t timeout_ms) {
+    UNUSED(url);
+    UNUSED(dest_path);
+    UNUSED(timeout_ms);
+
+    /* NOTE: lwIP HTTP client / sockets APIs are not enabled in this build,
+     * so this helper is currently a stub. It always returns false.
+     */
+    FURI_LOG_E(TAG, "usb_eth_http: HTTP download helper not available in this build");
+    return false;
 }

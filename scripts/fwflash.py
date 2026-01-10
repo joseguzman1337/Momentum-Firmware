@@ -14,6 +14,14 @@ from serial.tools.list_ports_common import ListPortInfo
 
 # When adding an interface, also add it to SWD_TRANSPORT in fbt/ufbt options
 
+# Simple ANSI styles for nicer CLI output (when stdout is a TTY)
+ANSI_RESET = "\033[0m"
+ANSI_BOLD = "\033[1m"
+ANSI_CYAN = "\033[36m"
+ANSI_GREEN = "\033[32m"
+ANSI_YELLOW = "\033[33m"
+ANSI_RED = "\033[31m"
+
 
 class Programmer(ABC):
     root_logger = logging.getLogger("Programmer")
@@ -44,11 +52,23 @@ class Programmer(ABC):
             stderr=subprocess.STDOUT,
         )
 
-        if show_progress:
-            while process.poll() is None:
-                time.sleep(0.25)
-                print(".", end="", flush=True)
-            print()
+        if show_progress and os.isatty(1):
+            # Simple spinner while underlying tool runs
+            frames = "|/-\\"
+            idx = 0
+            label = f"Flashing via {' '.join(process_params[:1])}..."
+            try:
+                while process.poll() is None:
+                    time.sleep(0.25)
+                    frame = frames[idx % len(frames)]
+                    idx += 1
+                    print(
+                        f"\r" f"{ANSI_CYAN}{ANSI_BOLD}{frame}{ANSI_RESET} {label}",
+                        end="",
+                        flush=True,
+                    )
+            finally:
+                print("\r", end="")
         else:
             process.wait()
 

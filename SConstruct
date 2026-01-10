@@ -140,6 +140,24 @@ if GetOption("fullenv") or any(
     )
     distenv.Alias("flash_usb", usb_minupdate_package)
 
+    # Convenience alias: build updater package and install it over USB with
+    # pretty, AI-style selfupdate output
+    smart_flash_target = distenv.PhonyTarget(
+        "smart_flash",
+        [
+            [
+                "${PYTHON3}",
+                "${SELFUPDATE_SCRIPT}",
+                "-p",
+                "${FLIP_PORT}",
+                "${UPDATE_BUNDLE_DIR}/update.fuf",
+                "${ARGS}",
+            ],
+        ],
+    )
+    distenv.Depends(smart_flash_target, usb_update_package)
+    distenv.Alias("smart_flash", smart_flash_target)
+
 
 # Target for copying & renaming binaries to dist folder
 basic_dist = distenv.DistCommand("fw_dist", distenv["DIST_DEPENDS"])

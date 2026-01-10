@@ -3,6 +3,7 @@
 import logging
 import os
 import pathlib
+import sys
 import time
 
 from flipper.app import App
@@ -15,6 +16,12 @@ class Main(App):
 
     def init(self):
         self.parser.add_argument("-p", "--port", help="CDC Port", default="auto")
+        self.parser.add_argument(
+            "--plain",
+            action="store_true",
+            help="Disable ANSI colors / pretty output",
+            default=False,
+        )
 
         self.parser.add_argument("manifest_path", help="Manifest path")
         self.parser.add_argument(
@@ -25,11 +32,37 @@ class Main(App):
         # logging
         self.logger = logging.getLogger()
 
+        # output mode flags
+        self.pretty = sys.stdout.isatty() and not self.args.plain
+
+    def _log_step(self, label: str, detail: str = ""):
+        if self.pretty:
+            prefix = "\033[36m\033[1m::\033[0m\033[1m"
+            msg = f"{prefix} {label}\033[0m"
+            if detail:
+                msg += f" {detail}"
+            print(msg)
+        else:
+            print(f":: {label} {detail}")
+
+    def _log_ok(self, msg: str):
+        if self.pretty:
+            print("\033[32m\033[1m  \xE2\x9C\x93 \033[0m" + msg)
+        else:
+            print(f"[OK] {msg}")
+
+    def _log_err(self, msg: str):
+        if self.pretty:
+            print("\033[31m\033[1m  \xE2\x9C\x97 \033[0m" + msg)
+        else:
+            print(f"[ERR] {msg}")
+
     def install(self):
         if not (port := resolve_port(self.logger, self.args.port)):
             return 1
 
         if not os.path.isfile(self.args.manifest_path):
+            self._log_err("Manifest not found")
             self.logger.error("Error: manifest not found")
             return 2
 
@@ -39,6 +72,16 @@ class Main(App):
         pkg_dir_name = self.args.pkg_dir_name or pkg_name
         update_root = "/ext/update"
         flipper_update_path = f"{update_root}/{pkg_dir_name}"
+
+        if self.pretty:
+            print("\n\033[1m⚡ FLIPPER USB UPDATE\033[0m")
+        self._log_step("SelfUpdate", f'Installing "{pkg_name}"')
+        if self.pretty:
+            print(f"  \033[90mLocal manifest:\033[0m {manifest_path}")
+            print(f"  \033[90mRemote path :\033[0m {flipper_update_path}")
+        else:
+            print(f"  Local manifest: {manifest_path}")
+            print(f"  Remote path : {flipper_update_path}")
 
         self.logger.info(f'Installing "{pkg_name}" from {flipper_update_path}')
 
@@ -51,6 +94,8 @@ class Main(App):
                     flipper_update_path, manifest_path.parents[0]
                 )
 
+                if self.pretty:
+                    self._log_step("Loader", "Closing current app, if any")
                 self.logger.info("Closing current app, if any")
                 for _ in range(10):
                     storage.send_and_wait_eol("loader close\r")
@@ -73,14 +118,22 @@ class Main(App):
                 )
                 result = storage.read.until(storage.CLI_EOL)
                 if b"Verifying" not in result:
-                    self.logger.error(f"Unexpected response: {result.decode('ascii')}")
+                    msg = result.decode("ascii")
+                    self._log_err(f"Unexpected response: {msg.strip()}")
+                    self.logger.error(f"Unexpected response: {msg}")
                     return 3
+                if self.pretty:
+                    self._log_step("Device", "Verifying & applying update...")
                 result = storage.read.until(storage.CLI_EOL)
                 if not result.startswith(b"OK"):
-                    self.logger.error(result.decode("ascii"))
+                    msg = result.decode("ascii")
+                    self._log_err(msg.strip())
+                    self.logger.error(msg)
                     return 4
+                self._log_ok("Update triggered successfully. Device will reboot.")
                 return 0
         except Exception as e:
+            self._log_err(str(e))
             self.logger.error(e)
             return 5
 
