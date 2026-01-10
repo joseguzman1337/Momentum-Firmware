@@ -95,6 +95,8 @@ Note that this repo is always updated with the great work from our friends at [U
 
 - Momentum App (Easy configuration of features and behavior of the firmware)
 - Asset Packs (Unparalleled theming and customization)
+- Native USB Ethernet support (CDC-ECM) - [Read Docs](documentation/NativeEthernet.md)
+- Automated Submodule Sync (Forked Development Workflow) - [Read Docs](documentation/ForkedDevelopment.md)
 - More UI customization, redesigns and optimizations
 - Bad-Keyboard App
 - BLE Spam App
