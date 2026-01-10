@@ -61,7 +61,10 @@ class Main(App):
         # Determine pretty mode now that arguments are parsed
         self.pretty = sys.stdout.isatty() and not self.args.plain
 
-        if not (port := resolve_port(self.logger, self.args.port)):
+        port = resolve_port(self.logger, self.args.port)
+        if not port:
+            self._log_err("Failed to find connected Flipper")
+            self.logger.error("Failed to find connected Flipper")
             return 1
 
         if not os.path.isfile(self.args.manifest_path):

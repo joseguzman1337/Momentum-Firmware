@@ -180,6 +180,7 @@ if GetOption("fullenv") or any(
         ENV={
             "REPO_ROOT": "${ROOT_DIR.abspath}",
             "ESP_PROJECT_PATH": "${ROOT_DIR.abspath}/.ai/esp_projects/default",
+            "PATH": os.environ.get("PATH", ""),
         },
     )
     # smart_flash should depend on the updater package being built, but

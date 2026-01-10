@@ -37,8 +37,10 @@ enum RpcResponse {
 
 fn main() -> Result<()> {
     // PROJECT_PATH: default to current directory unless overridden.
+    // We avoid canonicalize() here so that missing or lazily-created paths don't
+    // cause an immediate hard failure; the esp_mcp server will validate the path.
     let project_path = std::env::var("ESP_PROJECT_PATH").unwrap_or_else(|_| ".".to_string());
-    let project_path = PathBuf::from(project_path).canonicalize()?;
+    let project_path = PathBuf::from(project_path);
 
     // Optional serial port override (auto-detect if not set).
     let port_override = std::env::var("ESP_PORT").ok();
