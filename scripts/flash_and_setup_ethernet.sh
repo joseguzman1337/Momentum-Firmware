@@ -15,12 +15,51 @@ NC='\033[0m'
 DEVBOARD_FLASH=0
 DEVBOARD_CHANNEL="release"
 DEVBOARD_TIMEOUT=180
+DEVBOARD_AUTO_BOOTLOADER=1
+DEVBOARD_AUTO_BOOTLOADER_PORT="auto"
 SKIP_FLIPPER_FLASH=0
 AUTO_FORMAT_EXT=0
 
 usage() {
-    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--skip-flipper-flash] [--auto-format-ext]"
+    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--devboard-auto-bootloader <on|off>] [--devboard-auto-bootloader-port <port>] [--skip-flipper-flash] [--auto-format-ext]"
 }
+
+reset_flipper_usb() {
+    local dev
+    dev=$(lsusb | awk '/0483:5740/ {print $2, $4}' | head -1 | awk '{gsub(":", "", $2); print $1 " " $2}')
+    if [ -z "$dev" ]; then
+        return 1
+    fi
+    local bus
+    local devnum
+    bus=$(echo "$dev" | awk '{print $1}')
+    devnum=$(echo "$dev" | awk '{print $2}')
+    local path="/dev/bus/usb/${bus}/${devnum}"
+    if [ -x /usr/bin/usbreset ]; then
+        /usr/bin/usbreset "$path" >/dev/null 2>&1 && return 0
+        sudo -n /usr/bin/usbreset "$path" >/dev/null 2>&1 && return 0
+    fi
+    return 1
+}
+
+MM_STOPPED=0
+maybe_stop_modemmanager() {
+    if command -v systemctl >/dev/null 2>&1; then
+        if systemctl is-active --quiet ModemManager; then
+            if sudo -n systemctl stop ModemManager >/dev/null 2>&1; then
+                MM_STOPPED=1
+            fi
+        fi
+    fi
+}
+
+maybe_start_modemmanager() {
+    if [ "$MM_STOPPED" -eq 1 ] && command -v systemctl >/dev/null 2>&1; then
+        sudo -n systemctl start ModemManager >/dev/null 2>&1 || true
+    fi
+}
+
+trap maybe_start_modemmanager EXIT
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -34,6 +73,18 @@ while [ $# -gt 0 ]; do
             ;;
         --devboard-timeout)
             DEVBOARD_TIMEOUT="$2"
+            shift 2
+            ;;
+        --devboard-auto-bootloader)
+            if [ "$2" = "off" ]; then
+                DEVBOARD_AUTO_BOOTLOADER=0
+            else
+                DEVBOARD_AUTO_BOOTLOADER=1
+            fi
+            shift 2
+            ;;
+        --devboard-auto-bootloader-port)
+            DEVBOARD_AUTO_BOOTLOADER_PORT="$2"
             shift 2
             ;;
         --skip-flipper-flash)
@@ -75,9 +126,51 @@ if [ "$SKIP_FLIPPER_FLASH" -eq 1 ]; then
     echo -e "${YELLOW}[!] Skipping firmware flash (requested)${NC}"
 else
     if [ "$AUTO_FORMAT_EXT" -eq 1 ]; then
-        python3 "$SCRIPT_DIR/ensure_flipper_ext.py" --wait --timeout 30 --format-if-missing
+        if ! timeout 20s python3 "$SCRIPT_DIR/ensure_flipper_ext.py" --wait --timeout 30 --format-if-missing; then
+            echo -e "${YELLOW}[!] /ext check failed; continuing anyway${NC}"
+        fi
     fi
-    ./fbt flash_usb_full
+    maybe_stop_modemmanager
+    timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
+    FLASH_ATTEMPTS=0
+    attempt=0
+    FLIPPER_PORTS=()
+    if ls /dev/serial/by-id/*Flipper* >/dev/null 2>&1; then
+        while IFS= read -r port; do
+            FLIPPER_PORTS+=("$port")
+        done < <(ls -1 /dev/serial/by-id/*Flipper*)
+    fi
+    if ls /dev/ttyACM* >/dev/null 2>&1; then
+        while IFS= read -r port; do
+            FLIPPER_PORTS+=("$port")
+        done < <(ls -1 /dev/ttyACM*)
+    fi
+    if [ "${#FLIPPER_PORTS[@]}" -eq 0 ]; then
+        FLIPPER_PORTS=("auto")
+    fi
+    while true; do
+        attempt=$((attempt + 1))
+        if [ "$FLASH_ATTEMPTS" -gt 0 ]; then
+            echo -e "${YELLOW}    Flash attempt ${attempt}/${FLASH_ATTEMPTS}...${NC}"
+        else
+            echo -e "${YELLOW}    Flash attempt ${attempt} (retrying until success)...${NC}"
+        fi
+
+        timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
+        for port in "${FLIPPER_PORTS[@]}"; do
+            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=115200 FBT_STORAGE_CHUNK_SIZE=1024 ./fbt flash_usb_full; then
+                break 2
+            fi
+            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=230400 FBT_STORAGE_CHUNK_SIZE=1024 ./fbt flash_usb_full; then
+                break 2
+            fi
+        done
+        reset_flipper_usb || true
+        if [ "$FLASH_ATTEMPTS" -gt 0 ] && [ "$attempt" -ge "$FLASH_ATTEMPTS" ]; then
+            exit 1
+        fi
+        sleep 3
+    done
 fi
 
 echo -e "${GREEN}[✓] Firmware step complete${NC}"
@@ -162,7 +255,11 @@ while [ $COUNT -lt $MAX_WAIT ]; do
             STEP=$((STEP + 1))
             echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Flashing WiFi devboard via fbt...${NC}"
             echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
-            ./fbt devboard_flash ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
+            DEVBOARD_ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
+            if [ "$DEVBOARD_AUTO_BOOTLOADER" -eq 1 ]; then
+                DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT"
+            fi
+            ./fbt devboard_flash ARGS="$DEVBOARD_ARGS"
             echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"
             echo ""
         fi

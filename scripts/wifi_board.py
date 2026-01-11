@@ -142,6 +142,16 @@ class Main(App):
             default=2,
             help="Seconds between bootloader checks",
         )
+        self.parser.add_argument(
+            "--auto-bootloader",
+            action="store_true",
+            help="Try to auto-enter bootloader mode via USB serial",
+        )
+        self.parser.add_argument(
+            "--auto-bootloader-port",
+            default="auto",
+            help="Serial port to toggle for auto bootloader (default: auto)",
+        )
         self.parser.set_defaults(func=self.update)
 
         # logging
@@ -182,9 +192,70 @@ class Main(App):
         self.logger.info("Trying to find WiFi board using VID:PID")
         return self.find_port("VID:PID=303A:0002")
 
+    def _pick_auto_bootloader_ports(self) -> list[str]:
+        if self.args.auto_bootloader_port != "auto":
+            return [self.args.auto_bootloader_port]
+
+        candidates: list[str] = []
+        for port in list_ports.comports():
+            desc = f"{port.description} {port.manufacturer or ''}".lower()
+            vid = f"{port.vid:04x}" if port.vid is not None else ""
+            pid = f"{port.pid:04x}" if port.pid is not None else ""
+            id_str = f"{vid}:{pid}" if vid and pid else ""
+
+            if any(
+                token in desc
+                for token in (
+                    "esp32",
+                    "espressif",
+                    "usb jtag",
+                    "usb serial",
+                    "cp210",
+                    "ch340",
+                )
+            ) or id_str in ("303a:0002", "303a:1001", "10c4:ea60", "1a86:7523"):
+                candidates.append(port.device)
+
+        # If no obvious candidates, try any serial port once.
+        if not candidates:
+            candidates = [p.device for p in list_ports.comports()]
+
+        return candidates
+
+    def _try_auto_bootloader(self) -> bool:
+        try:
+            import serial
+        except Exception as e:
+            self.logger.warning(f"Auto-bootloader unavailable (pyserial): {e}")
+            return False
+
+        ports = self._pick_auto_bootloader_ports()
+        if not ports:
+            return False
+
+        success = False
+        for port in ports:
+            try:
+                self.logger.info(f"Attempting auto-bootloader via {port}")
+                with serial.Serial(port, 115200, timeout=1) as ser:
+                    # Best-effort RTS/DTR toggle to enter bootloader
+                    ser.dtr = False
+                    ser.rts = True
+                    time.sleep(0.1)
+                    ser.dtr = True
+                    ser.rts = False
+                    time.sleep(0.1)
+                    ser.dtr = False
+                    ser.rts = False
+                success = True
+            except Exception as e:
+                self.logger.warning(f"Auto-bootloader attempt failed on {port}: {e}")
+        return success
+
     def wait_for_bootloader_port(self) -> Optional[str]:
         deadline = time.time() + max(0, self.args.timeout)
         next_hint = 0.0
+        next_auto = 0.0
 
         while True:
             try:
@@ -199,6 +270,9 @@ class Main(App):
                 return port
 
             now = time.time()
+            if self.args.auto_bootloader and now >= next_auto:
+                self._try_auto_bootloader()
+                next_auto = now + max(3, self.args.interval)
             if now >= next_hint:
                 if self.is_wifi_board_connected():
                     self.logger.warning("WiFi board found, but not in bootloader mode.")

@@ -48,7 +48,7 @@ See [FLIPPER_AUTO_ETHERNET.md](FLIPPER_AUTO_ETHERNET.md) for full automation doc
 If you want to update the WiFi devboard firmware directly from your computer:
 
 ```bash
-./fbt devboard_flash ARGS="--wait --timeout 180"
+./fbt devboard_flash ARGS="--wait --timeout 180 --auto-bootloader"
 ```
 
 Or use the full automation wrapper:
@@ -58,7 +58,7 @@ Or use the full automation wrapper:
 ```
 
 Notes:
-1. Put the WiFi board into bootloader mode (hold **BOOT**, tap **RESET**).
+1. `--auto-bootloader` is best-effort and depends on the USB serial wiring.
 2. `--wait` keeps polling until the board is detected.
 3. Use `--devboard-channel dev` or `--devboard-channel rc` if needed.
 

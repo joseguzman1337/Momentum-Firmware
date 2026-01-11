@@ -11,7 +11,7 @@ sys.path.insert(0, str(SCRIPT_DIR / "flipper"))
 from storage import FlipperStorage, StorageErrorCode  # noqa: E402
 
 
-def find_flipper_port():
+def find_flipper_ports():
     import glob
 
     patterns = [
@@ -19,19 +19,20 @@ def find_flipper_port():
         "/dev/serial/by-id/*Flipper*",
         "/dev/cu.usbmodem*",
     ]
+    seen = set()
     for pattern in patterns:
-        ports = glob.glob(pattern)
-        if ports:
-            return ports[0]
-    return None
+        for port in glob.glob(pattern):
+            if port not in seen:
+                seen.add(port)
+                yield port
 
 
 def wait_for_port(timeout: int):
     deadline = time.time() + max(0, timeout)
     while True:
-        port = find_flipper_port()
-        if port:
-            return port
+        ports = list(find_flipper_ports())
+        if ports:
+            return ports
         if time.time() >= deadline:
             return None
         time.sleep(1)
@@ -59,30 +60,40 @@ def main():
     args = parser.parse_args()
 
     if args.port == "auto":
-        port = wait_for_port(args.timeout) if args.wait else find_flipper_port()
+        ports = wait_for_port(args.timeout) if args.wait else list(find_flipper_ports())
     else:
-        port = args.port
+        ports = [args.port]
 
-    if not port:
+    if not ports:
         print("ERROR: Flipper serial port not found", file=sys.stderr)
         return 1
 
-    with FlipperStorage(port) as storage:
-        status = stat_ext(storage)
-        if status == StorageErrorCode.OK:
-            print("OK: /ext is available")
-            return 0
+    last_error = None
+    for port in ports:
+        for attempt in range(1, 4):
+            try:
+                with FlipperStorage(port) as storage:
+                    status = stat_ext(storage)
+                    if status == StorageErrorCode.OK:
+                        print("OK: /ext is available")
+                        return 0
 
-        if args.format_if_missing:
-            print(f"INFO: /ext status is '{status.value}', formatting /ext...")
-            storage.format_ext()
-            status = stat_ext(storage)
-            if status == StorageErrorCode.OK:
-                print("OK: /ext formatted and available")
-                return 0
+                    if args.format_if_missing:
+                        print(f"INFO: /ext status is '{status.value}', formatting /ext...")
+                        storage.format_ext()
+                        status = stat_ext(storage)
+                        if status == StorageErrorCode.OK:
+                            print("OK: /ext formatted and available")
+                            return 0
 
-        print(f"ERROR: /ext not available ({status.value})", file=sys.stderr)
-        return 1
+                    last_error = f"/ext not available ({status.value}) on {port}"
+                    break
+            except Exception as exc:
+                last_error = f"{port} attempt {attempt}: {exc}"
+                time.sleep(1)
+
+    print(f"ERROR: {last_error}", file=sys.stderr)
+    return 1
 
 
 if __name__ == "__main__":

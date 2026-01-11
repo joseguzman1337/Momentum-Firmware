@@ -96,9 +96,16 @@ class FlipperStorage:
     CLI_EOL = "\r\n"
 
     def __init__(self, portname: str, chunk_size: int = 8192):
+        try:
+            env_chunk = int(os.environ.get("FBT_STORAGE_CHUNK_SIZE", "0"))
+            if env_chunk > 0:
+                chunk_size = env_chunk
+        except Exception:
+            pass
         self.port = serial.Serial()
         self.port.port = portname
         self.port.timeout = 2
+        self.port.write_timeout = 2
         self.port.baudrate = int(os.environ.get("FBT_FLIPPER_BAUD", "230400"))
         self.read = BufferedRead(self.port)
         self.chunk_size = chunk_size
