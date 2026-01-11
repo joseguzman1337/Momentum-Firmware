@@ -216,9 +216,12 @@ class Main(App):
             ) or id_str in ("303a:0002", "303a:1001", "10c4:ea60", "1a86:7523"):
                 candidates.append(port.device)
 
-        # If no obvious candidates, try any serial port once.
+        # If no obvious candidates, only probe USB/ACM-style ports.
         if not candidates:
-            candidates = [p.device for p in list_ports.comports()]
+            for port in list_ports.comports():
+                dev = (port.device or "").lower()
+                if any(token in dev for token in ("ttyusb", "ttyacm", "usbmodem", "usbserial")):
+                    candidates.append(port.device)
 
         return candidates
 
