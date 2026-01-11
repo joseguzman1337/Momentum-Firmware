@@ -19,6 +19,16 @@ FBT_GIT_SUBMODULE_SHALLOW="${FBT_GIT_SUBMODULE_SHALLOW:-""}";
 
 FBT_VERBOSE="$FBT_VERBOSE" . "$SCRIPT_PATH/scripts/toolchain/fbtenv.sh";
 
+if [ $# -gt 0 ] && echo " $* " | grep -q " smart_flash "; then
+    # Default smart_flash to allow C2 overlap and use ESP VID filter unless overridden.
+    FBT_ALLOW_C2_OVERLAP="${FBT_ALLOW_C2_OVERLAP:-1}";
+    ESP_PORT_FILTER="${ESP_PORT_FILTER:-vid=0x303A}";
+    export FBT_ALLOW_C2_OVERLAP ESP_PORT_FILTER;
+
+    # Ensure pip is upgraded before any tooling runs.
+    python3 -m pip install --upgrade --user pip >/dev/null 2>&1 || true;
+fi
+
 if [ -z "$FBT_VERBOSE" ]; then
     SCONS_DEFAULT_FLAGS="$SCONS_DEFAULT_FLAGS -Q";
 fi

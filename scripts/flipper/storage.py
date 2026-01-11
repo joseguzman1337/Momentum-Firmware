@@ -69,8 +69,9 @@ class BufferedRead:
         self.buffer = bytearray()
         self.stream = stream
 
-    def until(self, eol: str = "\n", cut_eol: bool = True):
+    def until(self, eol: str = "\n", cut_eol: bool = True, timeout_sec: float | None = None):
         eol = eol.encode("ascii")
+        deadline = time.monotonic() + timeout_sec if timeout_sec is not None else None
         while True:
             # search in buffer
             i = self.buffer.find(eol)
@@ -86,6 +87,8 @@ class BufferedRead:
             i = max(1, self.stream.in_waiting)
             data = self.stream.read(i)
             self.buffer.extend(data)
+            if deadline is not None and time.monotonic() > deadline:
+                raise TimeoutError(f"Timed out waiting for '{eol.decode('ascii', 'ignore')}'")
 
 
 class FlipperStorage:
@@ -96,9 +99,10 @@ class FlipperStorage:
         self.port = serial.Serial()
         self.port.port = portname
         self.port.timeout = 2
-        self.port.baudrate = 115200  # Doesn't matter for VCP
+        self.port.baudrate = int(os.environ.get("FBT_FLIPPER_BAUD", "230400"))
         self.read = BufferedRead(self.port)
         self.chunk_size = chunk_size
+        self.logger = logging.getLogger(__name__)
 
     def __enter__(self):
         self.start()
@@ -108,15 +112,49 @@ class FlipperStorage:
         self.stop()
 
     def start(self):
-        self.port.open()
-        time.sleep(0.5)
-        self.read.until(self.CLI_PROMPT)
-        self.port.reset_input_buffer()
-        # Send a command with a known syntax to make sure the buffer is flushed
-        self.send("device_info\r")
-        self.read.until("hardware_model")
-        # And read buffer until we get prompt
-        self.read.until(self.CLI_PROMPT)
+        open_retries = int(os.environ.get("FBT_STORAGE_OPEN_RETRIES", "3"))
+        open_timeout = float(os.environ.get("FBT_STORAGE_OPEN_TIMEOUT", "5.0"))
+        baud_candidates = []
+        try:
+            baud_candidates.append(int(os.environ.get("FBT_FLIPPER_BAUD", "230400")))
+        except ValueError:
+            baud_candidates.append(230400)
+        for candidate in (230400, 115200):
+            if candidate not in baud_candidates:
+                baud_candidates.append(candidate)
+        for attempt in range(1, open_retries + 1):
+            if not self.port.is_open:
+                self.port.open()
+            for baud in baud_candidates:
+                try:
+                    self.port.baudrate = baud
+                    self.logger.warning(f"Storage open attempt {attempt}/{open_retries} using baud {baud}")
+                    # Toggle control lines to prod the USB CDC interface.
+                    try:
+                        self.port.dtr = False
+                        self.port.rts = False
+                        time.sleep(0.1)
+                        self.port.dtr = True
+                        self.port.rts = True
+                    except Exception:
+                        pass
+                    time.sleep(0.3)
+                    self.port.reset_input_buffer()
+                    # Send a command with a known syntax to make sure the buffer is flushed
+                    self.send("\x03")  # Ctrl+C to break out of any running CLI mode
+                    self.send("\r\n")
+                    self.read.until(self.CLI_PROMPT, timeout_sec=open_timeout)
+                    self.send("device_info\r")
+                    self.read.until("hardware_model", timeout_sec=open_timeout)
+                    # And read buffer until we get prompt
+                    self.read.until(self.CLI_PROMPT, timeout_sec=open_timeout)
+                    return
+                except TimeoutError as err:
+                    self.logger.warning(f"Storage open attempt {attempt}/{open_retries} timed out: {err}")
+                    self.port.reset_input_buffer()
+            if attempt == open_retries:
+                raise TimeoutError(f"Timed out waiting for '{self.CLI_PROMPT}'")
+            time.sleep(0.5)
 
     def stop(self) -> None:
         self.port.close()

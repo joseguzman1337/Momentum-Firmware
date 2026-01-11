@@ -4,6 +4,8 @@ use serde_json::json;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use std::thread::sleep;
+use std::time::Duration;
 
 #[derive(Serialize)]
 struct RpcRequest<'a> {
@@ -43,7 +45,43 @@ fn main() -> Result<()> {
     let project_path = PathBuf::from(project_path);
 
     // Optional serial port override (auto-detect if not set).
-    let port_override = std::env::var("ESP_PORT").ok();
+    let port_override = std::env::var("ESP_PORT")
+        .ok()
+        .or_else(|| std::env::var("ESPPORT").ok());
+    let port_filter = std::env::var("ESP_PORT_FILTER")
+        .ok()
+        .or_else(|| std::env::var("ESPPORTFILTER").ok());
+
+    let (filter_vid, filter_pid) = port_filter
+        .as_deref()
+        .map(|filter| {
+            let mut vid = None;
+            let mut pid = None;
+            for part in filter.split(|c| c == ',' || c == ' ' || c == ';') {
+                let trimmed = part.trim();
+                if let Some(value) = trimmed.strip_prefix("vid=") {
+                    vid = parse_usb_id(value);
+                } else if let Some(value) = trimmed.strip_prefix("pid=") {
+                    pid = parse_usb_id(value);
+                }
+            }
+            (vid, pid)
+        })
+        .unwrap_or((None, None));
+
+    let port_transport = |port: &str| -> &'static str {
+        let port_lower = port.to_lowercase();
+        if port_lower.contains("usbmodem") || port_lower.contains("ttyacm") {
+            "usb-c cdc"
+        } else if port_lower.contains("ttyusb")
+            || port_lower.contains("usbserial")
+            || port_lower.contains("com")
+        {
+            "serial"
+        } else {
+            "unknown"
+        }
+    };
 
     // 1. Start esp_mcp server (python main.py in .ai/mcp/servers/esp_mcp)
     let repo_root = std::env::var("REPO_ROOT").unwrap_or_else(|_| ".".to_string());
@@ -214,7 +252,15 @@ fn main() -> Result<()> {
         Some(port)
     } else {
         println!("[esp_mcp_orchestrator] No ESP_PORT override set, calling list_esp_serial_ports");
-        let ports_result = call_tool("list_esp_serial_ports", json!({}))?;
+        let list_args = if filter_vid.is_some() || filter_pid.is_some() {
+            json!({
+                "vid": filter_vid.map(|v| format!("0x{:04x}", v)),
+                "pid": filter_pid.map(|p| format!("0x{:04x}", p)),
+            })
+        } else {
+            json!({})
+        };
+        let ports_result = call_tool("list_esp_serial_ports", list_args)?;
         // list_esp_serial_ports returns [stdout, stderr]; parse stdout for first non-empty token.
         let auto_port = if let Some(arr) = ports_result.as_array() {
             let stdout = arr.get(0).and_then(|v| v.as_str()).unwrap_or("");
@@ -239,7 +285,11 @@ fn main() -> Result<()> {
         };
 
         if let Some(ref p) = auto_port {
-            println!("[esp_mcp_orchestrator] Auto-detected ESP port: {}", p);
+            println!(
+                "[esp_mcp_orchestrator] Auto-detected ESP port: {} ({})",
+                p,
+                port_transport(p)
+            );
         } else {
             eprintln!("[esp_mcp_orchestrator] WARNING: Could not auto-detect ESP serial port; flash_esp_project will rely on esp_mcp defaults.");
         }
@@ -248,9 +298,23 @@ fn main() -> Result<()> {
     };
 
     let flash_args = if let Some(port) = selected_port {
+        println!(
+            "[esp_mcp_orchestrator] Using ESP port: {} ({})",
+            port,
+            port_transport(&port)
+        );
         json!({
             "project_path": project_path.to_string_lossy(),
             "port": port,
+        })
+    } else if let Some(filter) = port_filter {
+        println!(
+            "[esp_mcp_orchestrator] Using ESP port filter: {}",
+            filter
+        );
+        json!({
+            "project_path": project_path.to_string_lossy(),
+            "port_filter": filter,
         })
     } else {
         json!({
@@ -258,7 +322,38 @@ fn main() -> Result<()> {
         })
     };
 
-    let flash_result = call_tool("flash_esp_project", flash_args)?;
+    let flash_retries: u32 = std::env::var("ESP_MCP_FLASH_RETRIES")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(10);
+    let flash_delay_secs: f32 = std::env::var("ESP_MCP_FLASH_RETRY_DELAY")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(1.0);
+
+    let mut flash_result = None;
+    for attempt in 1..=flash_retries {
+        let result = call_tool("flash_esp_project", flash_args.clone());
+        match result {
+            Ok(value) => {
+                flash_result = Some(value);
+                break;
+            }
+            Err(err) => {
+                eprintln!(
+                    "[esp_mcp_orchestrator] flash_esp_project failed (attempt {}/{}): {}",
+                    attempt, flash_retries, err
+                );
+                if attempt < flash_retries {
+                    sleep(Duration::from_secs_f32(flash_delay_secs));
+                } else {
+                    return Err(err);
+                }
+            }
+        }
+    }
+
+    let flash_result = flash_result.unwrap_or_else(|| json!(null));
     if let Some(arr) = flash_result.as_array() {
         let stdout = arr.get(0).and_then(|v| v.as_str()).unwrap_or("");
         let stderr = arr.get(1).and_then(|v| v.as_str()).unwrap_or("");
@@ -271,4 +366,13 @@ fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+fn parse_usb_id(raw: &str) -> Option<u16> {
+    let value = raw.trim();
+    if let Some(hex) = value.strip_prefix("0x").or_else(|| value.strip_prefix("0X")) {
+        u16::from_str_radix(hex, 16).ok()
+    } else {
+        value.parse::<u16>().ok()
+    }
 }
