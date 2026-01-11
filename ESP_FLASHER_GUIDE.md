@@ -48,7 +48,7 @@ See [FLIPPER_AUTO_ETHERNET.md](FLIPPER_AUTO_ETHERNET.md) for full automation doc
 If you want to update the WiFi devboard firmware directly from your computer:
 
 ```bash
-./fbt devboard_flash --wait --timeout 180
+./fbt devboard_flash ARGS="--wait --timeout 180"
 ```
 
 Or use the full automation wrapper:

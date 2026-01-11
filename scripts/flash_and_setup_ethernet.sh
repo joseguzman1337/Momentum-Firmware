@@ -154,7 +154,7 @@ while [ $COUNT -lt $MAX_WAIT ]; do
             STEP=$((STEP + 1))
             echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Flashing WiFi devboard via fbt...${NC}"
             echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
-            ./fbt devboard_flash -c "$DEVBOARD_CHANNEL" --wait --timeout "$DEVBOARD_TIMEOUT"
+            ./fbt devboard_flash ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
             echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"
             echo ""
         fi
