@@ -47,3 +47,6 @@
 [submodule ".ai/mcp/servers/esp_mcp"]
 	path = .ai/mcp/servers/esp_mcp
 	url = https://github.com/joseguzman1337/esp-mcp.git
+[submodule "tools/fz"]
+	path = tools/fz
+	url = https://github.com/x31337/fz

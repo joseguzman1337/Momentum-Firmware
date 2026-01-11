@@ -94,6 +94,21 @@ From the repo root:
 - Run tests matching a pattern:
   - `pytest -k TestNfc`
 
+### Warp CLI (Agent Control)
+
+`scripts/flipper_warp_cli.py` is a specialized Python script designed to bridge the gap between AI agents (like Warp/Gemini) and the Flipper Zero device. It allows for direct, programmatic execution of CLI commands on a connected device without the overhead of interactive shell management.
+
+- **Usage:**
+  - `./scripts/flipper_warp_cli.py <command>`
+  - Example: `./scripts/flipper_warp_cli.py uptime`
+  - Example: `./scripts/flipper_warp_cli.py storage info`
+
+- **Features:**
+  - Automatically handles serial connection to `/dev/ttyACM0` (configurable).
+  - Imports and utilizes the `FlipperSerial` library from the `tools/fz` submodule (integrated from `x31337/fz`).
+  - Mocks missing dependencies (`pytz`) to ensure reliable execution in restricted environments.
+  - Designed for stateless, one-shot command execution, ideal for agent-driven workflows.
+
 ### VS Code workspace setup (optional)
 
 If you use VS Code locally, the repository includes preconfigured tasks and debug settings.
