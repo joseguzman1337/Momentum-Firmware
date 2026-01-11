@@ -15,11 +15,13 @@ NC='\033[0m'
 DEVBOARD_FLASH=0
 DEVBOARD_CHANNEL="release"
 DEVBOARD_TIMEOUT=180
+DEVBOARD_AUTO_BOOTLOADER=1
+DEVBOARD_AUTO_BOOTLOADER_PORT="auto"
 SKIP_FLIPPER_FLASH=0
 AUTO_FORMAT_EXT=0
 
 usage() {
-    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--skip-flipper-flash] [--auto-format-ext]"
+    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--devboard-auto-bootloader <on|off>] [--devboard-auto-bootloader-port <port>] [--skip-flipper-flash] [--auto-format-ext]"
 }
 
 while [ $# -gt 0 ]; do
@@ -34,6 +36,18 @@ while [ $# -gt 0 ]; do
             ;;
         --devboard-timeout)
             DEVBOARD_TIMEOUT="$2"
+            shift 2
+            ;;
+        --devboard-auto-bootloader)
+            if [ "$2" = "off" ]; then
+                DEVBOARD_AUTO_BOOTLOADER=0
+            else
+                DEVBOARD_AUTO_BOOTLOADER=1
+            fi
+            shift 2
+            ;;
+        --devboard-auto-bootloader-port)
+            DEVBOARD_AUTO_BOOTLOADER_PORT="$2"
             shift 2
             ;;
         --skip-flipper-flash)
@@ -75,9 +89,21 @@ if [ "$SKIP_FLIPPER_FLASH" -eq 1 ]; then
     echo -e "${YELLOW}[!] Skipping firmware flash (requested)${NC}"
 else
     if [ "$AUTO_FORMAT_EXT" -eq 1 ]; then
-        python3 "$SCRIPT_DIR/ensure_flipper_ext.py" --wait --timeout 30 --format-if-missing
+        if ! timeout 20s python3 "$SCRIPT_DIR/ensure_flipper_ext.py" --wait --timeout 30 --format-if-missing; then
+            echo -e "${YELLOW}[!] /ext check failed; continuing anyway${NC}"
+        fi
     fi
-    ./fbt flash_usb_full
+    FLASH_ATTEMPTS=2
+    for attempt in $(seq 1 $FLASH_ATTEMPTS); do
+        echo -e "${YELLOW}    Flash attempt ${attempt}/${FLASH_ATTEMPTS}...${NC}"
+        if FBT_FLIPPER_BAUD=115200 ./fbt flash_usb_full; then
+            break
+        fi
+        if [ "$attempt" -eq "$FLASH_ATTEMPTS" ]; then
+            exit 1
+        fi
+        sleep 2
+    done
 fi
 
 echo -e "${GREEN}[✓] Firmware step complete${NC}"
@@ -162,7 +188,11 @@ while [ $COUNT -lt $MAX_WAIT ]; do
             STEP=$((STEP + 1))
             echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Flashing WiFi devboard via fbt...${NC}"
             echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
-            ./fbt devboard_flash ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
+            DEVBOARD_ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
+            if [ "$DEVBOARD_AUTO_BOOTLOADER" -eq 1 ]; then
+                DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT"
+            fi
+            ./fbt devboard_flash ARGS="$DEVBOARD_ARGS"
             echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"
             echo ""
         fi

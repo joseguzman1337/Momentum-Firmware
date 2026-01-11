@@ -72,6 +72,9 @@ Optional flags:
 
 # Use a different channel for devboard firmware
 ./scripts/flash_and_setup_ethernet.sh --devboard-flash --devboard-channel dev
+
+# Best-effort auto bootloader (default on) with a specific port
+./scripts/flash_and_setup_ethernet.sh --devboard-flash --devboard-auto-bootloader-port /dev/ttyACM1
 ```
 
 The script will wait for the WiFi board to enter bootloader mode.
