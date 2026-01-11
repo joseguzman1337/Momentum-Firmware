@@ -58,3 +58,9 @@ node_modules/
 # macOS system files
 ._*
 applications_user/
+# Rust/Cargo build artifacts
+**/target/
+Cargo.lock
+# Firebase debug logs
+firebase-debug.log
+firebase-debug.*.log
