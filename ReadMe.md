@@ -15,6 +15,33 @@
 This custom firmware is based on the [Official Firmware](https://github.com/flipperdevices/flipperzero-firmware) for [Flipper Zero](https://flipperzero.one/), and includes most of the awesome features from [Unleashed](https://github.com/DarkFlippers/unleashed-firmware). It is a direct continuation of the Xtreme firmware, built by the same (and only) developers who made that project special.
 
 <br>
+
+## ✨ What Makes Momentum Special
+
+This isn't just a firmware - it's a **fully autonomous AI-driven development platform** for Flipper Zero. We combine cutting-edge features with an unprecedented AI automation infrastructure.
+
+### 🤖 Industry-First AI Automation
+- **8 Specialized AI Agents** working 24/7 on development, security, and operations
+- **MCP (Model Context Protocol)** integration for real-time agent capabilities
+- **Strawberry Toolkit** for AI hallucination detection in code review
+- **Smart Flash** - AI-enhanced build workflows with ESP orchestration
+- **Automated App Management** - One command to sync the entire Flipper Catalog
+
+### 🚀 Technical Excellence
+- **Native USB Ethernet** with HTTP download helpers ([NativeEthernet.md](documentation/NativeEthernet.md))
+- **Forked Submodule Workflow** for guaranteed compile-time stability
+- **Asset Pack System** - Complete theming with Anims/Icons/Fonts
+- **Extended JavaScript API** - Mass storage, file operations, and more
+- **Advanced Security** - Lock on boot, PIN protection, secure storage
+
+### 🎨 Unmatched Customization
+- **Momentum Settings App** - Configure everything from one place
+- **Desktop Keybinds** - Full key remapping and press/hold actions
+- **Main Menu Customization** - Add directories, JS files, reorganize freely
+- **Bad-Keyboard** - Full BLE/USB spoofing with custom VID/PID
+- **RGB Backlight** - Rainbow mode and per-app color profiles
+
+<br>
 <h2 align="center">Modus Operandi</h2>
 
 The goal of this firmware is to constantly push the bounds of what is possible with Flipper Zero, driving the innovation of many new groundbreaking features, while maintaining the easiest and most customizable user experience of any firmware. Fixing bugs promptly and ensuring a stable and compatible system is also of our utmost importance.
@@ -24,6 +51,8 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 - <h4>Stable: We ensure the most stable experience possible by having an actual understanding of what's going on, and proactively making all tweaks and additions backwards-, and inter-, compatible.</h4>
 
 - <h4>Customizable: You can tweak just about everything you see: add/remove apps from the menu, change the animations, replace icon graphics, change your Flipper's name, change how the main menu looks, setup different keybinds like never before, and so much more. All on-device, with no complicated configuration.</h4>
+
+- <h4>AI-Powered: Leveraging a fleet of specialized AI agents for autonomous development, security hardening, build automation, and quality assurance. From code generation to deployment, our AI infrastructure ensures rapid iteration and bulletproof reliability.</h4>
 
 <br>
 
@@ -100,11 +129,11 @@ Note that this repo is always updated with the great work from our friends at [U
 ```txt
 [Added]
 
+### Core Firmware Features
 - Momentum App (Easy configuration of features and behavior of the firmware)
 - Asset Packs (Unparalleled theming and customization)
 - Native USB Ethernet support (CDC-ECM) - [Read Docs](documentation/NativeEthernet.md)
 - USB Ethernet HTTP download helper (HTTP GET to Storage via lwIP)
-- Automated Submodule Sync (Forked Development Workflow) - [Read Docs](documentation/ForkedDevelopment.md)
 - More UI customization, redesigns and optimizations
 - Bad-Keyboard App
 - BLE Spam App
@@ -123,6 +152,19 @@ Note that this repo is always updated with the great work from our friends at [U
 - Advanced Security measures (Lock on Boot, reset on false pins, etc.)
 - Disk Image management (Mount and view image contents, open in Mass Storage)
 - Extended JavaScript API (Support for UsbDisk/Mass Storage, File operations)
+
+### AI & Developer Tooling Infrastructure
+- **Multi-Agent AI System** for 24/7 autonomous development (8 specialized agents)
+- **Smart Flash Target** - AI-enhanced build and flash workflow with ESP MCP orchestration
+- **Warp CLI** (`scripts/flipper_warp_cli.py`) - Direct CLI control for AI agents
+- **App Catalog Manager** (`scripts/warp_app_manager.py`) - Automated app downloads
+- **Strawberry Toolkit** - AI hallucination detection for code review
+- **MCP Server Integration** - GitHub, Context7, ESP Flasher, Playwright
+- **FlipperSerial Submodule** (`tools/fz`) - Python library for device communication
+- **ESP MCP Orchestrator** - Rust-based build automation with real-time monitoring
+- **Forked Submodule Workflow** - Automated dependency sync - [Read Docs](documentation/ForkedDevelopment.md)
+- **Agent Task Router** - Intelligent distribution of development tasks
+- **WARP.md Documentation** - Comprehensive AI agent integration guide
 ```
 ```txt
 [Updated]
@@ -191,57 +233,198 @@ There are 4 methods to install Momentum, we recommend you use the **Web Updater*
 
 <h2 align="center">Build it yourself</h2>
 
+### Quick Start
+
 ```bash
-To download the repository:
+# Clone the repository with all submodules
 $ git clone --recursive --jobs 8 https://github.com/joseguzman1337/Momentum-Firmware.git
 $ cd Momentum-Firmware/
+```
 
-To flash directly to the Flipper over USB (pretty, AI-styled output; Flipper connected via USB, qFlipper closed)
+### Build & Flash Options
+
+#### 🚀 Smart Flash (Recommended - AI-Enhanced Workflow)
+```bash
 $ ./fbt smart_flash
-  (Installs `colorlog`/`pyserial` and runs the ESP MCP orchestrator if `cargo` is available)
+```
+**What it does:**
+- Builds complete updater package with all resources
+- Auto-installs Python dependencies (`colorlog`, `pyserial`)
+- Launches ESP MCP orchestrator (if Rust `cargo` is available)
+- Provides beautiful, color-coded progress output
+- Auto-detects Flipper USB port and ESP devboard port
+- Handles both firmware and WiFi devboard updates seamlessly
 
-To flash via USB with the classic target
+**Requirements:**
+- Flipper connected via USB
+- qFlipper closed
+- Optional: Rust/Cargo for ESP MCP orchestrator features
+
+#### ⚡ Classic USB Flash
+```bash
+# Full flash (firmware + radio stack + resources)
 $ ./fbt flash_usb_full
 
-To compile a TGZ package
+# Firmware only (faster, for code-only changes)
+$ ./fbt flash_usb
+```
+
+#### 🔧 Debug Probe Flash (SWD)
+```bash
+$ ./fbt flash
+```
+Auto-detects supported debug probes (ST-Link, Blackmagic, WiFi devboard, etc.)
+
+#### 📦 Build Release Packages
+```bash
+# Full updater package (for Web Updater / qFlipper)
 $ ./fbt updater_package
 
-To build and launch a single app:
+# Minimal package (firmware DFU only)
+$ ./fbt updater_minpackage
+
+# Build firmware distribution
+$ ./fbt fw_dist
+
+# Build external app plugins
+$ ./fbt fap_dist
+```
+
+### Development Workflows
+
+#### Single App Development
+```bash
+# Build and launch a specific app
 $ ./fbt launch APPSRC=your_appid
 
-For AI agent workflows and detailed CLI integration:
-See WARP.md for Warp CLI usage and agent control scripts
+# Build with unit tests
+$ ./fbt FIRMWARE_APP_SET=unit_tests updater_package
+```
+
+#### App Catalog Management
+```bash
+# Auto-download missing apps from Flipper Catalog
+$ python3 scripts/warp_app_manager.py
+```
+
+#### Agent-Driven CLI Control
+```bash
+# Direct device CLI access for AI agents
+$ ./scripts/flipper_warp_cli.py <command>
+
+# Examples:
+$ ./scripts/flipper_warp_cli.py uptime
+$ ./scripts/flipper_warp_cli.py storage info
+$ ./scripts/flipper_warp_cli.py led r 255
+```
+
+### AI Agent Workflows
+
+For comprehensive AI agent integration, MCP server usage, and advanced automation workflows:
+
+📖 **See [WARP.md](WARP.md)** for detailed documentation on:
+- Warp CLI agent control patterns
+- MCP server integration
+- Build automation for CI/CD
+- Unit test execution workflows
+- Linting and formatting automation
 ```
 
 
 <h2 align="center">AI Automation Ecosystem</h2>
 
-This repository hosts a sophisticated **Multi-Agent AI System** designed for 24/7 autonomous development, security operations, and architectural governance.
+This repository hosts a sophisticated **Multi-Agent AI System** designed for 24/7 autonomous development, security operations, and architectural governance. Our AI infrastructure enables fully automated firmware development, testing, and deployment workflows.
 
 <details>
-<summary><b>🤖 View Agent Roster & Automation Scripts</b></summary>
+<summary><b>🤖 View Agent Roster & Automation Infrastructure</b></summary>
 
 ### Agent Roster
-The system is orchestrated by a collaborative fleet of specialized AI agents:
+The system is orchestrated by a collaborative fleet of specialized AI agents, each with specific capabilities and domain expertise:
 
-| Agent | Role | Focus Area |
-|-------|------|------------|
-| **Gemini** | **Architect** | Strategic planning, System Design, Orchestration |
-| **Codex** | **Engineer** | Feature implementation, Bug fixes, Refactoring |
-| **Claude** | **Security** | CVE patching, Vulnerability scanning, Hardening |
-| **Jules** | **Ops** | Async Cloud tasks, Submodule synchronization |
-| **DeepSeek** | **Performance** | Optimization, Latency reduction |
-| **Warp** | **QA** | Code quality analysis, Test generation |
-| **Amazon Q** | **Infra** | Cloud infrastructure, AWS/GCP integrations |
-| **Kiro** | **Build** | FBT (Flipper Build Tool) workflow automation |
+| Agent | Role | Focus Area | Primary Tools |
+|-------|------|------------|---------------|
+| **Gemini** | **Architect** | Strategic planning, System Design, Orchestration | MCP Servers, Architecture Review |
+| **Codex** | **Engineer** | Feature implementation, Bug fixes, Refactoring | GitHub Copilot, Code Generation |
+| **Claude** | **Security** | CVE patching, Vulnerability scanning, Hardening | Strawberry Toolkit, Security Analysis |
+| **Jules** | **Ops** | Async Cloud tasks, Submodule synchronization | Cloud APIs, Async Workflows |
+| **DeepSeek** | **Performance** | Optimization, Latency reduction | Profiling, Benchmarking |
+| **Warp** | **QA** | Code quality analysis, Test generation, CI/CD | Warp CLI, FBT Automation |
+| **Amazon Q** | **Infra** | Cloud infrastructure, AWS/GCP integrations | AWS Services, Firebase |
+| **Kiro** | **Build** | FBT (Flipper Build Tool) workflow automation | Smart Flash, Build Optimization |
 
-### Automation Scripts
-- **`.ai/scripts/orchestrator.py`**: The central nervous system. Run with `--yolo-mode` to activate all agents for autonomous operation.
-- **`.ai/scripts/sync_submodules.py`**: Automates the management of forked dependencies.
-- **`.ai/scripts/task_router.py`**: Intelligent routing of development tasks to the most suitable agent.
-- **`.ai/scripts/notify.py`**: System-wide notification bus.
-- **`scripts/warp_app_manager.py`**: Automated app manager for downloading and installing apps from the catalog.
-- **`scripts/flipper_warp_cli.py`**: Warp CLI agent control for direct CLI command execution on connected Flipper devices.
+### Core Automation Scripts
+
+#### Build & Flash Automation
+- **`scripts/flipper_warp_cli.py`**: Direct CLI interface for agents to communicate with connected Flipper devices
+  - Stateless command execution (no interactive shell overhead)
+  - Auto-discovery of serial ports (`/dev/ttyACM0`)
+  - Integrated FlipperSerial library from `tools/fz` submodule
+  - Mock dependency handling for restricted environments
+  - Usage: `./scripts/flipper_warp_cli.py <command>`
+
+- **ESP MCP Orchestrator** (`.ai/esp_mcp_orchestrator/`): Rust-based orchestration tool for smart flash workflows
+  - Real-time progress monitoring with colored output
+  - Automatic ESP port detection
+  - Integration with `smart_flash` FBT target
+  - Handles dependency installation (`colorlog`, `pyserial`)
+
+#### App Management
+- **`scripts/warp_app_manager.py`**: Fully automated Flipper app catalog manager
+  - Fetches latest apps from official Flipper Catalog API
+  - Scans existing `applications/external` and `applications_user` directories
+  - Identifies missing apps and auto-clones from GitHub
+  - Extracts repository URLs from catalog metadata
+  - Usage: `python3 scripts/warp_app_manager.py`
+
+#### Agent Orchestration
+- **`.ai/scripts/orchestrator.py`**: The central nervous system
+  - Multi-agent task distribution and load balancing
+  - Run with `--yolo-mode` for full autonomous operation
+  - Coordinates between Gemini, Claude, Codex, and other agents
+
+- **`.ai/scripts/sync_submodules.py`**: Forked dependency management
+  - Automates synchronization of all forked submodules
+  - Verifies compile-time integrity before merging
+  - See [Forked Development Documentation](documentation/ForkedDevelopment.md)
+
+- **`.ai/scripts/task_router.py`**: Intelligent task routing
+  - Analyzes task requirements and routes to optimal agent
+  - Context-aware agent selection based on specialization
+
+- **`.ai/scripts/notify.py`**: System-wide notification bus
+  - Cross-agent communication channel
+  - Slack/Discord integration for build status alerts
+
+### Security & Quality Assurance
+
+#### Strawberry Hallucination Detection
+The **Strawberry Toolkit** (`.ai/strawberry/`) provides advanced hallucination detection for AI-generated code:
+- Static analysis of AI code contributions
+- Pattern recognition for common AI mistakes
+- Integration with Claude Security Agent for CVE scanning
+- Automated PR review with hallucination flagging
+
+### MCP (Model Context Protocol) Integration
+
+We leverage **MCP servers** to give our AI agents real-time access to:
+- **ESP Flasher MCP** (`.ai/mcp/servers/esp_mcp/`): Direct control of ESP32 flashing operations
+- **GitHub MCP**: PR creation, issue management, code review automation
+- **Context7 MCP**: Up-to-date library documentation for accurate code generation
+- **Playwright MCP**: Automated web testing and UI validation
+
+See **WARP.md** for detailed MCP usage and integration patterns.
+
+### Developer Tools & Submodules
+
+- **`tools/fz`** (submodule from [x31337/fz](https://github.com/x31337/fz)): FlipperSerial library
+  - Python library for Flipper Zero serial communication
+  - Used by Warp CLI for agent-driven device control
+  - Mock-friendly architecture for testing environments
+
+- **`.ai/mcp/servers/esp_mcp`**: ESP32 operations via MCP protocol
+  - Flash firmware to WiFi devboard
+  - Monitor serial output
+  - Automated port detection
 
 </details>
 
