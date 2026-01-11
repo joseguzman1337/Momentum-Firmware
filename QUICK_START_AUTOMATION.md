@@ -44,6 +44,18 @@ This will:
 
 ---
 
+## 💾 Auto-Format /ext (SD Card) If Missing
+
+If your Flipper reports `/ext` missing during USB update, you can auto-format the SD card:
+
+```bash
+./scripts/flash_and_setup_ethernet.sh --auto-format-ext
+```
+
+This formats the SD card on the Flipper and enables `/ext` for updates.
+
+---
+
 ## 📡 Auto Flash WiFi Devboard (Fully Automated)
 
 Run the full flow (connect internet + flash WiFi board) in one command:

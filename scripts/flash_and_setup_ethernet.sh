@@ -16,9 +16,10 @@ DEVBOARD_FLASH=0
 DEVBOARD_CHANNEL="release"
 DEVBOARD_TIMEOUT=180
 SKIP_FLIPPER_FLASH=0
+AUTO_FORMAT_EXT=0
 
 usage() {
-    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--skip-flipper-flash]"
+    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--skip-flipper-flash] [--auto-format-ext]"
 }
 
 while [ $# -gt 0 ]; do
@@ -37,6 +38,10 @@ while [ $# -gt 0 ]; do
             ;;
         --skip-flipper-flash)
             SKIP_FLIPPER_FLASH=1
+            shift
+            ;;
+        --auto-format-ext)
+            AUTO_FORMAT_EXT=1
             shift
             ;;
         -h|--help)
@@ -69,6 +74,9 @@ cd "$PROJECT_ROOT"
 if [ "$SKIP_FLIPPER_FLASH" -eq 1 ]; then
     echo -e "${YELLOW}[!] Skipping firmware flash (requested)${NC}"
 else
+    if [ "$AUTO_FORMAT_EXT" -eq 1 ]; then
+        python3 "$SCRIPT_DIR/ensure_flipper_ext.py" --wait --timeout 30 --format-if-missing
+    fi
     ./fbt flash_usb_full
 fi
 
