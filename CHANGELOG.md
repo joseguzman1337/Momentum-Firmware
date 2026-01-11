@@ -9,6 +9,7 @@
     - Effort required to update scripts using `gui/widget`: very minimal
 
 ### Added:
+- Dev Tools: Strawberry hallucination detection toolkit integration
 - USB Ethernet: HAL HTTP download helper over usb_eth (HTTP-only, writes response body to Storage)
 - Build: smart_flash target (full updater package + USB selfupdate with enhanced CLI output)
 - USB selfupdate: abort early when an app must be closed manually
@@ -132,6 +133,9 @@
   - OFW: Add date/time input module (by @aaronjamt)
 
 ### Updated:
+- Build: esp_mcp submodule updated to fork
+- Build: Integrate esp_mcp orchestrator into smart_flash
+- Build: Auto-detect ESP port and tune updater layout checks
 - Apps:
   - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster, 4.0 update, Static Encrypted Nested attacks run 10x faster in NFC app (by @noproto)
   - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9), add default remote and clear slot features (by @jknlsn)
@@ -182,6 +186,7 @@
   - OFW: Update devboard docs (by @alexeyzakh)
 
 ### Fixed:
+- FBT: Fix pip install commands in usb installer
 - CLI: Fix long delay with quick connect/disconnect, qFlipper should connect faster as expected again (by @WillyJL)
 - Storage: Dont send mount event if SD mounted at boot, fix SD card icon showing late on boot (by @WillyJL)
 - Bad KB:
