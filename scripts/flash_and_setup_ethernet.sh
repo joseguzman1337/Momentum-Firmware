@@ -76,12 +76,17 @@ while [ $# -gt 0 ]; do
             shift 2
             ;;
         --devboard-auto-bootloader)
-            if [ "$2" = "off" ]; then
-                DEVBOARD_AUTO_BOOTLOADER=0
-            else
+            if [ -z "$2" ] || [[ "$2" == --* ]]; then
                 DEVBOARD_AUTO_BOOTLOADER=1
+                shift
+            else
+                if [ "$2" = "off" ]; then
+                    DEVBOARD_AUTO_BOOTLOADER=0
+                else
+                    DEVBOARD_AUTO_BOOTLOADER=1
+                fi
+                shift 2
             fi
-            shift 2
             ;;
         --devboard-auto-bootloader-port)
             DEVBOARD_AUTO_BOOTLOADER_PORT="$2"

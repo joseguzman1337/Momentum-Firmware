@@ -3,6 +3,7 @@
 import logging
 import os
 import pathlib
+import shutil
 import sys
 import time
 
@@ -74,6 +75,56 @@ class Main(App):
         self._log_debug(f"[serial] {label}: {result_str}")
         return result, result_str
 
+    def _detect_flipper_mount(self) -> str | None:
+        candidates = []
+        env_mount = os.environ.get("FLIPPER_SD_MOUNT") or os.environ.get("FLIPPER_MOUNT")
+        if env_mount:
+            candidates.append(env_mount)
+
+        user = os.environ.get("USER", "")
+        if user:
+            candidates.append(os.path.join("/media", user, "FLIPPER"))
+            candidates.append(os.path.join("/run/media", user, "FLIPPER"))
+        candidates.append("/media/FLIPPER")
+        candidates.append("/run/media/FLIPPER")
+        candidates.append("/mnt/FLIPPER")
+
+        try:
+            with open("/proc/mounts", "r", encoding="utf-8") as mounts:
+                for line in mounts:
+                    parts = line.split()
+                    if len(parts) < 2:
+                        continue
+                    mountpoint = parts[1]
+                    if "flipper" in mountpoint.lower():
+                        candidates.append(mountpoint)
+        except Exception:
+            pass
+
+        seen = set()
+        for path in candidates:
+            if not path or path in seen:
+                continue
+            seen.add(path)
+            ext_dir = os.path.join(path, "ext")
+            if os.path.isdir(ext_dir):
+                return path
+        return None
+
+    def _stage_update_via_sd(self, mount_root: str, update_dir: pathlib.Path, pkg_dir_name: str) -> str | None:
+        update_root = os.path.join(mount_root, "ext", "update")
+        dst_dir = os.path.join(update_root, pkg_dir_name)
+        try:
+            os.makedirs(update_root, exist_ok=True)
+            if os.path.isdir(dst_dir):
+                shutil.rmtree(dst_dir)
+            shutil.copytree(update_dir, dst_dir)
+            self._log_debug(f"[sd] staged update at {dst_dir}")
+            return dst_dir
+        except Exception as exc:
+            self.logger.warning(f"SD staging failed: {exc}")
+            return None
+
     def _port_transport(self, port: str) -> str:
         port_lower = port.lower()
         if "usbmodem" in port_lower or "ttyacm" in port_lower:
@@ -114,6 +165,14 @@ class Main(App):
         pkg_dir_name = self.args.pkg_dir_name or pkg_name
         update_root = "/ext/update"
         flipper_update_path = f"{update_root}/{pkg_dir_name}"
+
+        use_sd_install = False
+        sd_mount = self._detect_flipper_mount()
+        if sd_mount:
+            staged_path = self._stage_update_via_sd(sd_mount, manifest_path.parents[0], pkg_dir_name)
+            if staged_path:
+                use_sd_install = True
+                self._log_debug(f"[sd] using mounted update path {staged_path}")
 
         if self.pretty:
             print("\n\033[1m⚡ FLIPPER USB UPDATE\033[0m")
@@ -161,11 +220,12 @@ class Main(App):
                         return 4
 
                 # With no app running, proceed to send update data.
-                storage_ops.mkpath(update_root)
-                storage_ops.mkpath(flipper_update_path)
-                storage_ops.recursive_send(
-                    flipper_update_path, manifest_path.parents[0]
-                )
+                if not use_sd_install:
+                    storage_ops.mkpath(update_root)
+                    storage_ops.mkpath(flipper_update_path)
+                    storage_ops.recursive_send(
+                        flipper_update_path, manifest_path.parents[0]
+                    )
 
                 storage.send_and_wait_eol(
                     f"update install {flipper_update_path}/{manifest_name}\r"
