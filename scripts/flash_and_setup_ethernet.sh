@@ -12,27 +12,81 @@ YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
 NC='\033[0m'
 
+DEVBOARD_FLASH=0
+DEVBOARD_CHANNEL="release"
+DEVBOARD_TIMEOUT=180
+SKIP_FLIPPER_FLASH=0
+
+usage() {
+    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--skip-flipper-flash]"
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --devboard-flash)
+            DEVBOARD_FLASH=1
+            shift
+            ;;
+        --devboard-channel)
+            DEVBOARD_CHANNEL="$2"
+            shift 2
+            ;;
+        --devboard-timeout)
+            DEVBOARD_TIMEOUT="$2"
+            shift 2
+            ;;
+        --skip-flipper-flash)
+            SKIP_FLIPPER_FLASH=1
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            exit 1
+            ;;
+    esac
+done
+
 echo -e "${BLUE}╔══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   Momentum Firmware - Auto Flash & Ethernet Setup       ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
-# Step 1: Build & Flash Firmware
-echo -e "${YELLOW}[1/4] Building and flashing firmware...${NC}"
-cd "$PROJECT_ROOT"
-./fbt flash_usb_full
+TOTAL_STEPS=4
+if [ "$DEVBOARD_FLASH" -eq 1 ]; then
+    TOTAL_STEPS=5
+fi
 
-echo -e "${GREEN}[✓] Firmware flashed successfully${NC}"
+STEP=1
+
+# Step 1: Build & Flash Firmware
+echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Building and flashing firmware...${NC}"
+cd "$PROJECT_ROOT"
+if [ "$SKIP_FLIPPER_FLASH" -eq 1 ]; then
+    echo -e "${YELLOW}[!] Skipping firmware flash (requested)${NC}"
+else
+    ./fbt flash_usb_full
+fi
+
+echo -e "${GREEN}[✓] Firmware step complete${NC}"
 echo ""
 
+STEP=$((STEP + 1))
+
 # Step 2: Enable USB Ethernet on Flipper
-echo -e "${YELLOW}[2/4] Enabling USB Ethernet on Flipper...${NC}"
+echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Enabling USB Ethernet on Flipper...${NC}"
 python3 "$SCRIPT_DIR/fbt_hooks/post_flash_usb_ethernet.py"
 
 echo ""
 
+STEP=$((STEP + 1))
+
 # Step 3: Check if automation is installed
-echo -e "${YELLOW}[3/4] Checking automation setup...${NC}"
+echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Checking automation setup...${NC}"
 if [ -f "/etc/udev/rules.d/99-flipper-auto-ethernet.rules" ]; then
     echo -e "${GREEN}[✓] Automation already installed${NC}"
 else
@@ -50,8 +104,10 @@ fi
 
 echo ""
 
+STEP=$((STEP + 1))
+
 # Step 4: Wait for USB Ethernet and enable internet
-echo -e "${YELLOW}[4/4] Waiting for USB Ethernet interface...${NC}"
+echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Waiting for USB Ethernet interface...${NC}"
 MAX_WAIT=30
 COUNT=0
 
@@ -93,6 +149,15 @@ while [ $COUNT -lt $MAX_WAIT ]; do
         echo -e "${YELLOW}Status:${NC}"
         ip addr show "$FLIPPER_ETH"
         echo ""
+
+        if [ "$DEVBOARD_FLASH" -eq 1 ]; then
+            STEP=$((STEP + 1))
+            echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Flashing WiFi devboard via fbt...${NC}"
+            echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
+            ./fbt devboard_flash -c "$DEVBOARD_CHANNEL" --wait --timeout "$DEVBOARD_TIMEOUT"
+            echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"
+            echo ""
+        fi
 
         exit 0
     fi

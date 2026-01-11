@@ -44,6 +44,28 @@ This will:
 
 ---
 
+## 📡 Auto Flash WiFi Devboard (Fully Automated)
+
+Run the full flow (connect internet + flash WiFi board) in one command:
+
+```bash
+./scripts/flash_and_setup_ethernet.sh --devboard-flash
+```
+
+Optional flags:
+
+```bash
+# Skip flashing the Flipper firmware, only set up USB Ethernet + devboard flash
+./scripts/flash_and_setup_ethernet.sh --skip-flipper-flash --devboard-flash
+
+# Use a different channel for devboard firmware
+./scripts/flash_and_setup_ethernet.sh --devboard-flash --devboard-channel dev
+```
+
+The script will wait for the WiFi board to enter bootloader mode.
+
+---
+
 ## 📱 Using ESP Flasher FAP
 
 After automation is installed:

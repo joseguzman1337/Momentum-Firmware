@@ -6,6 +6,8 @@ import os
 import subprocess
 import tarfile
 import tempfile
+import time
+from typing import Optional
 
 import requests
 import serial.tools.list_ports as list_ports
@@ -123,6 +125,23 @@ class Main(App):
         self.parser.add_argument(
             "-c", "--channel", help="Channel name", default="release"
         )
+        self.parser.add_argument(
+            "--wait",
+            action="store_true",
+            help="Wait for WiFi board bootloader mode",
+        )
+        self.parser.add_argument(
+            "--timeout",
+            type=int,
+            default=120,
+            help="Seconds to wait for bootloader mode",
+        )
+        self.parser.add_argument(
+            "--interval",
+            type=int,
+            default=2,
+            help="Seconds between bootloader checks",
+        )
         self.parser.set_defaults(func=self.update)
 
         # logging
@@ -163,16 +182,59 @@ class Main(App):
         self.logger.info("Trying to find WiFi board using VID:PID")
         return self.find_port("VID:PID=303A:0002")
 
-    def update(self):
-        try:
-            port = self.find_wifi_board_bootloader_port()
+    def wait_for_bootloader_port(self) -> Optional[str]:
+        deadline = time.time() + max(0, self.args.timeout)
+        next_hint = 0.0
 
-            # Damn windows fix
-            if port is None and self.is_windows():
-                port = self.find_wifi_board_bootloader_port_damn_windows()
-        except Exception as e:
-            self.logger.error(f"{e}")
-            return 1
+        while True:
+            try:
+                port = self.find_wifi_board_bootloader_port()
+                if port is None and self.is_windows():
+                    port = self.find_wifi_board_bootloader_port_damn_windows()
+            except Exception as e:
+                self.logger.error(f"{e}")
+                return None
+
+            if port:
+                return port
+
+            now = time.time()
+            if now >= next_hint:
+                if self.is_wifi_board_connected():
+                    self.logger.warning("WiFi board found, but not in bootloader mode.")
+                    self.logger.info("Hold BOOT button and press RESET button")
+                else:
+                    self.logger.info("Waiting for WiFi board in bootloader mode...")
+                    self.logger.info(
+                        "Connect WiFi board, hold BOOT button and press RESET button"
+                    )
+                    if not self.is_windows():
+                        self.logger.info(
+                            "If you are using Linux, you may need to add udev rules to access the device"
+                        )
+                        self.logger.info(
+                            "Check out 41-flipper.rules & README in scripts/debug folder"
+                        )
+                next_hint = now + max(5, self.args.interval)
+
+            if self.args.timeout >= 0 and now >= deadline:
+                return None
+
+            time.sleep(max(1, self.args.interval))
+
+    def update(self):
+        if self.args.wait:
+            port = self.wait_for_bootloader_port()
+        else:
+            try:
+                port = self.find_wifi_board_bootloader_port()
+
+                # Damn windows fix
+                if port is None and self.is_windows():
+                    port = self.find_wifi_board_bootloader_port_damn_windows()
+            except Exception as e:
+                self.logger.error(f"{e}")
+                return 1
 
         if port is None:
             if self.is_wifi_board_connected():

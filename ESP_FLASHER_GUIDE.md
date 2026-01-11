@@ -43,6 +43,27 @@ See [FLIPPER_AUTO_ETHERNET.md](FLIPPER_AUTO_ETHERNET.md) for full automation doc
 
 ---
 
+## 🔁 Auto Flash WiFi Devboard (Host-Side, via fbt)
+
+If you want to update the WiFi devboard firmware directly from your computer:
+
+```bash
+./fbt devboard_flash --wait --timeout 180
+```
+
+Or use the full automation wrapper:
+
+```bash
+./scripts/flash_and_setup_ethernet.sh --devboard-flash
+```
+
+Notes:
+1. Put the WiFi board into bootloader mode (hold **BOOT**, tap **RESET**).
+2. `--wait` keeps polling until the board is detected.
+3. Use `--devboard-channel dev` or `--devboard-channel rc` if needed.
+
+---
+
 ### 🔧 Manual Setup (If automation not installed)
 
 ```bash
