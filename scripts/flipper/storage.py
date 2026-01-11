@@ -104,8 +104,8 @@ class FlipperStorage:
             pass
         self.port = serial.Serial()
         self.port.port = portname
-        self.port.timeout = 2
-        self.port.write_timeout = 2
+        self.port.timeout = float(os.environ.get("FBT_STORAGE_READ_TIMEOUT", "2"))
+        self.port.write_timeout = float(os.environ.get("FBT_STORAGE_WRITE_TIMEOUT", "2"))
         self.port.baudrate = int(os.environ.get("FBT_FLIPPER_BAUD", "230400"))
         self.read = BufferedRead(self.port)
         self.chunk_size = chunk_size
