@@ -208,6 +208,9 @@ $ ./fbt updater_package
 
 To build and launch a single app:
 $ ./fbt launch APPSRC=your_appid
+
+For AI agent workflows and detailed CLI integration:
+See WARP.md for Warp CLI usage and agent control scripts
 ```
 
 
@@ -232,11 +235,13 @@ The system is orchestrated by a collaborative fleet of specialized AI agents:
 | **Amazon Q** | **Infra** | Cloud infrastructure, AWS/GCP integrations |
 | **Kiro** | **Build** | FBT (Flipper Build Tool) workflow automation |
 
-### Automation Scripts (`.ai/scripts/`)
-- **`orchestrator.py`**: The central nervous system. Run with `--yolo-mode` to activate all agents for autonomous operation.
-- **`sync_submodules.py`**: Automates the management of forked dependencies.
-- **`task_router.py`**: Intelligent routing of development tasks to the most suitable agent.
-- **`notify.py`**: System-wide notification bus.
+### Automation Scripts
+- **`.ai/scripts/orchestrator.py`**: The central nervous system. Run with `--yolo-mode` to activate all agents for autonomous operation.
+- **`.ai/scripts/sync_submodules.py`**: Automates the management of forked dependencies.
+- **`.ai/scripts/task_router.py`**: Intelligent routing of development tasks to the most suitable agent.
+- **`.ai/scripts/notify.py`**: System-wide notification bus.
+- **`scripts/warp_app_manager.py`**: Automated app manager for downloading and installing apps from the catalog.
+- **`scripts/flipper_warp_cli.py`**: Warp CLI agent control for direct CLI command execution on connected Flipper devices.
 
 </details>
 

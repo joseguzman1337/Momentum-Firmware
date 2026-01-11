@@ -9,7 +9,11 @@
     - Effort required to update scripts using `gui/widget`: very minimal
 
 ### Added:
-- Dev Tools: Strawberry hallucination detection toolkit integration
+- Dev Tools:
+  - Strawberry hallucination detection toolkit integration
+  - Warp CLI agent control script for direct CLI command execution (`scripts/flipper_warp_cli.py`)
+  - Automated app manager for catalog downloads (`scripts/warp_app_manager.py`)
+- Build: fz submodule integration for FlipperSerial library support (from x31337/fz)
 - USB Ethernet: HAL HTTP download helper over usb_eth (HTTP-only, writes response body to Storage)
 - Build: smart_flash target (full updater package + USB selfupdate with enhanced CLI output)
 - USB selfupdate: abort early when an app must be closed manually
@@ -182,11 +186,13 @@
   - OFW: Expose nfc_common.h (by @zinongli)
 - OFW: GUI: Store View by value in ViewStack to save memory (by @CookiePLMonster)
 - Docs:
+  - Added WARP.md for AI agent workflows and Flipper CLI integration
   - UL: Update Sub-GHz DoorHan programming instructions (by @li0ard)
   - OFW: Update devboard docs (by @alexeyzakh)
 
 ### Fixed:
 - FBT: Fix pip install commands in usb installer
+- Build: Correctly extract repository URL from catalog details in app manager
 - CLI: Fix long delay with quick connect/disconnect, qFlipper should connect faster as expected again (by @WillyJL)
 - Storage: Dont send mount event if SD mounted at boot, fix SD card icon showing late on boot (by @WillyJL)
 - Bad KB:
