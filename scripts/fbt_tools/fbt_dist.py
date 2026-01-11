@@ -159,8 +159,6 @@ def generate(env):
                 action=[
                     [
                         "${PYTHON3}",
-                        "-m",
-                        "pip",
                         "-c",
                         "import pip; print(f'pip before: {pip.__version__}')",
                     ],
@@ -171,13 +169,10 @@ def generate(env):
                         "install",
                         "--upgrade",
                         "-v",
-                        "--user",
                         "pip",
                     ],
                     [
                         "${PYTHON3}",
-                        "-m",
-                        "pip",
                         "-c",
                         "import pip; print(f'pip after: {pip.__version__}')",
                     ],
@@ -186,7 +181,6 @@ def generate(env):
                         "-m",
                         "pip",
                         "install",
-                        "--user",
                         "colorlog",
                         "pyserial",
                     ],
