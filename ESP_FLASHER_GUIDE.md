@@ -21,12 +21,31 @@ Flipper Zero USB Ethernet interfaces detected:
 
 ---
 
-## 🌐 Enable Internet Connection Sharing (REQUIRED)
+## 🌐 Enable Internet Connection Sharing
 
-To use lwIP HTTP download, your Flipper needs internet access through your computer:
+### ⚡ Automatic Setup (Recommended)
+
+**One-time installation for full automation:**
 
 ```bash
-cd /home/d3c0d3r/x/Momentum-Firmware
+sudo ./scripts/install-flipper-auto-ethernet.sh
+```
+
+This installs automation that automatically:
+1. Detects when Flipper Zero is plugged in
+2. Enables USB Ethernet on Flipper
+3. Sets up internet sharing via NAT
+4. Cleans up on disconnect
+
+**After installation, just plug in your Flipper and everything works automatically!**
+
+See [FLIPPER_AUTO_ETHERNET.md](FLIPPER_AUTO_ETHERNET.md) for full automation documentation.
+
+---
+
+### 🔧 Manual Setup (If automation not installed)
+
+```bash
 sudo bash scripts/enable_internet.sh
 ```
 

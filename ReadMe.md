@@ -26,6 +26,9 @@ This isn't just a firmware - it's a **fully autonomous AI-driven development pla
 - **Strawberry Toolkit** for AI hallucination detection in code review
 - **Smart Flash** - AI-enhanced build workflows with ESP orchestration
 - **Automated App Management** - One command to sync the entire Flipper Catalog
+- **Auto USB Ethernet** - Zero-config internet sharing ([FLIPPER_AUTO_ETHERNET.md](FLIPPER_AUTO_ETHERNET.md))
+  - Plug in Flipper → USB Ethernet auto-enabled → Internet auto-shared
+  - One-time setup: `sudo ./scripts/install-flipper-auto-ethernet.sh`
 
 ### 🚀 Technical Excellence
 - **Native USB Ethernet** with HTTP download helpers ([NativeEthernet.md](documentation/NativeEthernet.md))

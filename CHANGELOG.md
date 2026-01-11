@@ -16,11 +16,24 @@
     - HTTP/HTTPS download over USB Ethernet (`furi_hal_usb_eth_http_download_to_file()`)
     - Support for WiFi Devboard (ESP32-S2) and all ESP32 variants
     - Flash addresses: 0x1000 (bootloader), 0x8000 (partitions), 0xE000 (boot_app0), 0x10000 (firmware)
+- Automation:
+  - **Fully Automated USB Ethernet & Internet Sharing** (`FLIPPER_AUTO_ETHERNET.md`)
+    - Automatic Flipper Zero detection via udev rules
+    - Auto-enable USB Ethernet on Flipper when connected
+    - Automatic NAT and internet sharing setup
+    - Systemd service for connection lifecycle management
+    - One-command installation: `sudo ./scripts/install-flipper-auto-ethernet.sh`
+  - All-in-one flash script: `./scripts/flash_and_setup_ethernet.sh`
+  - FBT post-flash hook for automatic USB Ethernet setup
 - Scripts:
-  - Internet Connection Sharing setup for Flipper USB Ethernet (`scripts/enable_internet.sh`)
-  - ESP Flasher guide with lwIP HTTP download instructions (`ESP_FLASHER_GUIDE.md`)
+  - Internet Connection Sharing setup (`scripts/enable_internet.sh`)
+  - Automated internet sharing manager (`scripts/flipper-internet-share.sh`)
+  - Flipper auto-setup controller (`scripts/flipper-auto-ethernet-setup.sh`)
+  - Udev rules for automatic detection (`scripts/99-flipper-auto-ethernet.rules`)
+  - Systemd service template (`scripts/flipper-ethernet@.service`)
 - Documentation:
-  - Comprehensive ESP Flasher FAP usage guide with lwIP HTTP download
+  - Comprehensive automation guide (`FLIPPER_AUTO_ETHERNET.md`)
+  - ESP Flasher FAP usage guide with lwIP HTTP download (`ESP_FLASHER_GUIDE.md`)
   - WiFi module v1 flashing instructions
   - Troubleshooting section for USB Ethernet and internet sharing
 

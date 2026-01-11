@@ -1,0 +1,10 @@
+# Flipper Zero Auto USB Ethernet Setup
+# Copy to /etc/udev/rules.d/99-flipper-auto-ethernet.rules
+# Then run: sudo udevadm control --reload-rules && sudo udevadm trigger
+
+# Flipper Zero USB Serial (VID: 0483, PID: 5740)
+SUBSYSTEM=="usb", ATTR{idVendor}=="0483", ATTR{idProduct}=="5740", TAG+="systemd", ENV{SYSTEMD_WANTS}="flipper-ethernet@%k.service", ENV{FLIPPER_SERIAL_DEV}="/dev/%k"
+
+# Flipper Zero USB Ethernet CDC-ECM (appears after enabling USB Ethernet)
+SUBSYSTEM=="net", ACTION=="add", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", ENV{ID_NET_DRIVER}=="cdc_ether", TAG+="systemd", RUN+="/usr/local/bin/flipper-internet-share.sh %k start"
+SUBSYSTEM=="net", ACTION=="remove", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", ENV{ID_NET_DRIVER}=="cdc_ether", RUN+="/usr/local/bin/flipper-internet-share.sh %k stop"
