@@ -237,15 +237,21 @@ class Main(App):
         for port in ports:
             try:
                 self.logger.info(f"Attempting auto-bootloader via {port}")
-                with serial.Serial(port, 115200, timeout=1) as ser:
-                    # Best-effort RTS/DTR toggle to enter bootloader
-                    ser.dtr = False
+                with serial.Serial(port, 115200, timeout=1, write_timeout=1) as ser:
+                    # Espressif-style reset: EN=RTS, IO0=DTR (both inverted on many adapters).
+                    # Sequence: hold EN low, IO0 low -> release EN -> release IO0.
+                    ser.dtr = True
                     ser.rts = True
                     time.sleep(0.1)
-                    ser.dtr = True
                     ser.rts = False
                     time.sleep(0.1)
                     ser.dtr = False
+                    time.sleep(0.1)
+                    # Fallback simple toggle
+                    ser.dtr = False
+                    ser.rts = True
+                    time.sleep(0.05)
+                    ser.dtr = True
                     ser.rts = False
                 success = True
             except Exception as e:
