@@ -57,3 +57,4 @@ node_modules/
 .agent/rules/snyk_rules.md
 # macOS system files
 ._*
+applications_user/
