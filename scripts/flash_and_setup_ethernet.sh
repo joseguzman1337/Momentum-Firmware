@@ -137,6 +137,7 @@ else
     fi
     maybe_stop_modemmanager
     timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
+    sleep 8
     FLASH_ATTEMPTS=0
     attempt=0
     FLIPPER_PORTS=()
@@ -162,11 +163,12 @@ else
         fi
 
         timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
+        sleep 8
         for port in "${FLIPPER_PORTS[@]}"; do
-            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=115200 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=10 FBT_STORAGE_READ_TIMEOUT=5 ./fbt flash_usb_full; then
+            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=115200 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=10 FBT_STORAGE_READ_TIMEOUT=5 FBT_STORAGE_OPEN_TIMEOUT=10 FBT_STORAGE_OPEN_RETRIES=5 ./fbt flash_usb_full; then
                 break 2
             fi
-            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=230400 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=10 FBT_STORAGE_READ_TIMEOUT=5 ./fbt flash_usb_full; then
+            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=230400 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=10 FBT_STORAGE_READ_TIMEOUT=5 FBT_STORAGE_OPEN_TIMEOUT=10 FBT_STORAGE_OPEN_RETRIES=5 ./fbt flash_usb_full; then
                 break 2
             fi
         done
