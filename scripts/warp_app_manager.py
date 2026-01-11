@@ -71,21 +71,36 @@ def install_missing_apps():
     new_count = 0
     for app in catalog:
         alias = app.get("alias")
-        repo_url = app.get("repository")
         
-        # Skip if no repo or already installed
-        if not repo_url:
-            continue
-            
-        # Check if alias or id is in installed
-        # The catalog 'alias' usually matches 'appid' in manifest, but not always.
-        # However, checking alias against known appids is a decent heuristic.
+        # Check if alias is in installed first
         if alias in installed:
             continue
 
-        # Check if directory exists (to avoid duplicate clones if manifest check failed)
+        # Check if directory exists
         target_dir = os.path.join(USER_APPS_DIR, alias)
         if os.path.exists(target_dir):
+            continue
+
+        # Not installed. Fetch full details to get repo URL.
+        app_id = app.get("_id")
+        # print(f"Fetching details for {alias}...") # Verbose
+        
+        repo_url = None
+        try:
+            req = urllib.request.Request(f"https://catalog.flipperzero.one/api/v0/application/{app_id}", headers={'User-Agent': 'Mozilla/5.0 (Momentum-Firmware-Warp-Agent)'})
+            with urllib.request.urlopen(req) as response:
+                details = json.load(response)
+                # Extract from details
+                repo_url = details.get("repository")
+                if not repo_url:
+                     repo_url = details.get("current_version", {}).get("links", {}).get("source_code", {}).get("uri")
+        except Exception as e:
+            print(f"Failed to fetch details for {alias}: {e}")
+            continue
+
+        # Skip if no repo
+        if not repo_url:
+            print(f"Skipping {alias}: No repo URL found in details")
             continue
 
         print(f"Installing new app: {alias}...")
