@@ -12,7 +12,8 @@
   },
   "general": {
     "checkpointing": {
-      "enabled": true
+      "enabled": true,
+      "autoCompact": true
     },
     "vimMode": false
   },
@@ -26,5 +27,10 @@
   },
   "privacy": {
     "usageStatisticsEnabled": false
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "/home/d3c0d3r/x/Momentum-Firmware/.ai/.gemini/status_bar.sh",
+    "padding": 0
   }
 }

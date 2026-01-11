@@ -13,6 +13,8 @@
   - Strawberry hallucination detection toolkit integration
   - Warp CLI agent control script for direct CLI command execution (`scripts/flipper_warp_cli.py`)
   - Automated app manager for catalog downloads (`scripts/warp_app_manager.py`)
+  - Claude Code status line with comprehensive metrics display (`.ai/.gemini/status_bar.sh`)
+  - Connection and MCP verification script (`scripts/verify_connection_and_mcps.py`)
 - Build: fz submodule integration for FlipperSerial library support (from x31337/fz)
 - USB Ethernet: HAL HTTP download helper over usb_eth (HTTP-only, writes response body to Storage)
 - Build: smart_flash target (full updater package + USB selfupdate with enhanced CLI output)
@@ -140,6 +142,7 @@
 - Build: esp_mcp submodule updated to fork
 - Build: Integrate esp_mcp orchestrator into smart_flash
 - Build: Auto-detect ESP port and tune updater layout checks
+- AI Tools: Enhanced Gemini settings with auto-compact and custom status line
 - Apps:
   - XERO: MFKey: Key recovery is 20% faster, new write buffering of Static Encrypted Nested key candidates performs recovery 70x faster, 4.0 update, Static Encrypted Nested attacks run 10x faster in NFC app (by @noproto)
   - UL: Sub-GHz Remote: Add possibility to use custom buttons (by @MrLego8-9), add default remote and clear slot features (by @jknlsn)
