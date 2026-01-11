@@ -46,4 +46,4 @@
 	url = https://github.com/joseguzman1337/lwip
 [submodule ".ai/mcp/servers/esp_mcp"]
 	path = .ai/mcp/servers/esp_mcp
-	url = https://github.com/horw/esp-mcp
+	url = https://github.com/joseguzman1337/esp-mcp.git
