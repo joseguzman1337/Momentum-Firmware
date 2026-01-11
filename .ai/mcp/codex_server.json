@@ -62,6 +62,15 @@
             "cwd": ".ai/mcp/servers/esp_mcp",
             "trust": true,
             "description": "ESP-IDF MCP server for building, flashing, and testing ESP32 projects via tools like build_esp_project and flash_esp_project"
+        },
+        "strawberry_mcp": {
+            "command": "python3",
+            "args": [
+                "main.py"
+            ],
+            "cwd": ".ai/mcp/servers/strawberry_mcp",
+            "trust": true,
+            "description": "Furi OS MCP server for Flipper Zero firmware operations (build, flash, clean) and WiFi Devboard deployment."
         }
     }
 }
