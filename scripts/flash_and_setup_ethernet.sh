@@ -24,6 +24,43 @@ usage() {
     echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--devboard-auto-bootloader <on|off>] [--devboard-auto-bootloader-port <port>] [--skip-flipper-flash] [--auto-format-ext]"
 }
 
+reset_flipper_usb() {
+    local dev
+    dev=$(lsusb | awk '/0483:5740/ {print $2, $4}' | head -1 | awk '{gsub(":", "", $2); print $1 " " $2}')
+    if [ -z "$dev" ]; then
+        return 1
+    fi
+    local bus
+    local devnum
+    bus=$(echo "$dev" | awk '{print $1}')
+    devnum=$(echo "$dev" | awk '{print $2}')
+    local path="/dev/bus/usb/${bus}/${devnum}"
+    if [ -x /usr/bin/usbreset ]; then
+        /usr/bin/usbreset "$path" >/dev/null 2>&1 && return 0
+        sudo -n /usr/bin/usbreset "$path" >/dev/null 2>&1 && return 0
+    fi
+    return 1
+}
+
+MM_STOPPED=0
+maybe_stop_modemmanager() {
+    if command -v systemctl >/dev/null 2>&1; then
+        if systemctl is-active --quiet ModemManager; then
+            if sudo -n systemctl stop ModemManager >/dev/null 2>&1; then
+                MM_STOPPED=1
+            fi
+        fi
+    fi
+}
+
+maybe_start_modemmanager() {
+    if [ "$MM_STOPPED" -eq 1 ] && command -v systemctl >/dev/null 2>&1; then
+        sudo -n systemctl start ModemManager >/dev/null 2>&1 || true
+    fi
+}
+
+trap maybe_start_modemmanager EXIT
+
 while [ $# -gt 0 ]; do
     case "$1" in
         --devboard-flash)
@@ -93,16 +130,46 @@ else
             echo -e "${YELLOW}[!] /ext check failed; continuing anyway${NC}"
         fi
     fi
-    FLASH_ATTEMPTS=2
-    for attempt in $(seq 1 $FLASH_ATTEMPTS); do
-        echo -e "${YELLOW}    Flash attempt ${attempt}/${FLASH_ATTEMPTS}...${NC}"
-        if FBT_FLIPPER_BAUD=115200 ./fbt flash_usb_full; then
-            break
+    maybe_stop_modemmanager
+    timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
+    FLASH_ATTEMPTS=0
+    attempt=0
+    FLIPPER_PORTS=()
+    if ls /dev/serial/by-id/*Flipper* >/dev/null 2>&1; then
+        while IFS= read -r port; do
+            FLIPPER_PORTS+=("$port")
+        done < <(ls -1 /dev/serial/by-id/*Flipper*)
+    fi
+    if ls /dev/ttyACM* >/dev/null 2>&1; then
+        while IFS= read -r port; do
+            FLIPPER_PORTS+=("$port")
+        done < <(ls -1 /dev/ttyACM*)
+    fi
+    if [ "${#FLIPPER_PORTS[@]}" -eq 0 ]; then
+        FLIPPER_PORTS=("auto")
+    fi
+    while true; do
+        attempt=$((attempt + 1))
+        if [ "$FLASH_ATTEMPTS" -gt 0 ]; then
+            echo -e "${YELLOW}    Flash attempt ${attempt}/${FLASH_ATTEMPTS}...${NC}"
+        else
+            echo -e "${YELLOW}    Flash attempt ${attempt} (retrying until success)...${NC}"
         fi
-        if [ "$attempt" -eq "$FLASH_ATTEMPTS" ]; then
+
+        timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
+        for port in "${FLIPPER_PORTS[@]}"; do
+            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=115200 FBT_STORAGE_CHUNK_SIZE=1024 ./fbt flash_usb_full; then
+                break 2
+            fi
+            if FLIPPER_PATH="$port" FBT_FLIPPER_BAUD=230400 FBT_STORAGE_CHUNK_SIZE=1024 ./fbt flash_usb_full; then
+                break 2
+            fi
+        done
+        reset_flipper_usb || true
+        if [ "$FLASH_ATTEMPTS" -gt 0 ] && [ "$attempt" -ge "$FLASH_ATTEMPTS" ]; then
             exit 1
         fi
-        sleep 2
+        sleep 3
     done
 fi
 
