@@ -29,6 +29,10 @@ This isn't just a firmware - it's a **fully autonomous AI-driven development pla
 
 ### 🚀 Technical Excellence
 - **Native USB Ethernet** with HTTP download helpers ([NativeEthernet.md](documentation/NativeEthernet.md))
+- **ESP Flasher FAP** - Flash WiFi modules with lwIP HTTP download ([ESP_FLASHER_GUIDE.md](ESP_FLASHER_GUIDE.md))
+  - Auto-download ESP32 Marauder firmware over USB Ethernet
+  - Support for all ESP32 variants (ESP32, S2, S3, C3)
+  - One-click flash for WiFi Devboard v1
 - **Forked Submodule Workflow** for guaranteed compile-time stability
 - **Asset Pack System** - Complete theming with Anims/Icons/Fonts
 - **Extended JavaScript API** - Mass storage, file operations, and more

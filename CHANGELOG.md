@@ -1,3 +1,29 @@
+### Fixed:
+- External Apps:
+  - Fixed multi_counter FuriMutex pointer issue (FuriMutex** → FuriMutex*)
+  - Fixed hc11_modem icon header includes and build configuration
+  - Fixed smack_my_dolphin_up ViewPort input callback signature
+  - Fixed secret_toggle ViewPort callback type compatibility
+  - Removed incompatible apps: deadzone (missing engine), mifare_nested (missing NFC headers), canfdhs (deprecated CLI API)
+- Build System:
+  - Cleaned up duplicate app declarations (fuzzer_rfid)
+  - Improved external apps compilation compatibility
+
+### Added:
+- GPIO/ESP:
+  - ESP Flasher FAP with lwIP HTTP download support
+    - Auto-download ESP32 Marauder firmware from GitHub releases
+    - HTTP/HTTPS download over USB Ethernet (`furi_hal_usb_eth_http_download_to_file()`)
+    - Support for WiFi Devboard (ESP32-S2) and all ESP32 variants
+    - Flash addresses: 0x1000 (bootloader), 0x8000 (partitions), 0xE000 (boot_app0), 0x10000 (firmware)
+- Scripts:
+  - Internet Connection Sharing setup for Flipper USB Ethernet (`scripts/enable_internet.sh`)
+  - ESP Flasher guide with lwIP HTTP download instructions (`ESP_FLASHER_GUIDE.md`)
+- Documentation:
+  - Comprehensive ESP Flasher FAP usage guide with lwIP HTTP download
+  - WiFi module v1 flashing instructions
+  - Troubleshooting section for USB Ethernet and internet sharing
+
 ### Breaking Changes:
 - OFW: JS: SDK 1.0:
   - Scripts using these modules will need to be updated
@@ -8,7 +34,7 @@
     - The `button` event now returns an object with `key` and `type`, instead of just the key name
     - Effort required to update scripts using `gui/widget`: very minimal
 
-### Added:
+### Previous Additions:
 - Dev Tools:
   - Strawberry hallucination detection toolkit integration
   - Warp CLI agent control script for direct CLI command execution (`scripts/flipper_warp_cli.py`)
