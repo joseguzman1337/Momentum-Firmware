@@ -110,5 +110,153 @@ async def deploy_wifi_devboard_config() -> Tuple[str, str]:
     """
     return "WiFi Devboard V1 configuration (Always Use SD Card) applied to source code.", ""
 
+@mcp.tool()
+async def gpio_set(pin: int, state: bool) -> str:
+    """Set GPIO pin state on Flipper Zero.
+
+    Args:
+        pin: GPIO pin number (0-13)
+        state: True for HIGH, False for LOW
+
+    Returns:
+        Status message
+    """
+    if not (0 <= pin <= 13):
+        return f"Error: Invalid pin number {pin}. Must be 0-13."
+
+    state_str = "1" if state else "0"
+    cmd = f"./fbt cli -c 'gpio set {pin} {state_str}'"
+
+    returncode, stdout, stderr = await run_command_async(cmd)
+
+    if returncode == 0:
+        return f"GPIO pin {pin} set to {'HIGH' if state else 'LOW'}"
+    else:
+        return f"Error setting GPIO pin {pin}: {stderr}"
+
+@mcp.tool()
+async def gpio_read(pin: int) -> dict:
+    """Read GPIO pin state from Flipper Zero.
+
+    Args:
+        pin: GPIO pin number (0-13)
+
+    Returns:
+        Pin state and metadata
+    """
+    if not (0 <= pin <= 13):
+        return {"error": f"Invalid pin number {pin}. Must be 0-13."}
+
+    cmd = f"./fbt cli -c 'gpio read {pin}'"
+    returncode, stdout, stderr = await run_command_async(cmd)
+
+    if returncode == 0:
+        # Parse output - looking for HIGH/LOW or 1/0
+        state = "HIGH" if "1" in stdout or "HIGH" in stdout.upper() else "LOW"
+        return {
+            "pin": pin,
+            "state": state,
+            "raw_output": stdout.strip(),
+            "success": True
+        }
+    else:
+        return {
+            "pin": pin,
+            "error": stderr,
+            "success": False
+        }
+
+@mcp.tool()
+async def system_info() -> dict:
+    """Get Flipper Zero system information.
+
+    Returns:
+        System information including firmware version, hardware info
+    """
+    cmd = "./fbt cli -c 'device_info'"
+    returncode, stdout, stderr = await run_command_async(cmd)
+
+    if returncode == 0:
+        return {
+            "success": True,
+            "device_info": stdout.strip(),
+            "raw_output": stdout
+        }
+    else:
+        return {
+            "success": False,
+            "error": stderr
+        }
+
+@mcp.tool()
+async def storage_info() -> dict:
+    """Get Flipper Zero storage (SD card) information.
+
+    Returns:
+        Storage information including size, free space
+    """
+    cmd = "./fbt cli -c 'storage info'"
+    returncode, stdout, stderr = await run_command_async(cmd)
+
+    if returncode == 0:
+        return {
+            "success": True,
+            "storage_info": stdout.strip(),
+            "raw_output": stdout
+        }
+    else:
+        return {
+            "success": False,
+            "error": stderr
+        }
+
+@mcp.tool()
+async def nfc_detect() -> dict:
+    """Detect NFC tag on Flipper Zero.
+
+    Returns:
+        NFC tag detection result
+    """
+    cmd = "./fbt cli -c 'nfc detect'"
+    returncode, stdout, stderr = await run_command_async(cmd)
+
+    if returncode == 0:
+        # Check if tag was detected
+        tag_detected = "detected" in stdout.lower() or "uid" in stdout.lower()
+        return {
+            "success": True,
+            "tag_detected": tag_detected,
+            "nfc_output": stdout.strip(),
+            "raw_output": stdout
+        }
+    else:
+        return {
+            "success": False,
+            "error": stderr
+        }
+
+@mcp.tool()
+async def flipper_cli(command: str) -> dict:
+    """Execute arbitrary Flipper CLI command.
+
+    Args:
+        command: CLI command (e.g., "gpio set 5 1", "storage info")
+
+    Returns:
+        Command output
+    """
+    # Sanitize command to prevent injection
+    safe_command = shlex.quote(command)
+    cmd = f"./fbt cli -c {safe_command}"
+
+    returncode, stdout, stderr = await run_command_async(cmd)
+
+    return {
+        "success": returncode == 0,
+        "stdout": stdout,
+        "stderr": stderr,
+        "return_code": returncode
+    }
+
 if __name__ == '__main__':
     mcp.run(transport='stdio')
