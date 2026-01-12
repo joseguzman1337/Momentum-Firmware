@@ -75,9 +75,13 @@ Optional flags:
 
 # Best-effort auto bootloader (default on) with a specific port
 ./scripts/flash_and_setup_ethernet.sh --devboard-flash --devboard-auto-bootloader-port /dev/ttyACM1
+
+# Force GPIO bootloader toggling via Flipper GPIO (BOOT/RESET pins)
+FBT_DEVBOARD_BOOT_PIN=PC3 FBT_DEVBOARD_RESET_PIN=PB2 ./scripts/flash_and_setup_ethernet.sh --devboard-flash
 ```
 
 The script will wait for the WiFi board to enter bootloader mode.
+If GPIO bootloader is enabled, the script will toggle BOOT/RESET using the Flipper CLI.
 
 ---
 
