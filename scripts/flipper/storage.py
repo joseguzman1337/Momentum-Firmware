@@ -106,6 +106,11 @@ class FlipperStorage:
         self.port.port = portname
         self.port.timeout = float(os.environ.get("FBT_STORAGE_READ_TIMEOUT", "2"))
         self.port.write_timeout = float(os.environ.get("FBT_STORAGE_WRITE_TIMEOUT", "2"))
+        self.port.xonxoff = False
+        self.port.rtscts = False
+        self.port.dsrdtr = False
+        if hasattr(self.port, "exclusive"):
+            self.port.exclusive = True
         self.port.baudrate = int(os.environ.get("FBT_FLIPPER_BAUD", "230400"))
         self.read = BufferedRead(self.port)
         self.chunk_size = chunk_size
@@ -148,7 +153,7 @@ class FlipperStorage:
                     time.sleep(0.3)
                     self.port.reset_input_buffer()
                     # Send a command with a known syntax to make sure the buffer is flushed
-                    self.send("\x03")  # Ctrl+C to break out of any running CLI mode
+                    self._write_with_retry(b"\x03")  # Ctrl+C to break out of any running CLI mode
                     self.send("\r\n")
                     self.read.until(self.CLI_PROMPT, timeout_sec=open_timeout)
                     self.send("device_info\r")
@@ -167,7 +172,21 @@ class FlipperStorage:
         self.port.close()
 
     def send(self, line: str) -> None:
-        self.port.write(line.encode("ascii"))
+        self._write_with_retry(line.encode("ascii"))
+
+    def _write_with_retry(self, data: bytes, retries: int = 2) -> None:
+        for attempt in range(retries + 1):
+            try:
+                self.port.write(data)
+                return
+            except serial.SerialTimeoutException:
+                if attempt >= retries:
+                    raise
+                try:
+                    self.port.reset_output_buffer()
+                except Exception:
+                    pass
+                time.sleep(0.2)
 
     def send_and_wait_eol(self, line: str):
         self.send(line)

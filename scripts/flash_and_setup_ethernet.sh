@@ -136,6 +136,11 @@ else
         fi
     fi
     maybe_stop_modemmanager
+    if [ -x "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" ]; then
+        "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" "$SCRIPT_DIR/usbreset_flipper.py" || true
+    else
+        python3 "$SCRIPT_DIR/usbreset_flipper.py" || true
+    fi
     timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
     sleep 8
     FLASH_ATTEMPTS=0
@@ -162,13 +167,18 @@ else
             echo -e "${YELLOW}    Flash attempt ${attempt} (retrying until success)...${NC}"
         fi
 
+        if [ -x "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" ]; then
+            "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" "$SCRIPT_DIR/usbreset_flipper.py" || true
+        else
+            python3 "$SCRIPT_DIR/usbreset_flipper.py" || true
+        fi
         timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
         sleep 8
         for port in "${FLIPPER_PORTS[@]}"; do
-            if FLIPPER_PATH="$port" FORCE=yes FBT_FLIPPER_BAUD=115200 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=10 FBT_STORAGE_READ_TIMEOUT=5 FBT_STORAGE_OPEN_TIMEOUT=10 FBT_STORAGE_OPEN_RETRIES=5 ./fbt flash_usb_full; then
+            if FLIPPER_PATH="$port" FORCE=yes FBT_FLIPPER_BAUD=115200 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=20 FBT_STORAGE_READ_TIMEOUT=5 FBT_STORAGE_OPEN_TIMEOUT=10 FBT_STORAGE_OPEN_RETRIES=5 ./fbt flash_usb_full; then
                 break 2
             fi
-            if FLIPPER_PATH="$port" FORCE=yes FBT_FLIPPER_BAUD=230400 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=10 FBT_STORAGE_READ_TIMEOUT=5 FBT_STORAGE_OPEN_TIMEOUT=10 FBT_STORAGE_OPEN_RETRIES=5 ./fbt flash_usb_full; then
+            if FLIPPER_PATH="$port" FORCE=yes FBT_FLIPPER_BAUD=230400 FBT_STORAGE_CHUNK_SIZE=1024 FBT_STORAGE_WRITE_TIMEOUT=20 FBT_STORAGE_READ_TIMEOUT=5 FBT_STORAGE_OPEN_TIMEOUT=10 FBT_STORAGE_OPEN_RETRIES=5 ./fbt flash_usb_full; then
                 break 2
             fi
         done
@@ -264,7 +274,7 @@ while [ $COUNT -lt $MAX_WAIT ]; do
             echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
             DEVBOARD_ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
             if [ "$DEVBOARD_AUTO_BOOTLOADER" -eq 1 ]; then
-                DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT"
+                DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT --auto-bootloader-gpio"
             fi
             ./fbt devboard_flash ARGS="$DEVBOARD_ARGS"
             echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"

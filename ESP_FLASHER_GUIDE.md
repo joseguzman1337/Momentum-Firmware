@@ -49,6 +49,9 @@ If you want to update the WiFi devboard firmware directly from your computer:
 
 ```bash
 ./fbt devboard_flash ARGS="--wait --timeout 180 --auto-bootloader"
+
+# Optional: GPIO auto-bootloader via Flipper (BOOT/RESET pins on Flipper GPIO)
+FBT_DEVBOARD_BOOT_PIN=PC3 FBT_DEVBOARD_RESET_PIN=PB2 ./fbt devboard_flash ARGS="--wait --timeout 180 --auto-bootloader --auto-bootloader-gpio"
 ```
 
 Or use the full automation wrapper:
@@ -59,6 +62,7 @@ Or use the full automation wrapper:
 
 Notes:
 1. `--auto-bootloader` is best-effort and depends on the USB serial wiring.
+2. `--auto-bootloader-gpio` uses the Flipper CLI to toggle GPIO pins for BOOT/RESET; set `FBT_DEVBOARD_BOOT_PIN` and `FBT_DEVBOARD_RESET_PIN`.
 2. `--wait` keeps polling until the board is detected.
 3. Use `--devboard-channel dev` or `--devboard-channel rc` if needed.
 

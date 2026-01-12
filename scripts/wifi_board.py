@@ -12,6 +12,8 @@ from typing import Optional
 import requests
 import serial.tools.list_ports as list_ports
 from flipper.app import App
+from flipper.storage import FlipperStorage
+from flipper.utils.cdc import resolve_port
 from serial.tools.list_ports_common import ListPortInfo
 
 
@@ -152,6 +154,30 @@ class Main(App):
             default="auto",
             help="Serial port to toggle for auto bootloader (default: auto)",
         )
+        self.parser.add_argument(
+            "--auto-bootloader-gpio",
+            action="store_true",
+            default=bool(
+                os.environ.get("FBT_DEVBOARD_BOOT_PIN")
+                and os.environ.get("FBT_DEVBOARD_RESET_PIN")
+            ),
+            help="Use Flipper GPIO to toggle boot/reset (default: on if env pins set)",
+        )
+        self.parser.add_argument(
+            "--auto-bootloader-gpio-boot",
+            default=os.environ.get("FBT_DEVBOARD_BOOT_PIN", ""),
+            help="Flipper GPIO pin name for BOOT (env: FBT_DEVBOARD_BOOT_PIN)",
+        )
+        self.parser.add_argument(
+            "--auto-bootloader-gpio-reset",
+            default=os.environ.get("FBT_DEVBOARD_RESET_PIN", ""),
+            help="Flipper GPIO pin name for RESET (env: FBT_DEVBOARD_RESET_PIN)",
+        )
+        self.parser.add_argument(
+            "--auto-bootloader-gpio-port",
+            default=os.environ.get("FBT_DEVBOARD_FLIPPER_PORT", "auto"),
+            help="Flipper CDC port for GPIO toggling (env: FBT_DEVBOARD_FLIPPER_PORT)",
+        )
         self.parser.set_defaults(func=self.update)
 
         # logging
@@ -216,14 +242,56 @@ class Main(App):
             ) or id_str in ("303a:0002", "303a:1001", "10c4:ea60", "1a86:7523"):
                 candidates.append(port.device)
 
-        # If no obvious candidates, only probe USB/ACM-style ports.
-        if not candidates:
-            for port in list_ports.comports():
-                dev = (port.device or "").lower()
-                if any(token in dev for token in ("ttyusb", "ttyacm", "usbmodem", "usbserial")):
-                    candidates.append(port.device)
-
         return candidates
+
+    def _try_gpio_bootloader(self) -> bool:
+        if not self.args.auto_bootloader_gpio:
+            return False
+
+        boot_pin = (self.args.auto_bootloader_gpio_boot or "").strip()
+        reset_pin = (self.args.auto_bootloader_gpio_reset or "").strip()
+        if not boot_pin or not reset_pin:
+            self.logger.warning("GPIO bootloader pins not set; trying common pairs")
+            pairs = [
+                ("PC3", "PB2"),
+                ("PC3", "PB3"),
+                ("PA7", "PA6"),
+                ("PA7", "PA4"),
+            ]
+        else:
+            pairs = [(boot_pin, reset_pin)]
+
+        os.environ.setdefault("FBT_STORAGE_WRITE_TIMEOUT", "10")
+        os.environ.setdefault("FBT_STORAGE_READ_TIMEOUT", "5")
+        os.environ.setdefault("FBT_STORAGE_OPEN_TIMEOUT", "10")
+        os.environ.setdefault("FBT_STORAGE_OPEN_RETRIES", "5")
+
+        port = resolve_port(self.logger, self.args.auto_bootloader_gpio_port)
+        if not port:
+            self.logger.warning("No Flipper CDC port found for GPIO toggle")
+            return False
+
+        try:
+            self.logger.info(
+                f"Attempting GPIO bootloader toggle via {port}"
+            )
+            with FlipperStorage(port) as storage:
+                for boot_pin, reset_pin in pairs:
+                    self.logger.info(f"GPIO toggle BOOT={boot_pin} RESET={reset_pin}")
+                    storage.send_and_wait_prompt(f"gpio mode {boot_pin} 1\r")
+                    storage.send_and_wait_prompt(f"gpio mode {reset_pin} 1\r")
+                    storage.send_and_wait_prompt(f"gpio set {boot_pin} 0\r")
+                    time.sleep(0.1)
+                    storage.send_and_wait_prompt(f"gpio set {reset_pin} 0\r")
+                    time.sleep(0.1)
+                    storage.send_and_wait_prompt(f"gpio set {reset_pin} 1\r")
+                    time.sleep(0.1)
+                    storage.send_and_wait_prompt(f"gpio set {boot_pin} 1\r")
+                    time.sleep(0.2)
+            return True
+        except Exception as e:
+            self.logger.warning(f"GPIO bootloader toggle failed: {e}")
+            return False
 
     def _try_auto_bootloader(self) -> bool:
         try:
@@ -232,11 +300,14 @@ class Main(App):
             self.logger.warning(f"Auto-bootloader unavailable (pyserial): {e}")
             return False
 
+        success = False
+        if self._try_gpio_bootloader():
+            success = True
+
         ports = self._pick_auto_bootloader_ports()
         if not ports:
-            return False
+            return success
 
-        success = False
         for port in ports:
             try:
                 self.logger.info(f"Attempting auto-bootloader via {port}")
