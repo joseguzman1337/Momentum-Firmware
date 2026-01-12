@@ -136,7 +136,11 @@ else
         fi
     fi
     maybe_stop_modemmanager
-    python3 "$SCRIPT_DIR/usbreset_flipper.py" || true
+    if [ -x "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" ]; then
+        "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" "$SCRIPT_DIR/usbreset_flipper.py" || true
+    else
+        python3 "$SCRIPT_DIR/usbreset_flipper.py" || true
+    fi
     timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
     sleep 8
     FLASH_ATTEMPTS=0
@@ -163,7 +167,11 @@ else
             echo -e "${YELLOW}    Flash attempt ${attempt} (retrying until success)...${NC}"
         fi
 
-        python3 "$SCRIPT_DIR/usbreset_flipper.py" || true
+        if [ -x "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" ]; then
+            "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" "$SCRIPT_DIR/usbreset_flipper.py" || true
+        else
+            python3 "$SCRIPT_DIR/usbreset_flipper.py" || true
+        fi
         timeout 5s python3 "$SCRIPT_DIR/set_usb_mode.py" --mode usb_serial || true
         sleep 8
         for port in "${FLIPPER_PORTS[@]}"; do

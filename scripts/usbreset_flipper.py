@@ -27,6 +27,9 @@ def reset_flipper() -> int:
             except Exception as install_exc:
                 print(f"[usbreset] pyusb install failed: {install_exc}")
                 return 1
+            if os.environ.get("USBRESET_TOOLCHAIN") != "1":
+                os.environ["USBRESET_TOOLCHAIN"] = "1"
+                os.execv(toolchain_py, [toolchain_py, __file__])
             try:
                 import usb.core
                 import usb.util
