@@ -251,8 +251,20 @@ class Main(App):
         boot_pin = (self.args.auto_bootloader_gpio_boot or "").strip()
         reset_pin = (self.args.auto_bootloader_gpio_reset or "").strip()
         if not boot_pin or not reset_pin:
-            self.logger.warning("GPIO bootloader pins not set; skipping GPIO toggle")
-            return False
+            self.logger.warning("GPIO bootloader pins not set; trying common pairs")
+            pairs = [
+                ("PC3", "PB2"),
+                ("PC3", "PB3"),
+                ("PA7", "PA6"),
+                ("PA7", "PA4"),
+            ]
+        else:
+            pairs = [(boot_pin, reset_pin)]
+
+        os.environ.setdefault("FBT_STORAGE_WRITE_TIMEOUT", "10")
+        os.environ.setdefault("FBT_STORAGE_READ_TIMEOUT", "5")
+        os.environ.setdefault("FBT_STORAGE_OPEN_TIMEOUT", "10")
+        os.environ.setdefault("FBT_STORAGE_OPEN_RETRIES", "5")
 
         port = resolve_port(self.logger, self.args.auto_bootloader_gpio_port)
         if not port:
@@ -261,18 +273,21 @@ class Main(App):
 
         try:
             self.logger.info(
-                f"Attempting GPIO bootloader toggle via {port} (BOOT={boot_pin}, RESET={reset_pin})"
+                f"Attempting GPIO bootloader toggle via {port}"
             )
             with FlipperStorage(port) as storage:
-                storage.send_and_wait_prompt(f"gpio mode {boot_pin} 1\r")
-                storage.send_and_wait_prompt(f"gpio mode {reset_pin} 1\r")
-                storage.send_and_wait_prompt(f"gpio set {boot_pin} 0\r")
-                time.sleep(0.1)
-                storage.send_and_wait_prompt(f"gpio set {reset_pin} 0\r")
-                time.sleep(0.1)
-                storage.send_and_wait_prompt(f"gpio set {reset_pin} 1\r")
-                time.sleep(0.1)
-                storage.send_and_wait_prompt(f"gpio set {boot_pin} 1\r")
+                for boot_pin, reset_pin in pairs:
+                    self.logger.info(f"GPIO toggle BOOT={boot_pin} RESET={reset_pin}")
+                    storage.send_and_wait_prompt(f"gpio mode {boot_pin} 1\r")
+                    storage.send_and_wait_prompt(f"gpio mode {reset_pin} 1\r")
+                    storage.send_and_wait_prompt(f"gpio set {boot_pin} 0\r")
+                    time.sleep(0.1)
+                    storage.send_and_wait_prompt(f"gpio set {reset_pin} 0\r")
+                    time.sleep(0.1)
+                    storage.send_and_wait_prompt(f"gpio set {reset_pin} 1\r")
+                    time.sleep(0.1)
+                    storage.send_and_wait_prompt(f"gpio set {boot_pin} 1\r")
+                    time.sleep(0.2)
             return True
         except Exception as e:
             self.logger.warning(f"GPIO bootloader toggle failed: {e}")
