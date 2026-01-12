@@ -264,7 +264,7 @@ while [ $COUNT -lt $MAX_WAIT ]; do
             echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
             DEVBOARD_ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
             if [ "$DEVBOARD_AUTO_BOOTLOADER" -eq 1 ]; then
-                DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT"
+                DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT --auto-bootloader-gpio"
             fi
             ./fbt devboard_flash ARGS="$DEVBOARD_ARGS"
             echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"
