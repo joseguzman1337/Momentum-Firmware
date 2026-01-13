@@ -5,6 +5,7 @@
 #include <core/thread.h>
 #include <furi_hal.h>
 #include <furi_hal_info.h>
+#include <furi_hal_usb_eth.h>
 #include <task_control_block.h>
 #include <time.h>
 #include <notification/notification_messages.h>
@@ -580,6 +581,25 @@ void cli_command_clear(PipeSide* pipe, FuriString* args, void* context) {
     printf("\e[2J\e[H");
 }
 
+void cli_command_ping(PipeSide* pipe, FuriString* args, void* context) {
+    UNUSED(pipe);
+    UNUSED(context);
+
+    if(furi_string_size(args) == 0) {
+        cli_print_usage("ping", "<host>", "");
+        return;
+    }
+
+    const char* host = furi_string_get_cstr(args);
+    printf("Pinging %s...\r\n", host);
+
+    if(furi_hal_usb_eth_ping(host, 4, 2000)) {
+        printf("Ping success!\r\n");
+    } else {
+        printf("Ping failed.\r\n");
+    }
+}
+
 void cli_main_commands_init(CliRegistry* registry) {
     cli_registry_add_command(
         registry, "!", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
@@ -594,6 +614,7 @@ void cli_main_commands_init(CliRegistry* registry) {
     cli_registry_add_command(registry, "echo", CliCommandFlagParallelSafe, cli_command_echo, NULL);
     cli_registry_add_command(
         registry, "sleep", CliCommandFlagParallelSafe, cli_command_sleep, NULL);
+    cli_registry_add_command(registry, "ping", CliCommandFlagParallelSafe, cli_command_ping, NULL);
 }
 
 CLI_COMMAND_INTERFACE(src, cli_command_src, CliCommandFlagParallelSafe, 768, CLI_APPID);

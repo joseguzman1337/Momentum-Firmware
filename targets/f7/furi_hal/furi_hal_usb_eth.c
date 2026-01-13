@@ -19,6 +19,13 @@
 #include <lwip/dhcp.h>
 #include <lwip/tcpip.h>
 #include <netif/ethernet.h>
+
+#include <lwip/dns.h>
+#include <lwip/raw.h>
+#include <lwip/altcp.h>
+#include <lwip/inet_chksum.h>
+#include <lwip/icmp.h>
+#include <lwip/prot/icmp.h>
 #include <lwip/apps/http_client.h>
 
 #include <furi/core/semaphore.h>
@@ -566,3 +573,114 @@ bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_pa
 }
 
 #endif /* LWIP_TCP && LWIP_CALLBACK_API */
+
+/* ---------------- PING-over-usb_eth helper implementation ---------------- */
+
+typedef struct {
+    FuriSemaphore* sem;
+    ip_addr_t addr;
+    bool resolved;
+} PingDnsContext;
+
+static void usb_eth_dns_cb(const char* name, const ip_addr_t* ipaddr, void* arg) {
+    UNUSED(name);
+    PingDnsContext* ctx = arg;
+    if(ipaddr) {
+        ctx->addr = *ipaddr;
+        ctx->resolved = true;
+    }
+    if(ctx->sem) {
+        furi_semaphore_release(ctx->sem);
+    }
+}
+
+typedef struct {
+    FuriSemaphore* sem;
+    uint16_t id;
+    uint16_t seq;
+    bool received;
+} UsbEthPingContext;
+
+static u8_t usb_eth_ping_recv(void* arg, struct raw_pcb* pcb, struct pbuf* p, const ip_addr_t* addr) {
+    UsbEthPingContext* ctx = arg;
+    UNUSED(pcb);
+    UNUSED(addr);
+
+    if(p->tot_len >= (IP_HLEN + sizeof(struct icmp_echo_hdr))) {
+        if(pbuf_remove_header(p, IP_HLEN) == 0) {
+            struct icmp_echo_hdr* iecho = (struct icmp_echo_hdr*)p->payload;
+            if(iecho->id == ctx->id && iecho->seqno == lwip_htons(ctx->seq)) {
+                ctx->received = true;
+                if(ctx->sem) {
+                    furi_semaphore_release(ctx->sem);
+                }
+                pbuf_free(p);
+                return 1;
+            }
+            pbuf_add_header(p, IP_HLEN);
+        }
+    }
+    return 0;
+}
+
+bool furi_hal_usb_eth_ping(const char* host, uint32_t count, uint32_t timeout_ms) {
+    if(!eth_connected) return false;
+
+    PingDnsContext dns_ctx = {
+        .sem = furi_semaphore_alloc(1, 0),
+        .resolved = false,
+    };
+
+    err_t err = dns_gethostbyname(host, &dns_ctx.addr, usb_eth_dns_cb, &dns_ctx);
+    if(err == ERR_INPROGRESS) {
+        furi_semaphore_acquire(dns_ctx.sem, FuriWaitForever);
+    } else if(err == ERR_OK) {
+        dns_ctx.resolved = true;
+    }
+    furi_semaphore_free(dns_ctx.sem);
+
+    if(!dns_ctx.resolved) return false;
+
+    struct raw_pcb* pcb = raw_new(IP_PROTO_ICMP);
+    if(!pcb) return false;
+
+    UsbEthPingContext ping_ctx = {
+        .sem = furi_semaphore_alloc(1, 0),
+        .id = 0x1234,
+        .seq = 0,
+        .received = false,
+    };
+
+    raw_recv(pcb, usb_eth_ping_recv, &ping_ctx);
+    raw_bind(pcb, IP_ADDR_ANY);
+
+    uint32_t success_count = 0;
+    for(uint32_t i = 0; i < count; i++) {
+        ping_ctx.seq++;
+        ping_ctx.received = false;
+
+        struct pbuf* p = pbuf_alloc(PBUF_IP, sizeof(struct icmp_echo_hdr), PBUF_RAM);
+        if(p) {
+            struct icmp_echo_hdr* iecho = (struct icmp_echo_hdr*)p->payload;
+            iecho->type = ICMP_ECHO;
+            iecho->code = 0;
+            iecho->chksum = 0;
+            iecho->id = ping_ctx.id;
+            iecho->seqno = lwip_htons(ping_ctx.seq);
+            iecho->chksum = inet_chksum(iecho, (u16_t)p->len);
+
+            raw_sendto(pcb, p, &dns_ctx.addr);
+            pbuf_free(p);
+
+            if(furi_semaphore_acquire(ping_ctx.sem, timeout_ms) == FuriStatusOk) {
+                if(ping_ctx.received) success_count++;
+            }
+        }
+        if(i < count - 1) furi_delay_ms(100);
+    }
+
+    furi_semaphore_free(ping_ctx.sem);
+    raw_remove(pcb);
+
+    return success_count > 0;
+}

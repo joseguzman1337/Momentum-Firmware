@@ -4,6 +4,7 @@
 #include <storage/storage.h>
 #include <lib/toolbox/path.h>
 #include <flipper_format/flipper_format.h>
+#include <string.h>
 
 #define BAD_USB_SETTINGS_PATH           BAD_USB_APP_BASE_FOLDER "/.badkb.settings"
 #define BAD_USB_SETTINGS_FILE_TYPE      "Flipper BadUSB Settings File"
@@ -162,7 +163,7 @@ static void bad_usb_save_settings(BadUsbApp* app) {
             if(!flipper_format_write_uint32(fff, "ble_pairing", &temp_uint, 1)) break;
             if(!flipper_format_write_string_cstr(fff, "ble_name", hid_cfg->ble.name)) break;
             if(!flipper_format_write_hex(
-                   fff, "ble_mac", (uint8_t*)&hid_cfg->ble.mac, sizeof(hid_cfg->ble.mac)))
+                   fff, "ble_mac", hid_cfg->ble.mac, sizeof(hid_cfg->ble.mac)))
                 break;
             if(!flipper_format_write_string_cstr(fff, "usb_manuf", hid_cfg->usb.manuf)) break;
             if(!flipper_format_write_string_cstr(fff, "usb_product", hid_cfg->usb.product)) break;
@@ -193,6 +194,8 @@ void bad_usb_app_show_loading_popup(BadUsbApp* app, bool show) {
 
 BadUsbApp* bad_usb_app_alloc(char* arg) {
     BadUsbApp* app = malloc(sizeof(BadUsbApp));
+    furi_check(app);
+    memset(app, 0, sizeof(BadUsbApp));
 
     app->bad_usb_script = NULL;
 

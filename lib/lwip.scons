@@ -15,6 +15,9 @@ libenv.ApplyLibFlags()
 sources = [
     "lwip/src/core/def.c",
     "lwip/src/core/dns.c",
+    "lwip/src/core/altcp.c",
+    "lwip/src/core/altcp_alloc.c",
+    "lwip/src/core/altcp_tcp.c",
     "lwip/src/core/inet_chksum.c",
     "lwip/src/core/init.c",
     "lwip/src/core/ip.c",
