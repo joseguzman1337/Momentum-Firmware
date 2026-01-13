@@ -126,11 +126,7 @@ class Main(App):
     def generate(self):
         current_info = GitVersion(self.args.sourcedir).get_version_info()
 
-        build_date = (
-            date.today()
-            if current_info["BUILD_DIRTY"]
-            else current_info["GIT_COMMIT_DATE"]
-        )
+        build_date = date.today()
 
         current_info.update(
             {
