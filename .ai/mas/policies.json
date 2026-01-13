@@ -1,0 +1,14 @@
+{
+  "roles": {
+    "protocol": {
+      "restricted_paths": ["targets/", "furi/core/"]
+    },
+    "ui_asset": {
+      "restricted_paths": ["furi/", "applications/main/"]
+    },
+    "core_system": {
+      "restricted_paths": []
+    }
+  },
+  "forbidden_commands": ["rm -rf /", "mkfs", "dd if=/dev/zero"]
+}
