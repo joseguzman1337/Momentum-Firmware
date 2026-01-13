@@ -1,0 +1,9 @@
+[package]
+name = "wifidevboarddetector"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serialport = "4"
+rusb = "0.9"
+thiserror = "1"
