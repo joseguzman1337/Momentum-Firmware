@@ -9,7 +9,11 @@ import tempfile
 import time
 from typing import Optional
 
-import requests
+try:
+    import requests
+except ImportError:
+    requests = None
+
 import serial.tools.list_ports as list_ports
 from flipper.app import App
 from flipper.storage import FlipperStorage
@@ -189,10 +193,28 @@ class Main(App):
         return list(list_ports.grep(regexp))  # type: ignore
 
     def is_wifi_board_connected(self) -> bool:
-        return (
-            len(self._grep_ports("ESP32-S2")) > 0
-            or len(self._grep_ports("CMSIS-DAP")) > 0
-        )
+        # Standard detection via serial ports
+        if (len(self._grep_ports("ESP32-S2")) > 0
+                or len(self._grep_ports("CMSIS-DAP")) > 0):
+            return True
+
+        # Linux-specific "Ghost USB" detection
+        if not self.is_windows() and os.path.exists("/sys/bus/usb/devices"):
+            try:
+                for device in os.listdir("/sys/bus/usb/devices"):
+                    vid_path = f"/sys/bus/usb/devices/{device}/idVendor"
+                    pid_path = f"/sys/bus/usb/devices/{device}/idProduct"
+                    if os.path.exists(vid_path):
+                        with open(vid_path, "r") as f:
+                            vid = f.read().strip()
+                        # Check for Espressif VID (303a)
+                        if vid == "303a":
+                            # It's an Espressif device, likely the S2
+                            return True
+            except Exception:
+                pass
+        
+        return False
 
     @staticmethod
     def is_windows() -> bool:

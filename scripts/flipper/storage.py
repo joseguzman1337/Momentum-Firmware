@@ -109,8 +109,11 @@ class FlipperStorage:
         self.port.xonxoff = False
         self.port.rtscts = False
         self.port.dsrdtr = False
-        if hasattr(self.port, "exclusive"):
-            self.port.exclusive = True
+        try:
+            if hasattr(self.port, "exclusive"):
+                self.port.exclusive = True
+        except Exception:
+            pass
         self.port.baudrate = int(os.environ.get("FBT_FLIPPER_BAUD", "230400"))
         self.read = BufferedRead(self.port)
         self.chunk_size = chunk_size
@@ -136,10 +139,24 @@ class FlipperStorage:
                 baud_candidates.append(candidate)
         for attempt in range(1, open_retries + 1):
             if not self.port.is_open:
-                self.port.open()
+                try:
+                    self.port.open()
+                except OSError as e:
+                    if e.errno == 25: # ENOTTY
+                        pass
+                    else:
+                        raise
+
             for baud in baud_candidates:
                 try:
-                    self.port.baudrate = baud
+                    try:
+                        self.port.baudrate = baud
+                    except OSError as e:
+                        if e.errno == 25: # ENOTTY
+                            pass
+                        else:
+                            raise
+                    
                     self.logger.warning(f"Storage open attempt {attempt}/{open_retries} using baud {baud}")
                     # Toggle control lines to prod the USB CDC interface.
                     try:
