@@ -14,7 +14,7 @@ from flipper.utils.cdc import resolve_port
 
 class Main(App):
     APP_POST_CLOSE_DELAY_SEC = 0.2
-    CONNECT_RETRY_DELAY_SEC = 1.0
+    CONNECT_RETRY_DELAY_SEC = 2.0
     CONNECT_RETRIES = 15
 
     def init(self):
@@ -68,6 +68,19 @@ class Main(App):
             print(f"\033[90m{msg}\033[0m")
         else:
             print(msg)
+
+    def _kill_blocking_processes(self, port: str):
+        if sys.platform != "linux":
+            return
+        
+        try:
+            import subprocess
+            self._log_debug(f"[system] checking for processes holding {port}")
+            subprocess.run(["fuser", "-k", port], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Give the OS a moment to clean up
+            time.sleep(0.5)
+        except Exception:
+            pass
 
     def _read_line(self, storage, label: str):
         result = storage.read.until(storage.CLI_EOL)
@@ -153,6 +166,8 @@ class Main(App):
             self.logger.error("Failed to find connected Flipper")
             return 1
         self._log_debug(f"[serial] selected port: {port} ({self._port_transport(port)})")
+        
+        self._kill_blocking_processes(port)
 
         if not os.path.isfile(self.args.manifest_path):
             self._log_err("Manifest not found")
