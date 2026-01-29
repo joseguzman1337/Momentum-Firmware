@@ -1,0 +1,168 @@
+manifest:
+  version: "0.1.2"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: joseguzman1337/momentum-firmware
+    source: https://github.com/joseguzman1337/momentum-firmware
+    branch: next
+    commit: "4a14418a"
+    scope: [.ai/codex/scripts/agent.py, .ai/security/scripts/ai_fix_generator.py]
+  issued:
+    by: A2AS.org
+    at: '2026-01-26T16:11:27Z'
+  signatures:
+    digest: sha256:VSDb5c1BiAoZyH_29dxazMbo2CpAJszyN60gdFHEd9o
+    key: ed25519:B06OlePFhIqZXtGQH7ux1dCNycNloHobsNXqdBn7Z00
+    sig: ed25519:qLIQtkfM3xGCxO4chpP2t5hozxeffcljhd7sRKZRwKUe8HH6iqaqc9as1unRcd2K0rSw1a1VTHhrm9Tk_sQ4CQ
+
+agents:
+  firmware_agent:
+    type: instance
+    models: [gpt-4.1]
+    mcp: [codex_mcp_server]
+    params:
+      function: main
+      name: Firmware Developer
+      instructions: ['You are an expert C/C++ firmware developer for Flipper Zero. Focus on embedded systems, hardware interfaces,
+          and firmware optimization. Always use approval-policy: never and sandbox: workspace-write when calling codex. Work
+          within the Momentum Firmware codebase structure.']
+  issue_agent:
+    type: instance
+    models: [gpt-4.1]
+    params:
+      function: main
+      name: Issue Processor
+      handoffs: [firmware_agent]
+      instructions: ['You process GitHub issues for Momentum Firmware. Analyze issue content, classify by type (bug/feature/enhancement),
+          and hand off to appropriate developer agents. Create fixes that maintain firmware stability and compatibility.']
+
+models:
+  gpt-4.1:
+    type: default
+    agents: [firmware_agent, issue_agent]
+
+mcp:
+  codex_mcp_server:
+    type: process
+    agents: [firmware_agent]
+    params:
+      class: MCPServerStdio
+      name: Codex CLI
+      command: npx
+      args: [-y, codex, mcp-server]
+      client_session_timeout_seconds: "360000"
+
+teams:
+  issue_agent:
+    type: handoff
+    agents: [issue_agent, firmware_agent]
+
+imports:
+  Agent: agents.Agent
+  anthropic: anthropic
+  asyncio: asyncio
+  datetime: datetime.datetime
+  json: json
+  MCPServerStdio: agents.mcp.MCPServerStdio
+  openai: openai
+  os: os
+  Path: pathlib.Path
+  Runner: agents.Runner
+  set_default_openai_api: agents.set_default_openai_api
+  subprocess: subprocess
+  sys: sys
+
+functions:
+  apply_fix:
+    type: sync
+    module: .ai.security.scripts.ai_fix_generator
+    args: [file_path, fixed_code]
+  generate_fix_with_claude:
+    type: sync
+    module: .ai.security.scripts.ai_fix_generator
+    args: [context, rule]
+  generate_fix_with_codex:
+    type: sync
+    module: .ai.security.scripts.ai_fix_generator
+    args: [context, rule]
+  log:
+    type: sync
+    module: .ai.codex.scripts.agent
+    args: [message]
+  main:
+    type: sync
+    module: .ai.security.scripts.ai_fix_generator
+  read_file_context:
+    type: sync
+    module: .ai.security.scripts.ai_fix_generator
+    args: [file_path, line_num, context_lines]
+
+variables:
+  AGENT:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [.ai.security.scripts.ai_fix_generator]
+  ANTHROPIC_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv, anthropic.Anthropic]
+      path: [.ai.security.scripts.ai_fix_generator]
+  ISSUE_NUMBER:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [.ai.security.scripts.ai_fix_generator]
+  OPENAI_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv, openai.OpenAI]
+      path: [.ai.codex.scripts.agent, .ai.security.scripts.ai_fix_generator]
+  VULN_FILE:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [.ai.security.scripts.ai_fix_generator]
+  VULN_LINE:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [.ai.security.scripts.ai_fix_generator]
+  VULN_RULE:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [.ai.security.scripts.ai_fix_generator]
+
+files:
+  file_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open]
+      alias: [f]
+  log_dir:
+    type: literal
+    actions: [read, write]
+    params:
+      caller: [Path('logs/codex'), log_dir.mkdir]
+  log_file:
+    type: variable
+    actions: [write, read]
+    params:
+      caller: [open]
+      alias: [f]
+  logs/codex:
+    type: literal
+    actions: [read]
+  patch_file:
+    type: variable
+    actions: [write]
+    params:
+      caller: [open]
+      alias: [f]
+  VULN_FILE:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.exists]
