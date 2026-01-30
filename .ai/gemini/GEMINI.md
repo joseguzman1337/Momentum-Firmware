@@ -72,6 +72,11 @@ When fixing issues:
 - `targets/f7/` - Flipper Zero hardware-specific code
 - `scripts/` - Build and deployment scripts
 
+## Hardware Interaction
+- **Auto-Detection**: Use `python3 detect_flipper.py` for quick device discovery and info.
+- **Core Logic**: Implementation resides in `scripts/flipper/utils/cdc.py:resolve_port`.
+- **CLI Access**: `scripts/flipper/storage.py` provides the `FlipperStorage` class for serial communication.
+
 ## Automation Context
 This project uses multiple AI agents:
 - **Codex**: Feature implementation and bug fixes

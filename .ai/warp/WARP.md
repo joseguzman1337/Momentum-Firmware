@@ -48,7 +48,14 @@ Momentum Firmware is a custom firmware for Flipper Zero based on the Official Fi
 
 # Open CLI session
 ./fbt cli
+
+# Auto-detect Flipper Zero and show info
+python3 detect_flipper.py
 ```
+
+### Hardware Discovery
+- **Logic**: Implemented in `scripts/flipper/utils/cdc.py:resolve_port`.
+- **Port Naming**: Usually `/dev/cu.usbmodemflip_XXXXXXXX` on macOS.
 
 ### Code Quality
 ```bash
