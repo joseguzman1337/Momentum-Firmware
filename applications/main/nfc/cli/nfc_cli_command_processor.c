@@ -8,7 +8,8 @@
 
 #define TAG "NfcCliProcessor"
 
-#define NFC_CLI_KEYS_FOUND_SIZE_BYTES (10 * sizeof(NfcCliKeyDescriptor*))
+#define NFC_CLI_KEYS_FOUND_MAX 20
+#define NFC_CLI_KEYS_FOUND_SIZE_BYTES (NFC_CLI_KEYS_FOUND_MAX * sizeof(NfcCliKeyDescriptor*))
 
 typedef enum {
     NfcCliArgumentTypeShortNameKey,
@@ -31,6 +32,7 @@ typedef enum {
     NfcCliProcessorErrorKeyDuplication, /**< Some argument key was duplicated in input parameters */
     NfcCliProcessorErrorKeyParseError, /**< Error happened during argument value parsing */
     NfcCliProcessorErrorKeyRequiredMissing, /**< Some keys required for command execution is missing*/
+    NfcCliProcessorErrorTooManyArguments, /**< Too many arguments passed in CLI */
 
     NfcCliProcessorErrorNum
 } NfcCliProcessorError;
@@ -208,6 +210,12 @@ static NfcCliProcessorError nfc_cli_parse_single_key(
             furi_string_printf(
                 instance->error_message, "Duplicated key \'%s\'", furi_string_get_cstr(argument));
             result = NfcCliProcessorErrorKeyDuplication;
+            break;
+        }
+
+        if(instance->total_keys_found >= NFC_CLI_KEYS_FOUND_MAX) {
+            furi_string_printf(instance->error_message, "Too many arguments");
+            result = NfcCliProcessorErrorTooManyArguments;
             break;
         }
 
