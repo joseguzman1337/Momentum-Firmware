@@ -38,7 +38,9 @@ static void furi_record_erase(const char* name, FuriRecordData* record_data) {
 
 void furi_record_init(void) {
     furi_record = malloc(sizeof(FuriRecord));
+    furi_check(furi_record);
     furi_record->mutex = furi_mutex_alloc(FuriMutexTypeNormal);
+    furi_check(furi_record->mutex);
     FuriRecordDataDict_init(furi_record->records);
 }
 
