@@ -393,6 +393,7 @@ int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) WEAK;
 int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) {
     va_list ap_copy;
     int len;
+    char* new_buf = NULL;
 
     va_copy(ap_copy, ap);
     len = vsnprintf(*buf, size, fmt, ap_copy);
@@ -402,19 +403,20 @@ int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) {
         /* eCos and Windows are not standard-compliant and return -1 when
      * the buffer is too small. Keep allocating larger buffers until we
      * succeed or out of memory. */
-        *buf = NULL; /* LCOV_EXCL_START */
         while(len < 0) {
-            MG_FREE(*buf);
             if(size == 0) {
                 size = 5;
             }
             size *= 2;
-            if((*buf = (char*)MG_MALLOC(size)) == NULL) {
+            char* next_buf = (char*)MG_MALLOC(size);
+            if(next_buf == NULL) {
                 len = -1;
                 break;
             }
+            MG_FREE(new_buf);
+            new_buf = next_buf;
             va_copy(ap_copy, ap);
-            len = vsnprintf(*buf, size - 1, fmt, ap_copy);
+            len = vsnprintf(new_buf, size - 1, fmt, ap_copy);
             va_end(ap_copy);
         }
 
@@ -422,16 +424,26 @@ int mg_avprintf(char** buf, size_t size, const char* fmt, va_list ap) {
      * Microsoft version of vsnprintf() is not always null-terminated, so put
      * the terminator manually
      */
-        (*buf)[len] = 0;
-        /* LCOV_EXCL_STOP */
+        if(len >= 0) {
+            new_buf[len] = 0;
+            *buf = new_buf;
+        } else {
+            MG_FREE(new_buf);
+        }
     } else if(len >= (int)size) {
         /* Standard-compliant code path. Allocate a buffer that is large enough. */
-        if((*buf = (char*)MG_MALLOC(len + 1)) == NULL) {
-            len = -1; /* LCOV_EXCL_LINE */
-        } else { /* LCOV_EXCL_LINE */
+        new_buf = (char*)MG_MALLOC(len + 1);
+        if(new_buf == NULL) {
+            len = -1;
+        } else {
             va_copy(ap_copy, ap);
-            len = vsnprintf(*buf, len + 1, fmt, ap_copy);
+            len = vsnprintf(new_buf, len + 1, fmt, ap_copy);
             va_end(ap_copy);
+            if(len >= 0) {
+                *buf = new_buf;
+            } else {
+                MG_FREE(new_buf);
+            }
         }
     }
 

@@ -282,13 +282,14 @@ static bool compress_decode_stream_internal(
     return !decode_failed;
 }
 
-typedef struct {
+typedef struct MemoryStreamState {
     uint8_t* data_ptr;
     size_t data_size;
     bool is_source;
 } MemoryStreamState;
 
 static int32_t memory_stream_io_callback(void* context, uint8_t* ptr, size_t size) {
+    furi_check(context);
     MemoryStreamState* state = (MemoryStreamState*)context;
 
     if(size > state->data_size) {
@@ -407,7 +408,7 @@ bool compress_decode_streamed(
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-typedef struct {
+typedef struct gzip_decoder_s {
     struct uzlib_uncomp uzlib;
     CompressStreamDecoder* sd;
     uint32_t dict_sz;
