@@ -1,0 +1,60 @@
+{
+    "tasks": [
+        {
+            "id": "1e1838e3",
+            "agent": "codex",
+            "name": "Fix Issue #49: Charge Cap",
+            "status": "started",
+            "started_at": "2026-01-30T01:30:16.524908",
+            "updated_at": "2026-01-30T01:30:16.524913"
+        },
+        {
+            "id": "46f8a57a",
+            "agent": "codex",
+            "name": "Implement Issue #48: Keybinds",
+            "status": "started",
+            "started_at": "2026-01-30T01:30:16.547454",
+            "updated_at": "2026-01-30T01:30:16.547458"
+        },
+        {
+            "id": "b4591f18",
+            "agent": "codex",
+            "name": "Fix Issue #47: NULL Pointers",
+            "status": "started",
+            "started_at": "2026-01-30T01:30:16.569590",
+            "updated_at": "2026-01-30T01:30:16.569594"
+        },
+        {
+            "id": "788f2352",
+            "agent": "claude",
+            "name": "Security Hardening Audit",
+            "status": "started",
+            "started_at": "2026-01-30T01:30:16.593417",
+            "updated_at": "2026-01-30T01:30:16.593422"
+        },
+        {
+            "id": "7c1ea889",
+            "agent": "warp",
+            "name": "Code Quality Analysis",
+            "status": "started",
+            "started_at": "2026-01-30T01:30:16.616784",
+            "updated_at": "2026-01-30T01:30:16.616788"
+        },
+        {
+            "id": "b7ee2b20",
+            "agent": "jules",
+            "name": "Background Task Orchestration",
+            "status": "started",
+            "started_at": "2026-01-30T01:30:16.638992",
+            "updated_at": "2026-01-30T01:30:16.638997"
+        },
+        {
+            "id": "a75a34e6",
+            "agent": "gemini",
+            "name": "Architecture Refinement",
+            "status": "started",
+            "started_at": "2026-01-30T01:30:16.665573",
+            "updated_at": "2026-01-30T01:30:16.665581"
+        }
+    ]
+}

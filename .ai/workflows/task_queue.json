@@ -1,0 +1,46 @@
+[
+    {
+        "id": "4f5bcb2b-85ff-435f-ab3b-97d174b1f853",
+        "agent": "Claude",
+        "type": "Audit",
+        "target": "furi/core",
+        "description": "Scan for memory leaks",
+        "status": "completed",
+        "output": "Completed Audit for furi/core"
+    },
+    {
+        "id": "2349e3ae-16da-4308-b2fb-b3756b933b6e",
+        "agent": "Codex",
+        "type": "Harden",
+        "target": "applications/main",
+        "description": "Add NULL guards to record access",
+        "status": "completed",
+        "output": "Completed Harden for applications/main"
+    },
+    {
+        "id": "4a1cd331-ed5d-482d-9de1-5a927ee8f882",
+        "agent": "Warp",
+        "type": "Analyze",
+        "target": "lib/nfc",
+        "description": "Check buffer bounds in EMV",
+        "status": "completed",
+        "output": "Completed Analyze for lib/nfc"
+    },
+    {
+        "id": "8257fdab-652c-4c55-a9b2-07c5f74326fb",
+        "agent": "Gemini",
+        "type": "Refactor",
+        "target": "targets/f7",
+        "description": "Optimize power management calls",
+        "status": "pending"
+    },
+    {
+        "id": "18d31e2e-b2e7-4fc5-9c1c-cc09f90f9720",
+        "agent": "Jules",
+        "type": "Verify",
+        "target": "unit_tests",
+        "description": "Validate security patches",
+        "status": "completed",
+        "output": "Completed Verify for unit_tests"
+    }
+]
