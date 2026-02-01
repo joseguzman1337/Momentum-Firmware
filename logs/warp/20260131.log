@@ -24,3 +24,22 @@
 [2026-01-31T13:21:25.498301] 
 [1/3] Processing...
 [2026-01-31T13:21:25.498445] Executing: Task #1: Warp - Asset Management (openclaw_assets.c)
+[2026-01-31T22:23:48.455017] 🤖 Warp Automation - Batch Mode
+[2026-01-31T22:23:48.455651] ============================================================
+[2026-01-31T22:23:48.456317] Found 3 tasks
+[2026-01-31T22:23:48.456513] 
+[1/3] Processing...
+[2026-01-31T22:23:48.456673] Executing: Task #1: Warp - Asset Management (openclaw_assets.c)
+[2026-01-31T22:26:12.115237]   Completed: Task #1: Warp - Asset Management (openclaw_assets.c)
+[2026-01-31T22:26:14.118695] 
+[2/3] Processing...
+[2026-01-31T22:26:14.120480] Executing: Task #2: Codex - Physics Engine (openclaw_engine.c)
+[2026-01-31T22:28:19.908753]   Completed: Task #2: Codex - Physics Engine (openclaw_engine.c)
+[2026-01-31T22:28:21.909295] 
+[3/3] Processing...
+[2026-01-31T22:28:21.909667] Executing: Task #3: Claude - Rendering System (openclaw_render.c)
+[2026-01-31T22:30:41.220134]   Completed: Task #3: Claude - Rendering System (openclaw_render.c)
+[2026-01-31T22:30:43.224024] 
+============================================================
+[2026-01-31T22:30:43.224903] 📊 Summary: 3 successful, 0 failed
+[2026-01-31T22:30:43.225327] ============================================================

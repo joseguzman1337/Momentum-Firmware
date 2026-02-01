@@ -30,34 +30,29 @@ def seed_firmware_hardening_sprint():
     with open(QUEUE_FILE, "w") as f:
         json.dump([], f)
 
-    # 1. DataIngestor: Global Security Scan
-    add_task("DataIngestor", "security_scan", {
-        "targets": ["furi/core", "applications/main", "applications/services"],
-        "skill": "furi_audit"
+    # 1. Claude: Security Analysis
+    add_task("Claude", "security_audit", {
+        "instruction": "Analyze SECURITY.md and suggest 3 key improvements for 2026."
     })
 
-    # 2. ModelTrainer: Remediation of NULL Dereferences (Issue #395 context)
-    add_task("ModelTrainer", "harden_allocations", {
-        "focus": "furi_check addition to all malloc/alloc calls in targets",
-        "strategy": "atomic_patch"
+    # 2. Codex: Code Implementation
+    add_task("Codex", "feature_impl", {
+        "instruction": "Write a python script scripts/hello_codex.py that prints 'Hello from Codex'."
     })
 
-    # 3. APIBuilder: Furi Record Safety
-    add_task("APIBuilder", "harden_records", {
-        "focus": "Validate furi_record_open returns in all applications",
-        "strategy": "null_guard_insertion"
+    # 3. Jules: PR/Branch Management
+    add_task("Jules", "pr_check", {
+        "instruction": "Check for any stale branches starting with 'jules-' and list them."
     })
 
-    # 4. TestRunner: Continuous Verification
-    add_task("TestRunner", "verify_hardening", {
-        "command": "./run_unit_tests.py",
-        "scope": "core_security"
+    # 4. Warp: Optimization
+    add_task("Warp", "code_opt", {
+        "instruction": "Suggest optimizations for the main build script SConstruct."
     })
 
-    # 5. Deployer: Real-time Deployment
-    add_task("Deployer", "push_hardened_firmware", {
-        "branch": "next",
-        "strategy": "force-with-lease"
+    # 5. Gemini: Orchestration/Summary
+    add_task("Gemini", "status_report", {
+        "instruction": "Generate a brief status report of the .ai directory structure."
     })
 
 if __name__ == "__main__":

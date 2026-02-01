@@ -1,46 +1,56 @@
 [
     {
-        "id": "4f5bcb2b-85ff-435f-ab3b-97d174b1f853",
-        "agent": "Claude",
-        "type": "Audit",
-        "target": "furi/core",
-        "description": "Scan for memory leaks",
+        "id": "d15305ac-34bc-4022-abe0-fe0fae5b838b",
+        "role": "Claude",
+        "type": "security_audit",
+        "payload": {
+            "instruction": "Analyze SECURITY.md and suggest 3 key improvements for 2026."
+        },
+        "granularity": "atomic",
         "status": "completed",
-        "output": "Completed Audit for furi/core"
+        "result": "You've hit your limit \u00b7 resets 1pm (America/Bogota)\n"
     },
     {
-        "id": "2349e3ae-16da-4308-b2fb-b3756b933b6e",
-        "agent": "Codex",
-        "type": "Harden",
-        "target": "applications/main",
-        "description": "Add NULL guards to record access",
+        "id": "b32ba357-a972-4228-83d3-dd387f0405af",
+        "role": "Codex",
+        "type": "feature_impl",
+        "payload": {
+            "instruction": "Write a python script scripts/hello_codex.py that prints 'Hello from Codex'."
+        },
+        "granularity": "atomic",
         "status": "completed",
-        "output": "Completed Harden for applications/main"
+        "result": ""
     },
     {
-        "id": "4a1cd331-ed5d-482d-9de1-5a927ee8f882",
-        "agent": "Warp",
-        "type": "Analyze",
-        "target": "lib/nfc",
-        "description": "Check buffer bounds in EMV",
+        "id": "5f667a2f-1936-4f89-a533-d5c000f9faaf",
+        "role": "Jules",
+        "type": "pr_check",
+        "payload": {
+            "instruction": "Check for any stale branches starting with 'jules-' and list them."
+        },
+        "granularity": "atomic",
         "status": "completed",
-        "output": "Completed Analyze for lib/nfc"
+        "result": ""
     },
     {
-        "id": "8257fdab-652c-4c55-a9b2-07c5f74326fb",
-        "agent": "Gemini",
-        "type": "Refactor",
-        "target": "targets/f7",
-        "description": "Optimize power management calls",
+        "id": "b52064d0-cbc9-48b4-b39e-c43df89176a2",
+        "role": "Warp",
+        "type": "code_opt",
+        "payload": {
+            "instruction": "Suggest optimizations for the main build script SConstruct."
+        },
+        "granularity": "atomic",
+        "status": "failed",
+        "error": "[Errno 2] No such file or directory: 'warp'"
+    },
+    {
+        "id": "5c7c29eb-534e-4d35-8fbc-79e75721077e",
+        "role": "Gemini",
+        "type": "status_report",
+        "payload": {
+            "instruction": "Generate a brief status report of the .ai directory structure."
+        },
+        "granularity": "atomic",
         "status": "pending"
-    },
-    {
-        "id": "18d31e2e-b2e7-4fc5-9c1c-cc09f90f9720",
-        "agent": "Jules",
-        "type": "Verify",
-        "target": "unit_tests",
-        "description": "Validate security patches",
-        "status": "completed",
-        "output": "Completed Verify for unit_tests"
     }
 ]
