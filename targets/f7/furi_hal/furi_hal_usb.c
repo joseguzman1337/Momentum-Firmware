@@ -2,7 +2,10 @@
 #include <furi_hal_usb_i.h>
 #include <furi_hal_usb.h>
 #include <furi_hal_usb_eth.h>
+#include <furi_hal_usb_cdc.h>
 #include <furi_hal_power.h>
+
+extern FuriHalUsbInterface usb_cdc_dual;
 
 #include <stm32wbxx_ll_pwr.h>
 #include <stm32wbxx_ll_rcc.h>
@@ -114,7 +117,7 @@ void furi_hal_usb_init(void) {
     // Reset callback will be enabled after first mode change to avoid getting false reset events
 
     usb.enabled = false;
-    usb.interface = &usb_eth;
+    usb.interface = &usb_cdc_dual;
     NVIC_SetPriority(USB_LP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 5, 0));
     NVIC_SetPriority(USB_HP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 15, 0));
     NVIC_EnableIRQ(USB_LP_IRQn);
