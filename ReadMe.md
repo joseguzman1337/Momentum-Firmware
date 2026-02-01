@@ -1,3 +1,5 @@
+[![A2AS-CERTIFIED](https://img.shields.io/badge/A2AS-CERTIFIED-f3af80)](https://www.a2as.org/certified/agents/joseguzman1337/momentum-firmware?utm_source=github&utm_medium=pull_request) 
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo_dark.png">

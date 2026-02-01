@@ -28,12 +28,11 @@ static int32_t unit_tests_thread(void* context) {
 }
 
 void unit_tests_on_system_start(void) {
-#ifdef SRV_CLI
     CliRegistry* registry = furi_record_open(RECORD_CLI);
     cli_registry_add_command(
         registry, "unit_tests", CliCommandFlagParallelSafe, unit_tests_cli, NULL);
     furi_record_close(RECORD_CLI);
-#endif
+
     if(furi_hal_is_normal_boot()) {
         run_parallel(unit_tests_thread, NULL, 4 * 1024);
     }

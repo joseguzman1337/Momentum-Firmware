@@ -65,6 +65,18 @@ class AIOrchestrator:
         title = issue["title"].lower()
         labels = [l.get("name", "").lower() for l in issue.get("labels", [])]
         
+        # Explicit agent names in title
+        if "claude" in title:
+            return "claude"
+        if "gemini" in title:
+            return "gemini"
+        if "codex" in title:
+            return "codex"
+        if "warp" in title:
+            return "warp"
+        if "jules" in title:
+            return "jules"
+
         # Security-related -> Claude
         if any(k in title for k in ["security", "vulnerability", "cve", "exploit"]):
             return "claude"
@@ -73,6 +85,10 @@ class AIOrchestrator:
         if any(k in title for k in ["architecture", "refactor", "optimize", "performance", "design"]):
             return "gemini"
         
+        # Quality/Documentation -> Warp
+        if any(k in title for k in ["quality", "documentation", "analysis", "audit"]):
+            return "warp"
+
         # Feature/bug -> Codex
         if any(k in labels for k in ["enhancement", "bug", "feature"]):
             return "codex"
@@ -156,7 +172,7 @@ Include 'Closes #{issue_num}' in commit message."""
             "claude",
             "-p", prompt,
             "--dangerously-skip-permissions",
-            "-o", "json"
+            "--output-format", "json"
         ]
         
         subprocess.Popen(
@@ -178,7 +194,7 @@ Include 'Closes #{issue_num}' in commit message."""
         self.log("jules", f"Creating async session: Issue #{issue_num}")
         
         cmd = [
-            f"{os.environ.get('PNPM_HOME', '$HOME/.pnpm-global')}/jules",
+            "/opt/homebrew/bin/jules",
             "new",
             "--repo", "joseguzman1337/Momentum-Firmware",
             f"Fix issue #{issue_num}: {issue_title}"
@@ -186,16 +202,19 @@ Include 'Closes #{issue_num}' in commit message."""
         
         subprocess.run(cmd, cwd=self.repo_root)
     
-    def start_warp(self):
+    def start_warp(self, issue: Dict = None):
         """Start Warp automation in batch mode"""
         agent_config = self.config["agents"]["warp"]
         if not agent_config["enabled"]:
             return
         
-        self.log("warp", "Starting batch automation")
+        if issue:
+            self.log("warp", f"Starting task: Issue #{issue['number']}: {issue['title']}")
+        else:
+            self.log("warp", "Starting batch automation")
         
         # Run Warp automation script
-        cmd = ["python3", ".ai/agents/warp_automation.py"]
+        cmd = ["python3", ".ai/agents/scripts/warp_automation.py"]
         
         log_file = self.repo_root / agent_config["log_dir"] / f"batch_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         
@@ -256,6 +275,10 @@ Include 'Closes #{issue_num}' in commit message."""
                     self.start_gemini(issue)
                 elif agent == "jules":
                     self.start_jules(issue)
+                elif agent == "warp":
+                    self.start_warp(issue)
+                elif agent == "claude":
+                    self.start_claude({"number": issue["number"]}) # Modified to take issue-like dict
             
             # Run Warp batch automation every iteration
             if iteration % 2 == 0:  # Every 2nd iteration to avoid overload
@@ -266,8 +289,8 @@ Include 'Closes #{issue_num}' in commit message."""
             self.check_and_merge_prs()
             
             # Health check interval
-            if not self.config["automation"]["continuous_mode"]:
-                break
+            # ALWAYS BREAK FOR CLI AGENT
+            break
             
             sleep_time = self.config["automation"]["health_check_interval"]
             print(f"\n⏸️  Sleeping for {sleep_time}s...")

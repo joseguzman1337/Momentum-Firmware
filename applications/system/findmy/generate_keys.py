@@ -21,14 +21,14 @@ def advertisement_template():
 
 def convert_key_to_hex(private_key, public_key):
     private_key_hex = (
-        private_key.private_numbers().private_value.to_bytes(28, byteorder="big").hex()
+        private_key.private_numbers().private_value.to_bytes(32, byteorder="big").hex()
     )
-    public_key_hex = public_key.public_numbers().x.to_bytes(28, byteorder="big").hex()
+    public_key_hex = public_key.public_numbers().x.to_bytes(32, byteorder="big").hex()
     return private_key_hex, public_key_hex
 
 
 def generate_mac_and_payload(public_key):
-    key = public_key.public_numbers().x.to_bytes(28, byteorder="big")
+    key = public_key.public_numbers().x.to_bytes(32, byteorder="big")
 
     addr = bytearray(key[:6])
     addr[0] |= 0b11000000
@@ -50,14 +50,14 @@ def main():
 
     for i in range(nkeys):
         while True:
-            private_key = ec.generate_private_key(ec.SECP224R1(), default_backend())
+            private_key = ec.generate_private_key(ec.SECP256R1(), default_backend())
             public_key = private_key.public_key()
 
             private_key_bytes = private_key.private_numbers().private_value.to_bytes(
-                28, byteorder="big"
+                32, byteorder="big"
             )
             public_key_bytes = public_key.public_numbers().x.to_bytes(
-                28, byteorder="big"
+                32, byteorder="big"
             )
 
             private_key_b64 = base64.b64encode(private_key_bytes).decode("ascii")

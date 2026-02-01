@@ -497,6 +497,7 @@ void furi_hal_power_suppress_charge_enter(void) {
 
 void furi_hal_power_suppress_charge_exit(void) {
     FURI_CRITICAL_ENTER();
+    furi_check(furi_hal_power.suppress_charge > 0);
     furi_hal_power.suppress_charge--;
     bool enable_charging = furi_hal_power.suppress_charge == 0;
     FURI_CRITICAL_EXIT();

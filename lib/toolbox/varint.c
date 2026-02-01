@@ -39,14 +39,7 @@ size_t varint_uint32_length(uint32_t value) {
 }
 
 size_t varint_int32_pack(int32_t value, uint8_t* output) {
-    uint32_t v;
-
-    if(value >= 0) {
-        v = value * 2;
-    } else {
-        v = (value * -2) - 1;
-    }
-
+    uint32_t v = ((uint32_t)value << 1) ^ (uint32_t)(value >> 31);
     return varint_uint32_pack(v, output);
 }
 
@@ -54,23 +47,12 @@ size_t varint_int32_unpack(int32_t* value, const uint8_t* input, size_t input_si
     uint32_t v;
     size_t size = varint_uint32_unpack(&v, input, input_size);
 
-    if(v & 1) {
-        *value = (int32_t)(v + 1) / (-2);
-    } else {
-        *value = v / 2;
-    }
+    *value = (int32_t)((v >> 1) ^ -(int32_t)(v & 1));
 
     return size;
 }
 
 size_t varint_int32_length(int32_t value) {
-    uint32_t v;
-
-    if(value >= 0) {
-        v = value * 2;
-    } else {
-        v = (value * -2) - 1;
-    }
-
+    uint32_t v = ((uint32_t)value << 1) ^ (uint32_t)(value >> 31);
     return varint_uint32_length(v);
 }

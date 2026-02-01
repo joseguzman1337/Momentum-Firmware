@@ -1,0 +1,14 @@
+{
+    "skills": [
+        {
+            "name": "context_compressor",
+            "path": ".ai/skills/core/context_compressor.py",
+            "description": "Compresses agent context for token efficiency."
+        },
+        {
+            "name": "furi_audit",
+            "path": ".ai/skills/hardening/furi_check_audit.py",
+            "description": "Audits Furi OS calls for memory safety violations."
+        }
+    ]
+}

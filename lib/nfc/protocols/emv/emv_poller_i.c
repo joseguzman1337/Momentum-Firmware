@@ -84,7 +84,7 @@ static bool
 
     switch(tag) {
     case EMV_TAG_LOG_FMT:
-        furi_check(tlen < sizeof(app->log_fmt));
+        furi_check(tlen <= sizeof(app->log_fmt));
         memcpy(app->log_fmt, &buff[i], tlen);
         app->log_fmt_len = tlen;
         success = true;
@@ -94,13 +94,13 @@ static bool
         // skip AIP
         i += 2;
         tlen -= 2;
-        furi_check(tlen < sizeof(app->afl.data));
         memcpy(app->afl.data, &buff[i], tlen);
         app->afl.size = tlen;
         success = true;
         FURI_LOG_T(TAG, "found EMV_TAG_GPO_FMT1 %X: ", tag);
         break;
     case EMV_TAG_AID:
+        furi_check(tlen <= sizeof(app->aid));
         app->aid_len = tlen;
         memcpy(app->aid, &buff[i], tlen);
         success = true;
@@ -111,6 +111,7 @@ static bool
         FURI_LOG_RAW_T("\r\n");
         break;
     case EMV_TAG_PRIORITY:
+        furi_check(tlen <= sizeof(app->priority));
         memcpy(&app->priority, &buff[i], tlen);
         success = true;
         FURI_LOG_T(TAG, "found EMV_TAG_APP_PRIORITY %X: %d", tag, app->priority);
@@ -126,6 +127,7 @@ static bool
         FURI_LOG_RAW_T("\r\n");
         break;
     case EMV_TAG_APPL_LABEL:
+        furi_check(tlen < sizeof(app->application_label));
         memcpy(app->application_label, &buff[i], tlen);
         app->application_label[tlen] = '\0';
         success = true;
@@ -161,6 +163,7 @@ static bool
     case EMV_TAG_TRACK_1_EQUIV: {
         // Contain PAN and expire date
         char track_1_equiv[80];
+        furi_check(tlen < sizeof(track_1_equiv));
         memcpy(track_1_equiv, &buff[i], tlen);
         track_1_equiv[tlen] = '\0';
         success = true;
@@ -173,6 +176,7 @@ static bool
         // 0xD0 delimits PAN from expiry (YYMM)
         for(int x = 1; x < tlen; x++) {
             if(buff[i + x + 1] > 0xD0) {
+                furi_check((size_t)(x + 1) <= sizeof(app->pan));
                 memcpy(app->pan, &buff[i], x + 1);
                 app->pan_len = x + 1;
                 app->exp_year = (buff[i + x + 1] << 4) | (buff[i + x + 2] >> 4);
@@ -418,7 +422,7 @@ static void emv_prepare_pdol(APDU* dest, APDU* src) {
             return;
         }
 
-        furi_check(dest->size + tlen < sizeof(dest->data));
+        furi_check(dest->size + tlen <= sizeof(dest->data));
         for(uint8_t j = 0; j < COUNT_OF(pdol_values); j++) {
             if(tag == pdol_values[j]->tag) {
                 memcpy(dest->data + dest->size, pdol_values[j]->data, tlen);

@@ -41,6 +41,10 @@ Claude AI Security Agent is responsible for automated security vulnerability det
 - Proper certificate validation
 - Side-channel attack prevention
 
+## Hardware Interaction
+- **Auto-Detection**: Use `python3 detect_flipper.py` for quick device discovery and info.
+- **Core Logic**: Implementation resides in `scripts/flipper/utils/cdc.py:resolve_port`.
+
 ## Agent Configuration
 Located in `.ai/claude/security_agent.py` and `.ai/claude/mcp_server.json`
 

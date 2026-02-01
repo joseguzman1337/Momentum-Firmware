@@ -1025,14 +1025,13 @@ MU_TEST_SUITE(subghz) {
     MU_RUN_TEST(subghz_decoder_hay21_test);
     MU_RUN_TEST(subghz_decoder_feron_test);
     MU_RUN_TEST(subghz_decoder_legrand_test);
-    MU_RUN_TEST(subghz_decoder_marantec24_test);
-    // MU_RUN_TEST(subghz_decoder_solight_te44_test);
-    // MU_RUN_TEST(subghz_decoder_bresser_3ch_v1_test);
-    // MU_RUN_TEST(subghz_decoder_bresser_3ch_v0_test);
-    // MU_RUN_TEST(subghz_decoder_vauno_en8822c_test);
-
-    MU_RUN_TEST(subghz_encoder_princeton_test);
-    MU_RUN_TEST(subghz_encoder_came_test);
+          MU_RUN_TEST(subghz_decoder_marantec24_test);
+          MU_RUN_TEST(subghz_decoder_solight_te44_test);
+          MU_RUN_TEST(subghz_decoder_bresser_3ch_v1_test);
+          MU_RUN_TEST(subghz_decoder_bresser_3ch_v0_test);
+          MU_RUN_TEST(subghz_decoder_vauno_en8822c_test);
+    
+          MU_RUN_TEST(subghz_encoder_princeton_test);    MU_RUN_TEST(subghz_encoder_came_test);
     MU_RUN_TEST(subghz_encoder_came_twee_test);
     MU_RUN_TEST(subghz_encoder_gate_tx_test);
     MU_RUN_TEST(subghz_encoder_nice_flo_test);
