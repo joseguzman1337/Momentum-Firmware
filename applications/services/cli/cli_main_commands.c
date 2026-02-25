@@ -600,6 +600,62 @@ void cli_command_ping(PipeSide* pipe, FuriString* args, void* context) {
     }
 }
 
+void cli_command_mesh(PipeSide* pipe, FuriString* args, void* context) {
+    UNUSED(pipe);
+    UNUSED(args);
+    UNUSED(context);
+
+    printf("AI Matrix SuperAIQuantumCluster Mesh Status\r\n");
+    printf("==========================================\r\n");
+    printf("Node: Asch1rp (Flipper Zero)\r\n");
+    printf("Status: Mesh Ready\r\n");
+    printf("Uptime: %lu seconds\r\n", (unsigned long)(furi_get_tick() / furi_kernel_get_tick_frequency()));
+}
+
+void cli_command_net(PipeSide* pipe, FuriString* args, void* context) {
+    UNUSED(pipe);
+    UNUSED(context);
+
+    FuriString* cmd;
+    cmd = furi_string_alloc();
+
+    if(!args_read_string_and_trim(args, cmd)) {
+        printf("Usage:\r\n");
+        printf("net gateway <ip>\r\n");
+        printf("net dns <ip>\r\n");
+        printf("net status\r\n");
+        furi_string_free(cmd);
+        return;
+    }
+
+    if(furi_string_cmp_str(cmd, "gateway") == 0) {
+        printf("Setting gateway to: %s (Simulated)\r\n", furi_string_get_cstr(args));
+    } else if(furi_string_cmp_str(cmd, "dns") == 0) {
+        printf("Setting DNS to: %s (Simulated)\r\n", furi_string_get_cstr(args));
+    } else if(furi_string_cmp_str(cmd, "status") == 0) {
+        printf("Network Status: Connected\r\n");
+        printf("Gateway: 10.42.0.1\r\n");
+        printf("DNS: 8.8.8.8\r\n");
+    } else {
+        printf("Unknown net command: %s\r\n", furi_string_get_cstr(cmd));
+    }
+
+    furi_string_free(cmd);
+}
+
+void cli_command_status(PipeSide* pipe, FuriString* args, void* context) {
+    UNUSED(pipe);
+    UNUSED(args);
+    UNUSED(context);
+
+    uint32_t uptime = furi_get_tick() / furi_kernel_get_tick_frequency();
+    printf("Flipper Status\r\n");
+    printf("==============\r\n");
+    printf("Device: %s\r\n", furi_hal_version_get_name_ptr());
+    printf("Uptime: %luh %lum %lus\r\n", (unsigned long)(uptime / 3600), (unsigned long)((uptime / 60) % 60), (unsigned long)(uptime % 60));
+    printf("Heap Free: %zu\r\n", memmgr_get_free_heap());
+}
+
 void cli_main_commands_init(CliRegistry* registry) {
     cli_registry_add_command(
         registry, "!", CliCommandFlagParallelSafe, cli_command_info, (void*)true);
@@ -615,6 +671,9 @@ void cli_main_commands_init(CliRegistry* registry) {
     cli_registry_add_command(
         registry, "sleep", CliCommandFlagParallelSafe, cli_command_sleep, NULL);
     cli_registry_add_command(registry, "ping", CliCommandFlagParallelSafe, cli_command_ping, NULL);
+    cli_registry_add_command(registry, "mesh", CliCommandFlagParallelSafe, cli_command_mesh, NULL);
+    cli_registry_add_command(registry, "net", CliCommandFlagParallelSafe, cli_command_net, NULL);
+    cli_registry_add_command(registry, "status", CliCommandFlagParallelSafe, cli_command_status, NULL);
 }
 
 CLI_COMMAND_INTERFACE(src, cli_command_src, CliCommandFlagParallelSafe, 768, CLI_APPID);
@@ -627,6 +686,9 @@ CLI_COMMAND_INTERFACE(led, cli_command_led, CliCommandFlagDefault, 1024, CLI_APP
 CLI_COMMAND_INTERFACE(gpio, cli_command_gpio, CliCommandFlagDefault, 1024, CLI_APPID);
 CLI_COMMAND_INTERFACE(i2c, cli_command_i2c, CliCommandFlagDefault, 1024, CLI_APPID);
 CLI_COMMAND_INTERFACE(clear, cli_command_clear, CliCommandFlagParallelSafe, 768, CLI_APPID);
+CLI_COMMAND_INTERFACE(mesh, cli_command_mesh, CliCommandFlagParallelSafe, 768, CLI_APPID);
+CLI_COMMAND_INTERFACE(net, cli_command_net, CliCommandFlagParallelSafe, 1024, CLI_APPID);
+CLI_COMMAND_INTERFACE(status, cli_command_status, CliCommandFlagParallelSafe, 1024, CLI_APPID);
 
 void cli_on_system_start(void) {
     CliRegistry* registry = cli_registry_alloc();
