@@ -11,6 +11,8 @@
 - [x] Added `defcon auto` dynamic escalation/de-escalation based on new HVT spikes and risk telemetry.
 - [x] Added persistent alert logging (`alerts` command) for HVT and DEFCON threshold events in SQLite.
 - [x] Added `intel` trend analysis command to summarize hot channels/risk and recommend DEFCON posture.
+- [x] Added `autopilot` orchestration command to run auto-DEFCON daemon cycles, intel snapshot, and CSV export in one pass.
+- [x] Added default IAC "automate all" flow (`marauder_automate_all.json`) with `autoall` shortcut and `iac/automate` fallback behavior.
 
 ## Pending / Next Steps
 - [x] Implement automated saving of unified intelligence matrix to SQLite database across `aio`, `super`, `spectrum`, `ghost`, and `hidden` modes.

@@ -1228,8 +1228,15 @@ while(true) {
     def do_iac(self, arg):
         """Run IAC Automation Strategy. Usage: iac [file.json]"""
         if not arg:
-            print(f"{CLR['R']}Usage: iac [automation_script.json]{CLR['RESET']}")
-            return
+            default_script = "marauder_automate_all.json"
+            if os.path.exists(default_script):
+                print(
+                    f"{CLR['Y']}[info] No script provided. Using default: {default_script}{CLR['RESET']}"
+                )
+                arg = default_script
+            else:
+                print(f"{CLR['R']}Usage: iac [automation_script.json]{CLR['RESET']}")
+                return
         
         path = arg if os.path.exists(arg) else os.path.join(os.getcwd(), arg)
         if not os.path.exists(path):
@@ -1306,6 +1313,11 @@ while(true) {
     def do_automate(self, arg):
         """Alias for iac. Run custom Infrastructure as Code strategy."""
         self.do_iac(arg)
+
+    def do_autoall(self, arg):
+        """Run full automation via default IAC strategy."""
+        _ = arg
+        self.do_iac("marauder_automate_all.json")
 
     def do_justcallmekoko(self, arg):
         """Alias for aio (JustCallMeKoko Super ESP32)."""
@@ -2035,6 +2047,49 @@ while(true) {
                 f"`defcon {rec_level}` or enable `defcon auto`.{CLR['RESET']}"
             )
 
+    def do_autopilot(self, arg):
+        """Run full automated wardriving pipeline. Usage: autopilot [cycles] [interval_s] [scan_s] [hvt_rssi] [export_csv]"""
+        parts = arg.split()
+        cycles = 10
+        interval_s = self.defcon["interval_s"]
+        scan_s = self.defcon["scan_s"]
+        hvt_rssi = self.defcon["hvt_rssi"]
+        export_path = ""
+
+        if len(parts) > 0:
+            try:
+                cycles = max(1, int(parts[0]))
+            except ValueError:
+                pass
+        if len(parts) > 1:
+            try:
+                interval_s = max(5, int(parts[1]))
+            except ValueError:
+                pass
+        if len(parts) > 2:
+            try:
+                scan_s = max(5, int(parts[2]))
+            except ValueError:
+                pass
+        if len(parts) > 3:
+            try:
+                hvt_rssi = int(parts[3])
+            except ValueError:
+                pass
+        if len(parts) > 4:
+            export_path = parts[4]
+
+        print(
+            f"\n{CLR['BG']}{CLR['BOLD']}  AUTOPILOT SEQUENCE  {CLR['RESET']}\n"
+            f"{CLR['C']}cycles={cycles} interval={interval_s}s scan={scan_s}s hvt_rssi>={hvt_rssi}{CLR['RESET']}"
+        )
+        self.do_defcon("auto on")
+        self.do_daemon(f"{interval_s} {scan_s} {hvt_rssi} {cycles}")
+        self.do_intel("1000")
+        if not export_path:
+            export_path = f"wardriving_autopilot_{datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}.csv"
+        self.do_exportcsv(f"{export_path} 0")
+
     def do_help(self, arg):
         """Tactical Help System."""
         commands = [
@@ -2070,9 +2125,11 @@ while(true) {
             {"Command": "exportcsv", "Description": "Export captured matrix to CSV"},
             {"Command": "alerts", "Description": "Show recent HVT/DEFCON alerts"},
             {"Command": "intel", "Description": "Analyze trends and recommend DEFCON"},
+            {"Command": "autopilot", "Description": "Automate daemon + intel + export flow"},
             {"Command": "files", "Description": "Alias for 'ls' (ESP Filesystem)"},
             {"Command": "ls/cat/rm", "Description": "ESP Filesystem management"},
             {"Command": "iac/automate", "Description": "Run Infrastructure as Code strategy"},
+            {"Command": "autoall", "Description": "Run default full IAC automation flow"},
             {"Command": "stop/reboot", "Description": "Process control & Power suite"}
         ]
         print("\n" + MarauderTable.format(commands, ["Command", "Description"], title="Marauder Bridge Command Suite"))
