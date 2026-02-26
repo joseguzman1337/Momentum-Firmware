@@ -41,6 +41,16 @@ class DatabaseManager:
                 gps_lon TEXT
             )
         ''')
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS alerts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT,
+                severity TEXT,
+                alert_type TEXT,
+                message TEXT,
+                details TEXT
+            )
+        ''')
         self._ensure_columns()
         self.conn.commit()
 
@@ -153,6 +163,30 @@ class DatabaseManager:
             ])
             writer.writerows(rows)
         return len(rows)
+
+    def log_alert(self, severity, alert_type, message, details=None):
+        timestamp = datetime.datetime.now().isoformat()
+        payload = json.dumps(details or {}, ensure_ascii=True)
+        self.cursor.execute(
+            '''
+            INSERT INTO alerts (timestamp, severity, alert_type, message, details)
+            VALUES (?, ?, ?, ?, ?)
+            ''',
+            (timestamp, severity, alert_type, message, payload),
+        )
+        self.conn.commit()
+
+    def get_recent_alerts(self, limit=20):
+        self.cursor.execute(
+            '''
+            SELECT timestamp, severity, alert_type, message
+            FROM alerts
+            ORDER BY id DESC
+            LIMIT ?
+            ''',
+            (max(1, int(limit)),),
+        )
+        return self.cursor.fetchall()
 
     def close(self):
         if self.conn:
@@ -1613,6 +1647,12 @@ while(true) {
                         f"{CLR['R']}{CLR['BOLD']}[ALERT] {len(new_hvts)} new HVT(s) detected "
                         f"(rssi >= {hvt_rssi}){CLR['RESET']}"
                     )
+                    self.db.log_alert(
+                        severity="high",
+                        alert_type="new_hvt",
+                        message=f"{len(new_hvts)} new HVT(s) detected in cycle {cycle}",
+                        details={"cycle": cycle, "count": len(new_hvts), "threshold_rssi": hvt_rssi},
+                    )
                     print(
                         MarauderTable.format(
                             new_hvts[:10],
@@ -1642,6 +1682,17 @@ while(true) {
                     print(
                         f"{CLR['R']}{CLR['BOLD']}[DEFCON ALERT]{CLR['RESET']} "
                         f"new_hvts={len(new_hvts)} exceeded profile threshold {self.defcon['max_new_hvts']}"
+                    )
+                    self.db.log_alert(
+                        severity="critical",
+                        alert_type="defcon_threshold",
+                        message="New HVT count exceeded DEFCON profile threshold",
+                        details={
+                            "cycle": cycle,
+                            "new_hvts": len(new_hvts),
+                            "profile_limit": self.defcon["max_new_hvts"],
+                            "defcon_level": self.defcon["level"],
+                        },
                     )
                 if self.defcon.get("auto"):
                     self._auto_adjust_defcon(
@@ -1879,6 +1930,30 @@ while(true) {
         rows = self.db.export_csv(output, limit)
         print(f"{CLR['G']}[+] Exported {rows} rows to {output}{CLR['RESET']}")
 
+    def do_alerts(self, arg):
+        """Show recent alert history. Usage: alerts [limit]"""
+        limit = 20
+        if arg:
+            try:
+                limit = max(1, int(arg.strip()))
+            except ValueError:
+                print(f"{CLR['R']}[!] Invalid limit '{arg}'. Use an integer.{CLR['RESET']}")
+                return
+        rows = self.db.get_recent_alerts(limit=limit)
+        data = [
+            {
+                "timestamp": ts,
+                "severity": sev.upper(),
+                "type": a_type,
+                "message": msg,
+            }
+            for ts, sev, a_type, msg in rows
+        ]
+        if not data:
+            print(f"{CLR['Y']}[!] No alerts recorded yet.{CLR['RESET']}")
+            return
+        print(MarauderTable.format(data, ["timestamp", "severity", "type", "message"], title="Recent Alerts"))
+
     def do_help(self, arg):
         """Tactical Help System."""
         commands = [
@@ -1912,6 +1987,7 @@ while(true) {
             {"Command": "gps", "Description": "View GPS telemetry"},
             {"Command": "dbstats", "Description": "Show local SQLite wardriving stats"},
             {"Command": "exportcsv", "Description": "Export captured matrix to CSV"},
+            {"Command": "alerts", "Description": "Show recent HVT/DEFCON alerts"},
             {"Command": "files", "Description": "Alias for 'ls' (ESP Filesystem)"},
             {"Command": "ls/cat/rm", "Description": "ESP Filesystem management"},
             {"Command": "iac/automate", "Description": "Run Infrastructure as Code strategy"},
