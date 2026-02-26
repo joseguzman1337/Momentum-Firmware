@@ -36,6 +36,8 @@ Other:
         Synchronized Parallel Cluster Spectrum Scan
     ghost:
         Stealth Synchronized Parallel Cluster Scan
+    hidden:
+        Hide Node SSIDs & Detect Hidden Networks
     firmware_cdb, updater_cdb:
         Generate compilation_database.json
     lint, lint_py:

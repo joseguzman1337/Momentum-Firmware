@@ -577,6 +577,21 @@ distenv.PhonyTarget(
         ]
     ],
 )
+
+# Hidden Mode: Hide Node SSIDs & Detect Hidden Networks
+distenv.PhonyTarget(
+    "hidden",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder_bridge.py",
+            "-p",
+            "${FLIP_PORT}",
+            "hidden",
+            "${ARGS}",
+        ]
+    ],
+)
 # Alias for automated field ops
 distenv.Alias("wardrive", "aio")
 distenv.Alias("field_ops", "super")
