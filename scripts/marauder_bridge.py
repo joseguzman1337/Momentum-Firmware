@@ -407,6 +407,14 @@ class MarauderShell(cmd.Cmd):
         """All-In-One Wardriving Dashboard (JustCallMeKoko Super ESP32 AI Wardriving)."""
         print(f"\n{CLR['BG']}{CLR['BOLD']}  MARAUDER AIO WARDRIVING DASHBOARD (JUSTCALLMEKOKO SUPER ESP32)  {CLR['RESET']}")
         
+        # 0. Enforce Stealth (Always Hide Mode)
+        print(f"\n{CLR['PURP']}{CLR['BOLD']}>> ENGAGING STEALTH PROTOCOLS...{CLR['RESET']}")
+        cm = ClusterManager(["RG1", "SK1"])
+        cm.run_remote("RG1", "sudo airmon-ng start wlan0 && sudo iw dev wlan0mon set type monitor")
+        cm.run_remote("SK1", "marauder-cli settings -s Hidden 1")
+        self.mi.execute_command("settings -s MacRandom 1", wait_ms=500)
+        self.mi.execute_command("settings -s ForceProbe 1", wait_ms=500)
+        
         # 1. System & GPS Status
         print(f"\n{CLR['PURP']}{CLR['BOLD']}>> INITIALIZING SENSORS...{CLR['RESET']}")
         info_raw = self.mi.get_info()
@@ -841,6 +849,15 @@ while(true) {
         """Supreme Automated Wardriving Suite (JustCallMeKoko + AI + IAC)."""
         print(f"\n{CLR['BG']}{CLR['BOLD']}  [∞] INITIATING SUPREME AUTOMATION SEQUENCE  {CLR['RESET']}")
         
+        # Phase 0: Stealth
+        print(f"\n{CLR['CYAN']}[Phase 0/3] Engaging Stealth Protocols...{CLR['RESET']}")
+        cm = ClusterManager(["RG1", "SK1"])
+        cm.run_remote("RG1", "sudo airmon-ng start wlan0 && sudo iw dev wlan0mon set type monitor")
+        cm.run_remote("SK1", "marauder-cli settings -s Hidden 1")
+        self.mi.execute_command("settings -s MacRandom 1", wait_ms=500)
+        self.mi.execute_command("settings -s ForceProbe 1", wait_ms=500)
+        print(f"{CLR['G']}[✓] Cluster Cloaked.{CLR['RESET']}")
+
         # Phase 1: Recon
         print(f"\n{CLR['CYAN']}[Phase 1/3] System Reconnaissance...{CLR['RESET']}")
         self.do_status("")
