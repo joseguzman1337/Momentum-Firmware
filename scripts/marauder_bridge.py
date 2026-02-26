@@ -11,6 +11,7 @@ import subprocess
 import sqlite3
 import datetime
 import csv
+import pathlib
 
 # Add scripts directory to path for flipper imports
 sys.path.append(os.path.join(os.getcwd(), 'scripts'))
@@ -74,6 +75,8 @@ class DatabaseManager:
             ssid = ap.get("ssid", ap.get("ap", "<Hidden>")) or "<Hidden>"
             bssid = ap.get("bssid", ap.get("mac", "N/A")) or "N/A"
             source = ap.get("Source", ap.get("source", "Unknown"))
+            row_lat = ap.get("gps_lat", lat)
+            row_lon = ap.get("gps_lon", lon)
             self.cursor.execute('''
                 INSERT INTO networks (
                     timestamp, session_id, operation, source, channel, rssi, ssid, bssid, gps_lat, gps_lon
@@ -87,8 +90,8 @@ class DatabaseManager:
                 rssi,
                 ssid,
                 bssid,
-                lat,
-                lon
+                row_lat,
+                row_lon
             ))
             inserted += 1
         self.conn.commit()
@@ -733,6 +736,96 @@ class MarauderShell(cmd.Cmd):
         except:
             print(f"{CLR['R']}[!] Diagnostics tools (lsusb/iwconfig) not found.{CLR['RESET']}")
 
+    def do_alfa_validate(self, arg):
+        """Validate Alfa monitor-mode stability. Usage: alfa_validate [duration_s] [iface] [sample_s]"""
+        parts = arg.split()
+        duration_s = 300
+        iface = "wlan0mon"
+        sample_s = 5
+        if len(parts) > 0:
+            try:
+                duration_s = max(30, int(parts[0]))
+            except ValueError:
+                pass
+        if len(parts) > 1:
+            iface = parts[1]
+        if len(parts) > 2:
+            try:
+                sample_s = max(1, int(parts[2]))
+            except ValueError:
+                pass
+
+        print(
+            f"\n{CLR['BG']}{CLR['BOLD']}  ALFA STABILITY VALIDATION  {CLR['RESET']}\n"
+            f"{CLR['C']}iface={iface} duration={duration_s}s sample={sample_s}s{CLR['RESET']}"
+        )
+
+        samples = []
+        start_ts = time.time()
+        checks = 0
+        failures = 0
+
+        while (time.time() - start_ts) < duration_s:
+            checks += 1
+            sample = {
+                "ts": datetime.datetime.now().isoformat(),
+                "iface": iface,
+                "present": False,
+                "monitor_mode": False,
+                "rx_packets": -1,
+                "tx_packets": -1,
+            }
+
+            try:
+                info = subprocess.run(
+                    ["iw", "dev", iface, "info"], capture_output=True, text=True
+                )
+                if info.returncode == 0:
+                    sample["present"] = True
+                    sample["monitor_mode"] = "type monitor" in info.stdout
+
+                rx_path = pathlib.Path(f"/sys/class/net/{iface}/statistics/rx_packets")
+                tx_path = pathlib.Path(f"/sys/class/net/{iface}/statistics/tx_packets")
+                if rx_path.exists():
+                    sample["rx_packets"] = int(rx_path.read_text().strip() or "0")
+                if tx_path.exists():
+                    sample["tx_packets"] = int(tx_path.read_text().strip() or "0")
+            except Exception:
+                pass
+
+            if not sample["present"] or not sample["monitor_mode"]:
+                failures += 1
+            samples.append(sample)
+
+            status = "OK" if sample["present"] and sample["monitor_mode"] else "FAIL"
+            color = CLR["G"] if status == "OK" else CLR["R"]
+            print(
+                f"{color}[{status}]{CLR['RESET']} {sample['ts']} "
+                f"mode={'monitor' if sample['monitor_mode'] else 'unknown'} "
+                f"rx={sample['rx_packets']} tx={sample['tx_packets']}"
+            )
+            time.sleep(sample_s)
+
+        result = {
+            "started_at": datetime.datetime.fromtimestamp(start_ts).isoformat(),
+            "duration_s": duration_s,
+            "iface": iface,
+            "sample_s": sample_s,
+            "checks": checks,
+            "failures": failures,
+            "pass_rate": round(((checks - failures) / checks) * 100.0, 2) if checks else 0.0,
+            "samples": samples,
+        }
+        report_name = f"alfa_validation_{datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}.json"
+        with open(report_name, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2)
+
+        print(
+            f"\n{CLR['BOLD']}Summary:{CLR['RESET']} checks={checks} failures={failures} "
+            f"pass_rate={result['pass_rate']}%"
+        )
+        print(f"{CLR['GRAY']}[info] Validation report written to {report_name}{CLR['RESET']}")
+
     def do_nx(self, arg):
         """Show status of NX Nodes (SK1, RG1, etc.)."""
         print(f"\n{CLR['BG']}{CLR['BOLD']}  NX NODE CLUSTER STATUS  {CLR['RESET']}")
@@ -1081,40 +1174,19 @@ while(true) {
 
         # 3. Stop and Aggregate
         print(f"{CLR['PURP']}Aggregating Spectrum Data Streams...{CLR['RESET']}")
-        
+
         # Fetch local
         local_aps = self.mi.list_aps()
+        local_lat, local_lon = self._get_gps()
         for ap in local_aps: ap["Source"] = "Flipper"
-        
-        # Fetch remote using nmcli to get real data if possible
-        remote_results = cm.parallel_trigger("nmcli -t -f SSID,BSSID,SIGNAL,CHAN dev wifi")
-        
-        aggregated = local_aps
-        
-        for node, output in remote_results.items():
-            if output and not output.startswith("Error") and len(output.strip()) > 0:
-                for idx, line in enumerate(output.strip().splitlines()):
-                    parts = line.split(':')
-                    if len(parts) >= 4:
-                        ssid = parts[0]
-                        bssid = parts[1]
-                        rssi = parts[2]
-                        ch = parts[3]
-                        aggregated.append({
-                            "idx": 1000 + idx, 
-                            "ch": ch, 
-                            "rssi": rssi, 
-                            "ssid": ssid, 
-                            "bssid": bssid, 
-                            "Source": f"{node} (Remote)"
-                        })
-            else:
-                # Fallback to simulated data if node unreachable or no data
-                if node == "RG1":
-                    aggregated.append({"idx": 99, "ch": 1, "rssi": -45, "ssid": "ALFA_POWER_SCAN", "bssid": "00:C0:CA:97:12:34", "Source": "RG1 (Alfa)"})
-                elif node == "SK1":
-                    aggregated.append({"idx": 101, "ch": 6, "rssi": -30, "ssid": "DEVBOARD_PROXIMITY", "bssid": "30:3A:00:01:02:03", "Source": "SK1 (Dev)"})
-        
+        for ap in local_aps:
+            ap["gps_lat"] = local_lat
+            ap["gps_lon"] = local_lon
+
+        gps_map = self._get_cluster_gps_map(cm, ["RG1", "SK1"])
+        remote_aps = self._collect_remote_wifi(cm, "Remote", idx_base=1000, gps_map=gps_map)
+        aggregated = local_aps + remote_aps
+
         # Sort by signal strength
         try:
             aggregated = sorted(aggregated, key=lambda x: int(x.get("rssi", -100)), reverse=True)
@@ -1178,7 +1250,55 @@ while(true) {
         bssid = bssid.replace("\\:", ":").strip() or "N/A"
         return ssid, bssid, rssi.strip(), ch.strip()
 
-    def _collect_remote_wifi(self, cm, source_suffix, idx_base=4000, hidden_only=False):
+    @staticmethod
+    def _parse_gps_any(raw):
+        if not raw or raw.startswith("Error"):
+            return ("N/A", "N/A")
+
+        lat_patterns = [r'"lat"\s*:\s*(-?\d+(?:\.\d+)?)', r'"latitude"\s*:\s*(-?\d+(?:\.\d+)?)']
+        lon_patterns = [r'"lon"\s*:\s*(-?\d+(?:\.\d+)?)', r'"longitude"\s*:\s*(-?\d+(?:\.\d+)?)']
+
+        lat = None
+        lon = None
+        for p in lat_patterns:
+            m = re.search(p, raw, flags=re.IGNORECASE)
+            if m:
+                lat = m.group(1)
+                break
+        for p in lon_patterns:
+            m = re.search(p, raw, flags=re.IGNORECASE)
+            if m:
+                lon = m.group(1)
+                break
+
+        if lat and lon:
+            return (lat, lon)
+
+        text_lat = re.search(r'lat(?:itude)?\D+(-?\d+(?:\.\d+)?)', raw, flags=re.IGNORECASE)
+        text_lon = re.search(r'lon(?:gitude)?\D+(-?\d+(?:\.\d+)?)', raw, flags=re.IGNORECASE)
+        if text_lat and text_lon:
+            return (text_lat.group(1), text_lon.group(1))
+
+        return ("N/A", "N/A")
+
+    def _get_cluster_gps_map(self, cm, nodes):
+        gps_cmd = (
+            "bash -lc '"
+            "if command -v gpspipe >/dev/null 2>&1; then "
+            "gpspipe -w -n 20 2>/dev/null | grep -m1 \"\\\"class\\\":\\\"TPV\\\"\"; "
+            "elif command -v termux-location >/dev/null 2>&1; then "
+            "termux-location -p gps 2>/dev/null; "
+            "else "
+            "echo \"gps_unavailable\"; "
+            "fi'"
+        )
+        raw_map = cm.parallel_trigger(gps_cmd)
+        parsed = {}
+        for node in nodes:
+            parsed[node] = self._parse_gps_any(raw_map.get(node, ""))
+        return parsed
+
+    def _collect_remote_wifi(self, cm, source_suffix, idx_base=4000, hidden_only=False, gps_map=None):
         aggregated = []
         remote_results = cm.parallel_trigger("nmcli -t -f SSID,BSSID,SIGNAL,CHAN dev wifi")
         for node, output in remote_results.items():
@@ -1199,10 +1319,24 @@ while(true) {
                             "rssi": rssi,
                             "ssid": ssid,
                             "bssid": bssid,
+                            "gps_lat": (gps_map.get(node, ("N/A", "N/A"))[0] if gps_map else "N/A"),
+                            "gps_lon": (gps_map.get(node, ("N/A", "N/A"))[1] if gps_map else "N/A"),
                             "Source": f"{node} ({source_suffix})",
                         }
                     )
         return aggregated
+
+    @staticmethod
+    def _channel_density_rows(data):
+        counts = {}
+        for row in data:
+            ch = str(row.get("ch", row.get("channel", "N/A")))
+            counts[ch] = counts.get(ch, 0) + 1
+        rows = []
+        for ch, cnt in sorted(counts.items(), key=lambda x: int(x[0]) if str(x[0]).isdigit() else 999):
+            bar = "█" * min(40, cnt)
+            rows.append({"ch": ch, "nets": cnt, "density": bar})
+        return rows
 
     def do_daemon(self, arg):
         """Continuous ghost scan + HVT alerts. Usage: daemon [interval_s] [scan_s] [hvt_rssi] [cycles]"""
@@ -1254,10 +1388,16 @@ while(true) {
                 self.mi.execute_command("scanap", wait_ms=scan_s * 1000)
 
                 local_aps = self.mi.list_aps()
+                local_lat, local_lon = self._get_gps()
                 for ap in local_aps:
                     ap["Source"] = "Flipper (Daemon)"
+                    ap["gps_lat"] = local_lat
+                    ap["gps_lon"] = local_lon
 
-                remote_aps = self._collect_remote_wifi(cm, "Daemon", idx_base=5000)
+                gps_map = self._get_cluster_gps_map(cm, ["RG1", "SK1"])
+                remote_aps = self._collect_remote_wifi(
+                    cm, "Daemon", idx_base=5000, gps_map=gps_map
+                )
                 aggregated = local_aps + remote_aps
                 try:
                     aggregated = sorted(
@@ -1319,6 +1459,63 @@ while(true) {
         except KeyboardInterrupt:
             print(f"\n{CLR['Y']}[info] Daemon mode interrupted by user.{CLR['RESET']}")
 
+    def do_tui(self, arg):
+        """Live spectrum density TUI. Usage: tui [cycles] [interval_s]"""
+        parts = arg.split()
+        cycles = 20
+        interval_s = 3
+        if len(parts) > 0:
+            try:
+                cycles = max(1, int(parts[0]))
+            except ValueError:
+                pass
+        if len(parts) > 1:
+            try:
+                interval_s = max(1, int(parts[1]))
+            except ValueError:
+                pass
+
+        cm = ClusterManager(["RG1", "SK1"])
+        print(f"{CLR['CYAN']}Starting live TUI for {cycles} cycles (interval={interval_s}s).{CLR['RESET']}")
+
+        try:
+            for cycle in range(1, cycles + 1):
+                self.mi.execute_command("scanap", wait_ms=1000)
+                local_aps = self.mi.list_aps()
+                for ap in local_aps:
+                    ap["Source"] = "Flipper (TUI)"
+
+                remote_aps = self._collect_remote_wifi(cm, "TUI", idx_base=7000)
+                aggregated = local_aps + remote_aps
+                density_rows = self._channel_density_rows(aggregated)
+                top_aps = sorted(
+                    aggregated, key=lambda x: self._safe_int(x.get("rssi"), -100), reverse=True
+                )[:8]
+
+                sys.stdout.write("\033[2J\033[H")
+                print(
+                    f"{CLR['BG']}{CLR['BOLD']}  LIVE SPECTRUM DENSITY TUI  {CLR['RESET']}  "
+                    f"{CLR['GRAY']}cycle {cycle}/{cycles}{CLR['RESET']}"
+                )
+                print(
+                    MarauderTable.format(
+                        density_rows,
+                        ["ch", "nets", "density"],
+                        title="Channel Occupancy",
+                    )
+                )
+                if top_aps:
+                    print(
+                        "\n" + MarauderTable.format(
+                            top_aps,
+                            ["Source", "ch", "rssi", "ssid", "bssid"],
+                            title="Top Signals",
+                        )
+                    )
+                time.sleep(interval_s)
+        except KeyboardInterrupt:
+            print(f"\n{CLR['Y']}[info] TUI interrupted by user.{CLR['RESET']}")
+
     def do_ghost(self, arg):
         """Ghost Mode: Stealth Synchronized Parallel Cluster Scan."""
         duration = 20
@@ -1354,36 +1551,16 @@ while(true) {
         print(f"{CLR['PURP']}Exfiltrating Aggregated Spectrum Data...{CLR['RESET']}")
         
         local_aps = self.mi.list_aps()
+        local_lat, local_lon = self._get_gps()
         for ap in local_aps: ap["Source"] = "Flipper (Cloaked)"
-        
-        # Fetch remote using nmcli (simulating stealth retrieval)
-        remote_results = cm.parallel_trigger("nmcli -t -f SSID,BSSID,SIGNAL,CHAN dev wifi")
-        
-        aggregated = local_aps
-        
-        for node, output in remote_results.items():
-            if output and not output.startswith("Error") and len(output.strip()) > 0:
-                for idx, line in enumerate(output.strip().splitlines()):
-                    parts = line.split(':')
-                    if len(parts) >= 4:
-                        ssid = parts[0]
-                        bssid = parts[1]
-                        rssi = parts[2]
-                        ch = parts[3]
-                        aggregated.append({
-                            "idx": 2000 + idx, 
-                            "ch": ch, 
-                            "rssi": rssi, 
-                            "ssid": ssid, 
-                            "bssid": bssid, 
-                            "Source": f"{node} (Ghost)"
-                        })
-            else:
-                if node == "RG1":
-                    aggregated.append({"idx": 66, "ch": 13, "rssi": -88, "ssid": "HIDDEN_GHOST_13", "bssid": "DE:AD:BE:EF:66:01", "Source": "RG1 (Ghost)"})
-                elif node == "SK1":
-                    aggregated.append({"idx": 67, "ch": 11, "rssi": -92, "ssid": "LOW_PRO_DEV", "bssid": "DE:AD:BE:EF:66:02", "Source": "SK1 (Ghost)"})
-        
+        for ap in local_aps:
+            ap["gps_lat"] = local_lat
+            ap["gps_lon"] = local_lon
+
+        gps_map = self._get_cluster_gps_map(cm, ["RG1", "SK1"])
+        remote_aps = self._collect_remote_wifi(cm, "Ghost", idx_base=2000, gps_map=gps_map)
+        aggregated = local_aps + remote_aps
+
         try:
             aggregated = sorted(aggregated, key=lambda x: int(x.get("rssi", -100)), reverse=True)
         except:
@@ -1438,38 +1615,27 @@ while(true) {
         print(f"{CLR['PURP']}Aggregating Stealth Results...{CLR['RESET']}")
         
         local_aps = self.mi.list_aps()
+        local_lat, local_lon = self._get_gps()
         hidden_aps = [ap for ap in local_aps if ap.get("ssid") == "<Hidden>" or not ap.get("ssid")]
         for ap in hidden_aps: 
             ap["Status"] = f"{CLR['R']}HIDDEN{CLR['RESET']}"
             ap["Source"] = "Flipper"
-        
-        # Real verification from RG1 using nmcli (it can often see hidden SSIDs)
-        remote_results = cm.parallel_trigger("nmcli -t -f SSID,BSSID,SIGNAL,CHAN dev wifi")
-        
+            ap["gps_lat"] = local_lat
+            ap["gps_lon"] = local_lon
+
+        gps_map = self._get_cluster_gps_map(cm, ["RG1", "SK1"])
+        remote_aps = self._collect_remote_wifi(
+            cm,
+            "Alfa/Dev",
+            idx_base=3000,
+            hidden_only=True,
+            gps_map=gps_map,
+        )
+
         aggregated = hidden_aps
-        for node, output in remote_results.items():
-            if output and not output.startswith("Error") and len(output.strip()) > 0:
-                for idx, line in enumerate(output.strip().splitlines()):
-                    parts = line.split(':')
-                    if len(parts) >= 4:
-                        ssid = parts[0]
-                        bssid = parts[1]
-                        rssi = parts[2]
-                        ch = parts[3]
-                        if ssid == "" or ssid == "--":
-                            aggregated.append({
-                                "idx": 3000 + idx, 
-                                "ch": ch, 
-                                "rssi": rssi, 
-                                "ssid": "<Hidden>", 
-                                "bssid": bssid, 
-                                "Status": f"{CLR['R']}HIDDEN{CLR['RESET']}",
-                                "Source": f"{node} (Alfa/Dev)"
-                            })
-            else:
-                # Fallback to simulated if nothing found or error
-                if node == "RG1":
-                    aggregated.append({"idx": 333, "ch": 1, "rssi": -55, "ssid": "<Hidden>", "bssid": "AA:BB:CC:DD:EE:FF", "Status": f"{CLR['R']}HIDDEN{CLR['RESET']}", "Source": "RG1 (Alfa)"})
+        for ap in remote_aps:
+            ap["Status"] = f"{CLR['R']}HIDDEN{CLR['RESET']}"
+            aggregated.append(ap)
         
         if not aggregated:
             print(f"{CLR['GRAY']}[-] No hidden networks detected in this sector.{CLR['RESET']}")
@@ -1526,11 +1692,13 @@ while(true) {
             {"Command": "aio/wardrive", "Description": "AIO Wardriving (Super ESP32 AI)"},
             {"Command": "super", "Description": "Supreme Automated Field Operation"},
             {"Command": "spectrum", "Description": "Parallel Cluster Spectrum Scan"},
+            {"Command": "tui", "Description": "Live spectrum density TUI view"},
             {"Command": "ghost", "Description": "Stealth Synchronized Cluster Scan"},
             {"Command": "daemon", "Description": "Continuous ghost scan + HVT alerts"},
             {"Command": "hidden/wardrive_hide", "Description": "Hide Node SSIDs & Detect Hidden"},
             {"Command": "cluster", "Description": "Manage NX Node Cluster"},
             {"Command": "alfa", "Description": "Alfa 1900 (RTL8814U) Diagnostics"},
+            {"Command": "alfa_validate", "Description": "Prolonged Alfa monitor-mode stability test"},
             {"Command": "port", "Description": "Port driver from SK1 to RG1"},
             {"Command": "nx", "Description": "NX Node Cluster Status"},
             {"Command": "prot", "Description": "Bridge protocol between nodes"},
