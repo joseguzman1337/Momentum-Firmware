@@ -502,6 +502,20 @@ distenv.PhonyTarget(
     ],
 )
 
+# Beautified Marauder Bridge
+distenv.PhonyTarget(
+    "bridge",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder_bridge.py",
+            "-p",
+            "${FLIP_PORT}",
+            "${ARGS}",
+        ]
+    ],
+)
+
 
 # Measure CLI loopback performance
 distenv.PhonyTarget(

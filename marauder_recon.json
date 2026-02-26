@@ -1,7 +1,26 @@
-[
-    {"action": "info", "params": {}},
-    {"action": "set_led", "params": {"hex_color": "FF0000"}},
-    {"action": "scan_aps", "params": {"t": 10}},
-    {"action": "list", "params": {"target": "a"}},
-    {"action": "set_led", "params": {"hex_color": "00FF00"}}
-]
+{
+    "name": "Quick Recon & Deauth",
+    "description": "Scans for APs, selects all, and runs a short deauth attack",
+    "steps": [
+        {
+            "cmd": "scanap",
+            "desc": "Tactical WiFi Scan",
+            "wait": 15
+        },
+        {
+            "cmd": "select -a all",
+            "desc": "Targeting All Detected APs",
+            "wait": 2
+        },
+        {
+            "cmd": "attack -t deauth",
+            "desc": "Initiating Deauth Burst",
+            "wait": 10
+        },
+        {
+            "cmd": "info",
+            "desc": "Status Report",
+            "wait": 2
+        }
+    ]
+}
