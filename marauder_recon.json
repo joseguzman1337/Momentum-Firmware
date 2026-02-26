@@ -1,0 +1,7 @@
+[
+    {"action": "info", "params": {}},
+    {"action": "set_led", "params": {"hex_color": "FF0000"}},
+    {"action": "scan_aps", "params": {"t": 10}},
+    {"action": "list", "params": {"target": "a"}},
+    {"action": "set_led", "params": {"hex_color": "00FF00"}}
+]
