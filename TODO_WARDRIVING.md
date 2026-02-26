@@ -7,6 +7,7 @@
 - [x] Implemented `port` command for automated RTL8814U driver deployment to NX nodes.
 - [x] Created `fbt hidden` to hide node SSIDs and detect non-broadcasted networks.
 - [x] Enforced stealth mode (hide mode) by default on all AI wardriving functions (`aio`, `super`).
+- [x] Added adaptive DEFCON profiles (`defcon`, `defcon_status`) with policy-aware daemon scanning and risky AP watchlist alerts.
 
 ## Pending / Next Steps
 - [x] Implement automated saving of unified intelligence matrix to SQLite database across `aio`, `super`, `spectrum`, `ghost`, and `hidden` modes.

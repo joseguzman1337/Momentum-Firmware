@@ -381,6 +381,95 @@ class MarauderShell(cmd.Cmd):
         self.mi = interface
         self.sort_key = "rssi"
         self.db = DatabaseManager()
+        self.defcon = {
+            "level": 5,
+            "name": "Normal",
+            "interval_s": 30,
+            "scan_s": 10,
+            "hvt_rssi": -60,
+            "max_new_hvts": 5,
+            "force_probe": False,
+        }
+
+    @staticmethod
+    def _defcon_profile(level):
+        profiles = {
+            1: {
+                "name": "Critical",
+                "interval_s": 8,
+                "scan_s": 12,
+                "hvt_rssi": -70,
+                "max_new_hvts": 1,
+                "force_probe": True,
+            },
+            2: {
+                "name": "High",
+                "interval_s": 12,
+                "scan_s": 10,
+                "hvt_rssi": -68,
+                "max_new_hvts": 2,
+                "force_probe": True,
+            },
+            3: {
+                "name": "Elevated",
+                "interval_s": 18,
+                "scan_s": 9,
+                "hvt_rssi": -65,
+                "max_new_hvts": 3,
+                "force_probe": True,
+            },
+            4: {
+                "name": "Guarded",
+                "interval_s": 24,
+                "scan_s": 8,
+                "hvt_rssi": -62,
+                "max_new_hvts": 4,
+                "force_probe": False,
+            },
+            5: {
+                "name": "Normal",
+                "interval_s": 30,
+                "scan_s": 7,
+                "hvt_rssi": -60,
+                "max_new_hvts": 5,
+                "force_probe": False,
+            },
+        }
+        return profiles.get(level)
+
+    def do_defcon(self, arg):
+        """Set DEFCON profile (1-5) for adaptive wardriving behavior. Usage: defcon [1-5]"""
+        if not arg:
+            self.do_defcon_status("")
+            return
+        try:
+            level = int(arg.strip())
+        except ValueError:
+            print(f"{CLR['R']}[!] Usage: defcon [1-5]{CLR['RESET']}")
+            return
+        profile = self._defcon_profile(level)
+        if not profile:
+            print(f"{CLR['R']}[!] DEFCON level must be 1-5.{CLR['RESET']}")
+            return
+        self.defcon = {"level": level, **profile}
+        print(
+            f"{CLR['BR_G']}[✓] DEFCON {level} ({profile['name']}) active.{CLR['RESET']} "
+            f"interval={profile['interval_s']}s scan={profile['scan_s']}s hvt_rssi>={profile['hvt_rssi']}"
+        )
+
+    def do_defcon_status(self, arg):
+        """Show current DEFCON profile."""
+        p = self.defcon
+        rows = [
+            {"Field": "Level", "Value": p["level"]},
+            {"Field": "Profile", "Value": p["name"]},
+            {"Field": "Scan Interval", "Value": f"{p['interval_s']}s"},
+            {"Field": "Scan Window", "Value": f"{p['scan_s']}s"},
+            {"Field": "HVT Threshold", "Value": p["hvt_rssi"]},
+            {"Field": "Max New HVT Alert", "Value": p["max_new_hvts"]},
+            {"Field": "ForceProbe", "Value": "ON" if p["force_probe"] else "OFF"},
+        ]
+        print(MarauderTable.format(rows, ["Field", "Value"], title="DEFCON Policy"))
 
     def _get_gps(self):
         gps_raw = self.mi.execute_command("gpsdata", wait_ms=1000)
@@ -1338,12 +1427,58 @@ while(true) {
             rows.append({"ch": ch, "nets": cnt, "density": bar})
         return rows
 
+    def _score_ap_risk(self, ap):
+        score = 0
+        reasons = []
+        ssid = (ap.get("ssid") or "").strip()
+        bssid = (ap.get("bssid") or "N/A").strip()
+        rssi = self._safe_int(ap.get("rssi"), -100)
+        ch = self._safe_int(ap.get("ch", ap.get("channel", 0)), 0)
+
+        if ssid in ("", "<Hidden>", "--"):
+            score += 2
+            reasons.append("hidden")
+        if rssi >= -50:
+            score += 2
+            reasons.append("very_strong")
+        elif rssi >= -60:
+            score += 1
+            reasons.append("strong")
+        if ch in (1, 6, 11):
+            score += 1
+            reasons.append("common_ch")
+        if bssid in ("", "N/A"):
+            score += 1
+            reasons.append("no_bssid")
+        if "free" in ssid.lower() or "guest" in ssid.lower() or "open" in ssid.lower():
+            score += 1
+            reasons.append("open_keyword")
+        return score, reasons
+
+    def _find_risky_aps(self, aggregated, min_score=4):
+        risky = []
+        for ap in aggregated:
+            score, reasons = self._score_ap_risk(ap)
+            if score >= min_score:
+                risky.append(
+                    {
+                        "Source": ap.get("Source", "Unknown"),
+                        "ch": ap.get("ch", ap.get("channel", "N/A")),
+                        "rssi": self._safe_int(ap.get("rssi"), -100),
+                        "ssid": ap.get("ssid", "<Hidden>"),
+                        "bssid": ap.get("bssid", "N/A"),
+                        "risk": score,
+                        "flags": ",".join(reasons[:3]),
+                    }
+                )
+        return sorted(risky, key=lambda x: x["risk"], reverse=True)
+
     def do_daemon(self, arg):
         """Continuous ghost scan + HVT alerts. Usage: daemon [interval_s] [scan_s] [hvt_rssi] [cycles]"""
         parts = arg.split()
-        interval_s = 30
-        scan_s = 10
-        hvt_rssi = -60
+        interval_s = self.defcon["interval_s"]
+        scan_s = self.defcon["scan_s"]
+        hvt_rssi = self.defcon["hvt_rssi"]
         max_cycles = 0  # 0 means run forever
 
         if len(parts) > 0:
@@ -1369,7 +1504,8 @@ while(true) {
 
         print(
             f"\n{CLR['BG']}{CLR['BOLD']}  DAEMON GHOST MODE ACTIVE  {CLR['RESET']}\n"
-            f"{CLR['C']}interval={interval_s}s scan={scan_s}s hvt_rssi>={hvt_rssi} cycles={max_cycles or 'INF'}{CLR['RESET']}"
+            f"{CLR['C']}defcon={self.defcon['level']}({self.defcon['name']}) "
+            f"interval={interval_s}s scan={scan_s}s hvt_rssi>={hvt_rssi} cycles={max_cycles or 'INF'}{CLR['RESET']}"
         )
         print(f"{CLR['Y']}Press Ctrl+C to stop daemon mode.{CLR['RESET']}")
 
@@ -1384,7 +1520,10 @@ while(true) {
                 print(f"\n{CLR['PURP']}[cycle {cycle}] {started}{CLR['RESET']}")
 
                 self.mi.execute_command("settings -s MacRandom 1", wait_ms=250)
-                self.mi.execute_command("settings -s ForceProbe 1", wait_ms=250)
+                self.mi.execute_command(
+                    f"settings -s ForceProbe {1 if self.defcon['force_probe'] else 0}",
+                    wait_ms=250,
+                )
                 self.mi.execute_command("scanap", wait_ms=scan_s * 1000)
 
                 local_aps = self.mi.list_aps()
@@ -1442,10 +1581,25 @@ while(true) {
                 else:
                     print(f"{CLR['G']}[ok] No new HVTs in cycle {cycle}.{CLR['RESET']}")
 
+                risky = self._find_risky_aps(aggregated, min_score=4)
+                if risky:
+                    print(
+                        MarauderTable.format(
+                            risky[:8],
+                            ["Source", "ch", "rssi", "risk", "ssid", "bssid", "flags"],
+                            title=f"Risky AP Watchlist (Cycle {cycle})",
+                        )
+                    )
+
                 if hvts:
                     print(
                         f"{CLR['GRAY']}[info] Active HVTs this cycle: {len(hvts)} | "
                         f"Known BSSIDs: {len(known_bssids)}{CLR['RESET']}"
+                    )
+                if len(new_hvts) >= self.defcon["max_new_hvts"]:
+                    print(
+                        f"{CLR['R']}{CLR['BOLD']}[DEFCON ALERT]{CLR['RESET']} "
+                        f"new_hvts={len(new_hvts)} exceeded profile threshold {self.defcon['max_new_hvts']}"
                     )
 
                 if max_cycles and cycle >= max_cycles:
@@ -1689,6 +1843,8 @@ while(true) {
             {"Command": "attack", "Description": "Execute WiFi attacks (deauth...)"},
             {"Command": "sniff", "Description": "Packet capture (beacon, pmkid...)"},
             {"Command": "dashboard", "Description": "System overview & metrics"},
+            {"Command": "defcon", "Description": "Set adaptive DEFCON profile (1-5)"},
+            {"Command": "defcon_status", "Description": "Show active DEFCON policy"},
             {"Command": "aio/wardrive", "Description": "AIO Wardriving (Super ESP32 AI)"},
             {"Command": "super", "Description": "Supreme Automated Field Operation"},
             {"Command": "spectrum", "Description": "Parallel Cluster Spectrum Scan"},
