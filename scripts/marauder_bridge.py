@@ -188,6 +188,30 @@ class DatabaseManager:
         )
         return self.cursor.fetchall()
 
+    def get_intel_snapshot(self, recent_rows=500):
+        self.cursor.execute(
+            '''
+            SELECT source, channel, rssi, ssid, bssid, timestamp
+            FROM networks
+            ORDER BY id DESC
+            LIMIT ?
+            ''',
+            (max(1, int(recent_rows)),),
+        )
+        rows = self.cursor.fetchall()
+
+        self.cursor.execute(
+            '''
+            SELECT severity, alert_type, COUNT(*) AS c
+            FROM alerts
+            WHERE timestamp >= datetime('now', '-24 hours')
+            GROUP BY severity, alert_type
+            ORDER BY c DESC
+            '''
+        )
+        alert_rows = self.cursor.fetchall()
+        return rows, alert_rows
+
     def close(self):
         if self.conn:
             self.conn.close()
@@ -1954,6 +1978,63 @@ while(true) {
             return
         print(MarauderTable.format(data, ["timestamp", "severity", "type", "message"], title="Recent Alerts"))
 
+    def do_intel(self, arg):
+        """Analyze recent intelligence and suggest DEFCON posture. Usage: intel [recent_rows]"""
+        recent_rows = 500
+        if arg:
+            try:
+                recent_rows = max(50, int(arg.strip()))
+            except ValueError:
+                print(f"{CLR['R']}[!] Invalid recent_rows '{arg}'. Use an integer.{CLR['RESET']}")
+                return
+
+        rows, alert_rows = self.db.get_intel_snapshot(recent_rows=recent_rows)
+        if not rows:
+            print(f"{CLR['Y']}[!] No capture data available yet.{CLR['RESET']}")
+            return
+
+        ch_counts = {}
+        hvt_like = 0
+        risky_hidden = 0
+        for source, channel, rssi, ssid, bssid, ts in rows:
+            ch_key = str(channel)
+            ch_counts[ch_key] = ch_counts.get(ch_key, 0) + 1
+            rssi_i = self._safe_int(rssi, -100)
+            if bssid not in ("", "N/A", None) and rssi_i >= -60:
+                hvt_like += 1
+            if (ssid in ("", "<Hidden>", "--")) and rssi_i >= -70:
+                risky_hidden += 1
+
+        hot_channels = sorted(ch_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        hot_rows = [{"channel": ch, "count": c} for ch, c in hot_channels]
+
+        alert_total_24h = sum(c for _, _, c in alert_rows)
+        rec_level = 5
+        if alert_total_24h >= 15 or hvt_like >= 40 or risky_hidden >= 25:
+            rec_level = 2
+        elif alert_total_24h >= 8 or hvt_like >= 20 or risky_hidden >= 12:
+            rec_level = 3
+        elif alert_total_24h >= 4 or hvt_like >= 10 or risky_hidden >= 6:
+            rec_level = 4
+
+        recommendation = self._defcon_profile(rec_level)
+        summary = [
+            {"Metric": "Rows Analyzed", "Value": len(rows)},
+            {"Metric": "Alerts (24h)", "Value": alert_total_24h},
+            {"Metric": "HVT-like Beacons", "Value": hvt_like},
+            {"Metric": "Strong Hidden Nets", "Value": risky_hidden},
+            {"Metric": "Current DEFCON", "Value": f"{self.defcon['level']} ({self.defcon['name']})"},
+            {"Metric": "Recommended DEFCON", "Value": f"{rec_level} ({recommendation['name']})"},
+        ]
+        print(MarauderTable.format(summary, ["Metric", "Value"], title="Intel Snapshot"))
+        print("\n" + MarauderTable.format(hot_rows, ["channel", "count"], title="Hot Channels"))
+
+        if rec_level < self.defcon["level"]:
+            print(
+                f"{CLR['Y']}[intel] Consider escalating to DEFCON {rec_level}: "
+                f"`defcon {rec_level}` or enable `defcon auto`.{CLR['RESET']}"
+            )
+
     def do_help(self, arg):
         """Tactical Help System."""
         commands = [
@@ -1988,6 +2069,7 @@ while(true) {
             {"Command": "dbstats", "Description": "Show local SQLite wardriving stats"},
             {"Command": "exportcsv", "Description": "Export captured matrix to CSV"},
             {"Command": "alerts", "Description": "Show recent HVT/DEFCON alerts"},
+            {"Command": "intel", "Description": "Analyze trends and recommend DEFCON"},
             {"Command": "files", "Description": "Alias for 'ls' (ESP Filesystem)"},
             {"Command": "ls/cat/rm", "Description": "ESP Filesystem management"},
             {"Command": "iac/automate", "Description": "Run Infrastructure as Code strategy"},

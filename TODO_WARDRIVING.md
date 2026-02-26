@@ -10,6 +10,7 @@
 - [x] Added adaptive DEFCON profiles (`defcon`, `defcon_status`) with policy-aware daemon scanning and risky AP watchlist alerts.
 - [x] Added `defcon auto` dynamic escalation/de-escalation based on new HVT spikes and risk telemetry.
 - [x] Added persistent alert logging (`alerts` command) for HVT and DEFCON threshold events in SQLite.
+- [x] Added `intel` trend analysis command to summarize hot channels/risk and recommend DEFCON posture.
 
 ## Pending / Next Steps
 - [x] Implement automated saving of unified intelligence matrix to SQLite database across `aio`, `super`, `spectrum`, `ghost`, and `hidden` modes.
