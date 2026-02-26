@@ -389,6 +389,7 @@ class MarauderShell(cmd.Cmd):
             "hvt_rssi": -60,
             "max_new_hvts": 5,
             "force_probe": False,
+            "auto": False,
         }
 
     @staticmethod
@@ -438,24 +439,55 @@ class MarauderShell(cmd.Cmd):
         return profiles.get(level)
 
     def do_defcon(self, arg):
-        """Set DEFCON profile (1-5) for adaptive wardriving behavior. Usage: defcon [1-5]"""
+        """Set DEFCON profile (1-5) or auto mode. Usage: defcon [1-5|auto on|auto off]"""
         if not arg:
             self.do_defcon_status("")
+            return
+        raw = arg.strip().lower()
+        if raw in ("auto", "auto on", "auto true", "auto 1"):
+            self.defcon["auto"] = True
+            print(f"{CLR['BR_G']}[✓] DEFCON auto mode enabled.{CLR['RESET']}")
+            return
+        if raw in ("auto off", "auto false", "auto 0"):
+            self.defcon["auto"] = False
+            print(f"{CLR['Y']}[info] DEFCON auto mode disabled.{CLR['RESET']}")
             return
         try:
             level = int(arg.strip())
         except ValueError:
-            print(f"{CLR['R']}[!] Usage: defcon [1-5]{CLR['RESET']}")
+            print(f"{CLR['R']}[!] Usage: defcon [1-5|auto on|auto off]{CLR['RESET']}")
             return
-        profile = self._defcon_profile(level)
-        if not profile:
+        if not self._apply_defcon_level(level):
             print(f"{CLR['R']}[!] DEFCON level must be 1-5.{CLR['RESET']}")
             return
-        self.defcon = {"level": level, **profile}
-        print(
-            f"{CLR['BR_G']}[✓] DEFCON {level} ({profile['name']}) active.{CLR['RESET']} "
-            f"interval={profile['interval_s']}s scan={profile['scan_s']}s hvt_rssi>={profile['hvt_rssi']}"
-        )
+        p = self.defcon
+        print(f"{CLR['BR_G']}[✓] DEFCON {p['level']} ({p['name']}) active.{CLR['RESET']}")
+
+    def _apply_defcon_level(self, level):
+        profile = self._defcon_profile(level)
+        if not profile:
+            return False
+        auto_state = self.defcon.get("auto", False)
+        self.defcon = {"level": level, **profile, "auto": auto_state}
+        return True
+
+    def _auto_adjust_defcon(self, new_hvts_count, risky_count, total_networks):
+        level = self.defcon["level"]
+        next_level = level
+        # Escalate aggressively on anomaly spikes.
+        if new_hvts_count >= 5 or risky_count >= 8:
+            next_level = max(1, level - 2)
+        elif new_hvts_count >= 3 or risky_count >= 5:
+            next_level = max(1, level - 1)
+        # De-escalate slowly if environment is calm.
+        elif new_hvts_count == 0 and risky_count <= 1 and total_networks < 10:
+            next_level = min(5, level + 1)
+        if next_level != level:
+            self._apply_defcon_level(next_level)
+            print(
+                f"{CLR['Y']}[auto] DEFCON adjusted {level} -> {next_level} "
+                f"({self.defcon['name']}) based on telemetry.{CLR['RESET']}"
+            )
 
     def do_defcon_status(self, arg):
         """Show current DEFCON profile."""
@@ -468,6 +500,7 @@ class MarauderShell(cmd.Cmd):
             {"Field": "HVT Threshold", "Value": p["hvt_rssi"]},
             {"Field": "Max New HVT Alert", "Value": p["max_new_hvts"]},
             {"Field": "ForceProbe", "Value": "ON" if p["force_probe"] else "OFF"},
+            {"Field": "Auto Adjust", "Value": "ON" if p.get("auto") else "OFF"},
         ]
         print(MarauderTable.format(rows, ["Field", "Value"], title="DEFCON Policy"))
 
@@ -1502,9 +1535,15 @@ while(true) {
             except ValueError:
                 pass
 
+        # Seed current policy with one-shot CLI values.
+        self.defcon["interval_s"] = interval_s
+        self.defcon["scan_s"] = scan_s
+        self.defcon["hvt_rssi"] = hvt_rssi
+
         print(
             f"\n{CLR['BG']}{CLR['BOLD']}  DAEMON GHOST MODE ACTIVE  {CLR['RESET']}\n"
             f"{CLR['C']}defcon={self.defcon['level']}({self.defcon['name']}) "
+            f"auto={'ON' if self.defcon.get('auto') else 'OFF'} "
             f"interval={interval_s}s scan={scan_s}s hvt_rssi>={hvt_rssi} cycles={max_cycles or 'INF'}{CLR['RESET']}"
         )
         print(f"{CLR['Y']}Press Ctrl+C to stop daemon mode.{CLR['RESET']}")
@@ -1516,6 +1555,9 @@ while(true) {
         try:
             while True:
                 cycle += 1
+                interval_s = self.defcon["interval_s"]
+                scan_s = self.defcon["scan_s"]
+                hvt_rssi = self.defcon["hvt_rssi"]
                 started = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 print(f"\n{CLR['PURP']}[cycle {cycle}] {started}{CLR['RESET']}")
 
@@ -1600,6 +1642,12 @@ while(true) {
                     print(
                         f"{CLR['R']}{CLR['BOLD']}[DEFCON ALERT]{CLR['RESET']} "
                         f"new_hvts={len(new_hvts)} exceeded profile threshold {self.defcon['max_new_hvts']}"
+                    )
+                if self.defcon.get("auto"):
+                    self._auto_adjust_defcon(
+                        new_hvts_count=len(new_hvts),
+                        risky_count=len(risky),
+                        total_networks=len(aggregated),
                     )
 
                 if max_cycles and cycle >= max_cycles:
@@ -1843,7 +1891,7 @@ while(true) {
             {"Command": "attack", "Description": "Execute WiFi attacks (deauth...)"},
             {"Command": "sniff", "Description": "Packet capture (beacon, pmkid...)"},
             {"Command": "dashboard", "Description": "System overview & metrics"},
-            {"Command": "defcon", "Description": "Set adaptive DEFCON profile (1-5)"},
+            {"Command": "defcon", "Description": "Set DEFCON profile or auto mode"},
             {"Command": "defcon_status", "Description": "Show active DEFCON policy"},
             {"Command": "aio/wardrive", "Description": "AIO Wardriving (Super ESP32 AI)"},
             {"Command": "super", "Description": "Supreme Automated Field Operation"},
