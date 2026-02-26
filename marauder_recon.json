@@ -1,25 +1,35 @@
 {
-    "name": "Quick Recon & Deauth",
-    "description": "Scans for APs, selects all, and runs a short deauth attack",
+    "name": "Full Tactical Audit",
+    "description": "Comprehensive reconnaissance including APs, Clients, and GPS telemetry",
     "steps": [
         {
-            "cmd": "scanap",
-            "desc": "Tactical WiFi Scan",
-            "wait": 15
-        },
-        {
-            "cmd": "select -a all",
-            "desc": "Targeting All Detected APs",
+            "cmd": "gps",
+            "desc": "Checking GPS Lock",
             "wait": 2
         },
         {
-            "cmd": "attack -t deauth",
-            "desc": "Initiating Deauth Burst",
-            "wait": 10
+            "cmd": "scanap",
+            "desc": "Access Point Discovery",
+            "wait": 15
         },
         {
-            "cmd": "info",
-            "desc": "Status Report",
+            "cmd": "aps",
+            "desc": "Indexing APs",
+            "wait": 2
+        },
+        {
+            "cmd": "scansta",
+            "desc": "Station/Client Discovery",
+            "wait": 15
+        },
+        {
+            "cmd": "clients",
+            "desc": "Indexing Network Clients",
+            "wait": 2
+        },
+        {
+            "cmd": "dashboard",
+            "desc": "Final Tactical Summary",
             "wait": 2
         }
     ]

@@ -143,12 +143,17 @@ s.end();
             capture = False
             result_lines = []
             for line in output.splitlines():
+                line = line.strip()
+                if not line: continue
                 if "Running script" in line:
                     capture = True
                     continue
                 if "Script done" in line:
                     break
                 if capture:
+                    # Filter out command echoes and prompts
+                    if line.startswith(">") or line.startswith("#"): continue
+                    if cmd in line and len(line) < len(cmd) + 5: continue
                     result_lines.append(line)
             
             return "\n".join(result_lines).strip()
@@ -156,12 +161,19 @@ s.end();
     def list_aps(self):
         raw = self.execute_command("list -a")
         aps = []
-        # pattern matches [idx] [CH: ch] SSID BSSID RSSI
-        pattern = re.compile(r"\[(\d+)\]\s*\[CH:\s*(\d+)\]\s*(.*?)\s+([0-9A-F:]{17})\s+(-?\d+)")
         for line in raw.splitlines():
-            match = pattern.search(line)
-            if match:
-                idx, ch, ssid, bssid, rssi = match.groups()
+            # Support [idx] [CH: ch] SSID RSSI or [idx] [CH: ch] SSID BSSID RSSI
+            m = re.search(r"\[(\d+)\]\s*\[CH:\s*(\d+)\]\s*(.*?)\s+(-?\d+)", line)
+            if m:
+                idx, ch, ssid_raw, rssi = m.groups()
+                bssid = "N/A"
+                # Check if BSSID is present in the SSID part
+                bssid_m = re.search(r"([0-9A-Fa-f:]{17})", ssid_raw)
+                ssid = ssid_raw
+                if bssid_m:
+                    bssid = bssid_m.group(1)
+                    ssid = ssid_raw.replace(bssid, "").strip()
+                
                 aps.append({
                     "idx": int(idx),
                     "ch": int(ch),
@@ -174,11 +186,11 @@ s.end();
     def list_stations(self):
         raw = self.execute_command("list -s")
         stations = []
-        pattern = re.compile(r"\[(\d+)\]\s*\[CH:\s*(\d+)\]\s+([0-9A-F:]{17})\s+\(AP:\s*(.*?)\)\s+(-?\d+)")
+        # Support [idx] [CH: ch] MAC (AP: SSID) RSSI
         for line in raw.splitlines():
-            match = pattern.search(line)
-            if match:
-                idx, ch, mac, ap, rssi = match.groups()
+            m = re.search(r"\[(\d+)\]\s*\[CH:\s*(\d+)\]\s+([0-9A-Fa-f:]{17})\s+\(AP:\s*(.*?)\)\s+(-?\d+)", line)
+            if m:
+                idx, ch, mac, ap, rssi = m.groups()
                 stations.append({
                     "idx": int(idx),
                     "ch": int(ch),
@@ -187,6 +199,9 @@ s.end();
                     "rssi": int(rssi)
                 })
         return stations
+
+    def get_info(self):
+        return self.execute_command("info")
 
 class MarauderShell(cmd.Cmd):
     intro = f"\n{CLR['BG']}{CLR['BOLD']}  MARAUDER SUPREME BRIDGE ACTIVE  {CLR['RESET']}\nType 'help' or '?' to list commands.\n"
@@ -249,14 +264,201 @@ class MarauderShell(cmd.Cmd):
             {"Metric": "Firmware", "Data": ver},
             {"Metric": "AP Pool", "Data": len(aps)},
             {"Metric": "Station Pool", "Data": len(stations)},
-            {"Metric": "WiFi Channel", "Data": self.mi.execute_command("channel").strip()}
+            {"Metric": "WiFi Channel", "Data": self.mi.execute_command("channel").strip()},
+            {"Metric": "Selection", "Data": self.mi.execute_command("select").strip() or "None"}
         ]
         print(MarauderTable.format(metrics, ["Metric", "Data"], title="Systems Overview"))
         
         if aps:
             print("\n" + MarauderTable.format(aps[:5], ["idx", "ch", "rssi", "ssid"], title="Top 5 APs (Signal)"))
 
-    def do_settings(self, arg):
+    def do_aio(self, arg):
+        """All-In-One Wardriving Dashboard (JustCallMeKoko Super ESP32 AI Wardriving)."""
+        print(f"\n{CLR['BG']}{CLR['BOLD']}  MARAUDER AIO WARDRIVING DASHBOARD (JUSTCALLMEKOKO SUPER ESP32)  {CLR['RESET']}")
+        
+        # 1. System & GPS Status
+        print(f"\n{CLR['PURP']}{CLR['BOLD']}>> INITIALIZING SENSORS...{CLR['RESET']}")
+        info_raw = self.mi.get_info()
+        gps_raw = self.mi.execute_command("gpsdata")
+        channel = self.mi.execute_command("channel").strip()
+        
+        # Parse info
+        ver = "N/A"
+        hw = "N/A"
+        for line in info_raw.splitlines():
+            if "Version" in line: ver = line.split(":", 1)[1].strip() if ":" in line else line.strip()
+            if "Hardware" in line: hw = line.split(":", 1)[1].strip() if ":" in line else line.strip()
+        
+        # Fallback if fragmentation happened
+        if ver == "N/A":
+            for line in info_raw.splitlines():
+                if "Marauder v" in line: ver = line.strip()
+
+        # Parse GPS
+        gps_status = "NO LOCK / OFFLINE"
+        lat, lon, sats = "N/A", "N/A", "0"
+        for line in gps_raw.splitlines():
+            if "Latitude" in line: lat = line.split(":", 1)[1].strip()
+            if "Longitude" in line: lon = line.split(":", 1)[1].strip()
+            if "Satellites" in line: sats = line.split(":", 1)[1].strip()
+        
+        if lat != "N/A" and lon != "N/A" and lat != "0.000000":
+            gps_status = f"{CLR['BR_G']}LOCKED ({sats} Sats){CLR['RESET']}"
+        else:
+            gps_status = f"{CLR['R']}NO LOCK / OFFLINE{CLR['RESET']}"
+
+        sys_data = [
+            {"Metric": "Firmware", "Value": ver},
+            {"Metric": "Hardware", "Value": hw},
+            {"Metric": "Radio Channel", "Value": channel},
+            {"Metric": "GPS State", "Value": gps_status},
+            {"Metric": "Coordinates", "Value": f"{lat}, {lon}"}
+        ]
+        print(MarauderTable.format(sys_data, ["Metric", "Value"], title="System Telemetry"))
+
+        # 2. Wardriving Scan execution
+        print(f"\n{CLR['C']}{CLR['BOLD']}>> INITIATING AI WARDRIVING PROTOCOL (15s)...{CLR['RESET']}")
+        # Ensure GPS tracking is on if wardriving
+        self.mi.execute_command("gpstracker -c start", wait_ms=1000)
+        # We start sniff beacon and scan concurrently via Marauder logic if possible, 
+        # or we just do a deep scan to gather APs and Stations.
+        # Marauder's "scanap" is synchronous, so we'll do a quick scan.
+        
+        sys.stdout.write(f"{CLR['Y']}[*] Tactical AP Discovery...{CLR['RESET']}")
+        sys.stdout.flush()
+        self.mi.execute_command("scanap", wait_ms=10000)
+        print(f"\r{CLR['G']}[+] Tactical AP Discovery Complete.{CLR['RESET']}      ")
+
+        sys.stdout.write(f"{CLR['Y']}[*] Station/Client Mapping...{CLR['RESET']}")
+        sys.stdout.flush()
+        self.mi.execute_command("scansta", wait_ms=10000)
+        print(f"\r{CLR['G']}[+] Station/Client Mapping Complete.{CLR['RESET']}     ")
+
+        # 3. Harvest Results
+        aps = self.mi.list_aps()
+        clients = []
+        raw_clients = self.mi.execute_command("list -c")
+        pattern = re.compile(r"\[(\d+)\]\s*\[CH:\s*(\d+)\]\s+([0-9A-F:]{17})\s+\(AP:\s*(.*?)\)\s+(-?\d+)")
+        for line in raw_clients.splitlines():
+            match = pattern.search(line)
+            if match:
+                idx, ch, mac, ap, rssi = match.groups()
+                clients.append({"idx": int(idx), "ch": int(ch), "mac": mac, "ap": ap.strip(), "rssi": int(rssi)})
+        
+        print(f"\n{CLR['PURP']}{CLR['BOLD']}>> RESULTS AGGREGATION{CLR['RESET']}")
+        
+        if not aps:
+            print(f"{CLR['Y']}[!] No APs discovered in this sector.{CLR['RESET']}")
+        else:
+            # Sort APs by RSSI
+            aps = sorted(aps, key=lambda x: int(x.get("rssi", -100)), reverse=True)
+            print(MarauderTable.format(aps[:10], ["idx", "ch", "rssi", "ssid", "bssid"], title=f"Top 10 APs (Total: {len(aps)})"))
+
+        print("")
+        if not clients:
+            print(f"{CLR['Y']}[!] No Client devices mapped.{CLR['RESET']}")
+        else:
+            # Sort Clients by RSSI
+            clients = sorted(clients, key=lambda x: int(x.get("rssi", -100)), reverse=True)
+            print(MarauderTable.format(clients[:10], ["idx", "ch", "rssi", "mac", "ap"], title=f"Top 10 Clients (Total: {len(clients)})"))
+        
+        print(f"\n{CLR['G']}{CLR['BOLD']}[✓] AIO WARDRIVING CYCLE COMPLETE. Data ready for analysis or PCAP saving.{CLR['RESET']}")
+
+    def do_clients(self, arg):
+        """List scanned Clients. Usage: clients [sort_column]"""
+        if arg: self.sort_key = arg
+        raw = self.mi.execute_command("list -c")
+        clients = []
+        # Pattern matches [idx] [CH: ch] MAC (AP: SSID) RSSI
+        pattern = re.compile(r"\[(\d+)\]\s*\[CH:\s*(\d+)\]\s+([0-9A-F:]{17})\s+\(AP:\s*(.*?)\)\s+(-?\d+)")
+        for line in raw.splitlines():
+            match = pattern.search(line)
+            if match:
+                idx, ch, mac, ap, rssi = match.groups()
+                clients.append({
+                    "idx": int(idx),
+                    "ch": int(ch),
+                    "mac": mac,
+                    "ap": ap.strip(),
+                    "rssi": int(rssi)
+                })
+        if not clients:
+            print(f"{CLR['Y']}[!] No clients in memory.{CLR['RESET']}")
+        else:
+            print(MarauderTable.format(clients, ["idx", "ch", "rssi", "mac", "ap"], title="Client List", sort_by=self.sort_key))
+
+    def do_gps(self, arg):
+        """Show GPS status and coordinates."""
+        raw = self.mi.execute_command("gpsdata")
+        data = []
+        for line in raw.splitlines():
+            if ":" in line:
+                name, val = line.split(":", 1)
+                data.append({"Field": name.strip(), "Value": val.strip()})
+        if not data:
+            print(f"{CLR['Y']}[!] GPS module not responsive or no lock.{CLR['RESET']}")
+        else:
+            print(MarauderTable.format(data, ["Field", "Value"], title="GPS Telemetry"))
+
+    def do_help(self, arg):
+        """Tactical Help System."""
+        commands = [
+            {"Command": "scan", "Description": "Tactical WiFi Scan (APs)"},
+            {"Command": "ap", "Description": "Quick Scan + List APs (IAC mode)"},
+            {"Command": "aps", "Description": "List discovered Access Points"},
+            {"Command": "stations", "Description": "List discovered Stations"},
+            {"Command": "clients", "Description": "List discovered Clients"},
+            {"Command": "select", "Description": "Target selection (idx|all)"},
+            {"Command": "attack", "Description": "Execute WiFi attacks (deauth, rickroll...)"},
+            {"Command": "sniff", "Description": "Packet capture (beacon, pmkid...)"},
+            {"Command": "dashboard", "Description": "System overview & metrics"},
+            {"Command": "aio", "Description": "All-in-One Wardriving Dashboard"},
+            {"Command": "settings", "Description": "View/Modify internal config"},
+            {"Command": "ssid", "Description": "Manage SSID spoofing pool"},
+            {"Command": "gps", "Description": "View GPS telemetry"},
+            {"Command": "files", "Description": "Alias for 'ls' (ESP Filesystem)"},
+            {"Command": "ls/cat/rm", "Description": "ESP Filesystem management"},
+            {"Command": "iac", "Description": "Run Infrastructure as Code strategy"},
+            {"Command": "stop/reboot", "Description": "Process control & Power suite"}
+        ]
+        print("\n" + MarauderTable.format(commands, ["Command", "Description"], title="Marauder Bridge Command Suite"))
+        print(f"{CLR['GRAY']}Run 'help <command>' for detailed usage or use 'raw <cmd>' for unmapped commands.{CLR['RESET']}\n")
+
+    def do_monitor(self, arg):
+        """Monitor live output from Marauder (Transparent Bridge mode)."""
+        print(f"{CLR['M']}[*] Entering Monitor Mode. Press Ctrl+C to return to shell.{CLR['RESET']}")
+        try:
+            # We use a persistent JS bridge for this
+            js_payload = """
+let s = require("serial");
+s.setup("usart", 115200);
+while(true) {
+    let d = s.readAny(100);
+    if(d) print(d);
+}
+"""
+            with FlipperStorage(self.mi.port) as storage:
+                storage.send('\x03\x03')
+                time.sleep(0.2)
+                storage.send("loader close\r\n")
+                time.sleep(0.5)
+                storage.read.until(storage.CLI_PROMPT)
+                
+                storage.start()
+                with open("monitor_tmp.js", "w") as f: f.write(js_payload)
+                storage.send_file("monitor_tmp.js", "/ext/monitor_bridge.js")
+                os.remove("monitor_tmp.js")
+                
+                storage.send("js /ext/monitor_bridge.js\r\n")
+                # Continuous read until KeyboardInterrupt
+                while True:
+                    line = storage.read.until(storage.CLI_EOL).decode('ascii', 'ignore')
+                    if line: print(f"{CLR['W']}{line.strip()}{CLR['RESET']}")
+        except KeyboardInterrupt:
+            print(f"\n{CLR['Y']}[*] Exiting Monitor Mode...{CLR['RESET']}")
+            with FlipperStorage(self.mi.port) as storage:
+                storage.send('\x03\x03') # Stop JS script
+                storage.remove("/ext/monitor_bridge.js")
         """List or set Marauder internal settings. Usage: settings [name] [value]"""
         if len(arg.split()) >= 2:
             parts = arg.split()
@@ -354,6 +556,17 @@ class MarauderShell(cmd.Cmd):
             print(f"{CLR['Y']}[!] No APs in memory. Run 'scan' first.{CLR['RESET']}")
         else:
             print(MarauderTable.format(aps, ["idx", "ch", "rssi", "ssid", "bssid"], sort_by=self.sort_key))
+
+    def do_ap(self, arg):
+        """Quick Tactical AP Scan & List (Integrates marauder_iac.py logic)."""
+        duration = 10
+        if arg:
+            try: duration = int(arg)
+            except: pass
+        print(f"{CLR['C']}[*] Tactical WiFi Scan Initiated ({duration}s)...{CLR['RESET']}")
+        self.mi.execute_command("scanap", wait_ms=(duration * 1000))
+        aps = self.mi.list_aps()
+        print(MarauderTable.format(aps, ["idx", "ch", "rssi", "ssid", "bssid"], sort_by="rssi", title="Discovered Access Points"))
 
     def do_select(self, arg):
         """Select targets by index. Usage: select [idx1,idx2,... or 'all']"""
@@ -476,6 +689,10 @@ class MarauderShell(cmd.Cmd):
         else:
             print(raw)
 
+    def do_files(self, arg):
+        """Alias for ls. List files on ESP SD card."""
+        self.do_ls(arg)
+
     def do_raw(self, arg):
         """Send raw command to Marauder. Usage: raw [command]"""
         if not arg:
@@ -498,8 +715,8 @@ class MarauderShell(cmd.Cmd):
 
 def main():
     parser = argparse.ArgumentParser(description="Marauder Beautified CLI Bridge")
-    parser.add_argument("cmd", nargs="?", help="Initial command to run (scan, aps, stations, info)")
-    parser.add_argument("--port", help="Serial port", default="auto")
+    parser.add_argument("-p", "--port", help="Serial port", default="auto")
+    parser.add_argument("cmd", nargs="*", help="Initial command to run (e.g., scan, ap 15, info)")
     
     args = parser.parse_args()
     
@@ -513,7 +730,8 @@ def main():
     if args.cmd:
         # Run single command mode
         shell = MarauderShell(mi)
-        shell.onecmd(" ".join(sys.argv[1:]))
+        full_cmd = " ".join(args.cmd)
+        shell.onecmd(full_cmd)
     else:
         # Interactive mode
         MarauderShell(mi).cmdloop()

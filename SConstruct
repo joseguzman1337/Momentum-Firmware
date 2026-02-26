@@ -502,7 +502,7 @@ distenv.PhonyTarget(
     ],
 )
 
-# Beautified Marauder Bridge
+# Beautified Marauder IAC Bridge
 distenv.PhonyTarget(
     "bridge",
     [
@@ -515,6 +515,8 @@ distenv.PhonyTarget(
         ]
     ],
 )
+# Alias for easier access
+distenv.Alias("marauder", "bridge")
 
 
 # Measure CLI loopback performance
