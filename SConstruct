@@ -518,6 +518,69 @@ distenv.PhonyTarget(
 # Alias for easier access
 distenv.Alias("marauder", "bridge")
 
+# Direct access to AIO Wardriving Dashboard
+distenv.PhonyTarget(
+    "aio",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder_bridge.py",
+            "-p",
+            "${FLIP_PORT}",
+            "aio",
+            "${ARGS}",
+        ]
+    ],
+)
+
+# Supreme Automated Field Operation
+distenv.PhonyTarget(
+    "super",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder_bridge.py",
+            "-p",
+            "${FLIP_PORT}",
+            "super",
+            "${ARGS}",
+        ]
+    ],
+)
+
+# Synchronized Parallel Spectrum Scan
+distenv.PhonyTarget(
+    "spectrum",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder_bridge.py",
+            "-p",
+            "${FLIP_PORT}",
+            "spectrum",
+            "${ARGS}",
+        ]
+    ],
+)
+
+# Ghost Mode: Stealth Synchronized Parallel Cluster Scan
+distenv.PhonyTarget(
+    "ghost",
+    [
+        [
+            "${PYTHON3}",
+            "${FBT_SCRIPT_DIR}/marauder_bridge.py",
+            "-p",
+            "${FLIP_PORT}",
+            "ghost",
+            "${ARGS}",
+        ]
+    ],
+)
+# Alias for automated field ops
+distenv.Alias("wardrive", "aio")
+distenv.Alias("field_ops", "super")
+
 
 # Measure CLI loopback performance
 distenv.PhonyTarget(
