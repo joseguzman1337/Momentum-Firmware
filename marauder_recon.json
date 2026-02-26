@@ -1,35 +1,35 @@
 {
-    "name": "Full Tactical Audit",
-    "description": "Comprehensive reconnaissance including APs, Clients, and GPS telemetry",
+    "name": "Super AI Wardriving Strategy",
+    "description": "Orchestrates AIO dashboard, Alfa 1900 telemetry, and NX node synchronization",
     "steps": [
         {
-            "cmd": "gps",
-            "desc": "Checking GPS Lock",
+            "cmd": "status",
+            "desc": "System Handshake",
             "wait": 2
         },
         {
-            "cmd": "scanap",
-            "desc": "Access Point Discovery",
-            "wait": 15
-        },
-        {
-            "cmd": "aps",
-            "desc": "Indexing APs",
+            "cmd": "nx",
+            "desc": "Synchronizing with NX Cluster (SK1/RG1)",
             "wait": 2
         },
         {
-            "cmd": "scansta",
-            "desc": "Station/Client Discovery",
-            "wait": 15
+            "cmd": "alfa",
+            "desc": "Initializing Alfa 1900 (RTL8814U) Telemetry",
+            "wait": 3
         },
         {
-            "cmd": "clients",
-            "desc": "Indexing Network Clients",
+            "cmd": "aio",
+            "desc": "Executing AIO AI Wardriving Cycle",
+            "wait": 35
+        },
+        {
+            "cmd": "prot sk1 rg1",
+            "desc": "Bridging Protocol Stream to RG1 Gateway",
             "wait": 2
         },
         {
             "cmd": "dashboard",
-            "desc": "Final Tactical Summary",
+            "desc": "Final Intelligence Summary",
             "wait": 2
         }
     ]
