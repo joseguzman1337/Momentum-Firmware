@@ -8,11 +8,153 @@ import re
 import json
 import cmd
 import subprocess
+import sqlite3
+import datetime
+import csv
 
 # Add scripts directory to path for flipper imports
 sys.path.append(os.path.join(os.getcwd(), 'scripts'))
 from flipper.utils.cdc import resolve_port
 from flipper.storage import FlipperStorage
+
+class DatabaseManager:
+    def __init__(self, db_path="wardriving.db"):
+        self.db_path = db_path
+        self.conn = sqlite3.connect(self.db_path)
+        self.cursor = self.conn.cursor()
+        self._init_db()
+
+    def _init_db(self):
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS networks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT,
+                session_id TEXT,
+                operation TEXT,
+                source TEXT,
+                channel INTEGER,
+                rssi INTEGER,
+                ssid TEXT,
+                bssid TEXT,
+                gps_lat TEXT,
+                gps_lon TEXT
+            )
+        ''')
+        self._ensure_columns()
+        self.conn.commit()
+
+    def _ensure_columns(self):
+        self.cursor.execute("PRAGMA table_info(networks)")
+        existing_columns = {row[1] for row in self.cursor.fetchall()}
+        required_columns = {
+            "session_id": "TEXT",
+            "operation": "TEXT",
+        }
+        for col_name, col_type in required_columns.items():
+            if col_name not in existing_columns:
+                self.cursor.execute(f"ALTER TABLE networks ADD COLUMN {col_name} {col_type}")
+
+    @staticmethod
+    def _to_int(value, default):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
+
+    def save_matrix(self, aggregated_data, lat="N/A", lon="N/A", operation="manual", session_id=None):
+        if not aggregated_data:
+            return 0
+
+        timestamp = datetime.datetime.now().isoformat()
+        session_id = session_id or datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        inserted = 0
+        for ap in aggregated_data:
+            channel = self._to_int(ap.get("ch", ap.get("channel", 0)), 0)
+            rssi = self._to_int(ap.get("rssi", -100), -100)
+            ssid = ap.get("ssid", ap.get("ap", "<Hidden>")) or "<Hidden>"
+            bssid = ap.get("bssid", ap.get("mac", "N/A")) or "N/A"
+            source = ap.get("Source", ap.get("source", "Unknown"))
+            self.cursor.execute('''
+                INSERT INTO networks (
+                    timestamp, session_id, operation, source, channel, rssi, ssid, bssid, gps_lat, gps_lon
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                timestamp,
+                session_id,
+                operation,
+                source,
+                channel,
+                rssi,
+                ssid,
+                bssid,
+                lat,
+                lon
+            ))
+            inserted += 1
+        self.conn.commit()
+        return inserted
+
+    def get_stats(self):
+        self.cursor.execute("SELECT COUNT(*) FROM networks")
+        total_rows = self.cursor.fetchone()[0]
+
+        self.cursor.execute("SELECT COUNT(DISTINCT session_id) FROM networks")
+        total_sessions = self.cursor.fetchone()[0]
+
+        self.cursor.execute("SELECT MAX(timestamp) FROM networks")
+        last_seen = self.cursor.fetchone()[0]
+
+        self.cursor.execute('''
+            SELECT operation, COUNT(*) AS c
+            FROM networks
+            GROUP BY operation
+            ORDER BY c DESC
+            LIMIT 5
+        ''')
+        top_operations = self.cursor.fetchall()
+        return {
+            "total_rows": total_rows,
+            "total_sessions": total_sessions,
+            "last_seen": last_seen,
+            "top_operations": top_operations,
+        }
+
+    def get_known_bssids(self):
+        self.cursor.execute('''
+            SELECT DISTINCT bssid
+            FROM networks
+            WHERE bssid IS NOT NULL
+              AND bssid NOT IN ('', 'N/A')
+        ''')
+        return {row[0] for row in self.cursor.fetchall() if row and row[0]}
+
+    def export_csv(self, output_path, limit=0):
+        sql = '''
+            SELECT timestamp, session_id, operation, source, channel, rssi, ssid, bssid, gps_lat, gps_lon
+            FROM networks
+            ORDER BY id DESC
+        '''
+        params = ()
+        if limit and limit > 0:
+            sql += " LIMIT ?"
+            params = (limit,)
+
+        self.cursor.execute(sql, params)
+        rows = self.cursor.fetchall()
+
+        with open(output_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "timestamp", "session_id", "operation", "source",
+                "channel", "rssi", "ssid", "bssid", "gps_lat", "gps_lon"
+            ])
+            writer.writerows(rows)
+        return len(rows)
+
+    def close(self):
+        if self.conn:
+            self.conn.close()
+            self.conn = None
 
 # ANSI Colors for a "Cyberpunk" aesthetic
 CLR = {
@@ -235,6 +377,15 @@ class MarauderShell(cmd.Cmd):
         super().__init__()
         self.mi = interface
         self.sort_key = "rssi"
+        self.db = DatabaseManager()
+
+    def _get_gps(self):
+        gps_raw = self.mi.execute_command("gpsdata", wait_ms=1000)
+        lat, lon = "N/A", "N/A"
+        for line in gps_raw.splitlines():
+            if "Latitude" in line: lat = line.split(":", 1)[1].strip()
+            if "Longitude" in line: lon = line.split(":", 1)[1].strip()
+        return lat, lon
 
     def do_scan(self, arg):
         """Scan for access points. Usage: scan [duration_seconds]"""
@@ -506,6 +657,7 @@ class MarauderShell(cmd.Cmd):
             clients = sorted(clients, key=lambda x: int(x.get("rssi", -100)), reverse=True)
             print(MarauderTable.format(clients[:10], ["idx", "ch", "rssi", "mac", "ap"], title=f"Top 10 Clients (Total: {len(clients)})"))
         
+        self._save_results(aps + clients, operation="aio")
         print(f"\n{CLR['G']}{CLR['BOLD']}[✓] AIO WARDRIVING CYCLE COMPLETE. Data ready for PCAP saving.{CLR['RESET']}")
 
     def do_port(self, arg):
@@ -875,6 +1027,7 @@ while(true) {
         print("\n" + MarauderTable.format(aps[:15], ["idx", "ch", "rssi", "ssid"], title=f"HVT AP Targets Found: {len(aps)}", sort_by="rssi"))
         print("\n" + MarauderTable.format(stations[:10], ["idx", "mac", "ap", "rssi"], title=f"Associated Stations Found: {len(stations)}", sort_by="rssi"))
         
+        self._save_results(aps + stations, operation="super")
         print(f"\n{CLR['BR_G']}{CLR['BOLD']}  [SUCCESS] FIELD OPERATION COMPLETE. SESSION LOGS READY.  {CLR['RESET']}\n")
 
     def do_automate(self, arg):
@@ -969,6 +1122,7 @@ while(true) {
             pass
         
         print("\n" + MarauderTable.format(aggregated, ["Source", "ch", "rssi", "ssid", "bssid"], title="Unified Cluster Spectrum Report"))
+        self._save_results(aggregated, operation="spectrum")
         print(f"\n{CLR['BR_G']}{CLR['BOLD']}  [✓] SPECTRUM ANALYSIS COMPLETE. Data merged from active sensors.  {CLR['RESET']}\n")
 
 
@@ -987,6 +1141,183 @@ while(true) {
             results.append({"Node": n, "Status": status, "Uptime": uptime})
             
         print(MarauderTable.format(results, ["Node", "Status", "Uptime"], title="Global Cluster Status"))
+
+    def _save_results(self, data, operation="manual"):
+        if not data:
+            print(f"{CLR['GRAY']}[info] No results to save for operation '{operation}'.{CLR['RESET']}")
+            return
+        lat, lon = self._get_gps()
+        session_id = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        inserted = self.db.save_matrix(
+            data,
+            lat=lat,
+            lon=lon,
+            operation=operation,
+            session_id=session_id,
+        )
+        print(
+            f"{CLR['GRAY']}[info] Logged {inserted} records to {self.db.db_path} "
+            f"(session={session_id}, op={operation}, gps={lat},{lon}){CLR['RESET']}"
+        )
+
+    @staticmethod
+    def _safe_int(value, default=-100):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
+
+    @staticmethod
+    def _parse_nmcli_wifi_line(line):
+        # nmcli -t escapes field separators with backslashes.
+        parts = re.split(r'(?<!\\):', line.strip())
+        if len(parts) < 4:
+            return None
+        ssid, bssid, rssi, ch = parts[0], parts[1], parts[2], parts[3]
+        ssid = ssid.replace("\\:", ":").strip() or "<Hidden>"
+        bssid = bssid.replace("\\:", ":").strip() or "N/A"
+        return ssid, bssid, rssi.strip(), ch.strip()
+
+    def _collect_remote_wifi(self, cm, source_suffix, idx_base=4000, hidden_only=False):
+        aggregated = []
+        remote_results = cm.parallel_trigger("nmcli -t -f SSID,BSSID,SIGNAL,CHAN dev wifi")
+        for node, output in remote_results.items():
+            if output and not output.startswith("Error") and output.strip():
+                for idx, line in enumerate(output.strip().splitlines()):
+                    parsed = self._parse_nmcli_wifi_line(line)
+                    if not parsed:
+                        continue
+                    ssid, bssid, rssi, ch = parsed
+                    if hidden_only and ssid not in ("<Hidden>", "--", ""):
+                        continue
+                    if ssid == "--":
+                        ssid = "<Hidden>"
+                    aggregated.append(
+                        {
+                            "idx": idx_base + idx,
+                            "ch": ch,
+                            "rssi": rssi,
+                            "ssid": ssid,
+                            "bssid": bssid,
+                            "Source": f"{node} ({source_suffix})",
+                        }
+                    )
+        return aggregated
+
+    def do_daemon(self, arg):
+        """Continuous ghost scan + HVT alerts. Usage: daemon [interval_s] [scan_s] [hvt_rssi] [cycles]"""
+        parts = arg.split()
+        interval_s = 30
+        scan_s = 10
+        hvt_rssi = -60
+        max_cycles = 0  # 0 means run forever
+
+        if len(parts) > 0:
+            try:
+                interval_s = max(5, int(parts[0]))
+            except ValueError:
+                pass
+        if len(parts) > 1:
+            try:
+                scan_s = max(5, int(parts[1]))
+            except ValueError:
+                pass
+        if len(parts) > 2:
+            try:
+                hvt_rssi = int(parts[2])
+            except ValueError:
+                pass
+        if len(parts) > 3:
+            try:
+                max_cycles = max(0, int(parts[3]))
+            except ValueError:
+                pass
+
+        print(
+            f"\n{CLR['BG']}{CLR['BOLD']}  DAEMON GHOST MODE ACTIVE  {CLR['RESET']}\n"
+            f"{CLR['C']}interval={interval_s}s scan={scan_s}s hvt_rssi>={hvt_rssi} cycles={max_cycles or 'INF'}{CLR['RESET']}"
+        )
+        print(f"{CLR['Y']}Press Ctrl+C to stop daemon mode.{CLR['RESET']}")
+
+        cm = ClusterManager(["RG1", "SK1"])
+        known_bssids = self.db.get_known_bssids()
+        cycle = 0
+
+        try:
+            while True:
+                cycle += 1
+                started = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print(f"\n{CLR['PURP']}[cycle {cycle}] {started}{CLR['RESET']}")
+
+                self.mi.execute_command("settings -s MacRandom 1", wait_ms=250)
+                self.mi.execute_command("settings -s ForceProbe 1", wait_ms=250)
+                self.mi.execute_command("scanap", wait_ms=scan_s * 1000)
+
+                local_aps = self.mi.list_aps()
+                for ap in local_aps:
+                    ap["Source"] = "Flipper (Daemon)"
+
+                remote_aps = self._collect_remote_wifi(cm, "Daemon", idx_base=5000)
+                aggregated = local_aps + remote_aps
+                try:
+                    aggregated = sorted(
+                        aggregated, key=lambda x: self._safe_int(x.get("rssi"), -100), reverse=True
+                    )
+                except Exception:
+                    pass
+
+                self._save_results(aggregated, operation="daemon_ghost")
+
+                hvts = []
+                new_hvts = []
+                for ap in aggregated:
+                    bssid = ap.get("bssid", "N/A")
+                    rssi = self._safe_int(ap.get("rssi"), -100)
+                    if bssid in ("", "N/A") or rssi < hvt_rssi:
+                        continue
+                    record = {
+                        "Source": ap.get("Source", "Unknown"),
+                        "rssi": rssi,
+                        "ch": ap.get("ch", ap.get("channel", "N/A")),
+                        "ssid": ap.get("ssid", "<Hidden>"),
+                        "bssid": bssid,
+                    }
+                    hvts.append(record)
+                    if bssid not in known_bssids:
+                        new_hvts.append(record)
+                        known_bssids.add(bssid)
+
+                if new_hvts:
+                    print(
+                        f"{CLR['R']}{CLR['BOLD']}[ALERT] {len(new_hvts)} new HVT(s) detected "
+                        f"(rssi >= {hvt_rssi}){CLR['RESET']}"
+                    )
+                    print(
+                        MarauderTable.format(
+                            new_hvts[:10],
+                            ["Source", "ch", "rssi", "ssid", "bssid"],
+                            title=f"New HVTs (Cycle {cycle})",
+                        )
+                    )
+                else:
+                    print(f"{CLR['G']}[ok] No new HVTs in cycle {cycle}.{CLR['RESET']}")
+
+                if hvts:
+                    print(
+                        f"{CLR['GRAY']}[info] Active HVTs this cycle: {len(hvts)} | "
+                        f"Known BSSIDs: {len(known_bssids)}{CLR['RESET']}"
+                    )
+
+                if max_cycles and cycle >= max_cycles:
+                    print(f"{CLR['Y']}[info] Reached configured cycle limit ({max_cycles}).{CLR['RESET']}")
+                    break
+
+                sleep_for = max(1, interval_s - scan_s)
+                if sleep_for > 0:
+                    print(f"{CLR['GRAY']}[info] Sleeping {sleep_for}s before next cycle...{CLR['RESET']}")
+                    time.sleep(sleep_for)
+        except KeyboardInterrupt:
+            print(f"\n{CLR['Y']}[info] Daemon mode interrupted by user.{CLR['RESET']}")
 
     def do_ghost(self, arg):
         """Ghost Mode: Stealth Synchronized Parallel Cluster Scan."""
@@ -1059,6 +1390,7 @@ while(true) {
             pass
         
         print("\n" + MarauderTable.format(aggregated, ["Source", "ch", "rssi", "ssid", "bssid"], title="Unified Intelligence Matrix (Ghost Mode)"))
+        self._save_results(aggregated, operation="ghost")
         print(f"\n{CLR['BOLD']}{CLR['G']}[✓] GHOST OPERATION COMPLETE. SPECTRUM MAPPED WITHOUT DETECTION.  {CLR['RESET']}\n")
 
     def do_wardrive_hide(self, arg):
@@ -1143,8 +1475,41 @@ while(true) {
             print(f"{CLR['GRAY']}[-] No hidden networks detected in this sector.{CLR['RESET']}")
         else:
             print("\n" + MarauderTable.format(aggregated, ["Source", "ch", "rssi", "bssid", "Status"], title="Non-Broadcasted Network Matrix"))
+            self._save_results(aggregated, operation="hidden")
         
         print(f"\n{CLR['BR_G']}{CLR['BOLD']}  [✓] HIDDEN OPERATION COMPLETE. NODES REMAINED SILENT.  {CLR['RESET']}\n")
+
+    def do_dbstats(self, arg):
+        """Show wardriving database stats."""
+        stats = self.db.get_stats()
+        summary = [
+            {"Metric": "Database", "Value": self.db.db_path},
+            {"Metric": "Total Rows", "Value": stats["total_rows"]},
+            {"Metric": "Sessions", "Value": stats["total_sessions"]},
+            {"Metric": "Last Capture", "Value": stats["last_seen"] or "N/A"},
+        ]
+        print(MarauderTable.format(summary, ["Metric", "Value"], title="SQLite Intelligence Store"))
+
+        top_ops = [
+            {"Operation": op if op else "unknown", "Rows": rows}
+            for op, rows in stats["top_operations"]
+        ]
+        if top_ops:
+            print("\n" + MarauderTable.format(top_ops, ["Operation", "Rows"], title="Top Capture Modes"))
+
+    def do_exportcsv(self, arg):
+        """Export SQLite captures to CSV. Usage: exportcsv [output_path] [limit]"""
+        parts = arg.split()
+        output = parts[0] if len(parts) > 0 else "wardriving_export.csv"
+        limit = 0
+        if len(parts) > 1:
+            try:
+                limit = int(parts[1])
+            except ValueError:
+                print(f"{CLR['R']}[!] Invalid limit '{parts[1]}'. Use an integer.{CLR['RESET']}")
+                return
+        rows = self.db.export_csv(output, limit)
+        print(f"{CLR['G']}[+] Exported {rows} rows to {output}{CLR['RESET']}")
 
     def do_help(self, arg):
         """Tactical Help System."""
@@ -1162,6 +1527,7 @@ while(true) {
             {"Command": "super", "Description": "Supreme Automated Field Operation"},
             {"Command": "spectrum", "Description": "Parallel Cluster Spectrum Scan"},
             {"Command": "ghost", "Description": "Stealth Synchronized Cluster Scan"},
+            {"Command": "daemon", "Description": "Continuous ghost scan + HVT alerts"},
             {"Command": "hidden/wardrive_hide", "Description": "Hide Node SSIDs & Detect Hidden"},
             {"Command": "cluster", "Description": "Manage NX Node Cluster"},
             {"Command": "alfa", "Description": "Alfa 1900 (RTL8814U) Diagnostics"},
@@ -1172,6 +1538,8 @@ while(true) {
             {"Command": "settings", "Description": "View/Modify internal config"},
             {"Command": "ssid", "Description": "Manage SSID spoofing pool"},
             {"Command": "gps", "Description": "View GPS telemetry"},
+            {"Command": "dbstats", "Description": "Show local SQLite wardriving stats"},
+            {"Command": "exportcsv", "Description": "Export captured matrix to CSV"},
             {"Command": "files", "Description": "Alias for 'ls' (ESP Filesystem)"},
             {"Command": "ls/cat/rm", "Description": "ESP Filesystem management"},
             {"Command": "iac/automate", "Description": "Run Infrastructure as Code strategy"},
@@ -1182,11 +1550,12 @@ while(true) {
 
     def do_exit(self, arg):
         """Exit the bridge."""
+        self.db.close()
         print(f"{CLR['Y']}Shutting down bridge...{CLR['RESET']}")
         return True
 
     def do_EOF(self, arg):
-        return True
+        return self.do_exit(arg)
 
 def main():
     parser = argparse.ArgumentParser(description="Marauder Beautified CLI Bridge")

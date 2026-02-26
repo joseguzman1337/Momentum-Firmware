@@ -9,8 +9,9 @@
 - [x] Enforced stealth mode (hide mode) by default on all AI wardriving functions (`aio`, `super`).
 
 ## Pending / Next Steps
-- [ ] Implement automated saving of unified intelligence matrix to PCAP or SQLite database.
+- [x] Implement automated saving of unified intelligence matrix to SQLite database across `aio`, `super`, `spectrum`, `ghost`, and `hidden` modes.
+- [x] Add local database observability/export commands (`dbstats`, `exportcsv`) for downstream analysis tooling.
 - [ ] Add real-time graphing or TUI visualization of spectrum density across nodes.
 - [ ] Integrate GPS location metadata from all nodes (if available) to the unified matrix.
-- [ ] Build a daemon mode to continuously run `ghost` scans and alert on new high-value targets (HVTs).
+- [x] Build a daemon mode to continuously run `ghost` scans and alert on new high-value targets (HVTs).
 - [ ] Validate Alfa 1900 (RG1) driver stability during prolonged monitor mode operations.
