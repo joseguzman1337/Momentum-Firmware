@@ -5,8 +5,6 @@
 #include <furi_hal_usb_cdc.h>
 #include <furi_hal_power.h>
 
-extern FuriHalUsbInterface usb_cdc_dual;
-
 #include <stm32wbxx_ll_pwr.h>
 #include <stm32wbxx_ll_rcc.h>
 #include <furi.h>

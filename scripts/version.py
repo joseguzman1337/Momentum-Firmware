@@ -130,7 +130,7 @@ class Main(App):
 
         current_info.update(
             {
-                "BUILD_DATE": build_date.strftime("%d-%m-%Y"),
+                "BUILD_DATE": "25-02-2026",
                 "TARGET": self.args.target,
                 "FIRMWARE_ORIGIN": self.args.firmware_origin,
             }
