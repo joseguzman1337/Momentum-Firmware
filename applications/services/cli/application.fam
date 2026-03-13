@@ -147,3 +147,20 @@ App(
     requires=["cli"],
     sources=["cli_main_commands.c"],
 )
+
+App(
+    appid="cli_status",
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_status_ep",
+    requires=["cli"],
+    sources=["commands/status.c"],
+)
+
+App(
+    appid="cli_mesh",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_mesh_ep",
+    requires=["cli"],
+    sources=["cli_main_commands.c"],
+)
