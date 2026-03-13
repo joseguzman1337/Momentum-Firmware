@@ -29,8 +29,13 @@
 #include <lwip/apps/http_client.h>
 
 #include <furi/core/semaphore.h>
+#include <furi/core/thread.h>
+#include <furi/core/stream_buffer.h>
 
 #define TAG "FuriHalUsbEth"
+
+/* Stream buffer capacity: 2 full MTU frames + overhead */
+#define ETH_RX_STREAM_SIZE (4096)
 
 /* CDC-ECM Class Codes */
 #define USB_CDC_SUBCLASS_ECM 0x06
@@ -208,6 +213,12 @@ FuriHalUsbInterface usb_eth = {
 static usbd_device* usb_dev;
 static bool eth_connected = false;
 static struct netif eth_netif;
+static bool eth_netif_added = false;
+
+/* ISR-to-thread RX path */
+static FuriStreamBuffer* eth_rx_stream = NULL;
+static FuriThread* eth_rx_thread = NULL;
+static volatile bool eth_rx_thread_run = false;
 
 static err_t eth_low_level_output(struct netif* netif, struct pbuf* p) {
     UNUSED(netif);
@@ -243,21 +254,50 @@ static err_t eth_netif_init(struct netif* netif) {
     return ERR_OK;
 }
 
+/* Worker thread: processes raw ethernet frames posted from USB ISR */
+static int32_t eth_rx_worker(void* context) {
+    UNUSED(context);
+    static uint8_t rx_data[2048];
+
+    while(eth_rx_thread_run) {
+        uint16_t pkt_len = 0;
+        size_t read = furi_stream_buffer_receive(eth_rx_stream, &pkt_len, sizeof(pkt_len), 500);
+        if(read != sizeof(pkt_len)) continue;
+        if(pkt_len == 0 || pkt_len > sizeof(rx_data)) continue;
+
+        read = furi_stream_buffer_receive(eth_rx_stream, rx_data, pkt_len, 100);
+        if(read != pkt_len) continue;
+
+        struct pbuf* p = pbuf_alloc(PBUF_RAW, pkt_len, PBUF_POOL);
+        if(p != NULL) {
+            pbuf_take(p, rx_data, pkt_len);
+            if(eth_netif.input(p, &eth_netif) != ERR_OK) {
+                pbuf_free(p);
+            }
+        }
+    }
+    return 0;
+}
+
+/*
+ * USB ISR callback – must NOT call LwIP or FreeRTOS blocking APIs.
+ * Raw bytes are pushed into the stream buffer (ISR-safe via
+ * xStreamBufferSendFromISR) and processed by eth_rx_worker.
+ */
 static void eth_rx_callback(usbd_device* dev, uint8_t event, uint8_t ep) {
     UNUSED(dev);
     UNUSED(event);
     UNUSED(ep);
 
+    if(!eth_rx_stream) return;
+
     static uint8_t rx_buf[2048];
     int32_t len = usbd_ep_read(usb_dev, ETH_RNDIS_RX_EP, rx_buf, sizeof(rx_buf));
     if(len > 0) {
-        struct pbuf* p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
-        if(p != NULL) {
-            pbuf_take(p, rx_buf, len);
-            if(eth_netif.input(p, &eth_netif) != ERR_OK) {
-                pbuf_free(p);
-            }
-        }
+        uint16_t pkt_len = (uint16_t)len;
+        /* furi_stream_buffer_send detects ISR context and uses xStreamBufferSendFromISR */
+        furi_stream_buffer_send(eth_rx_stream, &pkt_len, sizeof(pkt_len), 0);
+        furi_stream_buffer_send(eth_rx_stream, rx_buf, len, 0);
     }
 }
 
@@ -275,18 +315,50 @@ static void eth_init(usbd_device* dev, FuriHalUsbInterface* intf, void* ctx) {
         lwip_inited = true;
     }
 
-    netif_add(&eth_netif, IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY, NULL, eth_netif_init, tcpip_input);
-    netif_set_default(&eth_netif);
-    netif_set_up(&eth_netif);
-    dhcp_start(&eth_netif);
+    /* Guard against double-add on unexpected reinit */
+    if(!eth_netif_added) {
+        netif_add(
+            &eth_netif,
+            IP4_ADDR_ANY,
+            IP4_ADDR_ANY,
+            IP4_ADDR_ANY,
+            NULL,
+            eth_netif_init,
+            tcpip_input);
+        netif_set_default(&eth_netif);
+        netif_set_up(&eth_netif);
+        dhcp_start(&eth_netif);
+        eth_netif_added = true;
+    }
+
+    /* Start ISR-safe RX worker */
+    eth_rx_thread_run = true;
+    eth_rx_stream = furi_stream_buffer_alloc(ETH_RX_STREAM_SIZE, 1);
+    eth_rx_thread = furi_thread_alloc_ex("UsbEthRx", 1024, eth_rx_worker, NULL);
+    furi_thread_start(eth_rx_thread);
 
     usbd_connect(dev, true);
 }
 
 static void eth_deinit(usbd_device* dev) {
-    dhcp_stop(&eth_netif);
-    netif_set_down(&eth_netif);
-    netif_remove(&eth_netif);
+    /* Stop RX worker before touching LwIP state */
+    eth_rx_thread_run = false;
+    if(eth_rx_thread) {
+        furi_thread_join(eth_rx_thread);
+        furi_thread_free(eth_rx_thread);
+        eth_rx_thread = NULL;
+    }
+    if(eth_rx_stream) {
+        furi_stream_buffer_free(eth_rx_stream);
+        eth_rx_stream = NULL;
+    }
+
+    if(eth_netif_added) {
+        dhcp_stop(&eth_netif);
+        netif_set_down(&eth_netif);
+        netif_remove(&eth_netif);
+        eth_netif_added = false;
+    }
 
     usbd_reg_config(dev, NULL);
     usbd_reg_control(dev, NULL);

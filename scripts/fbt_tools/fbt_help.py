@@ -26,6 +26,18 @@ Flashing & debugging:
 Other:
     cli:
         Open a Flipper CLI session over USB
+    bridge/marauder:
+        Open a Marauder CLI Bridge (Cyberpunk Dashboard)
+    aio/wardrive:
+        Launch AIO Wardriving Dashboard (Super ESP32)
+    super/field_ops:
+        Supreme Automated Field Operation (AI + IAC)
+    spectrum:
+        Synchronized Parallel Cluster Spectrum Scan
+    ghost:
+        Stealth Synchronized Parallel Cluster Scan
+    hidden:
+        Hide Node SSIDs & Detect Hidden Networks
     firmware_cdb, updater_cdb:
         Generate compilation_database.json
     lint, lint_py:
