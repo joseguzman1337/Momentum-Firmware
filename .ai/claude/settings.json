@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "test + grant pr1m3 cli works with the 3 existent antrhopic profiles"
-    ]
-  }
-}

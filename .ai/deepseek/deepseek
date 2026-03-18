@@ -1,5 +1,0 @@
-#!/bin/bash
-# DeepSeek CLI Wrapper
-# Ensures the correct Python environment and script are used
-export PYTHONPATH=$PYTHONPATH:$(pwd)
-python3 .ai/deepseek/optimization_agent.py "$@"

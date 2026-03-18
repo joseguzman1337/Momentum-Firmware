@@ -1,2 +1,0 @@
-# Exclude Swift DriverKit files from indexing
-{"excludePaths": ["Momentum-Firmware/*.swift", "*.swift"]}

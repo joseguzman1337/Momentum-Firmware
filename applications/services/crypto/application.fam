@@ -1,8 +1,0 @@
-App(
-    appid="cli_crypto",
-    targets=["f7"],
-    apptype=FlipperAppType.PLUGIN,
-    entry_point="cli_crypto_ep",
-    requires=["cli"],
-    sources=["crypto_cli.c"],
-)

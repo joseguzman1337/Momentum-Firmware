@@ -1,5 +1,0 @@
-#pragma once
-
-#define DOLPHIN_STATE_FILE_NAME ".dolphin.state"
-
-#define DOLPHIN_STATE_PATH INT_PATH(DOLPHIN_STATE_FILE_NAME)
