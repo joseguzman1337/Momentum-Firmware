@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "linear-codex": {
+      "command": "python",
+      "args": [".ai/linear/integration.py"],
+      "env": {
+        "LOG_DIR": "logs/linear",
+        "AUTO_ASSIGN_CODEX": "true",
+        "YOLO_MODE": "true",
+        "LINEAR_TEAM_ID": "momentum-firmware"
+      }
+    }
+  },
+  "automation": {
+    "github_to_linear_sync": true,
+    "auto_assign_codex": true,
+    "issue_types": ["bug", "feature", "enhancement"],
+    "codex_environments": ["momentum-firmware-main"]
+  }
+}

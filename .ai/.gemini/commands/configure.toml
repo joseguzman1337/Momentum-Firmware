@@ -1,0 +1,17 @@
+description = "Configure Gemini CLI for firmware development"
+prompt = """
+Configure Gemini CLI settings optimized for Momentum Firmware development.
+
+Current settings:
+@{.gemini/settings.json}
+
+Recommended optimizations for firmware development:
+- Enable prompt completion for faster coding
+- Show line numbers and citations for code review
+- Enable codebase investigator for large firmware analysis
+- Respect gitignore for clean file searches
+- Extended tool output for build logs
+- Folder trust for secure development
+
+Apply these settings? {{args}}
+"""

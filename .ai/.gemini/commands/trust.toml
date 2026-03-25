@@ -1,0 +1,14 @@
+description = "Check folder trust status for firmware development"
+prompt = """
+Check the current folder trust status for Momentum Firmware development.
+
+Current directory: !{pwd}
+
+Trust configuration:
+!{cat ~/.gemini/trustedFolders.json 2>/dev/null || echo "No trust configuration found"}
+
+Security settings:
+!{grep -A5 "folderTrust" .gemini/settings.json 2>/dev/null || echo "Trust not configured"}
+
+Verify that this firmware project is properly trusted for full CLI functionality.
+"""

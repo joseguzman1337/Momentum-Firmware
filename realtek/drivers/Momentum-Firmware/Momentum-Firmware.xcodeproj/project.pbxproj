@@ -1,0 +1,571 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 90;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		179A056D2EFFCD4E00917591 /* RTL8814AUDriverBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A056C2EFFCD4E00917591 /* RTL8814AUDriverBuilder.swift */; };
+		179A056F2EFFCD7200917591 /* rtl8814au-driver.rb in Resources */ = {isa = PBXBuildFile; fileRef = 179A056E2EFFCD7200917591 /* rtl8814au-driver.rb */; };
+		179A05712EFFCDAB00917591 /* install-rtl8814au.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05702EFFCDAB00917591 /* install-rtl8814au.sh */; };
+		179A05732EFFCDF600917591 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05722EFFCDF600917591 /* README.md */; };
+		179A05752EFFCE2900917591 /* RTL8814AUDriverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A05742EFFCE2900917591 /* RTL8814AUDriverTests.swift */; };
+		179A05772EFFCE6100917591 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 179A05762EFFCE6100917591 /* Makefile */; };
+		179A05792EFFCE9E00917591 /* launcher.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05782EFFCE9E00917591 /* launcher.sh */; };
+		179A057B2EFFCEBC00917591 /* SETUP.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A057A2EFFCEBC00917591 /* SETUP.md */; };
+		179A057D2EFFCED200917591 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 179A057C2EFFCED200917591 /* LICENSE */; };
+		179A057F2EFFCF0200917591 /* CONTRIBUTING.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A057E2EFFCF0200917591 /* CONTRIBUTING.md */; };
+		179A05812EFFCF4B00917591 /* PROJECT_SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05802EFFCF4B00917591 /* PROJECT_SUMMARY.md */; };
+		179A05832F002BBD00917591 /* README 2.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05822F002BBD00917591 /* README 2.md */; };
+		179A05852F002BD000917591 /* build.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05842F002BD000917591 /* build.sh */; };
+		179A05872F002BE200917591 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05862F002BE200917591 /* install.sh */; };
+		179A05892F002BEC00917591 /* uninstall.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05882F002BEC00917591 /* uninstall.sh */; };
+		179A058B2F002BFD00917591 /* RTL8814AUAppmain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A058A2F002BFD00917591 /* RTL8814AUAppmain.swift */; };
+		179A058D2F002C1700917591 /* RTL8814AUDriverDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A058C2F002C1700917591 /* RTL8814AUDriverDriver.swift */; };
+		179A058F2F002C3500917591 /* RTL8814AUDriverUSBInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A058E2F002C3500917591 /* RTL8814AUDriverUSBInterface.swift */; };
+		179A05912F002C6000917591 /* RTL8814AUDriverWiFiInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A05902F002C6000917591 /* RTL8814AUDriverWiFiInterface.swift */; };
+		179A05932F002C7900917591 /* SharedConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A05922F002C7900917591 /* SharedConstants.swift */; };
+		179A05952F002C8600917591 /* RTL8814AUDriverInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 179A05942F002C8600917591 /* RTL8814AUDriverInfo.plist */; };
+		179A05972F002C8E00917591 /* RTL8814AUAppInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 179A05962F002C8E00917591 /* RTL8814AUAppInfo.plist */; };
+		179A05992F002C9500917591 /* CodeSigning.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 179A05982F002C9500917591 /* CodeSigning.xcconfig */; };
+		179A059D2F002CB900917591 /* TestsRTL8814AUDriverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A059C2F002CB900917591 /* TestsRTL8814AUDriverTests.swift */; };
+		179A059F2F002CCF00917591 /* CONTRIBUTING 2.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A059E2F002CCF00917591 /* CONTRIBUTING 2.md */; };
+		179A05A12F002CDD00917591 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05A02F002CDD00917591 /* CHANGELOG.md */; };
+		179A05A32F002D4400917591 /* README 3.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05A22F002D4400917591 /* README 3.md */; };
+		179A05A52F002D6E00917591 /* RTL8814AUDriverRTL8814AUDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A05A42F002D6E00917591 /* RTL8814AUDriverRTL8814AUDriver.swift */; };
+		179A05A72F002D8600917591 /* RTL8814AUDriverFirmwareLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A05A62F002D8600917591 /* RTL8814AUDriverFirmwareLoader.swift */; };
+		179A05A92F002DA100917591 /* RTL8814AUDriverNetworkInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179A05A82F002DA100917591 /* RTL8814AUDriverNetworkInterface.swift */; };
+		179A05AB2F002DB400917591 /* RTL8814AUDriverInfo 2.plist in Resources */ = {isa = PBXBuildFile; fileRef = 179A05AA2F002DB400917591 /* RTL8814AUDriverInfo 2.plist */; };
+		179A05AE2F002DD600917591 /* build 2.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05AD2F002DD600917591 /* build 2.sh */; };
+		179A05B02F002DE800917591 /* sign.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05AF2F002DE800917591 /* sign.sh */; };
+		179A05B22F002DFD00917591 /* install 2.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05B12F002DFD00917591 /* install 2.sh */; };
+		179A05B42F002E0B00917591 /* Homebrewrtl8814au-driver.rb in Resources */ = {isa = PBXBuildFile; fileRef = 179A05B32F002E0B00917591 /* Homebrewrtl8814au-driver.rb */; };
+		179A05B62F002E3700917591 /* RTL8814AUDriver.xcodeprojproject.pbxproj in Resources */ = {isa = PBXBuildFile; fileRef = 179A05B52F002E3700917591 /* RTL8814AUDriver.xcodeprojproject.pbxproj */; };
+		179A05B82F002E5700917591 /* BUILDING.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05B72F002E5700917591 /* BUILDING.md */; };
+		179A05BA2F002E6100917591 /* LICENSE 2 in Resources */ = {isa = PBXBuildFile; fileRef = 179A05B92F002E6100917591 /* LICENSE 2 */; };
+		179A05BC2F002E8B00917591 /* CONTRIBUTING 3.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05BB2F002E8B00917591 /* CONTRIBUTING 3.md */; };
+		179A05BE2F002EAC00917591 /* Makefile 2 in Resources */ = {isa = PBXBuildFile; fileRef = 179A05BD2F002EAC00917591 /* Makefile 2 */; };
+		179A05C02F002ECC00917591 /* CHANGELOG 2.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05BF2F002ECC00917591 /* CHANGELOG 2.md */; };
+		179A05C22F002EEB00917591 /* .githubworkflowsbuild.yml in Resources */ = {isa = PBXBuildFile; fileRef = 179A05C12F002EEB00917591 /* .githubworkflowsbuild.yml */; };
+		179A05C42F002EF900917591 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 179A05C32F002EF900917591 /* .gitignore */; };
+		179A05C62F002F1E00917591 /* setup.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05C52F002F1E00917591 /* setup.sh */; };
+		179A05C82F002F4600917591 /* QUICKSTART.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05C72F002F4600917591 /* QUICKSTART.md */; };
+		179A05CA2F002F8400917591 /* TROUBLESHOOTING.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05C92F002F8400917591 /* TROUBLESHOOTING.md */; };
+		179A05CC2F002FB800917591 /* PROJECT_SUMMARY 2.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05CB2F002FB800917591 /* PROJECT_SUMMARY 2.md */; };
+		179A05CE2F00300F00917591 /* DEVELOPMENT.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05CD2F00300F00917591 /* DEVELOPMENT.md */; };
+		179A05D02F00365000917591 /* XCODE_PROJECT_SETUP.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05CF2F00365000917591 /* XCODE_PROJECT_SETUP.md */; };
+		179A05D22F00371100917591 /* DriverKit.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 179A05D12F00371100917591 /* DriverKit.xcconfig */; };
+		179A05D42F00373D00917591 /* BUILD_ERRORS_FIX.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05D32F00373C00917591 /* BUILD_ERRORS_FIX.md */; };
+		179A05D62F00377100917591 /* fix-build-errors.sh in Resources */ = {isa = PBXBuildFile; fileRef = 179A05D52F00377100917591 /* fix-build-errors.sh */; };
+		179A05D82F0037D200917591 /* BUILD_FIX_SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05D72F0037D200917591 /* BUILD_FIX_SUMMARY.md */; };
+		179A05DA2F0037D300917591 /* QUICK_FIX.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05D92F0037D300917591 /* QUICK_FIX.md */; };
+		179A05DC2F0037E100917591 /* COMPLETE_FIX_CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05DB2F0037E100917591 /* COMPLETE_FIX_CHANGELOG.md */; };
+		179A05DE2F00381D00917591 /* ARCHITECTURE_DIAGRAM.md in Resources */ = {isa = PBXBuildFile; fileRef = 179A05DD2F00381D00917591 /* ARCHITECTURE_DIAGRAM.md */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		17204ADD2EFFC438007C235B /* Momentum-Firmware.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Momentum-Firmware.kext"; sourceTree = BUILT_PRODUCTS_DIR; };
+		179A056C2EFFCD4E00917591 /* RTL8814AUDriverBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverBuilder.swift; sourceTree = "<group>"; };
+		179A056E2EFFCD7200917591 /* rtl8814au-driver.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = "rtl8814au-driver.rb"; sourceTree = "<group>"; };
+		179A05702EFFCDAB00917591 /* install-rtl8814au.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-rtl8814au.sh"; sourceTree = "<group>"; };
+		179A05722EFFCDF600917591 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		179A05742EFFCE2900917591 /* RTL8814AUDriverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverTests.swift; sourceTree = "<group>"; };
+		179A05762EFFCE6100917591 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		179A05782EFFCE9E00917591 /* launcher.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = launcher.sh; sourceTree = "<group>"; };
+		179A057A2EFFCEBC00917591 /* SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SETUP.md; sourceTree = "<group>"; };
+		179A057C2EFFCED200917591 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		179A057E2EFFCF0200917591 /* CONTRIBUTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTRIBUTING.md; sourceTree = "<group>"; };
+		179A05802EFFCF4B00917591 /* PROJECT_SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PROJECT_SUMMARY.md; sourceTree = "<group>"; };
+		179A05822F002BBD00917591 /* README 2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README 2.md"; sourceTree = "<group>"; };
+		179A05842F002BD000917591 /* build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = build.sh; sourceTree = "<group>"; };
+		179A05862F002BE200917591 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
+		179A05882F002BEC00917591 /* uninstall.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = uninstall.sh; sourceTree = "<group>"; };
+		179A058A2F002BFD00917591 /* RTL8814AUAppmain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUAppmain.swift; sourceTree = "<group>"; };
+		179A058C2F002C1700917591 /* RTL8814AUDriverDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverDriver.swift; sourceTree = "<group>"; };
+		179A058E2F002C3500917591 /* RTL8814AUDriverUSBInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverUSBInterface.swift; sourceTree = "<group>"; };
+		179A05902F002C6000917591 /* RTL8814AUDriverWiFiInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverWiFiInterface.swift; sourceTree = "<group>"; };
+		179A05922F002C7900917591 /* SharedConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedConstants.swift; sourceTree = "<group>"; };
+		179A05942F002C8600917591 /* RTL8814AUDriverInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = RTL8814AUDriverInfo.plist; sourceTree = "<group>"; };
+		179A05962F002C8E00917591 /* RTL8814AUAppInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = RTL8814AUAppInfo.plist; sourceTree = "<group>"; };
+		179A05982F002C9500917591 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CodeSigning.xcconfig; sourceTree = "<group>"; };
+		179A059A2F002C9D00917591 /* RTL8814AUDriverRTL8814AUDriver.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RTL8814AUDriverRTL8814AUDriver.entitlements; sourceTree = "<group>"; };
+		179A059B2F002CA200917591 /* RTL8814AUAppRTL8814AUApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RTL8814AUAppRTL8814AUApp.entitlements; sourceTree = "<group>"; };
+		179A059C2F002CB900917591 /* TestsRTL8814AUDriverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestsRTL8814AUDriverTests.swift; sourceTree = "<group>"; };
+		179A059E2F002CCF00917591 /* CONTRIBUTING 2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "CONTRIBUTING 2.md"; sourceTree = "<group>"; };
+		179A05A02F002CDD00917591 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		179A05A22F002D4400917591 /* README 3.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "README 3.md"; sourceTree = "<group>"; };
+		179A05A42F002D6E00917591 /* RTL8814AUDriverRTL8814AUDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverRTL8814AUDriver.swift; sourceTree = "<group>"; };
+		179A05A62F002D8600917591 /* RTL8814AUDriverFirmwareLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverFirmwareLoader.swift; sourceTree = "<group>"; };
+		179A05A82F002DA100917591 /* RTL8814AUDriverNetworkInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RTL8814AUDriverNetworkInterface.swift; sourceTree = "<group>"; };
+		179A05AA2F002DB400917591 /* RTL8814AUDriverInfo 2.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RTL8814AUDriverInfo 2.plist"; sourceTree = "<group>"; };
+		179A05AC2F002DBF00917591 /* RTL8814AUDriverRTL8814AUDriver 2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RTL8814AUDriverRTL8814AUDriver 2.entitlements"; sourceTree = "<group>"; };
+		179A05AD2F002DD600917591 /* build 2.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build 2.sh"; sourceTree = "<group>"; };
+		179A05AF2F002DE800917591 /* sign.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign.sh; sourceTree = "<group>"; };
+		179A05B12F002DFD00917591 /* install 2.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install 2.sh"; sourceTree = "<group>"; };
+		179A05B32F002E0B00917591 /* Homebrewrtl8814au-driver.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = "Homebrewrtl8814au-driver.rb"; sourceTree = "<group>"; };
+		179A05B52F002E3700917591 /* RTL8814AUDriver.xcodeprojproject.pbxproj */ = {isa = PBXFileReference; lastKnownFileType = text.pbxproject; path = RTL8814AUDriver.xcodeprojproject.pbxproj; sourceTree = "<group>"; };
+		179A05B72F002E5700917591 /* BUILDING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BUILDING.md; sourceTree = "<group>"; };
+		179A05B92F002E6100917591 /* LICENSE 2 */ = {isa = PBXFileReference; lastKnownFileType = text; path = "LICENSE 2"; sourceTree = "<group>"; };
+		179A05BB2F002E8B00917591 /* CONTRIBUTING 3.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "CONTRIBUTING 3.md"; sourceTree = "<group>"; };
+		179A05BD2F002EAC00917591 /* Makefile 2 */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Makefile 2"; sourceTree = "<group>"; };
+		179A05BF2F002ECC00917591 /* CHANGELOG 2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "CHANGELOG 2.md"; sourceTree = "<group>"; };
+		179A05C12F002EEB00917591 /* .githubworkflowsbuild.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .githubworkflowsbuild.yml; sourceTree = "<group>"; };
+		179A05C32F002EF900917591 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		179A05C52F002F1E00917591 /* setup.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = setup.sh; sourceTree = "<group>"; };
+		179A05C72F002F4600917591 /* QUICKSTART.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = QUICKSTART.md; sourceTree = "<group>"; };
+		179A05C92F002F8400917591 /* TROUBLESHOOTING.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TROUBLESHOOTING.md; sourceTree = "<group>"; };
+		179A05CB2F002FB800917591 /* PROJECT_SUMMARY 2.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "PROJECT_SUMMARY 2.md"; sourceTree = "<group>"; };
+		179A05CD2F00300F00917591 /* DEVELOPMENT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DEVELOPMENT.md; sourceTree = "<group>"; };
+		179A05CF2F00365000917591 /* XCODE_PROJECT_SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = XCODE_PROJECT_SETUP.md; sourceTree = "<group>"; };
+		179A05D12F00371100917591 /* DriverKit.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DriverKit.xcconfig; sourceTree = "<group>"; };
+		179A05D32F00373C00917591 /* BUILD_ERRORS_FIX.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BUILD_ERRORS_FIX.md; sourceTree = "<group>"; };
+		179A05D52F00377100917591 /* fix-build-errors.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "fix-build-errors.sh"; sourceTree = "<group>"; };
+		179A05D72F0037D200917591 /* BUILD_FIX_SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BUILD_FIX_SUMMARY.md; sourceTree = "<group>"; };
+		179A05D92F0037D300917591 /* QUICK_FIX.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = QUICK_FIX.md; sourceTree = "<group>"; };
+		179A05DB2F0037E100917591 /* COMPLETE_FIX_CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = COMPLETE_FIX_CHANGELOG.md; sourceTree = "<group>"; };
+		179A05DD2F00381D00917591 /* ARCHITECTURE_DIAGRAM.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ARCHITECTURE_DIAGRAM.md; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		17204AE52EFFC438007C235B /* Exceptions for "Momentum-Firmware" folder in "Momentum-Firmware" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 17204ADC2EFFC438007C235B /* Momentum-Firmware */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		17204ADF2EFFC438007C235B /* Momentum-Firmware */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				17204AE52EFFC438007C235B /* Exceptions for "Momentum-Firmware" folder in "Momentum-Firmware" target */,
+			);
+			path = "Momentum-Firmware";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		17204ADA2EFFC438007C235B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		17204AD32EFFC438007C235B = {
+			isa = PBXGroup;
+			children = (
+				17204ADF2EFFC438007C235B /* Momentum-Firmware */,
+				17204ADE2EFFC438007C235B /* Products */,
+				179A056C2EFFCD4E00917591 /* RTL8814AUDriverBuilder.swift */,
+				179A056E2EFFCD7200917591 /* rtl8814au-driver.rb */,
+				179A05702EFFCDAB00917591 /* install-rtl8814au.sh */,
+				179A05722EFFCDF600917591 /* README.md */,
+				179A05742EFFCE2900917591 /* RTL8814AUDriverTests.swift */,
+				179A05762EFFCE6100917591 /* Makefile */,
+				179A05782EFFCE9E00917591 /* launcher.sh */,
+				179A057A2EFFCEBC00917591 /* SETUP.md */,
+				179A057C2EFFCED200917591 /* LICENSE */,
+				179A057E2EFFCF0200917591 /* CONTRIBUTING.md */,
+				179A05802EFFCF4B00917591 /* PROJECT_SUMMARY.md */,
+				179A05822F002BBD00917591 /* README 2.md */,
+				179A05842F002BD000917591 /* build.sh */,
+				179A05862F002BE200917591 /* install.sh */,
+				179A05882F002BEC00917591 /* uninstall.sh */,
+				179A058A2F002BFD00917591 /* RTL8814AUAppmain.swift */,
+				179A058C2F002C1700917591 /* RTL8814AUDriverDriver.swift */,
+				179A058E2F002C3500917591 /* RTL8814AUDriverUSBInterface.swift */,
+				179A05902F002C6000917591 /* RTL8814AUDriverWiFiInterface.swift */,
+				179A05922F002C7900917591 /* SharedConstants.swift */,
+				179A05942F002C8600917591 /* RTL8814AUDriverInfo.plist */,
+				179A05962F002C8E00917591 /* RTL8814AUAppInfo.plist */,
+				179A05982F002C9500917591 /* CodeSigning.xcconfig */,
+				179A059A2F002C9D00917591 /* RTL8814AUDriverRTL8814AUDriver.entitlements */,
+				179A059B2F002CA200917591 /* RTL8814AUAppRTL8814AUApp.entitlements */,
+				179A059C2F002CB900917591 /* TestsRTL8814AUDriverTests.swift */,
+				179A059E2F002CCF00917591 /* CONTRIBUTING 2.md */,
+				179A05A02F002CDD00917591 /* CHANGELOG.md */,
+				179A05A22F002D4400917591 /* README 3.md */,
+				179A05A42F002D6E00917591 /* RTL8814AUDriverRTL8814AUDriver.swift */,
+				179A05A62F002D8600917591 /* RTL8814AUDriverFirmwareLoader.swift */,
+				179A05A82F002DA100917591 /* RTL8814AUDriverNetworkInterface.swift */,
+				179A05AA2F002DB400917591 /* RTL8814AUDriverInfo 2.plist */,
+				179A05AC2F002DBF00917591 /* RTL8814AUDriverRTL8814AUDriver 2.entitlements */,
+				179A05AD2F002DD600917591 /* build 2.sh */,
+				179A05AF2F002DE800917591 /* sign.sh */,
+				179A05B12F002DFD00917591 /* install 2.sh */,
+				179A05B32F002E0B00917591 /* Homebrewrtl8814au-driver.rb */,
+				179A05B52F002E3700917591 /* RTL8814AUDriver.xcodeprojproject.pbxproj */,
+				179A05B72F002E5700917591 /* BUILDING.md */,
+				179A05B92F002E6100917591 /* LICENSE 2 */,
+				179A05BB2F002E8B00917591 /* CONTRIBUTING 3.md */,
+				179A05BD2F002EAC00917591 /* Makefile 2 */,
+				179A05BF2F002ECC00917591 /* CHANGELOG 2.md */,
+				179A05C12F002EEB00917591 /* .githubworkflowsbuild.yml */,
+				179A05C32F002EF900917591 /* .gitignore */,
+				179A05C52F002F1E00917591 /* setup.sh */,
+				179A05C72F002F4600917591 /* QUICKSTART.md */,
+				179A05C92F002F8400917591 /* TROUBLESHOOTING.md */,
+				179A05CB2F002FB800917591 /* PROJECT_SUMMARY 2.md */,
+				179A05CD2F00300F00917591 /* DEVELOPMENT.md */,
+				179A05CF2F00365000917591 /* XCODE_PROJECT_SETUP.md */,
+				179A05D12F00371100917591 /* DriverKit.xcconfig */,
+				179A05D32F00373C00917591 /* BUILD_ERRORS_FIX.md */,
+				179A05D52F00377100917591 /* fix-build-errors.sh */,
+				179A05D72F0037D200917591 /* BUILD_FIX_SUMMARY.md */,
+				179A05D92F0037D300917591 /* QUICK_FIX.md */,
+				179A05DB2F0037E100917591 /* COMPLETE_FIX_CHANGELOG.md */,
+				179A05DD2F00381D00917591 /* ARCHITECTURE_DIAGRAM.md */,
+			);
+			sourceTree = "<group>";
+		};
+		17204ADE2EFFC438007C235B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				17204ADD2EFFC438007C235B /* Momentum-Firmware.kext */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		17204AD82EFFC438007C235B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			files = (
+			);
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		17204ADC2EFFC438007C235B /* Momentum-Firmware */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 17204AE62EFFC438007C235B /* Build configuration list for PBXNativeTarget "Momentum-Firmware" */;
+			buildPhases = (
+				17204AD82EFFC438007C235B /* Headers */,
+				17204AD92EFFC438007C235B /* Sources */,
+				17204ADA2EFFC438007C235B /* Frameworks */,
+				17204ADB2EFFC438007C235B /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				17204ADF2EFFC438007C235B /* Momentum-Firmware */,
+			);
+			name = "Momentum-Firmware";
+			productName = "Momentum-Firmware";
+			productReference = 17204ADD2EFFC438007C235B /* Momentum-Firmware.kext */;
+			productType = "com.apple.product-type.kernel-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		17204AD42EFFC438007C235B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					17204ADC2EFFC438007C235B = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 17204AD72EFFC438007C235B /* Build configuration list for PBXProject "Momentum-Firmware" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 17204AD32EFFC438007C235B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 90;
+			productRefGroup = 17204ADE2EFFC438007C235B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				17204ADC2EFFC438007C235B /* Momentum-Firmware */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		17204ADB2EFFC438007C235B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				179A05BA2F002E6100917591 /* LICENSE 2 in Resources */,
+				179A05C82F002F4600917591 /* QUICKSTART.md in Resources */,
+				179A057D2EFFCED200917591 /* LICENSE in Resources */,
+				179A05C62F002F1E00917591 /* setup.sh in Resources */,
+				179A05D42F00373D00917591 /* BUILD_ERRORS_FIX.md in Resources */,
+				179A05BE2F002EAC00917591 /* Makefile 2 in Resources */,
+				179A05832F002BBD00917591 /* README 2.md in Resources */,
+				179A05AB2F002DB400917591 /* RTL8814AUDriverInfo 2.plist in Resources */,
+				179A05D22F00371100917591 /* DriverKit.xcconfig in Resources */,
+				179A05DC2F0037E100917591 /* COMPLETE_FIX_CHANGELOG.md in Resources */,
+				179A05732EFFCDF600917591 /* README.md in Resources */,
+				179A05B42F002E0B00917591 /* Homebrewrtl8814au-driver.rb in Resources */,
+				179A05C02F002ECC00917591 /* CHANGELOG 2.md in Resources */,
+				179A05CC2F002FB800917591 /* PROJECT_SUMMARY 2.md in Resources */,
+				179A05892F002BEC00917591 /* uninstall.sh in Resources */,
+				179A05972F002C8E00917591 /* RTL8814AUAppInfo.plist in Resources */,
+				179A05712EFFCDAB00917591 /* install-rtl8814au.sh in Resources */,
+				179A05B82F002E5700917591 /* BUILDING.md in Resources */,
+				179A05C42F002EF900917591 /* .gitignore in Resources */,
+				179A05D62F00377100917591 /* fix-build-errors.sh in Resources */,
+				179A05792EFFCE9E00917591 /* launcher.sh in Resources */,
+				179A05DE2F00381D00917591 /* ARCHITECTURE_DIAGRAM.md in Resources */,
+				179A057F2EFFCF0200917591 /* CONTRIBUTING.md in Resources */,
+				179A05CA2F002F8400917591 /* TROUBLESHOOTING.md in Resources */,
+				179A05B02F002DE800917591 /* sign.sh in Resources */,
+				179A05B22F002DFD00917591 /* install 2.sh in Resources */,
+				179A05812EFFCF4B00917591 /* PROJECT_SUMMARY.md in Resources */,
+				179A05872F002BE200917591 /* install.sh in Resources */,
+				179A059F2F002CCF00917591 /* CONTRIBUTING 2.md in Resources */,
+				179A05BC2F002E8B00917591 /* CONTRIBUTING 3.md in Resources */,
+				179A057B2EFFCEBC00917591 /* SETUP.md in Resources */,
+				179A05D02F00365000917591 /* XCODE_PROJECT_SETUP.md in Resources */,
+				179A05952F002C8600917591 /* RTL8814AUDriverInfo.plist in Resources */,
+				179A05A32F002D4400917591 /* README 3.md in Resources */,
+				179A05CE2F00300F00917591 /* DEVELOPMENT.md in Resources */,
+				179A05A12F002CDD00917591 /* CHANGELOG.md in Resources */,
+				179A056F2EFFCD7200917591 /* rtl8814au-driver.rb in Resources */,
+				179A05AE2F002DD600917591 /* build 2.sh in Resources */,
+				179A05D82F0037D200917591 /* BUILD_FIX_SUMMARY.md in Resources */,
+				179A05C22F002EEB00917591 /* .githubworkflowsbuild.yml in Resources */,
+				179A05DA2F0037D300917591 /* QUICK_FIX.md in Resources */,
+				179A05992F002C9500917591 /* CodeSigning.xcconfig in Resources */,
+				179A05852F002BD000917591 /* build.sh in Resources */,
+				179A05B62F002E3700917591 /* RTL8814AUDriver.xcodeprojproject.pbxproj in Resources */,
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		17204AD92EFFC438007C235B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				179A059D2F002CB900917591 /* TestsRTL8814AUDriverTests.swift in Sources */,
+				179A05A92F002DA100917591 /* RTL8814AUDriverNetworkInterface.swift in Sources */,
+				179A05932F002C7900917591 /* SharedConstants.swift in Sources */,
+				179A058D2F002C1700917591 /* RTL8814AUDriverDriver.swift in Sources */,
+				179A05752EFFCE2900917591 /* RTL8814AUDriverTests.swift in Sources */,
+				179A05A52F002D6E00917591 /* RTL8814AUDriverRTL8814AUDriver.swift in Sources */,
+				179A058B2F002BFD00917591 /* RTL8814AUAppmain.swift in Sources */,
+				179A05772EFFCE6100917591 /* Makefile in Sources */,
+				179A056D2EFFCD4E00917591 /* RTL8814AUDriverBuilder.swift in Sources */,
+				179A05912F002C6000917591 /* RTL8814AUDriverWiFiInterface.swift in Sources */,
+				179A058F2F002C3500917591 /* RTL8814AUDriverUSBInterface.swift in Sources */,
+				179A05A72F002D8600917591 /* RTL8814AUDriverFirmwareLoader.swift in Sources */,
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		17204AE72EFFC438007C235B /* Debug configuration for PBXNativeTarget "Momentum-Firmware" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1.0.0d1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 8WQ3PVXUJ7;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Momentum-Firmware/Info.plist";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_NAME = x1.Momentum_Firmware;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_BUNDLE_IDENTIFIER = "x1.Momentum-Firmware";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_CLANG_STATIC_ANALYZER = YES;
+				SDKROOT = macosx26.2;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Debug;
+		};
+		17204AE82EFFC438007C235B /* Release configuration for PBXNativeTarget "Momentum-Firmware" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1.0.0d1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 8WQ3PVXUJ7;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Momentum-Firmware/Info.plist";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				MODULE_NAME = x1.Momentum_Firmware;
+				MODULE_VERSION = 1.0.0d1;
+				PRODUCT_BUNDLE_IDENTIFIER = "x1.Momentum-Firmware";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUN_CLANG_STATIC_ANALYZER = YES;
+				SDKROOT = macosx26.2;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
+		17204AE92EFFC438007C235B /* Debug configuration for PBXProject "Momentum-Firmware" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 8WQ3PVXUJ7;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+			};
+			name = Debug;
+		};
+		17204AEA2EFFC438007C235B /* Release configuration for PBXProject "Momentum-Firmware" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 8WQ3PVXUJ7;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		17204AD72EFFC438007C235B /* Build configuration list for PBXProject "Momentum-Firmware" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				17204AE92EFFC438007C235B /* Debug configuration for PBXProject "Momentum-Firmware" */,
+				17204AEA2EFFC438007C235B /* Release configuration for PBXProject "Momentum-Firmware" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		17204AE62EFFC438007C235B /* Build configuration list for PBXNativeTarget "Momentum-Firmware" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				17204AE72EFFC438007C235B /* Debug configuration for PBXNativeTarget "Momentum-Firmware" */,
+				17204AE82EFFC438007C235B /* Release configuration for PBXNativeTarget "Momentum-Firmware" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 17204AD42EFFC438007C235B /* Project object */;
+}

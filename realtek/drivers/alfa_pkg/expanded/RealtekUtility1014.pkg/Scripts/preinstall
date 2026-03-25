@@ -1,0 +1,45 @@
+#!/bin/sh
+. /etc/rc.common
+
+echo "PreInstall_UI.command"
+
+echo "Remove All Legacy UI..."
+sudo rm -rf /Library/LaunchAgents/WlanAC104.Software
+sudo rm -rf /Library/LaunchAgents/WlanAC.Software
+sudo rm -rf /Library/LaunchAgents/WlanAC.plist
+sudo rm -rf /Library/LaunchAgents/Wlan104.Software
+sudo rm -rf /Library/LaunchAgents/Wlan.Software
+sudo rm -rf /Library/LaunchAgents/Wlan.Software.plist
+sudo rm -rf /Library/LaunchAgents/TPLINK.Software
+sudo rm -rf /Library/LaunchAgents/TPLINK104.Software
+sudo rm -rf /Library/LaunchAgents/TPLINK.plist
+sudo rm -rf /Library/LaunchDaemons/Wlan.Software*
+
+sudo rm -rf /Applications/Wireless-AC\ Network\ Utility.app
+sudo rm -rf /Applications/Wireless\ Network\ Utility.app
+sudo rm -rf /Applications/TP-LINK\ Wireless\ Configuration\ Utility.app
+sudo rm -rf /Applications/BearExtender.app
+sudo rm -rf /System/Library/CoreServices/StatusBarApp.app
+sudo rm -rf /Library/Application\ Support/WLAN/*
+sudo rm -rf /Library/Application\ Support/ALFA_RTWIFI/*
+sudo rm -rf /var/tmp/com.realtek.utility.*
+
+sudo rm -rf ~/Library/Preferences/com.realtek.utility.wifi.plist
+sudo rm -rf ~/Library/Preferences/com.realtek.utility.wifi11n.plist
+
+echo "Removing Socket Files"
+sudo rm -rf /var/tmp/com.realtek.utility.statusbar.socket
+sudo rm -rf /var/tmp/com.realtek.utility.daemon.socket
+
+sudo killall -c StatusBarApp
+sudo killall -c wpa_supplicant
+sudo killall -c RtWlanHelper
+
+echo "mkdir ALFA RTWIFI"
+sudo mkdir /Library/Application\ Support/ALFA_RTWIFI
+sudo mkdir /Library/Application\ Support/ALFA_RTWIFI/com.realtek.utility.wifi
+
+echo "Chown WLAN"
+sudo chown -R root:wheel /Library/Application\ Support/ALFA_RTWIFI
+
+echo "PreInstall_UI Complete."

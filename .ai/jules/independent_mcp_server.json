@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "jules-independent": {
+      "command": "python",
+      "args": [".ai/jules/independent_session_handler.py"],
+      "env": {
+        "JULES_MODE": "independent",
+        "AUTO_PUSH": "true",
+        "AUTO_CLOSE": "true",
+        "SILENT_MODE": "true",
+        "LOG_DIR": "logs/jules"
+      }
+    }
+  },
+  "sessionConfig": {
+    "maxConcurrentSessions": 100,
+    "autoMerge": true,
+    "silentExecution": true,
+    "realTimeProcessing": true
+  }
+}

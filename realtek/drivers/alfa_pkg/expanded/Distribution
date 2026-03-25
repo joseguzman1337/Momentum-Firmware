@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<installer-gui-script authoringTool="Packages" authoringToolVersion="1.2.6" authoringToolBuild="549" minSpecVersion="1.0">
+    <options rootVolumeOnly="true"/>
+    <!--+==========================+
+        |       Presentation       |
+        +==========================+-->
+    <title>DISTRIBUTION_TITLE</title>
+    <welcome file="welcome.rtfd"/>
+    <readme file="readme.rtfd"/>
+    <license file="license.rtf"/>
+    <!--+==========================+
+        |         Installer        |
+        +==========================+-->
+    <choices-outline>
+        <line choice="installer_choice_1"/>
+        <line choice="installer_choice_2"/>
+        <line choice="installer_choice_3"/>
+        <line choice="installer_choice_4"/>
+        <line choice="installer_choice_5"/>
+        <line choice="installer_choice_6"/>
+    </choices-outline>
+    <choice id="installer_choice_1" title="INSTALLER_CHOICE_1_TITLE" description="INSTALLER_CHOICE_1_DESCRIPTION">
+        <pkg-ref id="com.alfa-network-inc.Realtek109Driver"/>
+    </choice>
+    <choice id="installer_choice_2" start_enabled="installer_choice_2_enabled()" enabled="installer_choice_2_enabled()" start_selected="installer_choice_2_selected(true)" selected="installer_choice_2_selected(false)" title="INSTALLER_CHOICE_2_TITLE" description="">
+        <pkg-ref id="com.alfa-network-inc.RealtekUtility1014"/>
+    </choice>
+    <choice id="installer_choice_3" start_visible="false" title="INSTALLER_CHOICE_3_TITLE" description="INSTALLER_CHOICE_3_DESCRIPTION">
+        <pkg-ref id="com.alfa-network-inc.RealtekSerialsInstaller"/>
+    </choice>
+    <choice id="installer_choice_4" start_visible="false" title="INSTALLER_CHOICE_4_TITLE" description="INSTALLER_CHOICE_4_DESCRIPTION">
+        <pkg-ref id="com.alfa-network-inc.MediatekSerialsInstaller"/>
+    </choice>
+    <choice id="installer_choice_5" start_enabled="installer_choice_5_enabled()" enabled="installer_choice_5_enabled()" start_selected="installer_choice_5_selected(true)" selected="installer_choice_5_selected(false)" title="INSTALLER_CHOICE_5_TITLE" description="">
+        <pkg-ref id="com.alfa-network-inc.Uninstall"/>
+    </choice>
+    <choice id="installer_choice_6" start_visible="false" start_enabled="installer_choice_6_enabled()" enabled="installer_choice_6_enabled()" start_selected="installer_choice_6_selected(true)" selected="installer_choice_6_selected(false)" title="Realtek Uninstall" description="">
+        <pkg-ref id="com.alfa-network.inc.RealtekUninstall"/>
+    </choice>
+    <!--+==========================+
+        |    Package References    |
+        +==========================+-->
+    <pkg-ref id="com.alfa-network.inc.RealtekUninstall" version="1.0" auth="Root" installKBytes="0">#Realtek_Uninstall.pkg</pkg-ref>
+    <pkg-ref id="com.alfa-network-inc.RealtekSerialsInstaller" version="1.0" auth="Root" installKBytes="0">#RealtekSerialsInstaller.pkg</pkg-ref>
+    <pkg-ref id="com.alfa-network-inc.Uninstall" version="1.0" auth="Root" installKBytes="0">#Uninstall.pkg</pkg-ref>
+    <pkg-ref id="com.alfa-network-inc.RealtekUtility1014" version="10.14" auth="Root" installKBytes="7125">#RealtekUtility1014.pkg</pkg-ref>
+    <pkg-ref id="com.alfa-network-inc.MediatekSerialsInstaller" version="1.0" auth="Root" installKBytes="0">#MediatekSerialsInstaller.pkg</pkg-ref>
+    <pkg-ref id="com.alfa-network-inc.Realtek109Driver" version="10.9" auth="Root" installKBytes="18992" onConclusion="RequireRestart">#Realtek109110Driver.pkg</pkg-ref>
+    <!--+==========================+
+        |    JavaScript Scripts    |
+        +==========================+-->
+    <script>
+
+	const __IC_FLAT_DISTRIBUTION__=true;
+	function installer_choice_2_enabled()
+	{
+		return choices.installer_choice_1.selected;	
+	}
+
+	function installer_choice_2_selected(isStart)
+	{
+		var tSelected;
+
+		tSelected=choices.installer_choice_1.selected;
+
+		if (installer_choice_2_enabled()==false || isStart==true)
+		{
+			return tSelected;
+		}
+
+		return (tSelected &amp;&amp; my.choice.selected);
+	}
+
+	function installer_choice_5_enabled()
+	{
+		return (!choices.installer_choice_1.selected &amp;&amp; !choices.installer_choice_2.selected);	
+	}
+
+	function installer_choice_5_selected(isStart)
+	{
+		var tSelected;
+
+		tSelected=(!choices.installer_choice_1.selected &amp;&amp; !choices.installer_choice_2.selected);
+
+		if (installer_choice_5_enabled()==false || isStart==true)
+		{
+			return tSelected;
+		}
+
+		return (tSelected &amp;&amp; my.choice.selected);
+	}
+
+	function installer_choice_6_enabled()
+	{
+		return choices.installer_choice_5.selected;	
+	}
+
+	function installer_choice_6_selected(isStart)
+	{
+		var tSelected;
+
+		tSelected=choices.installer_choice_5.selected;
+
+		if (installer_choice_6_enabled()==false || isStart==true)
+		{
+			return tSelected;
+		}
+
+		return (tSelected &amp;&amp; my.choice.selected);
+	}
+
+    </script>
+</installer-gui-script>

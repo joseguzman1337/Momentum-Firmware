@@ -1,0 +1,14 @@
+[commands.agents]
+description = "Manage AI agents in YOLO mode"
+
+[commands.agents.status]
+description = "Check AI agent status"
+command = "python .ai/orchestrator.py --status"
+
+[commands.agents.trigger]
+description = "Trigger specific agent"
+command = "python .ai/orchestrator.py --trigger {agent}"
+
+[commands.agents.yolo]
+description = "Enable YOLO mode for all agents"
+command = "python .ai/orchestrator.py --yolo-mode"

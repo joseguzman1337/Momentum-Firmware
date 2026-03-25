@@ -1,0 +1,2 @@
+source /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/gdbinit/symbols
+source /Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/gdbinit/connect

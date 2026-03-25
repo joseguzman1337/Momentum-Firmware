@@ -1,0 +1,43 @@
+# Development workflow policies
+
+# Allow common development tools
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["python", "pip", "npm", "node", "gcc", "clang"]
+decision = "allow"
+priority = 300
+
+# Allow testing commands
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["pytest", "test", "./fbt test", "ctest"]
+decision = "allow"
+priority = 320
+
+# Allow documentation generation
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["doxygen", "sphinx", "mkdocs"]
+decision = "allow"
+priority = 280
+
+# Allow code formatting
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["clang-format", "black", "prettier"]
+decision = "allow"
+priority = 290
+
+# Require confirmation for package installation
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["pip install", "npm install", "brew install"]
+decision = "ask_user"
+priority = 400
+
+# Allow file operations in project directories
+[[rule]]
+toolName = ["write_file", "replace"]
+argsPattern = '"(/Users/x/x/Momentum-Firmware/|applications/|lib/|scripts/)'
+decision = "allow"
+priority = 250

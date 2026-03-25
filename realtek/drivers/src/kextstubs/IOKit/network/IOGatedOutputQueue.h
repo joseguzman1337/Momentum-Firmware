@@ -1,0 +1,9 @@
+#ifndef STUB_IOKIT_NETWORK_IOGATEDOUTPUTQUEUE_H
+#define STUB_IOKIT_NETWORK_IOGATEDOUTPUTQUEUE_H
+
+#include "IOEthernetInterface.h"
+
+class IOGatedOutputQueue : public OSObject {
+};
+
+#endif // STUB_IOKIT_NETWORK_IOGATEDOUTPUTQUEUE_H

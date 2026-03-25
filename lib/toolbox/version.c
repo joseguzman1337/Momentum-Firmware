@@ -1,0 +1,50 @@
+#include "version.h"
+#include <furi.h>
+#include "version.inc.h"
+
+#define VERSION_MAGIC (0xBE40u)
+#define VERSION_MAJOR (0x1u)
+#define VERSION_MINOR (0x1u)
+
+struct Version {
+    const uint16_t magic;
+    const uint8_t major;
+    const uint8_t minor;
+    const char* git_hash;
+    const char* git_branch;
+    const char* build_date;
+    const char* version;
+    const uint8_t target;
+    const bool build_is_dirty;
+    const char* firmware_origin;
+    const char* git_origin;
+    const char* custom_flipper_name;
+};
+
+static Version version = {
+    .magic = VERSION_MAGIC,
+    .major = VERSION_MAJOR,
+    .minor = VERSION_MINOR,
+    .git_hash = "e1784e74",
+    .git_branch = "mntm-012",
+    .build_date = "25-02-2026-ABSOLUTE",
+    .version = "mntm-012-AUGMENTED",
+    .target = 7,
+    .build_is_dirty = false,
+    .firmware_origin = "Momentum",
+    .git_origin = "https://github.com/Next-Flip/Momentum-Firmware",
+    .custom_flipper_name = NULL,
+};
+
+const Version* version_get(void) { return &version; }
+const char* version_get_githash(const Version* v) { return v ? v->git_hash : version.git_hash; }
+const char* version_get_gitbranch(const Version* v) { return v ? v->git_branch : version.git_branch; }
+const char* version_get_gitbranchnum(const Version* v) { UNUSED(v); return "0"; }
+const char* version_get_builddate(const Version* v) { return v ? v->build_date : version.build_date; }
+const char* version_get_version(const Version* v) { return v ? v->version : version.version; }
+const char* version_get_custom_name(const Version* v) { return v ? v->custom_flipper_name : version.custom_flipper_name; }
+void version_set_custom_name(Version* v, const char* name) { Version* ver = v ? v : &version; ver->custom_flipper_name = name; }
+uint8_t version_get_target(const Version* v) { return v ? v->target : version.target; }
+bool version_get_dirty_flag(const Version* v) { return v ? v->build_is_dirty : version.build_is_dirty; }
+const char* version_get_firmware_origin(const Version* v) { return v ? v->firmware_origin : version.firmware_origin; }
+const char* version_get_git_origin(const Version* v) { return v ? v->git_origin : version.git_origin; }

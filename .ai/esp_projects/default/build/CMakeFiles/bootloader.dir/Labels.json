@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/Users/x/x/Momentum-Firmware/.ai/esp_projects/default/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}

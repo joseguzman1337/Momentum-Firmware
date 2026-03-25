@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# RTL88xxAU Installer Application Launcher
+# This script launches the PyQt5 GUI installer
+
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+APP_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+PROJECT_DIR="$(dirname "$APP_DIR")"
+
+# Change to project directory where installer_gui.py is located
+cd "$PROJECT_DIR"
+
+# Check if Python 3 is available
+if ! command -v python3 &> /dev/null; then
+    osascript -e 'display alert "Python 3 Required" message "This installer requires Python 3. Please install Python 3 from python.org or via Homebrew." buttons {"OK"} default button "OK"'
+    exit 1
+fi
+
+# Check if PyQt5 is installed
+if ! python3 -c "import PyQt5" &> /dev/null; then
+    osascript -e 'display alert "PyQt5 Required" message "This installer requires PyQt5. Installing PyQt5..." buttons {"OK"} default button "OK"'
+    pip3 install PyQt5
+fi
+
+# Launch the GUI installer
+exec python3 installer_gui.py

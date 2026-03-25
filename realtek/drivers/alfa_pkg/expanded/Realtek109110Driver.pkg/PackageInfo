@@ -1,0 +1,12 @@
+<pkg-info format-version="2" identifier="com.alfa-network-inc.Realtek109Driver" version="10.9" relocatable="false" overwrite-permissions="false" followSymLinks="false" install-location="/" auth="root" postinstall-action="restart">
+<payload installKBytes="18992" numberOfFiles="24"/>
+<scripts>
+    <preinstall file="./preinstall"/>
+    <postinstall file="./postinstall"/>
+</scripts>
+<bundle-version>
+    <bundle path="./Library/Extensions/RtWlanDisk.kext" CFBundleShortVersionString="1830.20.b31" CFBundleVersion="1830.20.b31" id="com.realtek.driver.RtWlanDisk" CFBundleIdentifier="com.realtek.driver.RtWlanDisk"/>
+    <bundle path="./Library/Extensions/RtWlanU1827.kext" CFBundleShortVersionString="1827.4.b32" CFBundleVersion="1827.4.b32" id="com.realtek.driver.RtWlanU1827" CFBundleIdentifier="com.realtek.driver.RtWlanU1827"/>
+    <bundle path="./Library/Extensions/RtWlanU.kext" CFBundleShortVersionString="1830.20.b31" CFBundleVersion="1830.20.b31" id="com.realtek.driver.RtWlanU" CFBundleIdentifier="com.realtek.driver.RtWlanU"/>
+</bundle-version>
+</pkg-info>

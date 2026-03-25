@@ -1,0 +1,15 @@
+[Unit]
+Description=Flipper Zero USB Ethernet Auto-Setup for %I
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/flipper-auto-ethernet-setup.sh %I start
+ExecStop=/usr/local/bin/flipper-auto-ethernet-setup.sh %I stop
+TimeoutStartSec=30
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

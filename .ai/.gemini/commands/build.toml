@@ -1,0 +1,9 @@
+description = "Build and flash firmware to Flipper Zero"
+prompt = """
+Build the Momentum firmware and flash it to the connected Flipper Zero device.
+
+Execute the build command:
+!{./fbt flash_usb_full}
+
+If there are any build errors, analyze them and suggest fixes.
+"""

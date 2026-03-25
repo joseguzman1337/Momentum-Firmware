@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "momentum-codex": {
+      "command": "python",
+      "args": [".ai/codex/agent.py"],
+      "env": {
+        "LOG_DIR": "logs/codex",
+        "AUTO_MERGE": "true",
+        "YOLO_MODE": "true"
+      }
+    },
+    "momentum-security": {
+      "command": "python", 
+      "args": [".ai/claude/security_agent.py"],
+      "env": {
+        "LOG_DIR": "logs/claude",
+        "AUTO_MERGE": "true",
+        "YOLO_MODE": "true"
+      }
+    },
+    "momentum-aws": {
+      "command": "python",
+      "args": [".ai/amazonq/agent.py"], 
+      "env": {
+        "LOG_DIR": "logs/amazonq",
+        "AUTO_MERGE": "true",
+        "AWS_REGION": "us-east-1"
+      }
+    }
+  }
+}

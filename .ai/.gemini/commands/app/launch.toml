@@ -1,0 +1,9 @@
+description = "Build and launch a specific app"
+prompt = """
+Build and launch the specified app: {{args}}
+
+Execute the launch command:
+!{./fbt launch APPSRC={{args}}}
+
+If the app fails to launch, check for common issues and suggest fixes.
+"""

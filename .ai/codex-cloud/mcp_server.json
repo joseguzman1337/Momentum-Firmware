@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "codex-cloud-agent": {
+      "command": "python",
+      "args": [".ai/codex-cloud/agent.py"],
+      "env": {
+        "LOG_DIR": "logs/codex-cloud",
+        "AUTO_MERGE": "true",
+        "YOLO_MODE": "true",
+        "CODEX_CLOUD_API": "https://chatgpt.com/codex/api",
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}

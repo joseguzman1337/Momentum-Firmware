@@ -1,0 +1,22 @@
+REM Ethernet Auto-Connect for Flipper Zero
+REM Target: Windows 10/11 (PowerShell Administrator)
+REM This script enables Internet Connection Sharing (ICS) 
+REM from any active internet source to the Flipper's RNDIS interface.
+REM Compatibility: Direct, Hubs, and Docks.
+
+DELAY 3000
+REM Open Admin PowerShell (Win+R -> powershell -> Ctrl+Shift+Enter)
+GUI r
+DELAY 500
+STRING powershell
+CTRL SHIFT ENTER
+DELAY 1000
+ALT y
+DELAY 1000
+
+REM One-liner to find active WAN (Status=2, not Flipper) and share it to Flipper (Remote NDIS)
+STRING $m=New-Object -ComObject HNetCfg.HNetShare;$f=$m.EnumEveryConnection|?{$m.NetConnectionProps.Invoke($_).DeviceName -match 'Remote NDIS'};$w=$m.EnumEveryConnection|?{$p=$m.NetConnectionProps.Invoke($_);$p.Status -eq 2 -and $p.Guid -ne $m.NetConnectionProps.Invoke($f).Guid}|Select -First 1;if($f -and $w){$m.EnumEveryConnection|%{$m.INetSharingConfigurationForINetConnection.Invoke($_).DisableSharing()};$m.INetSharingConfigurationForINetConnection.Invoke($w).EnableSharing(0);$m.INetSharingConfigurationForINetConnection.Invoke($f).EnableSharing(1)}
+ENTER
+DELAY 500
+STRING exit
+ENTER

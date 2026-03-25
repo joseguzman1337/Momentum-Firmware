@@ -1,0 +1,9 @@
+#ifndef STUB_IOKIT_IOBUFFERMEMORYDESCRIPTOR_H
+#define STUB_IOKIT_IOBUFFERMEMORYDESCRIPTOR_H
+
+#include "IOService.h"
+
+class IOBufferMemoryDescriptor : public OSObject {
+};
+
+#endif // STUB_IOKIT_IOBUFFERMEMORYDESCRIPTOR_H

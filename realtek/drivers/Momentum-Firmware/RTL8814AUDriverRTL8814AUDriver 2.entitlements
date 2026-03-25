@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- DriverKit Entitlements -->
+    <key>com.apple.developer.driverkit</key>
+    <true/>
+    
+    <!-- USB Transport -->
+    <key>com.apple.developer.driverkit.transport.usb</key>
+    <true/>
+    
+    <!-- Network Extension -->
+    <key>com.apple.developer.networking.networkextension</key>
+    <array>
+        <string>packet-tunnel-provider</string>
+        <string>app-proxy-provider</string>
+        <string>content-filter-provider</string>
+        <string>dns-proxy</string>
+    </array>
+    
+    <!-- System Extension -->
+    <key>com.apple.developer.system-extension.install</key>
+    <true/>
+    
+    <!-- DriverKit Family Matching -->
+    <key>com.apple.developer.driverkit.family.networking</key>
+    <true/>
+    
+    <key>com.apple.developer.driverkit.family.usb</key>
+    <array>
+        <string>IOUSBHostDevice</string>
+        <string>IOUSBHostInterface</string>
+    </array>
+    
+    <!-- Allow USB device access -->
+    <key>com.apple.developer.driverkit.userclient-access</key>
+    <array>
+        <string>com.opensource.RTL8814AUDriver</string>
+    </array>
+    
+    <!-- Communication with user space -->
+    <key>com.apple.developer.driverkit.communicates-with-drivers</key>
+    <true/>
+    
+    <!-- Required for firmware loading -->
+    <key>com.apple.security.files.user-selected.read-only</key>
+    <true/>
+    
+    <!-- App Sandbox (required for system extensions) -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    
+    <!-- Network access -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+    
+    <key>com.apple.security.network.server</key>
+    <true/>
+</dict>
+</plist>

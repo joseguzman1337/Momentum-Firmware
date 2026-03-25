@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>RTL88xxAUUserDriver</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.realtek.driver</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>RTL88xxAU DriverKit Network Extension</string>
+	<key>CFBundlePackageType</key>
+	<string>XPC!</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+
+	<!-- System extension (DriverKit) declaration -->
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.system-extension.driverkit.network</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>RTL88xxAUUserDriver</string>
+	</dict>
+
+	<!-- DriverKit transport hints; these will need to be refined for real hardware -->
+	<key>IOKitPersonalities</key>
+	<dict>
+		<key>RTL88xxAUUserDriver</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.realtek.driver</string>
+			<key>IOClass</key>
+			<string>RTL88xxAUUserDriver</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBHostInterface</string>
+			<key>IOUserClass</key>
+			<string>RTL88xxAUUserDriver</string>
+			<key>IOKitDebug</key>
+			<integer>65535</integer>
+			<!-- Match Realtek vendor + RTL8814AU-like product IDs as a placeholder -->
+			<key>idVendor</key>
+			<integer>3034</integer>
+			<key>idProduct</key>
+			<integer>34835</integer>
+		</dict>
+	</dict>
+</dict>
+</plist>
