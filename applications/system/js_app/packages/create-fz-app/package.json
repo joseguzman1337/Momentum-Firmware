@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "prompts": "^2.4.2",
-    "replace-in-file": "^8.2.0"
+    "replace-in-file": "^9.0.0"
   }
 }
