@@ -288,9 +288,11 @@ bool subghz_device_cc1101_ext_is_connect(void) {
         subghz_device_cc1101_ext_free();
     } else { // initialized
         furi_hal_spi_acquire(subghz_device_cc1101_ext->spi_bus_handle);
-        uint8_t partnumber = cc1101_get_partnumber(subghz_device_cc1101_ext->spi_bus_handle);
+        //a genuine CC1101 reads PARTNUM as 0x00, same as an empty bus; only VERSION
+        //separates them
+        uint8_t version = cc1101_get_version(subghz_device_cc1101_ext->spi_bus_handle);
         furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
-        ret = (partnumber != 0) && (partnumber != 0xFF);
+        ret = (version != 0) && (version != 0xFF);
     }
 
     return ret;
@@ -445,51 +447,67 @@ void subghz_device_cc1101_ext_reset(void) {
     furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
 }
 
+//The module is hot-pluggable, so a state transition that never happens has to be
+//survivable rather than fatal. The state is logged because it separates a module
+//that is gone (its bus reads back as IDLE) from one that is wedged
+static bool subghz_device_cc1101_ext_wait_state(CC1101State state, const char* name) {
+    if(cc1101_wait_status_state(subghz_device_cc1101_ext->spi_bus_handle, state, 10000)) {
+        return true;
+    }
+    const CC1101Status status =
+        cc1101_strobe(subghz_device_cc1101_ext->spi_bus_handle, CC1101_STROBE_SNOP);
+    FURI_LOG_E(TAG, "Timeout switching to %s, chip state %u", name, status.STATE);
+    return false;
+}
+
 void subghz_device_cc1101_ext_idle(void) {
     furi_hal_spi_acquire(subghz_device_cc1101_ext->spi_bus_handle);
     cc1101_switch_to_idle(subghz_device_cc1101_ext->spi_bus_handle);
-    //waiting for the chip to switch to IDLE mode
-    furi_check(cc1101_wait_status_state(
-        subghz_device_cc1101_ext->spi_bus_handle, CC1101StateIDLE, 10000));
+    subghz_device_cc1101_ext_wait_state(CC1101StateIDLE, "IDLE");
+
+    //unconditional - leaving the E07 amp keyed is worse than an unreached state
+    furi_hal_gpio_write(SUBGHZ_DEVICE_CC1101_EXT_E07_AMP_GPIO, 0);
     // Reset GDO2 (!TX/RX) to floating state
     cc1101_write_reg(
         subghz_device_cc1101_ext->spi_bus_handle, CC1101_IOCFG2, CC1101IocfgHighImpedance);
     furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
-    if(subghz_device_cc1101_ext->amp_and_leds) {
-        furi_hal_gpio_write(SUBGHZ_DEVICE_CC1101_EXT_E07_AMP_GPIO, 0);
-    }
 }
 
 void subghz_device_cc1101_ext_rx(void) {
     furi_hal_spi_acquire(subghz_device_cc1101_ext->spi_bus_handle);
     cc1101_switch_to_rx(subghz_device_cc1101_ext->spi_bus_handle);
-    //waiting for the chip to switch to Rx mode
-    furi_check(
-        cc1101_wait_status_state(subghz_device_cc1101_ext->spi_bus_handle, CC1101StateRX, 10000));
-    // Go GDO2 (!TX/RX) to high (RX state)
-    cc1101_write_reg(
-        subghz_device_cc1101_ext->spi_bus_handle, CC1101_IOCFG2, CC1101IocfgHW | CC1101_IOCFG_INV);
+    subghz_device_cc1101_ext_wait_state(CC1101StateRX, "RX");
 
-    furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
     if(subghz_device_cc1101_ext->amp_and_leds) {
         furi_hal_gpio_write(SUBGHZ_DEVICE_CC1101_EXT_E07_AMP_GPIO, 0);
     }
+    // Go GDO2 (!TX/RX) to high (RX state). Momentum uses this signal even
+    // when the optional E07 amplifier/LED control is disabled.
+    cc1101_write_reg(
+        subghz_device_cc1101_ext->spi_bus_handle,
+        CC1101_IOCFG2,
+        CC1101IocfgHW | CC1101_IOCFG_INV);
+
+    furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
 }
 
 bool subghz_device_cc1101_ext_tx(void) {
     if(subghz_device_cc1101_ext->regulation != SubGhzDeviceCC1101ExtRegulationTxRx) return false;
     furi_hal_spi_acquire(subghz_device_cc1101_ext->spi_bus_handle);
     cc1101_switch_to_tx(subghz_device_cc1101_ext->spi_bus_handle);
-    //waiting for the chip to switch to Tx mode
-    furi_check(
-        cc1101_wait_status_state(subghz_device_cc1101_ext->spi_bus_handle, CC1101StateTX, 10000));
-    // Go GDO2 (!TX/RX) to low (TX state)
-    cc1101_write_reg(subghz_device_cc1101_ext->spi_bus_handle, CC1101_IOCFG2, CC1101IocfgHW);
-    furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
-    if(subghz_device_cc1101_ext->amp_and_leds) {
-        furi_hal_gpio_write(SUBGHZ_DEVICE_CC1101_EXT_E07_AMP_GPIO, 1);
+    const bool in_tx = subghz_device_cc1101_ext_wait_state(CC1101StateTX, "TX");
+
+    if(in_tx) {
+        // Preserve Momentum's GDO2 TX/RX control for every external module,
+        // but never key the optional amp without a confirmed TX state.
+        cc1101_write_reg(subghz_device_cc1101_ext->spi_bus_handle, CC1101_IOCFG2, CC1101IocfgHW);
+        if(subghz_device_cc1101_ext->amp_and_leds) {
+            furi_hal_gpio_write(SUBGHZ_DEVICE_CC1101_EXT_E07_AMP_GPIO, 1);
+        }
     }
-    return true;
+
+    furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
+    return in_tx;
 }
 
 float subghz_device_cc1101_ext_get_rssi(void) {
@@ -574,10 +592,9 @@ uint32_t subghz_device_cc1101_ext_set_frequency(uint32_t value) {
         cc1101_set_frequency(subghz_device_cc1101_ext->spi_bus_handle, value);
     cc1101_calibrate(subghz_device_cc1101_ext->spi_bus_handle);
 
-    while(true) {
-        CC1101Status status = cc1101_get_status(subghz_device_cc1101_ext->spi_bus_handle);
-        if(status.STATE == CC1101StateIDLE) break;
-    }
+    //the hopper reaches this every hop - an unanswering module must not spin the
+    //calling thread into the watchdog
+    subghz_device_cc1101_ext_wait_state(CC1101StateIDLE, "IDLE after calibration");
 
     furi_hal_spi_release(subghz_device_cc1101_ext->spi_bus_handle);
     return real_frequency;
