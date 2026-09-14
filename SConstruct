@@ -78,7 +78,6 @@ if GetOption("fullenv") or any(
         "${ARGS}",
         "--bundlever",
         "${UPDATE_VERSION_STRING}",
-        "--I-understand-what-I-am-doing=yes",
     ]
     dist_radio_arguments = [
         "--radio",
@@ -124,14 +123,6 @@ if GetOption("fullenv") or any(
                 os.environ.get("FBT_RADIOADDR_HEX"),
             ]
         )
-    if os.environ.get("FBT_ALLOW_C2_OVERLAP"):
-        dist_basic_arguments.extend(
-            [
-                "--I-understand-what-I-am-doing",
-                "yes",
-            ]
-        )
-
     selfupdate_min_dist = distenv.DistCommand(
         "updater_minpackage",
         distenv["DIST_DEPENDS"],
