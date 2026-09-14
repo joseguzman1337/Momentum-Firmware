@@ -16,6 +16,20 @@ appenv = ENV["APPENV"] = ENV.Clone(
     ],
 )
 
+# External applications are linked as relocatable ELF files. GCC LTO strips
+# their loadable sections at the intermediate `-r` link, so keep LTO scoped to
+# the base firmware even when appenv inherits the compact firmware flags.
+_fap_incompatible_lto_flags = {
+    "-flto",
+    "-flto-partition=one",
+    "-fno-fat-lto-objects",
+    "-fipa-pta",
+}
+appenv.Replace(
+    CCFLAGS=[flag for flag in appenv["CCFLAGS"] if flag not in _fap_incompatible_lto_flags],
+    LINKFLAGS=[flag for flag in appenv["LINKFLAGS"] if flag not in _fap_incompatible_lto_flags],
+)
+
 appenv.Replace(
     LINKER_SCRIPT_PATH=appenv["APP_LINKER_SCRIPT_PATH"],
 )
