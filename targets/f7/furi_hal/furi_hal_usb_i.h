@@ -10,4 +10,5 @@ enum UsbDevDescStr {
     UsbDevManuf = 1,
     UsbDevProduct = 2,
     UsbDevSerial = 3,
+    UsbDevEthMac = 4,
 };

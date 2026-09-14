@@ -19,6 +19,7 @@ struct FuriHalUsbInterface {
     void* str_manuf_descr;
     void* str_prod_descr;
     void* str_serial_descr;
+    void* str_eth_mac_descr;
 
     void* cfg_descr;
 };
