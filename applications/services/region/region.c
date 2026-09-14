@@ -124,17 +124,15 @@ static void region_storage_callback(const void* message, void* context) {
     }
 }
 
-int32_t region_on_system_start(void* p) {
-    UNUSED(p);
+void region_on_system_start(void) {
 
     Storage* storage = furi_record_open(RECORD_STORAGE);
     furi_pubsub_subscribe(storage_get_pubsub(storage), region_storage_callback, NULL);
 
     if(storage_sd_status(storage) != FSE_OK) {
         FURI_LOG_D(TAG, "SD Card not ready, skipping dynamic region");
-        return 0;
+        return;
     }
 
     region_load_file(NULL);
-    return 0;
 }

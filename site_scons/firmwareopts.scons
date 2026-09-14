@@ -8,17 +8,18 @@ if ENV["DEBUG"] and ENV["IS_BASE_FIRMWARE"]:
             "NDEBUG",
         ],
         CCFLAGS=[
-            "-Os" if ENV["COMPACT"] else "-Og",
+            "-Oz" if ENV["COMPACT"] else "-Og",
         ],
     )
 elif ENV["COMPACT"]:
     ENV.Append(
         CPPDEFINES=[
             "FURI_NDEBUG",
+            "FURI_COMPACT_LOGS",
             "NDEBUG",
         ],
         CCFLAGS=[
-            "-Os",
+            "-Oz",
         ],
     )
 else:
@@ -47,6 +48,20 @@ ENV.AppendUnique(
         "-T${LINKER_SCRIPT_PATH}",
     ],
 )
+
+if ENV["COMPACT"] and ENV["IS_BASE_FIRMWARE"]:
+    ENV.AppendUnique(
+        CCFLAGS=[
+            "-flto",
+            "-flto-partition=one",
+            "-fno-fat-lto-objects",
+            "-fipa-pta",
+            "-fmerge-all-constants",
+            "-fno-unwind-tables",
+            "-fno-asynchronous-unwind-tables",
+        ],
+        LINKFLAGS=["-flto", "-flto-partition=one"],
+    )
 
 
 if ENV["FIRMWARE_BUILD_CFG"] == "updater":
