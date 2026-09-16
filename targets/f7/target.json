@@ -53,7 +53,12 @@
         "bit_lib",
         "toolbox",
         "datetime",
-        "ieee754_parse_wrap",
-        "lwip"
+        "ieee754_parse_wrap"
+    ],
+    "excluded_sources": [
+        "furi_hal_usb_eth.c"
+    ],
+    "excluded_headers": [
+        "furi_hal_usb_eth.h"
     ]
 }

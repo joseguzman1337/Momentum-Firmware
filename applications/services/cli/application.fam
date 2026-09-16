@@ -4,15 +4,78 @@ App(
     entry_point="cli_on_system_start",
     cdefines=["SRV_CLI"],
     sources=[
-        "cli_command_gpio.c",
-        "cli_main_commands.c",
+        "cli_bootstrap_commands.c",
         "cli_main_shell.c",
     ],
+    sdk_headers=["usb_ethernet_broker.h"],
     # This STARTUP has to be processed before those that depend on the "cli" record.
     # "cli" used to be a SERVICE, but it's been converted into a STARTUP in order to
     # reduce RAM usage. The "block until record has been created" mechanism
     # unfortunately leads to a deadlock if the STARTUPs are processed sequentially.
     order=0,
+)
+
+App(
+    appid="cli_info",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_info_ep",
+    requires=["cli"],
+    sources=["cli_info_command.c"],
+)
+
+App(
+    appid="cli_device_info",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_device_info_ep",
+    requires=["cli"],
+    sources=["cli_info_command.c"],
+)
+
+App(
+    appid="cli_log",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_log_ep",
+    requires=["cli"],
+    sources=["cli_main_commands.c"],
+)
+
+App(
+    appid="cli_free",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_free_ep",
+    requires=["cli"],
+    sources=["cli_main_commands.c"],
+)
+
+App(
+    appid="cli_free_blocks",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_free_blocks_ep",
+    requires=["cli"],
+    sources=["cli_main_commands.c"],
+)
+
+App(
+    appid="cli_echo",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_echo_ep",
+    requires=["cli"],
+    sources=["cli_main_commands.c"],
+)
+
+App(
+    appid="cli_sleep",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_sleep_ep",
+    requires=["cli"],
+    sources=["cli_main_commands.c"],
 )
 
 App(
@@ -161,6 +224,15 @@ App(
     targets=["f7"],
     apptype=FlipperAppType.PLUGIN,
     entry_point="cli_mesh_ep",
+    requires=["cli"],
+    sources=["cli_main_commands.c"],
+)
+
+App(
+    appid="cli_net",
+    targets=["f7"],
+    apptype=FlipperAppType.PLUGIN,
+    entry_point="cli_net_ep",
     requires=["cli"],
     sources=["cli_main_commands.c"],
 )

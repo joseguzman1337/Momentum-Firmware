@@ -7,6 +7,7 @@ Header,+,applications/services/bt/bt_service/bt.h,,
 Header,+,applications/services/bt/bt_service/bt_keys_storage.h,,
 Header,+,applications/services/cli/cli.h,,
 Header,+,applications/services/cli/cli_vcp.h,,
+Header,+,applications/services/cli/usb_ethernet_broker.h,,
 Header,+,applications/services/dialogs/dialogs.h,,
 Header,+,applications/services/dolphin/dolphin.h,,
 Header,+,applications/services/expansion/expansion.h,,
@@ -332,7 +333,7 @@ Header,+,targets/furi_hal_include/furi_hal_speaker.h,,
 Header,+,targets/furi_hal_include/furi_hal_spi.h,,
 Header,+,targets/furi_hal_include/furi_hal_usb.h,,
 Header,+,targets/furi_hal_include/furi_hal_usb_ccid.h,,
-Header,+,targets/furi_hal_include/furi_hal_usb_eth.h,,
+Header,+,targets/furi_hal_include/furi_hal_usb_eth_freertos.h,,
 Header,+,targets/furi_hal_include/furi_hal_usb_hid.h,,
 Header,+,targets/furi_hal_include/furi_hal_usb_hid_u2f.h,,
 Header,+,targets/furi_hal_include/furi_hal_version.h,,
@@ -1817,8 +1818,6 @@ Function,+,furi_hal_usb_ccid_remove_smartcard,void,
 Function,+,furi_hal_usb_ccid_set_callbacks,void,"CcidCallbacks*, void*"
 Function,+,furi_hal_usb_disable,void,
 Function,+,furi_hal_usb_enable,void,
-Function,+,furi_hal_usb_eth_http_download_to_file,_Bool,"const char*, const char*, uint32_t"
-Function,+,furi_hal_usb_eth_ping,_Bool,"const char*, uint32_t, uint32_t"
 Function,+,furi_hal_usb_get_config,FuriHalUsbInterface*,
 Function,-,furi_hal_usb_init,void,
 Function,+,furi_hal_usb_is_locked,_Bool,
@@ -3910,6 +3909,11 @@ Function,-,ungetc,int,"int, FILE*"
 Function,-,unsetenv,int,const char*
 Function,-,usbd_poll,void,usbd_device*
 Function,-,utoa,char*,"unsigned, char*, int"
+Function,+,vPortEnterCritical,void,
+Function,+,vPortExitCritical,void,
+Function,+,vQueueDelete,void,QueueHandle_t
+Function,+,vTaskDelete,void,TaskHandle_t
+Function,+,vTaskSuspend,void,TaskHandle_t
 Function,+,validator_is_file_alloc_init,ValidatorIsFile*,"const char*, const char*, const char*"
 Function,+,validator_is_file_callback,_Bool,"const char*, FuriString*, void*"
 Function,+,validator_is_file_free,void,ValidatorIsFile*
@@ -4053,6 +4057,15 @@ Function,+,widget_alloc,Widget*,
 Function,+,widget_free,void,Widget*
 Function,+,widget_get_view,View*,Widget*
 Function,+,widget_reset,void,Widget*
+Function,+,xQueueCreateMutex,QueueHandle_t,const uint8_t
+Function,+,xQueueGenericCreate,QueueHandle_t,"const UBaseType_t, const UBaseType_t, const uint8_t"
+Function,+,xQueueGenericSend,BaseType_t,"QueueHandle_t, const void* const, TickType_t, const BaseType_t"
+Function,+,xQueueGiveMutexRecursive,BaseType_t,QueueHandle_t
+Function,+,xQueueReceive,BaseType_t,"QueueHandle_t, void* const, TickType_t"
+Function,+,xQueueSemaphoreTake,BaseType_t,"QueueHandle_t, TickType_t"
+Function,+,xQueueTakeMutexRecursive,BaseType_t,"QueueHandle_t, TickType_t"
+Function,+,xTaskCreate,BaseType_t,"TaskFunction_t, const char* const, const uint16_t, void* const, UBaseType_t, TaskHandle_t* const"
+Function,+,xTaskGetTickCount,TickType_t,
 Function,-,y0,double,double
 Function,-,y0f,float,float
 Function,-,y1,double,double
@@ -4680,7 +4693,6 @@ Variable,-,suboptarg,char*,
 Variable,+,usb_ccid,FuriHalUsbInterface,
 Variable,+,usb_cdc_dual,FuriHalUsbInterface,
 Variable,+,usb_cdc_single,FuriHalUsbInterface,
-Variable,+,usb_eth,FuriHalUsbInterface,
 Variable,+,usb_hid,FuriHalUsbInterface,
 Variable,+,usb_hid_u2f,FuriHalUsbInterface,
 Variable,+,usbd_devfs,const usbd_driver,
