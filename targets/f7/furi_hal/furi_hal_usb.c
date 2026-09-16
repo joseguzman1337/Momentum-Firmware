@@ -114,7 +114,12 @@ void furi_hal_usb_init(void) {
     // Reset callback will be enabled after first mode change to avoid getting false reset events
 
     usb.enabled = false;
-    usb.interface = &usb_cdc_dual;
+    /* No interface has been initialized yet.  In particular, preselecting
+     * usb_cdc_dual here makes the first set_config(&usb_cdc_dual) look like a
+     * no-op, so its init callback is never run and the device disappears from
+     * USB after an update.  Keep the neutral state until the USB service
+     * explicitly selects CDC, HID, CCID, or the external Ethernet interface. */
+    usb.interface = NULL;
     NVIC_SetPriority(USB_LP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 5, 0));
     NVIC_SetPriority(USB_HP_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 15, 0));
     NVIC_EnableIRQ(USB_LP_IRQn);

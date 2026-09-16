@@ -72,7 +72,7 @@ def test_core_usb_keeps_cdc_vcp_and_has_no_ethernet_dependency():
     source = USB_CORE.read_text()
 
     assert "#include <furi_hal_usb_cdc.h>" in source
-    assert "usb.interface = &usb_cdc_dual;" in source
+    assert "usb.interface = NULL;" in source
     assert "furi_hal_usb_eth.h" not in source
 
 
@@ -118,3 +118,11 @@ def test_host_queried_device_info_stays_builtin_and_cannot_be_shadowed():
     assert 'registry, "info"' in bootstrap
     assert "plugin_manager_load_single" not in bootstrap
     assert "if(CliCommandDict_get(registry->commands, plugin_name)) continue;" in registry
+
+
+def test_usb_boot_starts_without_a_phantom_initialized_interface():
+    usb_hal = (ROOT / "targets/f7/furi_hal/furi_hal_usb.c").read_text()
+
+    assert "usb.interface = NULL;" in usb_hal
+    assert "usb.interface = &usb_cdc_dual;" not in usb_hal
+    assert "usb.interface = &usb_eth;" not in usb_hal
