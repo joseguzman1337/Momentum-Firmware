@@ -464,13 +464,19 @@ void cli_command_free(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(args);
     UNUSED(context);
 
-    printf("Free heap size: %zu\r\n", memmgr_get_free_heap());
-    printf("Total heap size: %zu\r\n", memmgr_get_total_heap());
-    printf("Minimum heap size: %zu\r\n", memmgr_get_minimum_free_heap());
-    printf("Maximum heap block: %zu\r\n", memmgr_heap_get_max_free_block());
-
-    printf("Pool free: %zu\r\n", memmgr_pool_get_free());
-    printf("Maximum pool block: %zu\r\n", memmgr_pool_get_max_block());
+    printf(
+        "Free heap size: %zu\r\n"
+        "Total heap size: %zu\r\n"
+        "Minimum heap size: %zu\r\n"
+        "Maximum heap block: %zu\r\n"
+        "Pool free: %zu\r\n"
+        "Maximum pool block: %zu\r\n",
+        memmgr_get_free_heap(),
+        memmgr_get_total_heap(),
+        memmgr_get_minimum_free_heap(),
+        memmgr_heap_get_max_free_block(),
+        memmgr_pool_get_free(),
+        memmgr_pool_get_max_block());
 }
 
 void cli_command_free_blocks(PipeSide* pipe, FuriString* args, void* context) {

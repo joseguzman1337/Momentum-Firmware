@@ -95,97 +95,108 @@ static const struct usb_device_descriptor eth_device_desc = {
 };
 
 static const struct EthConfigDescriptor eth_cfg_desc = {
-    .config = {
-        .bLength = sizeof(struct usb_config_descriptor),
-        .bDescriptorType = USB_DTYPE_CONFIGURATION,
-        .wTotalLength = sizeof(struct EthConfigDescriptor),
-        .bNumInterfaces = 2,
-        .bConfigurationValue = 1,
-        .iConfiguration = NO_DESCRIPTOR,
-        .bmAttributes = USB_CFG_ATTR_RESERVED | USB_CFG_ATTR_SELFPOWERED,
-        .bMaxPower = USB_CFG_POWER_MA(500),
-    },
-    .ecm = {
-        .iad = {
-            .bLength = sizeof(struct usb_iad_descriptor),
-            .bDescriptorType = USB_DTYPE_INTERFASEASSOC,
-            .bFirstInterface = 0,
-            .bInterfaceCount = 2,
-            .bFunctionClass = USB_CLASS_CDC,
-            .bFunctionSubClass = USB_CDC_SUBCLASS_ECM,
-            .bFunctionProtocol = 0x00,
-            .iFunction = NO_DESCRIPTOR,
+    .config =
+        {
+            .bLength = sizeof(struct usb_config_descriptor),
+            .bDescriptorType = USB_DTYPE_CONFIGURATION,
+            .wTotalLength = sizeof(struct EthConfigDescriptor),
+            .bNumInterfaces = 2,
+            .bConfigurationValue = 1,
+            .iConfiguration = NO_DESCRIPTOR,
+            .bmAttributes = USB_CFG_ATTR_RESERVED | USB_CFG_ATTR_SELFPOWERED,
+            .bMaxPower = USB_CFG_POWER_MA(500),
         },
-        .comm = {
-            .bLength = sizeof(struct usb_interface_descriptor),
-            .bDescriptorType = USB_DTYPE_INTERFACE,
-            .bInterfaceNumber = 0,
-            .bAlternateSetting = 0,
-            .bNumEndpoints = 1,
-            .bInterfaceClass = USB_CLASS_CDC,
-            .bInterfaceSubClass = USB_CDC_SUBCLASS_ECM,
-            .bInterfaceProtocol = 0x00,
-            .iInterface = NO_DESCRIPTOR,
+    .ecm =
+        {
+            .iad =
+                {
+                    .bLength = sizeof(struct usb_iad_descriptor),
+                    .bDescriptorType = USB_DTYPE_INTERFASEASSOC,
+                    .bFirstInterface = 0,
+                    .bInterfaceCount = 2,
+                    .bFunctionClass = USB_CLASS_CDC,
+                    .bFunctionSubClass = USB_CDC_SUBCLASS_ECM,
+                    .bFunctionProtocol = 0x00,
+                    .iFunction = NO_DESCRIPTOR,
+                },
+            .comm =
+                {
+                    .bLength = sizeof(struct usb_interface_descriptor),
+                    .bDescriptorType = USB_DTYPE_INTERFACE,
+                    .bInterfaceNumber = 0,
+                    .bAlternateSetting = 0,
+                    .bNumEndpoints = 1,
+                    .bInterfaceClass = USB_CLASS_CDC,
+                    .bInterfaceSubClass = USB_CDC_SUBCLASS_ECM,
+                    .bInterfaceProtocol = 0x00,
+                    .iInterface = NO_DESCRIPTOR,
+                },
+            .cdc_hdr =
+                {
+                    .bFunctionLength = sizeof(struct usb_cdc_header_desc),
+                    .bDescriptorType = USB_DTYPE_CS_INTERFACE,
+                    .bDescriptorSubType = USB_DTYPE_CDC_HEADER,
+                    .bcdCDC = VERSION_BCD(1, 1, 0),
+                },
+            .cdc_union =
+                {
+                    .bFunctionLength = sizeof(struct usb_cdc_union_desc),
+                    .bDescriptorType = USB_DTYPE_CS_INTERFACE,
+                    .bDescriptorSubType = USB_DTYPE_CDC_UNION,
+                    .bMasterInterface0 = 0,
+                    .bSlaveInterface0 = 1,
+                },
+            .ecm_desc =
+                {
+                    .bLength = sizeof(struct usb_cdc_ecm_desc),
+                    .bDescriptorType = USB_DTYPE_CS_INTERFACE,
+                    .bDescriptorSubType = USB_DTYPE_CDC_ECM,
+                    .iMACAddress = UsbDevEthMac,
+                    .bmEthernetStatistics = 0,
+                    .wMaxSegmentSize = 1514,
+                    .wNumberMCFilters = 0,
+                    .bNumberPowerFilters = 0,
+                },
+            .ntf_ep =
+                {
+                    .bLength = sizeof(struct usb_endpoint_descriptor),
+                    .bDescriptorType = USB_DTYPE_ENDPOINT,
+                    .bEndpointAddress = ETH_RNDIS_NTF_EP,
+                    .bmAttributes = USB_EPTYPE_INTERRUPT,
+                    .wMaxPacketSize = ETH_RNDIS_NTF_SZ,
+                    .bInterval = 0x01,
+                },
+            .data =
+                {
+                    .bLength = sizeof(struct usb_interface_descriptor),
+                    .bDescriptorType = USB_DTYPE_INTERFACE,
+                    .bInterfaceNumber = 1,
+                    .bAlternateSetting = 0,
+                    .bNumEndpoints = 2,
+                    .bInterfaceClass = USB_CLASS_CDC_DATA,
+                    .bInterfaceSubClass = 0x00,
+                    .bInterfaceProtocol = 0x00,
+                    .iInterface = NO_DESCRIPTOR,
+                },
+            .data_rx =
+                {
+                    .bLength = sizeof(struct usb_endpoint_descriptor),
+                    .bDescriptorType = USB_DTYPE_ENDPOINT,
+                    .bEndpointAddress = ETH_RNDIS_RX_EP,
+                    .bmAttributes = USB_EPTYPE_BULK,
+                    .wMaxPacketSize = ETH_RNDIS_DATA_SZ,
+                    .bInterval = 0x01,
+                },
+            .data_tx =
+                {
+                    .bLength = sizeof(struct usb_endpoint_descriptor),
+                    .bDescriptorType = USB_DTYPE_ENDPOINT,
+                    .bEndpointAddress = ETH_RNDIS_TX_EP,
+                    .bmAttributes = USB_EPTYPE_BULK,
+                    .wMaxPacketSize = ETH_RNDIS_DATA_SZ,
+                    .bInterval = 0x01,
+                },
         },
-        .cdc_hdr = {
-            .bFunctionLength = sizeof(struct usb_cdc_header_desc),
-            .bDescriptorType = USB_DTYPE_CS_INTERFACE,
-            .bDescriptorSubType = USB_DTYPE_CDC_HEADER,
-            .bcdCDC = VERSION_BCD(1, 1, 0),
-        },
-        .cdc_union = {
-            .bFunctionLength = sizeof(struct usb_cdc_union_desc),
-            .bDescriptorType = USB_DTYPE_CS_INTERFACE,
-            .bDescriptorSubType = USB_DTYPE_CDC_UNION,
-            .bMasterInterface0 = 0,
-            .bSlaveInterface0 = 1,
-        },
-        .ecm_desc = {
-            .bLength = sizeof(struct usb_cdc_ecm_desc),
-            .bDescriptorType = USB_DTYPE_CS_INTERFACE,
-            .bDescriptorSubType = USB_DTYPE_CDC_ECM,
-            .iMACAddress = UsbDevEthMac,
-            .bmEthernetStatistics = 0,
-            .wMaxSegmentSize = 1514,
-            .wNumberMCFilters = 0,
-            .bNumberPowerFilters = 0,
-        },
-        .ntf_ep = {
-            .bLength = sizeof(struct usb_endpoint_descriptor),
-            .bDescriptorType = USB_DTYPE_ENDPOINT,
-            .bEndpointAddress = ETH_RNDIS_NTF_EP,
-            .bmAttributes = USB_EPTYPE_INTERRUPT,
-            .wMaxPacketSize = ETH_RNDIS_NTF_SZ,
-            .bInterval = 0x01,
-        },
-        .data = {
-            .bLength = sizeof(struct usb_interface_descriptor),
-            .bDescriptorType = USB_DTYPE_INTERFACE,
-            .bInterfaceNumber = 1,
-            .bAlternateSetting = 0,
-            .bNumEndpoints = 2,
-            .bInterfaceClass = USB_CLASS_CDC_DATA,
-            .bInterfaceSubClass = 0x00,
-            .bInterfaceProtocol = 0x00,
-            .iInterface = NO_DESCRIPTOR,
-        },
-        .data_rx = {
-            .bLength = sizeof(struct usb_endpoint_descriptor),
-            .bDescriptorType = USB_DTYPE_ENDPOINT,
-            .bEndpointAddress = ETH_RNDIS_RX_EP,
-            .bmAttributes = USB_EPTYPE_BULK,
-            .wMaxPacketSize = ETH_RNDIS_DATA_SZ,
-            .bInterval = 0x01,
-        },
-        .data_tx = {
-            .bLength = sizeof(struct usb_endpoint_descriptor),
-            .bDescriptorType = USB_DTYPE_ENDPOINT,
-            .bEndpointAddress = ETH_RNDIS_TX_EP,
-            .bmAttributes = USB_EPTYPE_BULK,
-            .wMaxPacketSize = ETH_RNDIS_DATA_SZ,
-            .bInterval = 0x01,
-        },
-    },
 };
 
 static const struct usb_string_descriptor eth_mac_desc = USB_STRING_DESC("F20000000001");
@@ -220,14 +231,22 @@ static FuriStreamBuffer* eth_rx_stream = NULL;
 static FuriThread* eth_rx_thread = NULL;
 static volatile bool eth_rx_thread_run = false;
 
+#define ETH_FRAME_BUFFER_SIZE 2048
+typedef struct {
+    uint8_t tx[ETH_FRAME_BUFFER_SIZE];
+    uint8_t rx_worker[ETH_FRAME_BUFFER_SIZE];
+    uint8_t rx_isr[ETH_FRAME_BUFFER_SIZE];
+} EthFrameBuffers;
+
+static EthFrameBuffers* eth_frame_buffers = NULL;
+
 static err_t eth_low_level_output(struct netif* netif, struct pbuf* p) {
     UNUSED(netif);
     if(!eth_connected) return ERR_CONN;
 
-    static uint8_t tx_buf[2048];
-    pbuf_copy_partial(p, tx_buf, p->tot_len, 0);
+    pbuf_copy_partial(p, eth_frame_buffers->tx, p->tot_len, 0);
 
-    if(usbd_ep_write(usb_dev, ETH_RNDIS_TX_EP, tx_buf, p->tot_len) < 0) {
+    if(usbd_ep_write(usb_dev, ETH_RNDIS_TX_EP, eth_frame_buffers->tx, p->tot_len) < 0) {
         return ERR_IF;
     }
 
@@ -240,7 +259,7 @@ static err_t eth_netif_init(struct netif* netif) {
     netif->output = etharp_output;
     netif->linkoutput = eth_low_level_output;
     netif->hwaddr_len = 6;
-    
+
     netif->hwaddr[0] = 0xF2;
     netif->hwaddr[1] = 0x00;
     netif->hwaddr[2] = 0x00;
@@ -257,20 +276,19 @@ static err_t eth_netif_init(struct netif* netif) {
 /* Worker thread: processes raw ethernet frames posted from USB ISR */
 static int32_t eth_rx_worker(void* context) {
     UNUSED(context);
-    static uint8_t rx_data[2048];
-
     while(eth_rx_thread_run) {
         uint16_t pkt_len = 0;
         size_t read = furi_stream_buffer_receive(eth_rx_stream, &pkt_len, sizeof(pkt_len), 500);
         if(read != sizeof(pkt_len)) continue;
-        if(pkt_len == 0 || pkt_len > sizeof(rx_data)) continue;
+        if(pkt_len == 0 || pkt_len > ETH_FRAME_BUFFER_SIZE) continue;
 
-        read = furi_stream_buffer_receive(eth_rx_stream, rx_data, pkt_len, 100);
+        read =
+            furi_stream_buffer_receive(eth_rx_stream, eth_frame_buffers->rx_worker, pkt_len, 100);
         if(read != pkt_len) continue;
 
         struct pbuf* p = pbuf_alloc(PBUF_RAW, pkt_len, PBUF_POOL);
         if(p != NULL) {
-            pbuf_take(p, rx_data, pkt_len);
+            pbuf_take(p, eth_frame_buffers->rx_worker, pkt_len);
             if(eth_netif.input(p, &eth_netif) != ERR_OK) {
                 pbuf_free(p);
             }
@@ -291,13 +309,13 @@ static void eth_rx_callback(usbd_device* dev, uint8_t event, uint8_t ep) {
 
     if(!eth_rx_stream) return;
 
-    static uint8_t rx_buf[2048];
-    int32_t len = usbd_ep_read(usb_dev, ETH_RNDIS_RX_EP, rx_buf, sizeof(rx_buf));
+    int32_t len =
+        usbd_ep_read(usb_dev, ETH_RNDIS_RX_EP, eth_frame_buffers->rx_isr, ETH_FRAME_BUFFER_SIZE);
     if(len > 0) {
         uint16_t pkt_len = (uint16_t)len;
         /* furi_stream_buffer_send detects ISR context and uses xStreamBufferSendFromISR */
         furi_stream_buffer_send(eth_rx_stream, &pkt_len, sizeof(pkt_len), 0);
-        furi_stream_buffer_send(eth_rx_stream, rx_buf, len, 0);
+        furi_stream_buffer_send(eth_rx_stream, eth_frame_buffers->rx_isr, len, 0);
     }
 }
 
@@ -332,6 +350,7 @@ static void eth_init(usbd_device* dev, FuriHalUsbInterface* intf, void* ctx) {
     }
 
     /* Start ISR-safe RX worker */
+    eth_frame_buffers = malloc(sizeof(EthFrameBuffers));
     eth_rx_thread_run = true;
     eth_rx_stream = furi_stream_buffer_alloc(ETH_RX_STREAM_SIZE, 1);
     eth_rx_thread = furi_thread_alloc_ex("UsbEthRx", 1024, eth_rx_worker, NULL);
@@ -352,6 +371,9 @@ static void eth_deinit(usbd_device* dev) {
         furi_stream_buffer_free(eth_rx_stream);
         eth_rx_stream = NULL;
     }
+
+    free(eth_frame_buffers);
+    eth_frame_buffers = NULL;
 
     if(eth_netif_added) {
         dhcp_stop(&eth_netif);
@@ -385,9 +407,9 @@ static usbd_respond eth_ep_config(usbd_device* dev, uint8_t cfg) {
         usbd_ep_config(dev, ETH_RNDIS_NTF_EP, USB_EPTYPE_INTERRUPT, ETH_RNDIS_NTF_SZ);
         usbd_ep_config(dev, ETH_RNDIS_TX_EP, USB_EPTYPE_BULK, ETH_RNDIS_DATA_SZ);
         usbd_ep_config(dev, ETH_RNDIS_RX_EP, USB_EPTYPE_BULK, ETH_RNDIS_DATA_SZ);
-        
+
         usbd_reg_endpoint(dev, ETH_RNDIS_RX_EP, eth_rx_callback);
-        
+
         return usbd_ack;
     default:
         return usbd_fail;
@@ -398,7 +420,9 @@ static usbd_respond eth_control(usbd_device* dev, usbd_ctlreq* req, usbd_rqc_cal
     UNUSED(dev);
     UNUSED(callback);
 
-    if(((USB_REQ_RECIPIENT | USB_REQ_TYPE) & req->bmRequestType) == (USB_REQ_INTERFACE | USB_REQ_CLASS) && req->wIndex == 0) {
+    if(((USB_REQ_RECIPIENT | USB_REQ_TYPE) & req->bmRequestType) ==
+           (USB_REQ_INTERFACE | USB_REQ_CLASS) &&
+       req->wIndex == 0) {
         switch(req->bRequest) {
         case 0x43: /* SET_ETHERNET_PACKET_FILTER */
             return usbd_ack;
@@ -533,7 +557,10 @@ static bool usb_eth_http_parse_url(
     return true;
 }
 
-bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_path, uint32_t timeout_ms) {
+bool furi_hal_usb_eth_http_download_to_file(
+    const char* url,
+    const char* dest_path,
+    uint32_t timeout_ms) {
     UNUSED(timeout_ms); /* Currently unused: we wait until HTTP client finishes internally. */
 
     if(!url || !dest_path) return false;
@@ -588,7 +615,8 @@ bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_pa
     }
 
     httpc_state_t* connection = NULL;
-    err_t err = httpc_get_file_dns(host, port, uri, &ctx.settings, usb_eth_http_recv, &ctx, &connection);
+    err_t err =
+        httpc_get_file_dns(host, port, uri, &ctx.settings, usb_eth_http_recv, &ctx, &connection);
     if(err != ERR_OK) {
         FURI_LOG_E(TAG, "usb_eth_http: httpc_get_file_dns failed (%d)", err);
         furi_semaphore_free(ctx.done_sem);
@@ -635,7 +663,10 @@ bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_pa
 
 #else /* LWIP_TCP && LWIP_CALLBACK_API */
 
-bool furi_hal_usb_eth_http_download_to_file(const char* url, const char* dest_path, uint32_t timeout_ms) {
+bool furi_hal_usb_eth_http_download_to_file(
+    const char* url,
+    const char* dest_path,
+    uint32_t timeout_ms) {
     UNUSED(url);
     UNUSED(dest_path);
     UNUSED(timeout_ms);
@@ -673,7 +704,8 @@ typedef struct {
     bool received;
 } UsbEthPingContext;
 
-static u8_t usb_eth_ping_recv(void* arg, struct raw_pcb* pcb, struct pbuf* p, const ip_addr_t* addr) {
+static u8_t
+    usb_eth_ping_recv(void* arg, struct raw_pcb* pcb, struct pbuf* p, const ip_addr_t* addr) {
     UsbEthPingContext* ctx = arg;
     UNUSED(pcb);
     UNUSED(addr);
