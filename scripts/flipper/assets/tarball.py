@@ -1,6 +1,7 @@
 import io
 import gzip
 import tarfile
+from pathlib import Path
 
 import heatshrink2
 
@@ -37,7 +38,20 @@ def compress_tree_tarball(
         mode="w:",
         format=FLIPPER_TAR_FORMAT,
     ) as tarball:
-        tarball.add(src_dir, arcname="", filter=filter)
+        # tarfile.add() follows filesystem enumeration order recursively, which
+        # is not stable across repeated builds. Add every member explicitly in
+        # lexical archive-name order while retaining the same root entry.
+        source = Path(src_dir)
+        tarball.add(source, arcname="", recursive=False, filter=filter)
+        for entry in sorted(
+            source.rglob("*"), key=lambda path: path.relative_to(source).as_posix()
+        ):
+            tarball.add(
+                entry,
+                arcname=entry.relative_to(source).as_posix(),
+                recursive=False,
+                filter=filter,
+            )
     plain_tar.seek(0)
     src_data = plain_tar.read()
 

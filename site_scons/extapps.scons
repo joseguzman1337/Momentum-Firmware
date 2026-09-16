@@ -24,6 +24,8 @@ _fap_incompatible_lto_flags = {
     "-flto-partition=one",
     "-fno-fat-lto-objects",
     "-fipa-pta",
+    # GNU ld rejects relaxation for the relocatable (-r/-Ur) link used by FAPs.
+    "-Wl,--relax",
 }
 appenv.Replace(
     CCFLAGS=[flag for flag in appenv["CCFLAGS"] if flag not in _fap_incompatible_lto_flags],
@@ -137,6 +139,7 @@ Alias("api_check", api_check)
 firmware_apitable = appenv.ApiSymbolTable(
     "${BUILD_DIR}/assets/compiled/firmware_api_table.h", appenv["SDK_DEFINITION"]
 )
+Depends(firmware_apitable, "#scripts/fbt_tools/fbt_sdk.py")
 Alias("api_table", firmware_apitable)
 ENV.Replace(
     FW_API_TABLE=firmware_apitable,

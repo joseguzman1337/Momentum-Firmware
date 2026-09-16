@@ -1,0 +1,16 @@
+{
+  "firmware": "build/f7-firmware-C/firmware.bin",
+  "output": ".ai/logs/qemu-fw/fw-review-v2",
+  "oracle_snapshot": ".ai/fz-emulator/snapshot",
+  "sd_tree": ".ai/fz-emulator/sd-fixture",
+  "internal_flash_image": ".ai/fz-emulator/internal-flash.json",
+  "virtual_usb": true,
+  "max_instructions": 250000000,
+  "verbosity": 1,
+  "inputs": [
+    {"button": "OK", "action": "PRESS"},
+    {"button": "OK", "action": "RELEASE"},
+    {"button": "BACK", "action": "PRESS"},
+    {"button": "BACK", "action": "RELEASE"}
+  ]
+}

@@ -179,6 +179,21 @@ void view_dispatcher_remove_view(ViewDispatcher* view_dispatcher, uint32_t view_
  */
 void view_dispatcher_switch_to_view(ViewDispatcher* view_dispatcher, uint32_t view_id);
 
+/** Show the built-in loading animation until the next view switch
+ *
+ * For work that has to happen before an application can show its own first screen. The view is
+ * allocated on first use and belongs to the ViewDispatcher: it takes no view id, needs no removal,
+ * and is freed with the dispatcher. Switch to an application view to dismiss it.
+ *
+ * @note Keys pressed while it is up are discarded when switching away, unless an input sequence
+ *       is already in flight.
+ * @note It consumes every key while current, including Back; ensure the covered work terminates.
+ * @note For a spinner over a live view, add an application-owned Loading to a ViewStack instead.
+ *
+ * @param view_dispatcher ViewDispatcher instance
+ */
+void view_dispatcher_show_loading(ViewDispatcher* view_dispatcher);
+
 /** Send ViewPort of this ViewDispatcher instance to front
  *
  * @param      view_dispatcher  ViewDispatcher instance

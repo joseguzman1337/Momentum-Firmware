@@ -1,1 +1,1 @@
-{"yolo_mode": true, "silent_mode": true, "log_dir": ".ai/logs", "auto_merge": true}
+{"yolo_mode": true, "silent_mode": true, "log_dir": ".ai/logs", "auto_merge": true, "configuration_status": "legacy-metadata-only", "execution_notice": "These flags describe legacy intent and do not enable command execution, approval bypass, or automatic merging."}

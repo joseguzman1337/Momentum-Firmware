@@ -1,14 +1,17 @@
 {
   "mcpServers": {
     "gemini-super": {
-      "command": "python",
-      "args": [".ai/gemini/super_agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/gemini",
-        "AUTO_MERGE": "true",
-        "CHECKPOINTING": "true",
-        "YOLO_MODE": "true"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "CHECKPOINTING": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "gemini-super",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the gemini-super identity; legacy super-agent and automation labels are metadata only"
     }
   }
 }

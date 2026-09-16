@@ -1,31 +1,33 @@
 {
   "mcpServers": {
     "codex-agent": {
-      "command": "python",
-      "args": [".ai/codex/agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/codex",
-        "AUTO_MERGE": "true",
-        "YOLO_MODE": "true",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "OPENAI_API_KEY": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "codex-agent",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the codex-agent identity; legacy Codex and automation labels are metadata only and make no external calls"
     }
   },
   "agentConfig": {
     "name": "Codex Agent",
-    "description": "Automated issue resolution and feature implementation",
-    "status": "YOLO Mode - Auto-running 24/7 with instant PR submission",
+    "description": "Read-only repository status compatibility adapter registered under the Codex identity",
+    "status": "On-demand MCP; no background monitoring, code generation, PR submission, or merge execution",
     "capabilities": [
-      "Feature requests auto-assignment and auto-merge",
-      "Code generation and refactoring",
-      "AI-to-AI coordination via MCP server",
-      "Zero-touch issue resolution pipeline"
+      "Read repository branch and HEAD",
+      "Read scoped worktree status",
+      "Run non-mutating git diff validation",
+      "Describe the adapter's actual capability surface"
     ],
     "workflow": [
-      "Continuously monitors GitHub issues",
-      "Auto-assigns and implements fixes instantly", 
-      "Auto-submits PRs with 'Closes #N' and merges",
-      "AI-to-AI coordination via .ai/codex/ MCP server"
+      "Start only when an MCP client launches it",
+      "Respond only to explicit MCP tool calls",
+      "Never mutate files or contact GitHub"
     ]
   }
 }

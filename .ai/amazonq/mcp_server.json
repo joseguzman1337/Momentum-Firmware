@@ -1,14 +1,17 @@
 {
   "mcpServers": {
     "amazonq-agent": {
-      "command": "python",
-      "args": [".ai/amazonq/agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/amazonq",
-        "AUTO_MERGE": "true",
-        "YOLO_MODE": "true",
-        "AWS_REGION": "us-east-1"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "AWS_REGION": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "amazonq-agent",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the amazonq-agent identity; legacy automation and AWS labels are metadata only and perform no merge or cloud action"
     }
   }
 }

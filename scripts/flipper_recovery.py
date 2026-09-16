@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
 import glob
 import hashlib
 import json
@@ -14,7 +15,9 @@ import struct
 import subprocess
 import sys
 import tempfile
+import threading
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Sequence
 
@@ -23,6 +26,7 @@ FLASH_BASE = 0x08000000
 FLASH_PHYSICAL_END = 0x08100000
 CONFIRM = "FLASH_VERIFIED_IMAGE"
 Runner = Callable[..., subprocess.CompletedProcess]
+_MONITOR_THREAD_LOCK = threading.RLock()
 
 
 def workspace() -> Path:
@@ -260,7 +264,7 @@ def _external_watchers() -> list[str]:
 
 def monitor_paths(root: Path, *, create: bool = False) -> dict[str, Path]:
     base = recovery_dir(root, create=create)
-    return {name: base / filename for name, filename in {"pid": "monitor.pid", "state": "monitor.json", "arm": "armed.json", "log": "monitor.log", "history": "history.jsonl"}.items()}
+    return {name: base / filename for name, filename in {"pid": "monitor.pid", "state": "monitor.json", "arm": "armed.json", "log": "monitor.log", "history": "history.jsonl", "state_lock": "monitor.state.lock"}.items()}
 
 
 def _read_json(path: Path) -> dict | None:
@@ -324,6 +328,20 @@ def append_history(path: Path, record: dict) -> None:
         os.close(fd)
 
 
+@contextmanager
+def _monitor_state_lock(path: Path):
+    """Serialize the monitor state/journal commit across threads and processes."""
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    with _MONITOR_THREAD_LOCK:
+        fd = os.open(path, os.O_RDWR | os.O_CREAT, 0o600)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            yield
+        finally:
+            fcntl.flock(fd, fcntl.LOCK_UN)
+            os.close(fd)
+
+
 def get_monitor_history(root: Path, limit: int = 100, since: float | None = None, state: str | None = None) -> list[dict]:
     """Read JSONL history without creating or modifying any file."""
     path = monitor_paths(root)["history"]
@@ -355,17 +373,46 @@ def arm_monitor(image: Path, *, root: Path, port: str, confirm: str) -> dict:
     return {"armed": True, **value}
 
 
+def _claim_arm(path: Path) -> tuple[dict | None, Path | None]:
+    """Atomically move a one-shot arm out of reach of competing monitor cycles."""
+    fd, candidate = tempfile.mkstemp(prefix=".armed.claim.", dir=path.parent)
+    os.close(fd)
+    os.unlink(candidate)
+    claim = Path(candidate)
+    try:
+        os.replace(path, claim)
+    except FileNotFoundError:
+        return None, None
+    return _read_json(claim), claim
+
+
+def _restore_arm(path: Path, claim: Path, armed: dict) -> bool:
+    """Restore a failed/retryable claim without overwriting a newer authorization."""
+    atomic_json(claim, armed)
+    try:
+        os.link(claim, path)
+    except FileExistsError:
+        claim.unlink(missing_ok=True)
+        return False
+    claim.unlink(missing_ok=True)
+    return True
+
+
 def monitor_once(root: Path, *, runner: Runner = subprocess.run, dry_run: bool = False, heartbeat_seconds: float = 60.0, absent_threshold: int = 3) -> dict:
     paths = monitor_paths(root, create=True)
-    started = time.monotonic(); previous = _read_json(paths["state"]) or {}; now = time.time()
+    started = time.monotonic(); now = time.time()
     observed = devices()
     result: dict = {"observed_at": now, "devices": observed, "action": "observe_only"}
     armed = _read_json(paths["arm"])
+    claim = None
     if armed and observed["blackmagic"]:
+        armed, claim = _claim_arm(paths["arm"])
+    if armed and claim is not None:
         image = Path(armed.get("image", ""))
         if now < float(armed.get("next_retry_at", 0)):
             result["action"] = "retry_wait"
             result["next_retry_at"] = armed["next_retry_at"]
+            result["arm_restored"] = _restore_arm(paths["arm"], claim, armed)
         else:
             try:
                 checked = validate_image(image)
@@ -379,7 +426,7 @@ def monitor_once(root: Path, *, runner: Runner = subprocess.run, dry_run: bool =
                 verified_load = result["flash"].get("returncode") == 0 and positive_load and not negative_load
                 result["verified_load"] = verified_load
                 if verified_load:
-                    paths["arm"].unlink(missing_ok=True)
+                    claim.unlink(missing_ok=True)
                 else:
                     raise RuntimeError(f"SWD load not verified (rc={result['flash'].get('returncode')})\n{flash_output}")
             except Exception as error:
@@ -387,46 +434,57 @@ def monitor_once(root: Path, *, runner: Runner = subprocess.run, dry_run: bool =
                 last_error = sanitized_evidence(str(error), 2000)
                 next_retry_at = now + monitor_backoff(attempts, base=2.0, maximum=300.0)
                 armed.update({"attempts": attempts, "last_error": last_error, "next_retry_at": next_retry_at, "last_attempt_at": now})
-                atomic_json(paths["arm"], armed)
+                result["arm_restored"] = _restore_arm(paths["arm"], claim, armed)
+                result["arm_superseded"] = not result["arm_restored"]
                 result["action"] = "flash_failed" if "flash" in result else "refused"
                 result["error"] = last_error
                 result["next_retry_at"] = next_retry_at
-    if result["action"] == "swd_flash": candidate_state = "flash_succeeded"
-    elif result["action"] == "flash_failed": candidate_state = "flash_failed"
-    elif result["action"] == "refused": candidate_state = "refused"
-    elif result["action"] == "retry_wait": candidate_state = previous.get("state") or "retry_wait"
-    elif observed["flipper"]: candidate_state = "flipper_online"
-    elif observed["blackmagic"]: candidate_state = "devboard_online"
-    elif armed: candidate_state = "armed_waiting"
-    else: candidate_state = "absent"
-    threshold = max(3, int(absent_threshold))
-    raw_absent = candidate_state == "absent"
-    miss_count = int(previous.get("miss_count", 0)) + 1 if raw_absent else 0
-    # Backward migration: pre-hysteresis state persisted the effective inventory
-    # only in `devices`. Preserve it across the first transient miss after upgrade.
-    last_known_devices = previous.get("last_known_devices") or previous.get("devices") or {}
-    if not raw_absent:
-        last_known_devices = observed
-    transient_miss = raw_absent and miss_count < threshold
-    if transient_miss:
-        state = previous.get("state") or "unknown"
-        result["raw_devices"] = observed
-        result["devices"] = last_known_devices
-    else:
-        state = candidate_state
-    failed = state in ("flash_failed", "refused")
-    errors = int(previous.get("consecutive_errors", 0)) + 1 if failed else 0
-    cycle = int(previous.get("cycle", 0)) + 1
-    transition = state != previous.get("state")
-    last_heartbeat = float(previous.get("last_heartbeat", 0))
-    event = "transient_miss" if transient_miss else "transition" if transition else "heartbeat" if now - last_heartbeat >= heartbeat_seconds else None
-    flash = result.get("flash", {})
-    evidence = sanitized_evidence("\n".join(filter(None, [flash.get("stdout", ""), flash.get("stderr", "")])))
-    record = {"timestamp": now, "cycle": cycle, "event": event, "state": state, "previous_state": previous.get("state"), "probe_port": (armed or {}).get("port"), "swd_outcome": result["action"], "target": (armed or {}).get("image"), "image_sha256": (armed or {}).get("sha256"), "consecutive_errors": errors, "miss_count": miss_count, "raw_source": observed.get("source"), "elapsed_seconds": round(time.monotonic() - started, 6), "gdb_rc": flash.get("returncode"), "evidence": evidence}
-    if event:
-        append_history(paths["history"], record); last_heartbeat = now
-    result.update({"state": state, "effective_state": state, "cycle": cycle, "transition": transition, "transient_miss": transient_miss, "miss_count": miss_count, "absent_threshold": threshold, "last_known_devices": last_known_devices, "consecutive_errors": errors, "last_heartbeat": last_heartbeat, "next_delay": monitor_backoff(errors)})
-    atomic_json(paths["state"], result)
+    # Device probing and a potentially slow SWD operation stay outside this
+    # critical section. Only the state-machine transition and its journal/state
+    # commit are serialized, so every completed observation receives a unique
+    # cycle and cannot overwrite another cycle's history or current state.
+    with _monitor_state_lock(paths["state_lock"]):
+        previous = _read_json(paths["state"]) or {}
+        if result["action"] == "swd_flash": candidate_state = "flash_succeeded"
+        elif result["action"] == "flash_failed": candidate_state = "flash_failed"
+        elif result["action"] == "refused": candidate_state = "refused"
+        elif result["action"] == "retry_wait": candidate_state = previous.get("state") or "retry_wait"
+        elif observed["flipper"]: candidate_state = "flipper_online"
+        elif observed["blackmagic"]: candidate_state = "devboard_online"
+        elif armed: candidate_state = "armed_waiting"
+        else: candidate_state = "absent"
+        threshold = max(3, int(absent_threshold))
+        raw_absent = candidate_state == "absent"
+        miss_count = int(previous.get("miss_count", 0)) + 1 if raw_absent else 0
+        # Backward migration: pre-hysteresis state persisted the effective inventory
+        # only in `devices`. Preserve it across the first transient miss after upgrade.
+        last_known_devices = previous.get("last_known_devices") or previous.get("devices") or {}
+        if not raw_absent:
+            last_known_devices = observed
+        transient_miss = raw_absent and miss_count < threshold
+        if transient_miss:
+            state = previous.get("state") or "unknown"
+            result["raw_devices"] = observed
+            result["devices"] = last_known_devices
+        else:
+            state = candidate_state
+        failed = state in ("flash_failed", "refused")
+        errors = int(previous.get("consecutive_errors", 0)) + 1 if failed else 0
+        cycle = int(previous.get("cycle", 0)) + 1
+        transition = state != previous.get("state")
+        last_heartbeat = float(previous.get("last_heartbeat", 0))
+        # Observations may finish out of order. Commit time must never precede
+        # the last serialized heartbeat or a later-finishing thread can vanish
+        # from a zero-interval journal.
+        event_now = max(now, last_heartbeat, time.time())
+        event = "transient_miss" if transient_miss else "transition" if transition else "heartbeat" if event_now - last_heartbeat >= heartbeat_seconds else None
+        flash = result.get("flash", {})
+        evidence = sanitized_evidence("\n".join(filter(None, [flash.get("stdout", ""), flash.get("stderr", "")])))
+        record = {"timestamp": event_now, "cycle": cycle, "event": event, "state": state, "previous_state": previous.get("state"), "probe_port": (armed or {}).get("port"), "swd_outcome": result["action"], "target": (armed or {}).get("image"), "image_sha256": (armed or {}).get("sha256"), "consecutive_errors": errors, "miss_count": miss_count, "raw_source": observed.get("source"), "elapsed_seconds": round(time.monotonic() - started, 6), "gdb_rc": flash.get("returncode"), "evidence": evidence}
+        if event:
+            append_history(paths["history"], record); last_heartbeat = event_now
+        result.update({"state": state, "effective_state": state, "cycle": cycle, "transition": transition, "transient_miss": transient_miss, "miss_count": miss_count, "absent_threshold": threshold, "last_known_devices": last_known_devices, "consecutive_errors": errors, "last_heartbeat": last_heartbeat, "next_delay": monitor_backoff(errors)})
+        atomic_json(paths["state"], result)
     return result
 
 

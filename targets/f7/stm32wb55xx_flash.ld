@@ -6,8 +6,9 @@ _stack_end = 0x20030000;    /* end of RAM */
 _stack_size = 0x400; /* required amount of stack */
 
 MEMORY {
-    /* CPU2 bundled wireless firmware starts at 0x080D7000. */
-    FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 860K
+    /* CPU2 bundled wireless firmware starts at 0x080D7000. Keep the preceding
+       4 KiB erase page unused so CPU1 updates never share a page with C2. */
+    FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 856K
     RAM1  (xrw) : ORIGIN = 0x20000008, LENGTH = 0x2FFF8
     RAM2A (xrw) : ORIGIN = 0x20030000, LENGTH = 10K
     RAM2B (xrw) : ORIGIN = 0x20038000, LENGTH = 10K

@@ -147,6 +147,36 @@ MJS_PRIVATE const char* opcodetostr(uint8_t opcode) {
     return name;
 }
 
+static const char* mjs_tok_to_op_name(uint8_t op) {
+    static const uint8_t tokens[] = {
+        TOK_DOT,          TOK_MINUS,          TOK_PLUS,          TOK_MUL,
+        TOK_DIV,          TOK_REM,            TOK_XOR,           TOK_AND,
+        TOK_OR,           TOK_LSHIFT,         TOK_RSHIFT,        TOK_URSHIFT,
+        TOK_UNARY_MINUS,  TOK_UNARY_PLUS,     TOK_NOT,           TOK_TILDA,
+        TOK_EQ,           TOK_NE,             TOK_EQ_EQ,         TOK_NE_NE,
+        TOK_LT,           TOK_GT,             TOK_LE,            TOK_GE,
+        TOK_ASSIGN,       TOK_POSTFIX_PLUS,   TOK_POSTFIX_MINUS, TOK_MINUS_MINUS,
+        TOK_PLUS_PLUS,    TOK_LOGICAL_AND,    TOK_LOGICAL_OR,    TOK_KEYWORD_TYPEOF,
+        TOK_PLUS_ASSIGN,  TOK_MINUS_ASSIGN,   TOK_MUL_ASSIGN,    TOK_DIV_ASSIGN,
+        TOK_REM_ASSIGN,   TOK_XOR_ASSIGN,     TOK_AND_ASSIGN,    TOK_OR_ASSIGN,
+        TOK_LSHIFT_ASSIGN, TOK_RSHIFT_ASSIGN, TOK_URSHIFT_ASSIGN,
+    };
+    static const char* const names[] = {
+        ".",  "-",          "+",          "*",  "/",  "%",  "^",   "&",   "|",
+        "<<", ">>",         ">>>",        "- (unary)", "+ (unary)", "!", "~",
+        "==", "!=",         "===",        "!==", "<",  ">",  "<=",  ">=",  "=",
+        "++ (postfix)", "-- (postfix)", "--", "++", "&&", "||", "typeof",
+        "+=", "-=",         "*=",         "/=",  "%=", "^=", "&=",  "|=",
+        "<<=", ">>=",       ">>>=",
+    };
+
+    _Static_assert(ARRAY_SIZE(tokens) == ARRAY_SIZE(names), "Token name table mismatch");
+    for(size_t i = 0; i < ARRAY_SIZE(tokens); i++) {
+        if(tokens[i] == op) return names[i];
+    }
+    return "???";
+}
+
 MJS_PRIVATE size_t
     mjs_disasm_single(const uint8_t* code, size_t i, MjsPrintCallback print_cb, void* print_ctx) {
     char buf[40];
@@ -218,56 +248,7 @@ MJS_PRIVATE size_t
         break;
     }
     case OP_EXPR: {
-        int op = code[i + 1];
-        const char* name = "???";
-        /* clang-format off */
-      switch (op) {
-        case TOK_DOT:       name = "."; break;
-        case TOK_MINUS:     name = "-"; break;
-        case TOK_PLUS:      name = "+"; break;
-        case TOK_MUL:       name = "*"; break;
-        case TOK_DIV:       name = "/"; break;
-        case TOK_REM:       name = "%"; break;
-        case TOK_XOR:       name = "^"; break;
-        case TOK_AND:       name = "&"; break;
-        case TOK_OR:        name = "|"; break;
-        case TOK_LSHIFT:    name = "<<"; break;
-        case TOK_RSHIFT:    name = ">>"; break;
-        case TOK_URSHIFT:   name = ">>>"; break;
-        case TOK_UNARY_MINUS:   name = "- (unary)"; break;
-        case TOK_UNARY_PLUS:    name = "+ (unary)"; break;
-        case TOK_NOT:       name = "!"; break;
-        case TOK_TILDA:     name = "~"; break;
-        case TOK_EQ:        name = "=="; break;
-        case TOK_NE:        name = "!="; break;
-        case TOK_EQ_EQ:     name = "==="; break;
-        case TOK_NE_NE:     name = "!=="; break;
-        case TOK_LT:        name = "<"; break;
-        case TOK_GT:        name = ">"; break;
-        case TOK_LE:        name = "<="; break;
-        case TOK_GE:        name = ">="; break;
-        case TOK_ASSIGN:    name = "="; break;
-        case TOK_POSTFIX_PLUS:  name = "++ (postfix)"; break;
-        case TOK_POSTFIX_MINUS: name = "-- (postfix)"; break;
-        case TOK_MINUS_MINUS:   name = "--"; break;
-        case TOK_PLUS_PLUS:     name = "++"; break;
-        case TOK_LOGICAL_AND:   name = "&&"; break;
-        case TOK_LOGICAL_OR:    name = "||"; break;
-        case TOK_KEYWORD_TYPEOF:  name = "typeof"; break;
-        case TOK_PLUS_ASSIGN:     name = "+="; break;
-        case TOK_MINUS_ASSIGN:    name = "-="; break;
-        case TOK_MUL_ASSIGN:      name = "*="; break;
-        case TOK_DIV_ASSIGN:      name = "/="; break;
-        case TOK_REM_ASSIGN:      name = "%="; break;
-        case TOK_XOR_ASSIGN:      name = "^="; break;
-        case TOK_AND_ASSIGN:      name = "&="; break;
-        case TOK_OR_ASSIGN:       name = "|="; break;
-        case TOK_LSHIFT_ASSIGN:   name = "<<="; break;
-        case TOK_RSHIFT_ASSIGN:   name = ">>="; break;
-        case TOK_URSHIFT_ASSIGN:  name = ">>>="; break;
-      }
-        /* clang-format on */
-        print_cb(print_ctx, "%s\t%s", buf, name);
+        print_cb(print_ctx, "%s\t%s", buf, mjs_tok_to_op_name(code[i + 1]));
         i++;
         break;
     }

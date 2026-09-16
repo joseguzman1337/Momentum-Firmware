@@ -1,0 +1,140 @@
+{
+  "captured_at": "2026-09-15T13:28:12.886774+00:00",
+  "commands": [
+    {
+      "command": "device_info",
+      "mode": "read-only",
+      "sha256": "156d8a116f895e0e71e319531815efd106e385fa842765fe6a6eda315fd0137e"
+    },
+    {
+      "command": "storage info /int",
+      "mode": "read-only",
+      "sha256": "ff3a3f21cdd23eaa26c32b48c3842c987206f8b8b7bee6065a69025eb3b3a443"
+    },
+    {
+      "command": "storage info /ext",
+      "mode": "read-only",
+      "sha256": "ad3f7a9cb9309aa60fa8355bde5e10aa9a7b72cd493314470f9152a4ea8505c7"
+    },
+    {
+      "command": "storage list /int",
+      "mode": "read-only",
+      "sha256": "9a2e7a216d6b936cf709c687826df66a6a352b59806cc01f3db7e8a1a637ba57"
+    },
+    {
+      "command": "storage list /ext",
+      "mode": "read-only",
+      "sha256": "a72230f807cd90d96113eb184f3b17695a1dc3df245536db02d36a6b29e181cb"
+    },
+    {
+      "command": "storage tree /ext/apps",
+      "mode": "read-only",
+      "sha256": "5d45d33d07b1c60c0e1b46db8308d2fa3a666ee1581f291f0832b5f7079ee8f7"
+    },
+    {
+      "command": "storage tree /ext/asset_packs",
+      "mode": "read-only",
+      "sha256": "7c48ead77a5a7a468ac98fbb224d45d4887d1a07d43c93ee0a9fdd97f23d757f"
+    },
+    {
+      "command": "storage tree /ext/update",
+      "mode": "read-only",
+      "sha256": "c449bf4d2ade8c884ba646eb7b286a11ed6b1b3dfc69ff23235f1b266c2f831e"
+    },
+    {
+      "command": "storage md5 /int/.notification.settings",
+      "mode": "read-only",
+      "sha256": "44ebfbc325c99112ab014b72f3071a5b31732a3504d5bbb10e72667792d1496f"
+    },
+    {
+      "command": "storage md5 /int/.expansion.settings",
+      "mode": "read-only",
+      "sha256": "dc234d476640315693789e5c0451a199bafd84d367c0070cc49a61769e64597d"
+    },
+    {
+      "command": "storage md5 /int/.desktop.settings",
+      "mode": "read-only",
+      "sha256": "a3a91db722cc100dedf3a0847de6dc4fc5334f67bb77b608fcb42b63f315c908"
+    },
+    {
+      "command": "storage md5 /int/.region_data",
+      "mode": "read-only",
+      "sha256": "d935db3f9ef20760e08807776304be04a0f7e28fd57bbed189a25232eef1c4f2"
+    },
+    {
+      "command": "storage md5 /int/.momentum_firstboot.flag",
+      "mode": "read-only",
+      "sha256": "e56634de8abfd15fe8a17033c89f47e8f8e94b16f6971cce5012d332a3de5f28"
+    },
+    {
+      "command": "uptime",
+      "mode": "read-only",
+      "sha256": "8822e4ac5ef741b3b7a94e93c8eb65a1a7f7d3f999c5d04ac2965ac5fa4d7bcb"
+    },
+    {
+      "command": "free",
+      "mode": "read-only",
+      "sha256": "ba95c40bbfff84ebf25adaf41206788eb93b614894c18a475e695d10ac2db34f"
+    }
+  ],
+  "firmware_package": {
+    "Filetype": "Flipper firmware upgrade configuration",
+    "Firmware": "firmware.dfu",
+    "Info": "mntm-integration-all-fw-improvements-925da401",
+    "Loader": "updater.bin",
+    "Radio": "radio.bin",
+    "Radio address": "00 70 0D 08",
+    "Radio version": "01 14 00 00 02 03",
+    "Resources": "resources.tar.gz",
+    "Splashscreen": "splash.bin",
+    "Target": "7",
+    "Version": "2"
+  },
+  "local_firmware_artifacts": [
+    {
+      "name": "firmware.dfu",
+      "sha256": "d3c6bf3435fb816e042e6a5f37dc0eeda1e787eadd766ea56d4aae9c346e1b26",
+      "size": 880461
+    },
+    {
+      "name": "update.fuf",
+      "sha256": "9791abef64b965b9ecaa65bd290ecb3bf628558ebbac0d8f04724011aba4a071",
+      "size": 1617
+    },
+    {
+      "name": "<redacted>.tgz",
+      "sha256": "fae9c9a08283ee7e2be6c0b68261aa4f2a7e20835c7d97a78ec8bb32524a550b",
+      "size": 370
+    }
+  ],
+  "safety": {
+    "device_flashes": 0,
+    "device_resets": 0,
+    "device_writes": 0,
+    "identifiers_redacted": true,
+    "storage_contents_downloaded": false
+  },
+  "schema": 1,
+  "screen": {
+    "bytes": 1024,
+    "captured": true,
+    "file": "screen/framebuffer-128x64-1bpp.bin",
+    "format": "Flipper canvas native 1bpp",
+    "height": 64,
+    "orientation": 0,
+    "sha256": "08413adbec4accf4137b444cd3d793b162d65a119de188d7b3fea4b3bc548ccb",
+    "transport": "RPC ScreenStream",
+    "width": 128
+  },
+  "usb": {
+    "configurations": 1,
+    "device_class": 239,
+    "device_subclass": 2,
+    "link_speed_bps": 12000000,
+    "product_id": 22336,
+    "product_name": "Flipper <redacted>",
+    "serial": "<redacted>",
+    "vendor": "Flipper Devices Inc.",
+    "vendor_id": 1155
+  }
+}

@@ -1,0 +1,14 @@
+Filetype: Flipper IR device
+Version: 1
+# 
+name: Power
+type: parsed
+protocol: Samsung
+address: 07 00 00 00
+command: 02 00 00 00
+# 
+name: Mute
+type: parsed
+protocol: Samsung
+address: 07 00 00 00
+command: 0F 00 00 00

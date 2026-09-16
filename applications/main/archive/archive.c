@@ -142,6 +142,9 @@ int32_t archive_app(void* p) {
     ArchiveApp* archive = archive_alloc();
     view_dispatcher_attach_to_gui(
         archive->view_dispatcher, archive->gui, ViewDispatcherTypeFullscreen);
+    // Cover startup work until Archive switches to its first browser view. Keep the separate
+    // application-owned Loading above for runtime overlays on the live ViewStack.
+    view_dispatcher_show_loading(archive->view_dispatcher);
 
     // If we are sent a path from context, set it in the browser
     if(path && !furi_string_empty(path)) {

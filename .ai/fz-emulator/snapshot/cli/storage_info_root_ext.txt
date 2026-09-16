@@ -1,0 +1,6 @@
+Label: <redacted>
+Type: EXFAT
+122134528KiB total
+121939456KiB free
+1dAD USD v2.0
+SN: <redacted>

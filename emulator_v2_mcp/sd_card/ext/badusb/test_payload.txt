@@ -1,0 +1,4 @@
+REM BadUSB payload for testing
+DELAY 500
+STRING echo 'Hello from Flipper Zero Emulator emulator-v2'
+ENTER

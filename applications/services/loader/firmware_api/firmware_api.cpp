@@ -8,16 +8,17 @@
 
 #include <furi_hal_info.h>
 
-static_assert(!has_hash_collisions(elf_api_table), "Detected API method hash collision!");
-
 constexpr HashtableApiInterface elf_api_interface{
     {
         .api_version_major = (elf_api_version >> 16),
         .api_version_minor = (elf_api_version & 0xFFFF),
         .resolver_callback = &elf_resolve_from_hashtable,
     },
-    elf_api_table.cbegin(),
-    elf_api_table.cend(),
+    elf_api_hash_low,
+    elf_api_hash_high,
+    elf_api_addresses,
+    elf_api_count,
+    elf_api_low_width,
 };
 const ElfApiInterface* const firmware_api_interface = &elf_api_interface;
 

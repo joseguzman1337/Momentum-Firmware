@@ -3,6 +3,7 @@
 import math
 import os
 import shutil
+import struct
 import tarfile
 import zlib
 from os.path import exists, join
@@ -36,9 +37,9 @@ class Main(App):
     FLASH_BASE = 0x8000000
     FLASH_PAGE_SIZE = 4 * 1024
     # Minimum number of flash pages to reserve between firmware image and C2 stack.
-    # Default is 0, but can be overridden via environment variables to relax layout
-    # checks for custom radio/stack layouts.
-    MIN_GAP_PAGES = int(os.environ.get("FBT_MIN_C2_GAP_PAGES", "0"))
+    # One complete flash page is the minimum safe release headroom. Builds may
+    # request more headroom, but never less: the updater erases/programs by page.
+    MIN_GAP_PAGES = max(1, int(os.environ.get("FBT_MIN_C2_GAP_PAGES", "1")))
 
     # Update stage file larger than that is not loadable without fix
     # https://github.com/flipperdevices/flipperzero-firmware/pull/3676
@@ -140,9 +141,9 @@ class Main(App):
         updater_stage_size = os.stat(self.args.stage).st_size
         shutil.copyfile(self.args.stage, join(self.args.directory, stage_basename))
 
-        dfu_size = 0
+        firmware_flash_range = None
         if self.args.dfu:
-            dfu_size = os.stat(self.args.dfu).st_size
+            firmware_flash_range = self.dfu_flash_range(self.args.dfu)
             shutil.copyfile(self.args.dfu, join(self.args.directory, dfu_basename))
         if radiobin_basename:
             shutil.copyfile(
@@ -166,7 +167,14 @@ class Main(App):
             ):
                 return 3
 
-        if not self.layout_check(updater_stage_size, dfu_size, radio_addr):
+        # Unlike warnings about updater compatibility or custom stack types,
+        # CPU1/C2 separation is a physical programming invariant. A disclaimer
+        # must never turn an image with less than one erase page of headroom into
+        # a release package.
+        if not self.c2_headroom_check(firmware_flash_range, radio_addr):
+            return 2
+
+        if not self.layout_check(updater_stage_size, firmware_flash_range, radio_addr):
             self.logger.warning("Memory layout looks suspicious")
             if self.args.disclaimer != "yes":
                 self.show_disclaimer()
@@ -226,17 +234,105 @@ class Main(App):
 
         return 0
 
-    def layout_check(self, stage_size, fw_size, radio_addr):
+    @staticmethod
+    def dfu_flash_range(path):
+        """Return the exact address range programmed by a DfuSe image.
+
+        A DfuSe file contains a 309-byte envelope even for a single target and
+        element. Counting that envelope as flash payload produces false C2
+        overlap reports at the end of flash.
+        """
+        file_size = os.stat(path).st_size
+        with open(path, "rb") as dfu:
+            prefix = dfu.read(11)
+            if len(prefix) != 11:
+                raise ValueError("Truncated DfuSe prefix")
+            signature, version, image_size, target_count = struct.unpack(
+                "<5sBIB", prefix
+            )
+            if signature != b"DfuSe" or version != 1:
+                raise ValueError("Unsupported DfuSe image")
+            # Image size excludes the standard 16-byte DFU suffix.
+            if image_size + 16 != file_size:
+                raise ValueError("DfuSe image size does not match its header")
+
+            ranges = []
+            for _ in range(target_count):
+                target = dfu.read(274)
+                if len(target) != 274:
+                    raise ValueError("Truncated DfuSe target prefix")
+                target_signature, _alt, _named, _name, target_size, elements = (
+                    struct.unpack("<6sBI255sII", target)
+                )
+                if target_signature != b"Target":
+                    raise ValueError("Invalid DfuSe target signature")
+                target_start = dfu.tell()
+                for _ in range(elements):
+                    element = dfu.read(8)
+                    if len(element) != 8:
+                        raise ValueError("Truncated DfuSe element header")
+                    address, size = struct.unpack("<II", element)
+                    if not size:
+                        raise ValueError("Empty DfuSe element")
+                    end = address + size
+                    if end > 0x1_0000_0000:
+                        raise ValueError("DfuSe element address overflow")
+                    ranges.append((address, end))
+                    if len(dfu.read(size)) != size:
+                        raise ValueError("Truncated DfuSe element payload")
+                if dfu.tell() - target_start != target_size:
+                    raise ValueError("DfuSe target size does not match its elements")
+
+            if not ranges or dfu.tell() + 16 != file_size:
+                raise ValueError("DfuSe image has invalid payload boundaries")
+
+            suffix = dfu.read(16)
+            _device, _product, _vendor, _dfu, signature, length, expected_crc = (
+                struct.unpack("<HHHH3sBI", suffix)
+            )
+            if signature != b"UFD" or length != 16:
+                raise ValueError("Invalid DfuSe suffix")
+            with open(path, "rb") as image:
+                actual_crc = ~zlib.crc32(image.read(file_size - 4)) & 0xFFFFFFFF
+            if actual_crc != expected_crc:
+                raise ValueError("Invalid DfuSe CRC")
+            return min(start for start, _ in ranges), max(end for _, end in ranges)
+
+    def c2_headroom_check(self, firmware_flash_range, radio_addr):
+        if firmware_flash_range is None or radio_addr == 0:
+            return True
+        fw_start, fw_end = firmware_flash_range
+        minimum = self.MIN_GAP_PAGES * self.FLASH_PAGE_SIZE
+        gap = radio_addr - fw_end
+        if fw_start < self.FLASH_BASE or fw_end <= fw_start:
+            self.logger.error("Firmware image has an invalid flash range")
+            return False
+        if gap < minimum:
+            self.logger.error(
+                f"CPU1/C2 headroom is {gap} byte(s); release packages require "
+                f">={minimum} byte(s) ({self.MIN_GAP_PAGES} flash page(s))"
+            )
+            return False
+        self.logger.info(
+            f"CPU1/C2 headroom: {gap} byte(s) ({gap / self.FLASH_PAGE_SIZE:.2f} pages)"
+        )
+        return True
+
+    def layout_check(self, stage_size, firmware_flash_range, radio_addr):
         if stage_size > self.UPDATER_SIZE_THRESHOLD:
             self.logger.warning(
                 f"Updater size {stage_size}b > {self.UPDATER_SIZE_THRESHOLD}b and is not loadable on older firmwares!"
             )
 
-        if fw_size == 0 or radio_addr == 0:
+        if firmware_flash_range is None or radio_addr == 0:
             self.logger.info("Cannot validate layout for partial package")
             return True
 
-        fw2stack_gap = radio_addr - self.FLASH_BASE - fw_size
+        fw_start, fw_end = firmware_flash_range
+        if fw_start < self.FLASH_BASE or fw_end <= fw_start:
+            self.logger.warning("Firmware image has an invalid flash range")
+            return False
+        fw2stack_gap = radio_addr - fw_end
         self.logger.debug(f"Expected reserved space size: {fw2stack_gap}")
         fw2stack_gap_pages = fw2stack_gap / self.FLASH_PAGE_SIZE
         if fw2stack_gap_pages < 0:

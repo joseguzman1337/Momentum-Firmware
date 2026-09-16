@@ -1,36 +1,42 @@
 {
   "mcpServers": {
     "claude-vscode-bridge": {
-      "command": "python",
-      "args": [".ai/claude-vscode/mcp_bridge.py"],
+      "command": "python3",
+      "args": [".ai/claude-vscode/scripts/mcp_bridge.py"],
       "env": {
-        "WORKSPACE_ROOT": "/Users/x/x/Momentum-Firmware",
+        "WORKSPACE_ROOT": ".",
         "LOG_DIR": "logs/claude-vscode",
         "YOLO_MODE": "true"
       }
     },
     "momentum-codex": {
-      "command": "python",
-      "args": [".ai/codex/agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
-        "COORDINATION_MODE": "true",
-        "PRIMARY_AGENT": "claude-vscode"
-      }
+        "COORDINATION_MODE": "identity-metadata-only",
+        "PRIMARY_AGENT": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "momentum-codex",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the momentum-codex identity; legacy coordination labels are metadata only"
     },
     "flipper-tools": {
-      "command": "python",
-      "args": [".ai/tools/flipper_mcp.py"],
+      "command": "python3",
+      "args": [".ai/tools/scripts/flipper_mcp.py"],
       "env": {
         "FBT_PATH": "./fbt",
         "TARGET": "f7"
       }
     },
     "firmware-analyzer": {
-      "command": "python",
-      "args": [".ai/tools/firmware_analyzer.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
-        "ANALYSIS_MODE": "realtime"
-      }
+        "ANALYSIS_MODE": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "firmware-analyzer",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the firmware-analyzer identity; legacy realtime analysis label is metadata only and no firmware analysis is performed"
     }
   }
 }

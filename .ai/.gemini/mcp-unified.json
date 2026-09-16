@@ -12,31 +12,40 @@
       }
     },
     "momentum-codex": {
-      "command": "python",
-      "args": [".ai/codex/agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/codex",
-        "AUTO_MERGE": "true",
-        "YOLO_MODE": "true"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "momentum-codex",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the momentum-codex identity; legacy automation labels are metadata only"
     },
     "momentum-security": {
-      "command": "python", 
-      "args": [".ai/claude/security_agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/claude",
-        "AUTO_MERGE": "true",
-        "YOLO_MODE": "true"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "momentum-security",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the momentum-security identity; legacy security and automation labels are metadata only"
     },
     "momentum-aws": {
-      "command": "python",
-      "args": [".ai/amazonq/agent.py"], 
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/amazonq",
-        "AUTO_MERGE": "true",
-        "AWS_REGION": "us-east-1"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "AWS_REGION": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "momentum-aws",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the momentum-aws identity; legacy AWS, cloud, and automation labels are metadata only and make no external calls"
     }
   }
 }

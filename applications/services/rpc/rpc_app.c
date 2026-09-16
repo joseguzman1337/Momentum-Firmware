@@ -101,8 +101,7 @@ static void rpc_system_app_start_process(const PB_Main* request, void* context) 
             result = PB_CommandStatus_ERROR_INVALID_PARAMETERS;
             break;
         case LoaderStatusErrorInternal:
-        case LoaderStatusErrorApiMismatch:
-        case LoaderStatusErrorApiMismatchExit:
+        case LoaderStatusErrorApiMismatchCanceled:
             result = PB_CommandStatus_ERROR_APP_CANT_START;
             break;
         }

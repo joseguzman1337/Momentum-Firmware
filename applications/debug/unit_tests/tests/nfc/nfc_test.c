@@ -702,6 +702,14 @@ MU_TEST(felica_read_auth) {
     felica_free(felica_data);
 }
 
+MU_TEST(felica_oversized_lite_file_test) {
+    NfcDevice* nfc_device = nfc_device_alloc();
+    mu_assert(
+        !nfc_device_load(nfc_device, EXT_PATH("unit_tests/nfc/Felica_oversized_lite.nfc")),
+        "oversized FeliCa Lite file was accepted");
+    nfc_device_free(nfc_device);
+}
+
 MU_TEST(slix_file_with_capabilities_test) {
     NfcDevice* nfc_device_missed_cap = nfc_device_alloc();
     mu_assert(
@@ -866,6 +874,7 @@ MU_TEST_SUITE(nfc) {
     MU_RUN_TEST(mf_classic_dict_test);
     MU_RUN_TEST(felica_read);
     MU_RUN_TEST(felica_read_auth);
+    MU_RUN_TEST(felica_oversized_lite_file_test);
 
     MU_RUN_TEST(slix_file_with_capabilities_test);
     MU_RUN_TEST(slix_set_password_default_cap_correct_pass);

@@ -1,7 +1,9 @@
 import importlib.util
 import struct
 import tempfile
+import threading
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest import mock
 
@@ -62,6 +64,21 @@ class RecoveryTests(unittest.TestCase):
             r.monitor_once(self.root, heartbeat_seconds=9999); r.monitor_once(self.root, heartbeat_seconds=9999)
         history = r.get_monitor_history(self.root)
         self.assertEqual(len(history), 1); self.assertEqual(history[0]["event"], "transition"); self.assertEqual(history[0]["state"], "devboard_online")
+    def test_concurrent_monitor_cycles_are_unique_and_history_is_preserved(self):
+        probe = {"device": "/dev/test", "kind": "blackmagic_devboard"}
+        inventory = {"source": "test", "devices": [probe], "blackmagic": [probe], "flipper": []}
+        cycle_count = 24
+        with mock.patch.object(r, "devices", return_value=inventory):
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                results = list(pool.map(lambda _index: r.monitor_once(self.root, heartbeat_seconds=0), range(cycle_count)))
+        cycles = sorted(item["cycle"] for item in results)
+        history = r.get_monitor_history(self.root, limit=cycle_count + 10)
+        persisted = r._read_json(r.monitor_paths(self.root)["state"])
+        self.assertEqual(cycles, list(range(1, cycle_count + 1)))
+        self.assertEqual(sorted(item["cycle"] for item in history), cycles)
+        self.assertEqual(len(history), cycle_count)
+        self.assertEqual(persisted["cycle"], cycle_count)
+        self.assertEqual(len({item["cycle"] for item in history}), cycle_count)
     def test_evidence_redaction_and_truncation(self):
         value = r.sanitized_evidence("token=supersecret " + "x" * 100, limit=30)
         self.assertNotIn("supersecret", value); self.assertTrue(value.endswith("...[truncated]"))
@@ -200,6 +217,45 @@ class RecoveryTests(unittest.TestCase):
         success = type("Result", (), {"returncode": 0, "stdout": "Loading section .text\nTransfer rate: 20 KB/s", "stderr": ""})()
         with mock.patch.object(r, "devices", return_value=inventory): result = r.monitor_once(self.root, runner=lambda *a, **k: success)
         self.assertEqual(result["state"], "flash_succeeded"); self.assertTrue(result["verified_load"]); self.assertFalse(r.monitor_paths(self.root)["arm"].exists())
+    def test_concurrent_monitor_cycles_consume_arm_only_once(self):
+        _image, inventory = self._armed_swd_fixture()
+        entered = threading.Event(); release = threading.Event(); calls = 0
+        def successful_runner(*_args, **_kwargs):
+            nonlocal calls
+            calls += 1; entered.set(); self.assertTrue(release.wait(2))
+            return type("Result", (), {"returncode": 0, "stdout": "Loading section .text\nTransfer rate: 20 KB/s", "stderr": ""})()
+        with mock.patch.object(r, "devices", return_value=inventory):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                first = pool.submit(r.monitor_once, self.root, runner=successful_runner)
+                self.assertTrue(entered.wait(2))
+                second = pool.submit(r.monitor_once, self.root, runner=successful_runner)
+                second_result = second.result(timeout=2); release.set(); first_result = first.result(timeout=2)
+        self.assertEqual(calls, 1)
+        self.assertEqual(first_result["state"], "flash_succeeded")
+        self.assertEqual(second_result["action"], "observe_only")
+        self.assertFalse(r.monitor_paths(self.root)["arm"].exists())
+    def test_failed_claim_restores_retryable_arm_atomically(self):
+        _image, inventory = self._armed_swd_fixture()
+        failed = type("Result", (), {"returncode": 1, "stdout": "", "stderr": "load failed"})()
+        with mock.patch.object(r, "devices", return_value=inventory):
+            result = r.monitor_once(self.root, runner=lambda *_a, **_k: failed)
+        restored = r._read_json(r.monitor_paths(self.root)["arm"])
+        self.assertTrue(result["arm_restored"]); self.assertFalse(result["arm_superseded"])
+        self.assertEqual(restored["attempts"], 1); self.assertIn("SWD load not verified", restored["last_error"])
+        self.assertEqual(list((self.root / ".recovery").glob(".armed.claim.*")), [])
+    def test_failed_claim_never_overwrites_concurrent_rearm(self):
+        image, inventory = self._armed_swd_fixture()
+        original = r._read_json(r.monitor_paths(self.root)["arm"])
+        failed = type("Result", (), {"returncode": 1, "stdout": "", "stderr": "load failed"})()
+        def rearm_then_fail(*_args, **_kwargs):
+            r.arm_monitor(image, root=self.root, port="/dev/new-port", confirm=r.CONFIRM)
+            return failed
+        with mock.patch.object(r, "devices", return_value=inventory):
+            result = r.monitor_once(self.root, runner=rearm_then_fail)
+        current = r._read_json(r.monitor_paths(self.root)["arm"])
+        self.assertFalse(result["arm_restored"]); self.assertTrue(result["arm_superseded"])
+        self.assertEqual(current["port"], "/dev/new-port"); self.assertEqual(current["attempts"], 0)
+        self.assertGreaterEqual(current["armed_at"], original["armed_at"])
     def test_next_retry_prevents_runner_call(self):
         _image, inventory = self._armed_swd_fixture(); arm_path = r.monitor_paths(self.root)["arm"]
         arm = r._read_json(arm_path); arm["next_retry_at"] = __import__("time").time() + 600; r.atomic_json(arm_path, arm)

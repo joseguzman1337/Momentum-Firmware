@@ -1,21 +1,25 @@
 {
   "mcpServers": {
     "jules-independent": {
-      "command": "python",
-      "args": [".ai/jules/independent_session_handler.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
-        "JULES_MODE": "independent",
-        "AUTO_PUSH": "true",
-        "AUTO_CLOSE": "true",
-        "SILENT_MODE": "true",
-        "LOG_DIR": "logs/jules"
-      }
+        "JULES_MODE": "identity-metadata-only",
+        "AUTO_PUSH": "identity-metadata-only",
+        "AUTO_CLOSE": "identity-metadata-only",
+        "SILENT_MODE": "identity-metadata-only",
+        "LOG_DIR": "logs/jules",
+        "MCP_AGENT_ROLE": "jules-independent",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the jules-independent identity; legacy independent, push, close, and silent labels are metadata only"
     }
   },
   "sessionConfig": {
-    "maxConcurrentSessions": 100,
-    "autoMerge": true,
-    "silentExecution": true,
-    "realTimeProcessing": true
+    "status": "legacy identity metadata only; not implemented by this read-only MCP adapter",
+    "maxConcurrentSessions": "identity-metadata-only",
+    "autoMerge": "identity-metadata-only",
+    "silentExecution": "identity-metadata-only",
+    "realTimeProcessing": "identity-metadata-only"
   }
 }

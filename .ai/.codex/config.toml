@@ -9,7 +9,7 @@ model_reasoning_effort = "high"
 # Profile for automated development
 profile = "momentum-dev"
 
-# Approval and sandbox settings for YOLO mode
+# Approval and sandbox settings for the Codex client (independent of MCP capabilities)
 approval_policy = "never"
 sandbox_mode = "workspace-write"
 
@@ -48,7 +48,7 @@ exec_policy = true
 exclude_tmpdir_env_var = false
 exclude_slash_tmp = false
 writable_roots = [
-    "/Users/x/x/Momentum-Firmware",
+    ".",
     "/tmp",
     "~/.cache"
 ]
@@ -68,31 +68,22 @@ exclude = ["AWS_*", "AZURE_*", "*_SECRET", "*_TOKEN", "*_KEY"]
 
 # MCP servers for AI coordination
 [mcp_servers.momentum-codex]
-command = "python"
-args = [".ai/codex/agent.py"]
-env = {
-    LOG_DIR = "logs/codex",
-    AUTO_MERGE = "true",
-    YOLO_MODE = "true",
-    PROJECT_ROOT = "/Users/x/x/Momentum-Firmware"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/codex", AUTO_MERGE = "identity-metadata-only", YOLO_MODE = "identity-metadata-only", PROJECT_ROOT = ".", MCP_AGENT_ROLE = "momentum-codex" }
+description = "Read-only repository status compatibility adapter; legacy automation labels are identity metadata only"
 
 [mcp_servers.security-agent]
-command = "python"
-args = [".ai/claude/security_agent.py"]
-env = {
-    LOG_DIR = "logs/claude",
-    AUTO_MERGE = "true",
-    SECURITY_SCAN = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/claude", AUTO_MERGE = "identity-metadata-only", SECURITY_SCAN = "identity-metadata-only", MCP_AGENT_ROLE = "security-agent" }
+description = "Read-only repository status compatibility adapter; security and automation labels are identity metadata only"
 
 [mcp_servers.quality-agent]
-command = "python"
-args = [".ai/warp/quality_agent.py"]
-env = {
-    LOG_DIR = "logs/warp",
-    QUALITY_CHECK = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/warp", QUALITY_CHECK = "identity-metadata-only", MCP_AGENT_ROLE = "quality-agent" }
+description = "Read-only repository status compatibility adapter; quality label is identity metadata only"
 
 # Observability for AI pipeline monitoring
 [otel]
@@ -101,7 +92,7 @@ exporter = "none"
 log_user_prompt = false
 
 # Notifications for automation events
-notify = ["python3", ".ai/notify.py"]
+notify = ["python3", ".ai/scripts/notify.py"]
 
 # Model providers configuration
 [model_providers.openai]

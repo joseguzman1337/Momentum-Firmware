@@ -1,0 +1,6 @@
+Free heap size: 116064
+Total heap size: 190208
+Minimum heap size: 104520
+Maximum heap block: 111264
+Pool free: 4200
+Maximum pool block: 3584

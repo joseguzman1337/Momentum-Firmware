@@ -1,0 +1,17 @@
+[D] /ext/update/f7-update-dev-04092026-7f0b6e1c
+	[F] /ext/update/f7-update-dev-04092026-7f0b6e1c/firmware.dfu 800761b
+	[F] /ext/update/f7-update-dev-04092026-7f0b6e1c/radio.bin 116956b
+	[F] /ext/update/f7-update-dev-04092026-7f0b6e1c/resources.ths 1614211b
+	[F] /ext/update/f7-update-dev-04092026-7f0b6e1c/splash.bin 528b
+	[F] /ext/update/f7-update-dev-04092026-7f0b6e1c/update.fuf 1590b
+	[F] /ext/update/f7-update-dev-04092026-7f0b6e1c/updater.bin 119765b
+	[F] /ext/update/f7-update-dev-04092026-7f0b6e1c/backup.tar 8192b
+	[D] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/firmware.dfu 880461b
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/firstboot.bin 2879b
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/radio.bin 116956b
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/resources.tar.gz 11805045b
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/splash.bin 431b
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/update.fuf 1617b
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/updater.bin 119661b
+	[F] /ext/update/f7-update-mntm-integration-all-fw-improvements-925da401/backup.tar 8704b

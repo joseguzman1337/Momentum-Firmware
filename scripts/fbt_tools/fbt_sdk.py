@@ -202,22 +202,54 @@ def gen_sdk_data(sdk_cache: SdkCache):
 
     api_def.append(f"const int elf_api_version = {sdk_cache.version.as_int()};")
 
-    api_def.append(
-        "static constexpr auto elf_api_table = sort(create_array_t<sym_entry>("
-    )
-
     api_lines = []
     for fun_def in sdk_cache.get_functions():
-        api_lines.append(
-            f"API_METHOD({fun_def.name}, {fun_def.returns}, ({fun_def.params}))"
-        )
+        api_lines.append((fun_def.name, f"API_ADDRESS_METHOD({fun_def.name}, {fun_def.returns}, ({fun_def.params}))"))
 
     for var_def in sdk_cache.get_variables():
-        api_lines.append(f"API_VARIABLE({var_def.name}, {var_def.var_type })")
+        api_lines.append((var_def.name, f"API_ADDRESS_VARIABLE({var_def.name}, {var_def.var_type })"))
 
-    api_def.append(",\n".join(api_lines))
+    def elf_hash(name):
+        value = 0x1505
+        for byte in name.encode("utf-8"):
+            value = ((value << 5) + value + byte) & 0xFFFFFFFF
+        return value
 
-    api_def.append("));")
+    api_lines.sort(key=lambda item: elf_hash(item[0]))
+    hashes = [elf_hash(item[0]) for item in api_lines]
+    if len(set(hashes)) != len(hashes):
+        raise UserError("Detected API method hash collision")
+
+    # Elias-Fano encodes a sorted 32-bit set exactly. With L=floor(log2(U/N)),
+    # low bits are packed densely and high bits use a monotone unary bitvector.
+    low_width = max(0, (0x100000000 // len(hashes)).bit_length() - 1)
+    low_mask = (1 << low_width) - 1
+    # The resolver reads a four-byte unaligned window. Preserve three trailing
+    # zero bytes so the final lookup never reads beyond the generated array.
+    low_data = bytearray((len(hashes) * low_width + 7) // 8 + 3)
+    high_bit_count = len(hashes) + (0xFFFFFFFF >> low_width) + 1
+    high_data = bytearray((high_bit_count + 7) // 8)
+    for index, value in enumerate(hashes):
+        low = value & low_mask
+        bit = index * low_width
+        for shift in range(low_width):
+            if low & (1 << shift):
+                low_data[(bit + shift) // 8] |= 1 << ((bit + shift) % 8)
+        high_position = (value >> low_width) + index
+        high_data[high_position // 8] |= 1 << (high_position % 8)
+
+    def bytes_initializer(data):
+        return ",".join(f"0x{value:02x}" for value in data)
+
+    api_def.extend([
+        f"static constexpr uint16_t elf_api_count = {len(hashes)};",
+        f"static constexpr uint8_t elf_api_low_width = {low_width};",
+        f"static constexpr uint8_t elf_api_hash_low[] = {{{bytes_initializer(low_data)}}};",
+        f"static constexpr uint8_t elf_api_hash_high[] = {{{bytes_initializer(high_data)}}};",
+        "static constexpr uint32_t elf_api_addresses[] = {",
+        ",\n".join(item[1] for item in api_lines),
+        "};",
+    ])
     return api_def
 
 

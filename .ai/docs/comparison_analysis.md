@@ -1,5 +1,9 @@
 # AI Automation Comparison: Current vs Codex
 
+> **Legacy comparison:** the modes, timing, PR-volume, and auto-merge claims in
+> this document are not verified runtime capabilities. Current repository MCP
+> registrations expose read-only inventory/status tools only.
+
 ## Current Pipeline (YOLO Mode)
 - **Agents**: 8 parallel agents (OpenAI, Anthropic, Google, etc.)
 - **Execution**: Local CLI tools with instant auto-merge

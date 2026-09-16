@@ -1,0 +1,4 @@
+Label: <redacted>
+Type: Virtual
+122134784KiB total
+121939584KiB free

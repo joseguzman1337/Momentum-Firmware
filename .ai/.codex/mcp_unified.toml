@@ -1,112 +1,87 @@
 # Unified MCP Configuration for Momentum Firmware
 # Model Context Protocol servers for AI-powered development pipeline
 
-# Core AI Agents (Internal)
+# Compatibility registrations for named AI roles. These entries intentionally
+# expose the same read-only repository-status MCP; role names and env flags are
+# metadata only and do not claim cloud, security, merge, or generation actions.
+# Provider-specific integrations may be registered separately when available.
 [mcp_servers.momentum-codex]
-command = "python"
-args = [".ai/codex/agent.py"]
-env = {
-    LOG_DIR = "logs/codex",
-    AUTO_MERGE = "true",
-    YOLO_MODE = "true",
-    PROJECT_ROOT = "/Users/x/x/Momentum-Firmware"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/codex", AUTO_MERGE = "identity-metadata-only", YOLO_MODE = "identity-metadata-only", PROJECT_ROOT = ".", MCP_AGENT_ROLE = "momentum-codex" }
+description = "Read-only repository status adapter; legacy automation labels are identity metadata only"
 startup_timeout_sec = 30
 tool_timeout_sec = 300
 enabled = true
 
 [mcp_servers.codex-cloud]
-command = "python"
-args = [".ai/codex-cloud/agent.py"]
-env = {
-    LOG_DIR = "logs/codex-cloud",
-    AUTO_MERGE = "true",
-    CLOUD_MODE = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/codex-cloud", AUTO_MERGE = "identity-metadata-only", CLOUD_MODE = "identity-metadata-only", MCP_AGENT_ROLE = "codex-cloud" }
+description = "Read-only repository status adapter; cloud and automation labels are identity metadata only"
 startup_timeout_sec = 45
 tool_timeout_sec = 600
 enabled = true
 
 [mcp_servers.claude-security]
-command = "python"
-args = [".ai/claude/security_agent.py"]
-env = {
-    LOG_DIR = "logs/claude",
-    AUTO_MERGE = "true",
-    SECURITY_SCAN = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/claude", AUTO_MERGE = "identity-metadata-only", SECURITY_SCAN = "identity-metadata-only", MCP_AGENT_ROLE = "claude-security" }
+description = "Read-only repository status adapter; security and automation labels are identity metadata only"
 startup_timeout_sec = 20
 tool_timeout_sec = 180
 enabled = true
 
 [mcp_servers.jules-async]
-command = "python"
-args = [".ai/jules/async_agent.py"]
-env = {
-    LOG_DIR = "logs/jules",
-    ASYNC_MODE = "true",
-    CONCURRENT_SESSIONS = "100"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/jules", ASYNC_MODE = "identity-metadata-only", CONCURRENT_SESSIONS = "identity-metadata-only", MCP_AGENT_ROLE = "jules-async" }
+description = "Read-only repository status adapter; async and concurrency labels are identity metadata only"
 startup_timeout_sec = 25
 tool_timeout_sec = 240
 enabled = true
 
 [mcp_servers.gemini-super]
-command = "python"
-args = [".ai/gemini/super_agent.py"]
-env = {
-    LOG_DIR = "logs/gemini",
-    SUPER_AGENT = "true",
-    RAG_MODE = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/gemini", SUPER_AGENT = "identity-metadata-only", RAG_MODE = "identity-metadata-only", MCP_AGENT_ROLE = "gemini-super" }
+description = "Read-only repository status adapter; super-agent and RAG labels are identity metadata only"
 startup_timeout_sec = 35
 tool_timeout_sec = 360
 enabled = true
 
 [mcp_servers.deepseek-optimizer]
-command = "python"
-args = [".ai/deepseek/optimization_agent.py"]
-env = {
-    LOG_DIR = "logs/deepseek",
-    OPTIMIZATION_MODE = "true",
-    INDIVIDUAL_PRS = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/deepseek", OPTIMIZATION_MODE = "identity-metadata-only", INDIVIDUAL_PRS = "identity-metadata-only", MCP_AGENT_ROLE = "deepseek-optimizer" }
+description = "Read-only repository status adapter; optimization and PR labels are identity metadata only"
 startup_timeout_sec = 20
 tool_timeout_sec = 200
 enabled = true
 
 [mcp_servers.warp-quality]
-command = "python"
-args = [".ai/warp/quality_agent.py"]
-env = {
-    LOG_DIR = "logs/warp",
-    QUALITY_CHECK = "true",
-    AI_AGENT_MODE = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/warp", QUALITY_CHECK = "identity-metadata-only", AI_AGENT_MODE = "identity-metadata-only", MCP_AGENT_ROLE = "warp-quality" }
+description = "Read-only repository status adapter; quality and agent labels are identity metadata only"
 startup_timeout_sec = 15
 tool_timeout_sec = 120
 enabled = true
 
 [mcp_servers.amazonq-cloud]
-command = "python"
-args = [".ai/amazonq/agent.py"]
-env = {
-    LOG_DIR = "logs/amazonq",
-    AUTO_MERGE = "true",
-    AWS_REGION = "us-east-1"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/amazonq", AUTO_MERGE = "identity-metadata-only", AWS_REGION = "identity-metadata-only", MCP_AGENT_ROLE = "amazonq-cloud" }
+description = "Read-only repository status adapter; AWS, cloud, and automation labels are identity metadata only"
 startup_timeout_sec = 25
 tool_timeout_sec = 180
 enabled = true
 
 [mcp_servers.kiro-dev]
-command = "python"
-args = [".ai/kiro/agent.py"]
-env = {
-    LOG_DIR = "logs/kiro",
-    DEV_WORKFLOW = "true",
-    TOOLING_OPTIMIZATION = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { LOG_DIR = "logs/kiro", DEV_WORKFLOW = "identity-metadata-only", TOOLING_OPTIMIZATION = "identity-metadata-only", MCP_AGENT_ROLE = "kiro-dev" }
+description = "Read-only repository status adapter; development workflow labels are identity metadata only"
 startup_timeout_sec = 20
 tool_timeout_sec = 150
 enabled = true
@@ -122,9 +97,7 @@ enabled = true
 [mcp_servers.github]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-github"]
-env = {
-    GITHUB_PERSONAL_ACCESS_TOKEN = "$GITHUB_TOKEN"
-}
+env = { GITHUB_PERSONAL_ACCESS_TOKEN = "$GITHUB_TOKEN" }
 startup_timeout_sec = 20
 tool_timeout_sec = 90
 enabled = true
@@ -145,70 +118,58 @@ enabled = false  # Enable when Chrome debugging needed
 
 # Internal Communication Servers
 [mcp_servers.rag-knowledge]
-command = "python"
-args = [".ai/rag/server.py"]
-env = {
-    VECTOR_STORE = ".ai/rag/embeddings",
-    KNOWLEDGE_BASE = ".ai/rag/shared_knowledge.json"
-}
+command = "python3"
+args = [".ai/mcp/scripts/rag_server.py"]
+env = { VECTOR_STORE = ".ai/rag/embeddings", KNOWLEDGE_BASE = ".ai/rag/shared_knowledge.json" }
 startup_timeout_sec = 15
 tool_timeout_sec = 60
 enabled = true
 
 [mcp_servers.agent-communication]
-command = "python"
-args = [".ai/workflows/message_bus.py"]
-env = {
-    MESSAGE_BUS = ".ai/workflows/message_bus.json",
-    COORDINATION_MODE = "true"
-}
+command = "python3"
+args = [".ai/mcp/scripts/a2a_server.py"]
+env = { MESSAGE_BUS = ".ai/workflows/message_bus.json", COORDINATION_MODE = "true" }
 startup_timeout_sec = 10
 tool_timeout_sec = 30
 enabled = true
 
 # Development Tools Integration
 [mcp_servers.flipper-tools]
-command = "python"
-args = [".ai/tools/flipper_mcp.py"]
-env = {
-    FBT_PATH = "./fbt",
-    FLIPPER_TOOLCHAIN = "toolchain/current"
-}
+command = "python3"
+args = [".ai/tools/scripts/flipper_mcp.py"]
+env = { FBT_PATH = "./fbt", FLIPPER_TOOLCHAIN = "toolchain/current" }
 startup_timeout_sec = 25
 tool_timeout_sec = 180
 enabled = true
 
 [mcp_servers.firmware-analyzer]
-command = "python"
-args = [".ai/tools/firmware_analyzer.py"]
-env = {
-    ANALYSIS_MODE = "comprehensive",
-    OUTPUT_DIR = "logs/analysis"
-}
+# Read-only compatibility identity; it does not perform firmware analysis.
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { ANALYSIS_MODE = "identity-metadata-only", OUTPUT_DIR = "logs/analysis", MCP_AGENT_ROLE = "firmware-analyzer" }
+description = "Read-only repository status adapter; analysis label is identity metadata only"
 startup_timeout_sec = 20
 tool_timeout_sec = 300
 enabled = true
 
 # Security and Compliance
 [mcp_servers.security-scanner]
-command = "python"
-args = [".ai/security/scanner.py"]
-env = {
-    SCAN_MODE = "continuous",
-    ALERT_THRESHOLD = "medium"
-}
+# Read-only compatibility identity; it does not run a security scan.
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { SCAN_MODE = "identity-metadata-only", ALERT_THRESHOLD = "identity-metadata-only", MCP_AGENT_ROLE = "security-scanner" }
+description = "Read-only repository status adapter; scan and alert labels are identity metadata only"
 startup_timeout_sec = 15
 tool_timeout_sec = 120
 enabled = true
 
 # Documentation and Knowledge
 [mcp_servers.docs-generator]
-command = "python"
-args = [".ai/docs/generator.py"]
-env = {
-    DOCS_OUTPUT = "docs/generated",
-    AUTO_UPDATE = "true"
-}
+# Read-only compatibility identity; it does not generate documentation.
+command = "python3"
+args = [".ai/mcp/scripts/repo_agent_server.py"]
+env = { DOCS_OUTPUT = "docs/generated", AUTO_UPDATE = "identity-metadata-only", MCP_AGENT_ROLE = "docs-generator" }
+description = "Read-only repository status adapter; documentation generation and update labels are identity metadata only"
 startup_timeout_sec = 10
 tool_timeout_sec = 90
 enabled = true

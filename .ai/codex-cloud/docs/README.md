@@ -1,5 +1,10 @@
 # Codex Cloud Agent
 
+> **Legacy design document:** capability and throughput statements below are
+> historical, unverified metadata. The repository MCP adapter is read-only and
+> does not implement cloud execution, GitHub mutation, approval bypass, or
+> automatic merging.
+
 ## Overview
 OpenAI's cloud-based coding agent that provisions sandboxed containers for complex code execution, refactoring, and architectural improvements.
 

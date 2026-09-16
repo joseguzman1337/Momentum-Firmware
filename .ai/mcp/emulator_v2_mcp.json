@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "flipper-emulator-v2": {
+      "command": "python3",
+      "args": [
+        "flipper_mcp_server.py"
+      ],
+      "cwd": "/Volumes/h101/Momentum-Firmware/emulator_v2_mcp",
+      "env": {
+        "MOMENTUM_FIRMWARE_ROOT": "/Volumes/h101/Momentum-Firmware",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "trust": true,
+      "description": "Hardware-isolated MCP control plane for Emulator v2 and the canonical native firmware emulator runner. It never opens or flashes physical hardware."
+    }
+  }
+}

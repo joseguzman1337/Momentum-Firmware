@@ -92,10 +92,10 @@ void gui_update(Gui* gui);
  */
 void gui_input_events_callback(const void* value, void* ctx);
 
-/** Get count of view ports in layer
+/** Get count of enabled view ports in layer
  *
  * @param      gui        The Gui instance
- * @param[in]  layer      GuiLayer that we want to get count of view ports
+ * @param[in]  layer      layer to count, or GuiLayerMAX to count every layer
  */
 size_t gui_active_view_port_count(Gui* gui, GuiLayer layer);
 

@@ -9,6 +9,7 @@
 #include "nfc_app_api_table_i.h"
 
 static_assert(!has_hash_collisions(nfc_app_api_table), "Detected API method hash collision!");
+static constexpr auto nfc_app_packed_api_table = pack_hashtable(nfc_app_api_table);
 
 constexpr HashtableApiInterface nfc_application_hashtable_api_interface{
     {
@@ -18,8 +19,11 @@ constexpr HashtableApiInterface nfc_application_hashtable_api_interface{
         .resolver_callback = &elf_resolve_from_hashtable,
     },
     /* pointers to application's API table boundaries */
-    nfc_app_api_table.cbegin(),
-    nfc_app_api_table.cend(),
+    nfc_app_packed_api_table.hash_low.data(),
+    nfc_app_packed_api_table.hash_high.data(),
+    nfc_app_packed_api_table.addresses.data(),
+    nfc_app_api_table.size(),
+    nfc_app_packed_api_table.low_width,
 };
 
 /* Casting to generic resolver to use in Composite API resolver */

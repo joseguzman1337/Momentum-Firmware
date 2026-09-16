@@ -1,0 +1,53 @@
+[D] /ext/apps/Bluetooth
+	[F] /ext/apps/Bluetooth/hid_ble.fap 57320b
+	[D] /ext/apps/GPIO
+	[D] /ext/apps/GPIO/Debug
+	[D] /ext/apps/GPIO/ESP
+	[D] /ext/apps/GPIO/FlipBoard
+	[D] /ext/apps/GPIO/FlipperHTTP
+	[D] /ext/apps/GPIO/GPS
+	[D] /ext/apps/GPIO/MALVEKE
+	[D] /ext/apps/GPIO/MAYHEM
+	[D] /ext/apps/GPIO/NRF24
+	[D] /ext/apps/GPIO/Sensors
+	[D] /ext/apps/GPIO/VGM
+	[F] /ext/apps/GPIO/gpio.fap 28904b
+	[D] /ext/apps/Games
+	[F] /ext/apps/Games/snake_game.fap 6900b
+	[D] /ext/apps/Infrared
+	[F] /ext/apps/Infrared/infrared.fap 121840b
+	[D] /ext/apps/Media
+	[D] /ext/apps/NFC
+	[F] /ext/apps/NFC/nfc.fap 217508b
+	[D] /ext/apps/RFID
+	[F] /ext/apps/RFID/lfrfid.fap 45608b
+	[D] /ext/apps/Scripts
+	[D] /ext/apps/Scripts/Examples
+	[F] /ext/apps/Scripts/array_buf_test.js 270b
+	[F] /ext/apps/Scripts/bad_uart.js 549b
+	[F] /ext/apps/Scripts/badusb_demo.js 1953b
+	[F] /ext/apps/Scripts/console.js 121b
+	[F] /ext/apps/Scripts/delay.js 114b
+	[F] /ext/apps/Scripts/event_loop.js 862b
+	[F] /ext/apps/Scripts/gpio.js 2217b
+	[F] /ext/apps/Scripts/gui.js 10622b
+	[F] /ext/apps/Scripts/load.js 90b
+	[F] /ext/apps/Scripts/load_api.js 50b
+	[F] /ext/apps/Scripts/math.js 953b
+	[F] /ext/apps/Scripts/notify.js 181b
+	[F] /ext/apps/Scripts/path.js 267b
+	[F] /ext/apps/Scripts/storage.js 769b
+	[F] /ext/apps/Scripts/stringutils.js 518b
+	[F] /ext/apps/Scripts/uart_echo.js 463b
+	[F] /ext/apps/Scripts/uart_echo_8e1.js 511b
+	[F] /ext/apps/Scripts/interactive.js 3282b
+	[D] /ext/apps/Sub-GHz
+	[F] /ext/apps/Sub-GHz/subghz.fap 116820b
+	[D] /ext/apps/Tools
+	[D] /ext/apps/USB
+	[F] /ext/apps/USB/bad_usb.fap 55108b
+	[F] /ext/apps/USB/hid_usb.fap 47476b
+	[F] /ext/apps/USB/u2f.fap 67176b
+	[D] /ext/apps/assets
+	[D] /ext/apps/iButton
+	[F] /ext/apps/iButton/ibutton.fap 37008b

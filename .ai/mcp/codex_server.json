@@ -1,32 +1,35 @@
 {
     "mcpServers": {
         "codex_tools": {
-            "command": "node",
+            "command": "python3",
             "args": [
-                ".ai/mcp/servers/codex_tools.js"
+                ".ai/mcp/scripts/repo_agent_server.py"
             ],
             "env": {
-                "REPO_ROOT": "/Users/x/x/Momentum-Firmware",
-                "LOG_DIR": "logs/codex"
+                "PROJECT_ROOT": ".",
+                "LOG_DIR": "logs/codex",
+                "MCP_AGENT_ROLE": "codex-tools"
             },
             "trust": true,
-            "description": "Codex-specific tools for code generation and bug fixes"
+            "description": "Read-only repository status compatibility adapter using the codex-tools identity; the legacy tools label is metadata only and it does not generate or modify code"
         },
         "github_integration": {
-            "command": "node",
+            "command": "python3",
             "args": [
-                ".ai/mcp/servers/github_tools.js"
+                ".ai/mcp/scripts/repo_agent_server.py"
             ],
             "env": {
-                "GH_TOKEN": "$GITHUB_TOKEN"
+                "GH_TOKEN": "identity-metadata-only",
+                "PROJECT_ROOT": ".",
+                "MCP_AGENT_ROLE": "github-integration"
             },
             "trust": true,
-            "description": "GitHub API integration for PR/issue management"
+            "description": "Read-only repository status compatibility adapter using the github-integration identity; the legacy GitHub label is metadata only and it does not call GitHub APIs"
         },
         "rag_knowledge": {
             "command": "python3",
             "args": [
-                ".ai/mcp/servers/rag_server.py"
+                ".ai/mcp/scripts/rag_server.py"
             ],
             "env": {
                 "VECTOR_STORE": ".ai/rag/embeddings",
@@ -38,7 +41,7 @@
         "agent_communication": {
             "command": "python3",
             "args": [
-                ".ai/mcp/servers/a2a_server.py"
+                ".ai/mcp/scripts/a2a_server.py"
             ],
             "env": {
                 "MESSAGE_BUS": ".ai/workflows/message_bus.json"
@@ -71,6 +74,15 @@
             "cwd": ".ai/mcp/servers/strawberry_mcp",
             "trust": true,
             "description": "Furi OS MCP server for Flipper Zero firmware operations (build, flash, clean) and WiFi Devboard deployment."
+        },
+        "flipper_recovery": {
+            "command": "python3",
+            "args": [
+                "main.py"
+            ],
+            "cwd": ".ai/mcp/servers/flipper_recovery",
+            "trust": true,
+            "description": "Fail-closed Flipper recovery MCP with ELF boundary validation and explicitly confirmed flash operations."
         }
     }
 }

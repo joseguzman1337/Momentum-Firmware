@@ -56,11 +56,22 @@ if ENV["COMPACT"] and ENV["IS_BASE_FIRMWARE"]:
             "-flto-partition=one",
             "-fno-fat-lto-objects",
             "-fipa-pta",
+            "-fipa-icf",
+            "-fno-ipa-cp-clone",
             "-fmerge-all-constants",
+            "-falign-functions=2",
+            "-falign-labels=1",
+            "-falign-loops=1",
+            "-falign-jumps=1",
             "-fno-unwind-tables",
             "-fno-asynchronous-unwind-tables",
         ],
-        LINKFLAGS=["-flto", "-flto-partition=one"],
+        LINKFLAGS=[
+            "-flto",
+            "-flto-partition=one",
+            "-Wl,--sort-section=alignment",
+            "-Wl,--relax",
+        ],
     )
 
 

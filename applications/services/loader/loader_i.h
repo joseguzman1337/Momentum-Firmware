@@ -36,6 +36,11 @@ struct Loader {
     Gui* gui;
     ViewHolder* view_holder;
     Loading* loading;
+    FuriTimer* loading_timer;
+    uint32_t loading_hold_start;
+    size_t loading_view_ports_baseline;
+    uint8_t loading_depth;
+    bool loading_held;
 };
 
 typedef enum {
@@ -55,6 +60,7 @@ typedef enum {
     LoaderMessageTypeClearLaunchQueue,
 
     LoaderMessageTypeShowSettings,
+    LoaderMessageTypeLoadingCheck,
 } LoaderMessageType;
 
 typedef struct {

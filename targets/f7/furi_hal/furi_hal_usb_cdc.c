@@ -394,10 +394,11 @@ static usbd_respond cdc_ep_config(usbd_device* dev, uint8_t cfg);
 static usbd_respond cdc_control(usbd_device* dev, usbd_ctlreq* req, usbd_rqc_callback* callback);
 
 static usbd_device* usb_dev;
-static volatile FuriHalUsbInterface* cdc_if_cur = NULL;
+/* The pointer values, not the callback/interface objects, are shared with USB IRQ callbacks. */
+static FuriHalUsbInterface* volatile cdc_if_cur = NULL;
 static volatile bool connected = false;
-static volatile CdcCallbacks* callbacks[IF_NUM_MAX] = {NULL};
-static void* cb_ctx[IF_NUM_MAX];
+static CdcCallbacks* volatile callbacks[IF_NUM_MAX] = {NULL};
+static void* volatile cb_ctx[IF_NUM_MAX];
 
 FuriHalUsbInterface usb_cdc_single = {
     .init = cdc_init,

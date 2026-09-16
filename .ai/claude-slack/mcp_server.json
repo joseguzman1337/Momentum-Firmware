@@ -1,15 +1,18 @@
 {
   "mcpServers": {
     "claude-slack-agent": {
-      "command": "python",
-      "args": [".ai/claude-slack/agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/claude-slack",
-        "AUTO_MERGE": "true",
-        "YOLO_MODE": "true",
-        "SLACK_BOT_TOKEN": "${SLACK_BOT_TOKEN}",
-        "CLAUDE_API_KEY": "${CLAUDE_API_KEY}"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "SLACK_BOT_TOKEN": "identity-metadata-only",
+        "CLAUDE_API_KEY": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "claude-slack-agent",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the claude-slack-agent identity; legacy automation, Slack, and Claude labels are metadata only and make no external calls"
     }
   }
 }

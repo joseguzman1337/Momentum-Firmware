@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """FastMCP adapter for the repository-local safe Flipper recovery engine."""
 
-from pathlib import Path
 import importlib.util
+import sys
+from pathlib import Path
 
 try:
     from mcp.server.fastmcp import FastMCP as MCPServer
 except ModuleNotFoundError:  # MCP SDK 2.x rename
-    from mcp.server.mcpserver import MCPServer
+    try:
+        from mcp.server.mcpserver import MCPServer
+    except ModuleNotFoundError:
+        SCRIPTS = Path(__file__).resolve().parents[2] / "scripts"
+        sys.path.insert(0, str(SCRIPTS))
+        from mcp_stdio import FastMCPCompat as MCPServer
 
 ROOT = Path(__file__).resolve().parents[4]
 SPEC = importlib.util.spec_from_file_location("flipper_recovery", ROOT / "scripts/flipper_recovery.py")

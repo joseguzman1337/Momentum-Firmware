@@ -1,0 +1,12 @@
+{
+  "firmware": "build/f7-firmware-C/firmware.bin",
+  "output": ".ai/logs/qemu-fw/snapshot-headless",
+  "oracle_snapshot": ".ai/fz-emulator/snapshot",
+  "sd_tree": ".ai/fz-emulator/sd-fixture",
+  "max_instructions": 100000000,
+  "verbosity": 0,
+  "inputs": [
+    {"button": "OK", "action": "PRESS"},
+    {"button": "OK", "action": "RELEASE"}
+  ]
+}

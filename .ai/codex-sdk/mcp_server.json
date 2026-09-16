@@ -1,14 +1,17 @@
 {
   "mcpServers": {
     "codex-sdk-agent": {
-      "command": "python",
-      "args": [".ai/codex-sdk/agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/codex-sdk",
-        "AUTO_MERGE": "true",
-        "YOLO_MODE": "true",
-        "CODEX_API_KEY": "${CODEX_API_KEY}"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "CODEX_API_KEY": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "codex-sdk-agent",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the codex-sdk-agent identity; legacy SDK and automation labels are metadata only and make no external calls"
     }
   }
 }

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flipper-zero-emulator-v2"
+version = "2.1.0"
+description = "Flipper Zero Hardware & Firmware Emulator with Model Context Protocol (MCP) Server"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.scripts]
+momentum-emulator-v2 = "main:main"
+momentum-emulator-v2-mcp = "integration_server:main"
+
+[tool.setuptools]
+py-modules = ["integration_server", "flipper_mcp_server", "main"]
+
+[tool.setuptools.packages.find]
+include = ["tools*"]

@@ -1,0 +1,3 @@
+[console_scripts]
+momentum-emulator-v2 = main:main
+momentum-emulator-v2-mcp = integration_server:main

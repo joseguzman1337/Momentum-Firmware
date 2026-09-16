@@ -64,3 +64,9 @@ Cargo.lock
 # Firebase debug logs
 firebase-debug.log
 firebase-debug.*.log
+
+# Locally reproducible emulator runtimes and execution history.  Keep source,
+# fixtures, specifications, and tests in Git; these trees contain downloaded
+# toolchains, nested repositories, generated disk images, and rotating logs.
+/.tools/
+/.ai/logs/

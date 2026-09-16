@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "backends": {
+    "native": {
+      "role": "functional",
+      "features": ["cortex-m4", "nvic", "systick", "rcc", "rtc", "gpio", "dma", "spi", "i2c", "usart", "sram2", "otp", "hsem", "ipcc", "cpu2-service-replay", "safe-option-bytes"],
+      "limitations": ["cpu2 is a boot-boundary stub", "cpu2 binary is reference-only", "fus and radio use deterministic service replay", "option bytes are read-only"]
+    },
+    "renode": {
+      "role": "cross-check",
+      "features": ["cortex-m4", "trace-hooks", "elf-symbols", "scriptable-mmio"],
+      "limitations": ["stm32wb peripherals are mapped-memory shims", "no cpu2 radio stack"]
+    },
+    "oracle": {
+      "role": "hardware-oracle",
+      "features": ["read-only device snapshot replay", "trace comparison"],
+      "limitations": ["capture requires an explicitly invoked hardware session", "never used by default"]
+    }
+  }
+}

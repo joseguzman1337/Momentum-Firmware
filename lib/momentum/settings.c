@@ -57,27 +57,18 @@ typedef enum {
 } momentum_settings_type;
 
 static const struct {
-    momentum_settings_type type;
     const char* key;
     void* val;
-    union {
-        size_t str_len;
-        struct {
-            int32_t i_min;
-            int32_t i_max;
-            uint8_t i_sz;
-        };
-        struct {
-            uint32_t u_min;
-            uint32_t u_max;
-            uint8_t u_sz;
-        };
-    };
-#define setting(t, n)             .type = momentum_settings_type##t, .key = #n, .val = &momentum_settings.n
-#define setting_str(n)            setting(_str, n), .str_len = sizeof(momentum_settings.n)
-#define num(t, n, min, max)       .t##_min = min, .t##_max = max, .t##_sz = sizeof(momentum_settings.n)
-#define setting_int(n, min, max)  setting(_int, n), num(i, n, min, max)
-#define setting_uint(n, min, max) setting(_uint, n), num(u, n, min, max)
+    uint32_t min;
+    uint32_t max;
+    momentum_settings_type type : 8;
+    uint8_t size;
+#define setting(t, n) \
+    .key = #n, .val = &momentum_settings.n, .type = momentum_settings_type##t, \
+    .size = sizeof(momentum_settings.n)
+#define setting_str(n)            setting(_str, n)
+#define setting_int(n, vmin, vmax) setting(_int, n), .min = (uint32_t)(vmin), .max = (uint32_t)(vmax)
+#define setting_uint(n, vmin, vmax) setting(_uint, n), .min = (vmin), .max = (vmax)
 #define setting_enum(n, cnt)      setting_uint(n, 0, cnt - 1)
 #define setting_bool(n)           setting(_bool, n)
 } momentum_settings_entries[] = {
@@ -123,6 +114,10 @@ static const struct {
     {setting_uint(rpc_color_bg, 0x000000, 0xFFFFFF)},
 };
 
+_Static_assert(
+    sizeof(momentum_settings_entries[0]) == 20,
+    "Momentum settings metadata must remain compact");
+
 void momentum_settings_load(void) {
     Storage* storage = furi_record_open(RECORD_STORAGE);
     FlipperFormat* file = flipper_format_file_alloc(storage);
@@ -138,17 +133,17 @@ void momentum_settings_load(void) {
             switch(entry.type) {
             case momentum_settings_type_str:
                 ok = flipper_format_read_string(file, entry.key, val_str);
-                if(ok) strlcpy((char*)entry.val, furi_string_get_cstr(val_str), entry.str_len);
+                if(ok) strlcpy((char*)entry.val, furi_string_get_cstr(val_str), entry.size);
                 break;
             case momentum_settings_type_int:
                 ok = flipper_format_read_int32(file, entry.key, &val_int, 1);
-                val_int = CLAMP(val_int, entry.i_max, entry.i_min);
-                if(ok) memcpy(entry.val, &val_int, entry.i_sz);
+                val_int = CLAMP(val_int, (int32_t)entry.max, (int32_t)entry.min);
+                if(ok) memcpy(entry.val, &val_int, entry.size);
                 break;
             case momentum_settings_type_uint:
                 ok = flipper_format_read_uint32(file, entry.key, &val_uint, 1);
-                val_uint = CLAMP(val_uint, entry.u_max, entry.u_min);
-                if(ok) memcpy(entry.val, &val_uint, entry.u_sz);
+                val_uint = CLAMP(val_uint, entry.max, entry.min);
+                if(ok) memcpy(entry.val, &val_uint, entry.size);
                 break;
             case momentum_settings_type_bool:
                 ok = flipper_format_read_bool(file, entry.key, &val_bool, 1);
@@ -183,12 +178,12 @@ void momentum_settings_save(void) {
                 break;
             case momentum_settings_type_int:
                 tmp_int = 0;
-                memcpy(&tmp_int, entry.val, entry.i_sz);
+                memcpy(&tmp_int, entry.val, entry.size);
                 flipper_format_write_int32(file, entry.key, &tmp_int, 1);
                 break;
             case momentum_settings_type_uint:
                 tmp_uint = 0;
-                memcpy(&tmp_uint, entry.val, entry.u_sz);
+                memcpy(&tmp_uint, entry.val, entry.size);
                 flipper_format_write_uint32(file, entry.key, &tmp_uint, 1);
                 break;
             case momentum_settings_type_bool:

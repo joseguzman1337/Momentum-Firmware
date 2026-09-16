@@ -64,6 +64,8 @@ To use language servers other than the default VS Code C/C++ language server, us
 
 - `fw_dist` — build & publish firmware to the `dist` folder. This is a default target when no others are specified.
 - `fap_dist` — build external plugins & publish to the `dist` folder.
+- `marketplace_sync` — merge bundled apps with every compatible app downloaded directly from the official Flipper Apps Catalog, then atomically publish the staging tree only after every official FAP passes ELF and catalog SHA-256 validation. It does not access a device.
+- `fap_deploy` — run the complete Marketplace synchronization gate and make one transfer of the verified combined app tree. Any catalog/network/compatibility/hash failure occurs before device access. Deployment overwrites matching app paths but deliberately preserves unrelated/custom files already on the SD card; it is not a destructive mirror. `fap_deploy_local` is the explicit development-only target for locally built apps.
 - `updater_package`, `updater_minpackage` — build a self-update package. The minimal version only includes the firmware's DFU file; the full version also includes a radio stack & resources for the SD card.
 - `copro_dist` — bundle Core2 FUS+stack binaries for qFlipper.
 - `flash` — flash the attached device over SWD interface with supported probes. Probe is detected automatically; you can override it with `SWD_TRANSPORT=...` variable. If multiple probes are attached, you can specify the serial number of the probe to use with `SWD_TRANSPORT_SERIAL=...`.

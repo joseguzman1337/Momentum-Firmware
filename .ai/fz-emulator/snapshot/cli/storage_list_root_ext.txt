@@ -1,0 +1,17 @@
+[D] .int
+	[D] update
+	[F] Manifest 85330b
+	[D] apps
+	[D] apps_data
+	[D] asset_packs
+	[D] badusb
+	[D] dolphin
+	[D] ibutton_fuzzer
+	[D] infrared
+	[D] lfrfid
+	[D] lfrfid_fuzzer
+	[D] mifare_fuzzer
+	[D] nfc
+	[D] subghz
+	[D] u2f
+	[D] wav_player

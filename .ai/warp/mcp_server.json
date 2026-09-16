@@ -1,14 +1,17 @@
 {
   "mcpServers": {
     "warp-quality": {
-      "command": "python",
-      "args": [".ai/warp/quality_agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/warp",
-        "AUTO_MERGE": "true",
-        "CONTINUOUS_ANALYSIS": "true",
-        "YOLO_MODE": "true"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "CONTINUOUS_ANALYSIS": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "warp-quality",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the warp-quality identity; legacy quality, continuous-analysis, and automation labels are metadata only"
     }
   }
 }

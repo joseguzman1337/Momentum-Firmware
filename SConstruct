@@ -239,10 +239,31 @@ Depends(
 )
 Alias("fap_dist", fap_dist)
 
-# Copy all faps to device
+# Fetch hash-verified official Marketplace builds. This target only stages files;
+# it never communicates with a device.
+marketplace_sync = distenv.PhonyTarget(
+    "marketplace_sync",
+    Action(
+        [
+            [
+                "${PYTHON3}",
+                "${ROOT_DIR}/scripts/official_marketplace_sync.py",
+                "--api-file",
+                "${ROOT_DIR}/targets/f7/api_symbols.csv",
+                "--destination",
+                "${ROOT_DIR}/build/official-marketplace/apps",
+                "--base",
+                "${SOURCE}",
+            ]
+        ]
+    ),
+    source=firmware_env.Dir(("${RESOURCES_ROOT}/apps")),
+)
+Depends(marketplace_sync, firmware_env["FW_RESOURCES_MANIFEST"])
 
-fap_deploy = distenv.PhonyTarget(
-    "fap_deploy",
+# Explicit development-only deployment of locally built apps.
+fap_deploy_local = distenv.PhonyTarget(
+    "fap_deploy_local",
     Action(
         [
             [
@@ -259,7 +280,27 @@ fap_deploy = distenv.PhonyTarget(
     ),
     source=firmware_env.Dir(("${RESOURCES_ROOT}/apps")),
 )
-Depends(fap_deploy, firmware_env["FW_RESOURCES_MANIFEST"])
+Depends(fap_deploy_local, firmware_env["FW_RESOURCES_MANIFEST"])
+
+marketplace_deploy = distenv.PhonyTarget(
+    "marketplace_deploy",
+    Action(
+        [
+            [
+                "${PYTHON3}",
+                "${FBT_SCRIPT_DIR}/storage.py",
+                "-p",
+                "${FLIP_PORT}",
+                "send",
+                "${ROOT_DIR}/build/official-marketplace/apps",
+                "/ext/apps",
+                "${ARGS}",
+            ]
+        ]
+    ),
+)
+Depends(marketplace_deploy, marketplace_sync)
+Alias("fap_deploy", marketplace_deploy)
 
 
 # Target for bundling core2 package for qFlipper

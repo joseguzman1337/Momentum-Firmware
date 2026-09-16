@@ -1,13 +1,16 @@
 {
   "mcpServers": {
     "kiro-agent": {
-      "command": "python",
-      "args": [".ai/kiro/agent.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/kiro",
-        "AUTO_MERGE": "true",
-        "YOLO_MODE": "true"
-      }
+        "AUTO_MERGE": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "kiro-agent",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the kiro-agent identity; legacy automation labels are metadata only and perform no merge"
     }
   }
 }

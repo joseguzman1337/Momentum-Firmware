@@ -23,18 +23,20 @@ ViewPort* gui_view_port_find_enabled(ViewPortArray_t array) {
 
 size_t gui_active_view_port_count(Gui* gui, GuiLayer layer) {
     furi_assert(gui);
-    furi_check(layer < GuiLayerMAX);
+    furi_check(layer <= GuiLayerMAX);
     size_t ret = 0;
 
     gui_lock(gui);
-    ViewPortArray_it_t it;
-    ViewPortArray_it_last(it, gui->layers[layer]);
-    while(!ViewPortArray_end_p(it)) {
-        ViewPort* view_port = *ViewPortArray_ref(it);
-        if(view_port_is_enabled(view_port)) {
-            ret++;
+    const GuiLayer first = layer == GuiLayerMAX ? 0 : layer;
+    const GuiLayer end = layer == GuiLayerMAX ? GuiLayerMAX : layer + 1;
+    for(GuiLayer current = first; current < end; current++) {
+        ViewPortArray_it_t it;
+        ViewPortArray_it_last(it, gui->layers[current]);
+        while(!ViewPortArray_end_p(it)) {
+            ViewPort* view_port = *ViewPortArray_ref(it);
+            if(view_port_is_enabled(view_port)) ret++;
+            ViewPortArray_previous(it);
         }
-        ViewPortArray_previous(it);
     }
     gui_unlock(gui);
 

@@ -1,0 +1,11 @@
+{
+  "bytes": 1024,
+  "captured": true,
+  "file": "screen/framebuffer-128x64-1bpp.bin",
+  "format": "Flipper canvas native 1bpp",
+  "height": 64,
+  "orientation": 0,
+  "sha256": "3112c93101e45558d427750d01c500b945f983e765a069e84d355d4a9a044b66",
+  "transport": "RPC ScreenStream",
+  "width": 128
+}

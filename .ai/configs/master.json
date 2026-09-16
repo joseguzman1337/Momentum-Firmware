@@ -1,14 +1,17 @@
 {
     "version": "1.0.0",
+    "registry_notice": "Legacy provider, task, YOLO, automation, cloud, and security labels describe preserved identities and intended orchestration only. Registrations backed by repo_agent_server.py expose read-only local repository status tools and do not merge, push, close, scan, generate, call providers, or perform cloud actions.",
     "agents": {
         "codex": {
             "enabled": true,
+            "mcp_capability": "Mixed registry; repo_agent_server-backed identities are read-only repository status adapters",
+            "tasks_status": "intended orchestration metadata; not executed by the registered read-only MCP adapter",
             "mode": "yolo",
-            "auto_approve": true,
+            "auto_approve": "identity-metadata-only",
             "log_dir": "logs/codex",
             "config": {
                 "model": "gpt-5.2-codex",
-                "full_auto": true,
+                "full_auto": "identity-metadata-only",
                 "search": true,
                 "sandbox": "workspace-write"
             },
@@ -21,12 +24,14 @@
         },
         "claude": {
             "enabled": true,
+            "mcp_capability": "Read-only repository status compatibility adapter; security and automation labels are identity metadata only",
+            "tasks_status": "intended orchestration metadata; not executed by the registered read-only MCP adapter",
             "mode": "yolo",
-            "auto_approve": true,
+            "auto_approve": "identity-metadata-only",
             "log_dir": "logs/claude",
             "config": {
                 "model": "claude-sonnet-4-5",
-                "dangerously_skip_permissions": true,
+                "dangerously_skip_permissions": "identity-metadata-only",
                 "output_format": "json"
             },
             "tasks": [
@@ -34,12 +39,14 @@
                 "code_review",
                 "vulnerability_remediation"
             ],
-            "mcp_server": ".ai/mcp/claude_server.json"
+            "mcp_server": ".ai/claude/mcp_server.json"
         },
         "gemini": {
             "enabled": true,
+            "mcp_capability": "Read-only repository status compatibility adapter; architecture and super-agent labels are identity metadata only",
+            "tasks_status": "intended orchestration metadata; not executed by the registered read-only MCP adapter",
             "mode": "yolo",
-            "auto_approve": true,
+            "auto_approve": "identity-metadata-only",
             "log_dir": "logs/gemini",
             "config": {
                 "model": "gemini-2.5-pro",
@@ -51,12 +58,14 @@
                 "complex_refactoring",
                 "performance_optimization"
             ],
-            "mcp_server": ".ai/mcp/gemini_server.json"
+            "mcp_server": ".ai/gemini/mcp_server.json"
         },
         "jules": {
             "enabled": true,
+            "mcp_capability": "Read-only repository status compatibility adapter; async and PR labels are identity metadata only",
+            "tasks_status": "intended orchestration metadata; not executed by the registered read-only MCP adapter",
             "mode": "async",
-            "auto_approve": true,
+            "auto_approve": "identity-metadata-only",
             "log_dir": "logs/jules",
             "config": {
                 "quota_aware": true,
@@ -67,16 +76,18 @@
                 "pr_generation",
                 "multi_step_tasks"
             ],
-            "mcp_server": ".ai/mcp/jules_server.json"
+            "mcp_server": ".ai/jules/mcp_server.json"
         },
         "warp": {
             "enabled": true,
+            "mcp_capability": "Read-only repository status compatibility adapter; quality and automation labels are identity metadata only",
+            "tasks_status": "intended orchestration metadata; not executed by the registered read-only MCP adapter",
             "mode": "yolo",
-            "auto_approve": true,
+            "auto_approve": "identity-metadata-only",
             "log_dir": "logs/warp",
             "config": {
                 "task_file": "warp_agent_tasks.md",
-                "auto_execute": true,
+                "auto_execute": "identity-metadata-only",
                 "batch_mode": true
             },
             "tasks": [
@@ -84,11 +95,12 @@
                 "documentation",
                 "analysis"
             ],
-            "mcp_server": ".ai/mcp/warp_server.json"
+            "mcp_server": ".ai/warp/mcp_server.json"
         }
     },
     "super_agent": {
-        "enabled": true,
+        "enabled": "identity-metadata-only",
+        "runtime_status": "not implemented by any repo_agent_server-backed MCP registration",
         "name": "orchestrator",
         "capabilities": [
             "task_routing",
@@ -97,7 +109,7 @@
             "priority_management"
         ],
         "decision_model": "gemini-2.5-pro",
-        "rag_enabled": true
+        "rag_enabled": "identity-metadata-only"
     },
     "a2a_communication": {
         "enabled": true,
@@ -119,11 +131,12 @@
         "overlap": 200
     },
     "automation": {
-        "auto_pr_creation": true,
-        "auto_merge": true,
-        "auto_issue_close": true,
-        "continuous_mode": true,
-        "health_check_interval": 300
+        "status": "legacy intended-orchestration metadata; not implemented by repo_agent_server-backed MCP registrations",
+        "auto_pr_creation": "identity-metadata-only",
+        "auto_merge": "identity-metadata-only",
+        "auto_issue_close": "identity-metadata-only",
+        "continuous_mode": "identity-metadata-only",
+        "health_check_interval": "identity-metadata-only"
     },
     "logging": {
         "level": "info",

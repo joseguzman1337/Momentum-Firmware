@@ -1,19 +1,23 @@
 {
   "mcpServers": {
     "linear-codex": {
-      "command": "python",
-      "args": [".ai/linear/integration.py"],
+      "command": "python3",
+      "args": [".ai/mcp/scripts/repo_agent_server.py"],
       "env": {
         "LOG_DIR": "logs/linear",
-        "AUTO_ASSIGN_CODEX": "true",
-        "YOLO_MODE": "true",
-        "LINEAR_TEAM_ID": "momentum-firmware"
-      }
+        "AUTO_ASSIGN_CODEX": "identity-metadata-only",
+        "YOLO_MODE": "identity-metadata-only",
+        "LINEAR_TEAM_ID": "identity-metadata-only",
+        "MCP_AGENT_ROLE": "linear-codex",
+        "PROJECT_ROOT": "."
+      },
+      "description": "Read-only repository status compatibility adapter using the linear-codex identity; legacy Linear, assignment, and automation labels are metadata only and make no external calls"
     }
   },
   "automation": {
-    "github_to_linear_sync": true,
-    "auto_assign_codex": true,
+    "status": "legacy identity metadata only; no Linear or GitHub calls are implemented by this MCP adapter",
+    "github_to_linear_sync": "identity-metadata-only",
+    "auto_assign_codex": "identity-metadata-only",
     "issue_types": ["bug", "feature", "enhancement"],
     "codex_environments": ["momentum-firmware-main"]
   }

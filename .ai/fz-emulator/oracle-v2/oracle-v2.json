@@ -1,0 +1,224 @@
+{
+  "cli": [
+    {
+      "command": "device_info",
+      "latency_ms": 154.139,
+      "sha256": "156d8a116f895e0e71e319531815efd106e385fa842765fe6a6eda315fd0137e"
+    },
+    {
+      "command": "storage info /int",
+      "latency_ms": 150.844,
+      "sha256": "ff3a3f21cdd23eaa26c32b48c3842c987206f8b8b7bee6065a69025eb3b3a443"
+    },
+    {
+      "command": "storage info /ext",
+      "latency_ms": 154.899,
+      "sha256": "ad3f7a9cb9309aa60fa8355bde5e10aa9a7b72cd493314470f9152a4ea8505c7"
+    },
+    {
+      "command": "storage list /int",
+      "latency_ms": 155.147,
+      "sha256": "9a2e7a216d6b936cf709c687826df66a6a352b59806cc01f3db7e8a1a637ba57"
+    },
+    {
+      "command": "storage list /ext",
+      "latency_ms": 155.108,
+      "sha256": "a72230f807cd90d96113eb184f3b17695a1dc3df245536db02d36a6b29e181cb"
+    },
+    {
+      "command": "storage tree /ext/apps",
+      "latency_ms": 305.363,
+      "sha256": "5d45d33d07b1c60c0e1b46db8308d2fa3a666ee1581f291f0832b5f7079ee8f7"
+    },
+    {
+      "command": "storage tree /ext/asset_packs",
+      "latency_ms": 606.093,
+      "sha256": "7c48ead77a5a7a468ac98fbb224d45d4887d1a07d43c93ee0a9fdd97f23d757f"
+    },
+    {
+      "command": "storage tree /ext/update",
+      "latency_ms": 155.576,
+      "sha256": "c449bf4d2ade8c884ba646eb7b286a11ed6b1b3dfc69ff23235f1b266c2f831e"
+    },
+    {
+      "command": "storage md5 /int/.notification.settings",
+      "latency_ms": 151.723,
+      "sha256": "44ebfbc325c99112ab014b72f3071a5b31732a3504d5bbb10e72667792d1496f"
+    },
+    {
+      "command": "storage md5 /int/.expansion.settings",
+      "latency_ms": 155.343,
+      "sha256": "dc234d476640315693789e5c0451a199bafd84d367c0070cc49a61769e64597d"
+    },
+    {
+      "command": "storage md5 /int/.desktop.settings",
+      "latency_ms": 155.285,
+      "sha256": "a3a91db722cc100dedf3a0847de6dc4fc5334f67bb77b608fcb42b63f315c908"
+    },
+    {
+      "command": "storage md5 /int/.region_data",
+      "latency_ms": 154.587,
+      "sha256": "d935db3f9ef20760e08807776304be04a0f7e28fd57bbed189a25232eef1c4f2"
+    },
+    {
+      "command": "storage md5 /int/.momentum_firstboot.flag",
+      "latency_ms": 152.672,
+      "sha256": "e56634de8abfd15fe8a17033c89f47e8f8e94b16f6971cce5012d332a3de5f28"
+    },
+    {
+      "command": "uptime",
+      "latency_ms": 154.173,
+      "sha256": "ab55b672c07d6576733752088634f2864c3117f0ae6802a635fd6325c9488442"
+    },
+    {
+      "command": "free",
+      "latency_ms": 152.147,
+      "sha256": "9d3a3c982d8c8b85f683fbc0d2444069ca61877f35cce1f29fd03697887109fe"
+    }
+  ],
+  "contracts": {
+    "input": {
+      "defines": {
+        "INPUT_DEBOUNCE_TICKS_HALF": "(INPUT_DEBOUNCE_TICKS",
+        "INPUT_LONG_PRESS_COUNTS": "2",
+        "INPUT_PRESS_TICKS": "150",
+        "INPUT_THREAD_FLAG_ISR": "0x00000001"
+      },
+      "source": "applications/services/input/input.c"
+    },
+    "settings": {
+      "desktop": {
+        "fields": [
+          {
+            "name": "auto_lock_delay_ms",
+            "type": "uint32_t"
+          },
+          {
+            "name": "auto_lock_with_pin",
+            "type": "uint8_t"
+          },
+          {
+            "name": "usb_inhibit_auto_lock",
+            "type": "uint8_t"
+          },
+          {
+            "name": "display_clock",
+            "type": "uint8_t"
+          }
+        ],
+        "payload_extracted": false,
+        "source": "applications/services/desktop/desktop_settings.h"
+      },
+      "expansion": {
+        "fields": [
+          {
+            "name": "uart_index",
+            "type": "uint8_t"
+          }
+        ],
+        "payload_extracted": false,
+        "source": "applications/services/expansion/expansion_settings.h"
+      },
+      "notification": {
+        "fields": [],
+        "payload_extracted": false,
+        "source": "applications/services/notification/notification_settings.h"
+      }
+    }
+  },
+  "rpc": {
+    "persistent_state_changed": false,
+    "screen_stream": {
+      "frames": [
+        {
+          "bytes": 1024,
+          "index": 0,
+          "latency_ms": 955.111,
+          "orientation": 0,
+          "sha256": "05e9ad5c545671d7cde4754d5f8a6c456b68faf753ca75c874bf54a704067a85"
+        },
+        {
+          "bytes": 1024,
+          "index": 1,
+          "latency_ms": 950.019,
+          "orientation": 0,
+          "sha256": "46520be6013b89368839fd4395ab91a8577548bf9b4d2484bdfe958d672bdbf7"
+        },
+        {
+          "bytes": 1024,
+          "index": 2,
+          "latency_ms": 946.669,
+          "orientation": 0,
+          "sha256": "3112c93101e45558d427750d01c500b945f983e765a069e84d355d4a9a044b66"
+        }
+      ],
+      "request_count": 3
+    }
+  },
+  "safety": {
+    "device_flashes": 0,
+    "device_resets": 0,
+    "device_writes": 0,
+    "protected_reads": 0,
+    "storage_payloads_read": 0,
+    "usb_strings_requested": 0
+  },
+  "schema": 2,
+  "usb": {
+    "available": true,
+    "class": 239,
+    "configurations": [
+      {
+        "attributes": 192,
+        "interfaces": [
+          {
+            "alternate": 0,
+            "class": 2,
+            "endpoints": [
+              {
+                "address": 131,
+                "attributes": 3,
+                "interval": 255,
+                "max_packet_size": 8
+              }
+            ],
+            "number": 0,
+            "protocol": 0,
+            "subclass": 2
+          },
+          {
+            "alternate": 0,
+            "class": 10,
+            "endpoints": [
+              {
+                "address": 1,
+                "attributes": 2,
+                "interval": 1,
+                "max_packet_size": 64
+              },
+              {
+                "address": 130,
+                "attributes": 2,
+                "interval": 1,
+                "max_packet_size": 64
+              }
+            ],
+            "number": 1,
+            "protocol": 0,
+            "subclass": 0
+          }
+        ],
+        "max_power_ma": 500,
+        "value": 1
+      }
+    ],
+    "device_bcd": 256,
+    "ep0_max_packet_size": 8,
+    "product_id": 22336,
+    "protocol": 1,
+    "strings_requested": false,
+    "subclass": 2,
+    "usb_bcd": 512,
+    "vendor_id": 1155
+  }
+}

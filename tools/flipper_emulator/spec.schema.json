@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Flipper emulator run",
+  "type": "object",
+  "required": ["firmware", "output"],
+  "additionalProperties": false,
+  "properties": {
+    "firmware": {"type": "string"}, "output": {"type": "string"},
+    "engine": {"type": "string"}, "svd": {"type": "string"}, "sd_image": {"type": "string"},
+    "oracle_snapshot": {"type": "string"}, "sd_tree": {"type": "string"},
+    "virtual_usb": {"type": "boolean"}, "internal_flash_image": {"type": "string"},
+    "live_control": {"type": "boolean"},
+    "device_info_model": {"type": "string"}, "c2_firmware": {"type": "string"},
+    "max_instructions": {"type": "integer", "minimum": 1},
+    "verbosity": {"type": "integer", "minimum": 0, "maximum": 4},
+    "inputs": {"type": "array", "items": {"type": "object", "required": ["button", "action"], "additionalProperties": false,
+      "properties": {"button": {"type": "string", "pattern": "^[A-Za-z0-9_]+$"}, "action": {"enum": ["PRESS", "RELEASE"]}}}}
+  }
+}

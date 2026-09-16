@@ -1,0 +1,7 @@
+[F] .bt.settings 9b
+	[F] .dolphin.state 40b
+	[F] .notification.settings 24b
+	[F] .expansion.settings 9b
+	[F] .desktop.settings 1040b
+	[F] .region_data 58b
+	[F] .momentum_firstboot.flag 0b

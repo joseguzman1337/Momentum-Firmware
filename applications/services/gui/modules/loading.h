@@ -30,6 +30,15 @@ void loading_free(Loading* instance);
  */
 View* loading_get_view(Loading* instance);
 
+/** Show progress below the loading animation. Progress is clamped to 0..1. */
+void loading_set_progress(Loading* instance, float progress);
+
+/** Show progress from completed and total work units without floating-point division. */
+void loading_set_progress_ratio(Loading* instance, size_t completed, size_t total);
+
+/** Return to the loading animation without a progress bar. */
+void loading_reset_progress(Loading* instance);
+
 #ifdef __cplusplus
 }
 #endif

@@ -5,19 +5,24 @@ Provides shared knowledge base for all AI agents
 """
 
 import json
-import sys
+import os
+import subprocess
+import tempfile
 from pathlib import Path
 from typing import Dict, List
+from mcp_stdio import MCPStdioServer
 
 
 class RAGServer:
     def __init__(self):
-    """TODO: Add docstring."""
-    """Initialize RAG server with knowledge base paths."""
-    self.repo_root = Path("/Users/x/x/Momentum-Firmware")
-    self.knowledge_base = self.repo_root / ".ai/rag/shared_knowledge.json"
-    self.embeddings_dir = self.repo_root / ".ai/rag/embeddings"
-    self.embeddings_dir.mkdir(parents=True, exist_ok=True)
+        """Initialize RAG server with workspace-relative knowledge paths."""
+        self.repo_root = Path(os.environ.get("REPO_ROOT", Path(__file__).resolve().parents[3])).resolve()
+        self.knowledge_base = Path(
+            os.environ.get("KNOWLEDGE_BASE", self.repo_root / ".ai/rag/shared_knowledge.json")
+        ).resolve()
+        self.embeddings_dir = Path(
+            os.environ.get("VECTOR_STORE", self.repo_root / ".ai/rag/embeddings")
+        ).resolve()
 
     def index_knowledge(self):
         """Index project knowledge for RAG"""
@@ -30,8 +35,18 @@ class RAGServer:
             "code_patterns": self.extract_code_patterns()
         }
 
-        with open(self.knowledge_base, "w") as f:
-            json.dump(knowledge, f, indent=2)
+        self.knowledge_base.parent.mkdir(parents=True, exist_ok=True)
+        fd, temporary = tempfile.mkstemp(prefix=".knowledge.", dir=self.knowledge_base.parent)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as stream:
+                json.dump(knowledge, stream, indent=2)
+                stream.write("\n")
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temporary, self.knowledge_base)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
 
         return knowledge
 
@@ -40,19 +55,22 @@ class RAGServer:
         try:
             with open(self.repo_root / path) as f:
                 return f.read()
-        except:
+        except (OSError, UnicodeError):
             return ""
 
     def get_recent_commits(self) -> List[Dict]:
         """Get recent commit history"""
-        import subprocess
         try:
             result = subprocess.run(
                 ["git", "log", "--oneline", "-n", "20"],
                 capture_output=True,
                 text=True,
-                cwd=self.repo_root
+                cwd=self.repo_root,
+                timeout=15,
+                check=False,
             )
+            if result.returncode != 0:
+                return []
             commits = []
             for line in result.stdout.strip().split("\n"):
                 if line:
@@ -62,22 +80,25 @@ class RAGServer:
                         "message": hash_msg[1] if len(hash_msg) > 1 else ""
                     })
             return commits
-        except:
+        except (OSError, subprocess.SubprocessError):
             return []
 
     def get_open_issues(self) -> List[Dict]:
         """Get open GitHub issues"""
-        import subprocess
         try:
             result = subprocess.run(
                 ["gh", "issue", "list", "--limit",
                     "50", "--json", "number,title"],
                 capture_output=True,
                 text=True,
-                cwd=self.repo_root
+                cwd=self.repo_root,
+                timeout=20,
+                check=False,
             )
+            if result.returncode != 0 or len(result.stdout) > 1_000_000:
+                return []
             return json.loads(result.stdout)
-        except:
+        except (OSError, subprocess.SubprocessError, json.JSONDecodeError):
             return []
 
     def extract_code_patterns(self) -> Dict:
@@ -101,11 +122,17 @@ class RAGServer:
 
     def query(self, query: str) -> Dict:
         """Query the knowledge base"""
+        if not isinstance(query, str) or not 1 <= len(query) <= 512:
+            raise ValueError("query must contain 1..512 characters")
         if not self.knowledge_base.exists():
-            self.index_knowledge()
+            raise FileNotFoundError("knowledge base is not indexed; call reindex_knowledge first")
 
-        with open(self.knowledge_base) as f:
+        if self.knowledge_base.stat().st_size > 10 * 1024 * 1024:
+            raise ValueError("knowledge base exceeds 10 MiB safety limit")
+        with open(self.knowledge_base, encoding="utf-8") as f:
             knowledge = json.load(f)
+        if not isinstance(knowledge, dict):
+            raise ValueError("knowledge base root must be an object")
 
         # Simple keyword matching (can be enhanced with embeddings)
         results = {}
@@ -123,36 +150,50 @@ class RAGServer:
         return results
 
 
+def create_mcp_server(server: RAGServer = None) -> MCPStdioServer:
+    """Create the MCP server, including additive legacy tool aliases."""
+    server = server or RAGServer()
+    mcp = MCPStdioServer("momentum-rag")
+    query_schema = {
+        "type": "object",
+        "properties": {"query": {"type": "string", "minLength": 1, "maxLength": 512}},
+        "required": ["query"],
+        "additionalProperties": False,
+    }
+    reindex_schema = {"type": "object", "properties": {}, "additionalProperties": False}
+    query_handler = server.query
+    reindex_handler = lambda: {"indexed": len(server.index_knowledge())}
+    mcp.tool(
+        "query_knowledge",
+        "Search the repository-local knowledge base without modifying it.",
+        query_schema,
+        query_handler,
+    )
+    mcp.tool(
+        "query",
+        "Legacy alias for query_knowledge; searches without modifying the knowledge base.",
+        query_schema,
+        query_handler,
+    )
+    mcp.tool(
+        "reindex_knowledge",
+        "Rebuild the repository-local knowledge index (mutating).",
+        reindex_schema,
+        reindex_handler,
+    )
+    mcp.tool(
+        "reindex",
+        "Legacy alias for reindex_knowledge; rebuilds the repository-local knowledge index (mutating).",
+        reindex_schema,
+        reindex_handler,
+    )
+    return mcp
+
+
 def main():
-    """MCP Server main loop"""
-    server = RAGServer()
-
-    # Index knowledge on startup
-    print("Indexing knowledge base...", file=sys.stderr)
-    knowledge = server.index_knowledge()
-    print(f"Indexed {len(knowledge)} knowledge categories", file=sys.stderr)
-
-    # MCP protocol loop
-    for line in sys.stdin:
-        try:
-            request = json.loads(line)
-            method = request.get("method")
-            params = request.get("params", {})
-
-            if method == "query":
-                results = server.query(params.get("query", ""))
-                response = {"result": results}
-            elif method == "reindex":
-                knowledge = server.index_knowledge()
-                response = {"result": {"indexed": len(knowledge)}}
-            else:
-                response = {"error": f"Unknown method: {method}"}
-
-            print(json.dumps(response))
-            sys.stdout.flush()
-        except Exception as e:
-            print(json.dumps({"error": str(e)}))
-            sys.stdout.flush()
+    """Run a standards-compliant MCP stdio server."""
+    mcp = create_mcp_server()
+    mcp.run()
 
 
 if __name__ == "__main__":

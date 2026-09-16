@@ -6,6 +6,7 @@
 #include <assets_icons.h>
 
 #include <dialogs/dialogs.h>
+#include <gui/gui_i.h>
 #include <toolbox/path.h>
 #include <flipper_application/flipper_application.h>
 #include <loader/firmware_api/firmware_api.h>
@@ -15,6 +16,16 @@
 #define TAG "Loader"
 
 #define LOADER_MAGIC_THREAD_VALUE 0xDEADBEEF
+
+#define LOADER_LOADING_HOLD_PERIOD_MS 50U
+#define LOADER_LOADING_HOLD_MAX_MS    2000U
+
+/* The full-screen loading integration is part of the default firmware. The
+ * define remains overridable for diagnostic builds, but production keeps the
+ * complete feature enabled. */
+#ifndef LOADER_AUTO_LOADING_ENABLED
+#define LOADER_AUTO_LOADING_ENABLED 1
+#endif
 
 // helpers
 
@@ -362,13 +373,31 @@ static void
 
 // implementation
 
+static void loader_loading_timer_callback(void* context) {
+    Loader* loader = context;
+    LoaderMessage message = {.type = LoaderMessageTypeLoadingCheck};
+    if(furi_message_queue_put(loader->queue, &message, 0) != FuriStatusOk) {
+        FURI_LOG_D(TAG, "Load timer busy");
+    }
+}
+
 static Loader* loader_alloc(void) {
     Loader* loader = malloc(sizeof(Loader));
+    /* Initialize every state field added for the asynchronous loading path. */
+    loader->loading_timer = NULL;
+    loader->loading_hold_start = 0;
+    loader->loading_view_ports_baseline = 0;
+    loader->loading_depth = 0;
+    loader->loading_held = false;
     loader->pubsub = furi_pubsub_alloc();
     loader->queue = furi_message_queue_alloc(1, sizeof(LoaderMessage));
     loader->gui = furi_record_open(RECORD_GUI);
     loader->view_holder = view_holder_alloc();
     loader->loading = loading_alloc();
+    if(LOADER_AUTO_LOADING_ENABLED) {
+        loader->loading_timer =
+            furi_timer_alloc(loader_loading_timer_callback, FuriTimerTypePeriodic, loader);
+    }
     view_holder_attach_to_gui(loader->view_holder, loader->gui);
     return loader;
 }
@@ -519,6 +548,13 @@ static LoaderStatusError
     }
 }
 
+static void loader_do_assets_progress(void* context, size_t done, size_t total) {
+    Loader* loader = context;
+    if(total && loader->loading_depth) {
+        loading_set_progress_ratio(loader->loading, done, total);
+    }
+}
+
 static LoaderMessageLoaderStatusResult loader_start_external_app(
     Loader* loader,
     Storage* storage,
@@ -535,6 +571,9 @@ static LoaderMessageLoaderStatusResult loader_start_external_app(
 
         FURI_LOG_I(TAG, "Loading %s", path);
 
+        flipper_application_set_assets_progress_callback(
+            loader->app.fap, loader_do_assets_progress, loader);
+
         // Calling preload will load whole FAP file, so need to preload manifest first to
         // get flags value, unload asset packs if requested by flags, then preload whole FAP
         FlipperApplicationFlag flags = FlipperApplicationFlagDefault;
@@ -549,6 +588,7 @@ static LoaderMessageLoaderStatusResult loader_start_external_app(
                 asset_packs_free();
             }
             preload_res = flipper_application_preload(loader->app.fap, path);
+            loading_reset_progress(loader->loading);
         }
 
         bool api_mismatch = false;
@@ -685,6 +725,72 @@ static bool loader_do_is_locked(Loader* loader) {
     return loader->app.thread != NULL;
 }
 
+static bool loader_is_application_running(Loader* loader) {
+    FuriThread* app_thread = loader->app.thread;
+    return app_thread && app_thread != (FuriThread*)LOADER_MAGIC_THREAD_VALUE;
+}
+
+static size_t loader_do_count_view_ports(Loader* loader) {
+    return gui_active_view_port_count(loader->gui, GuiLayerMAX);
+}
+
+static void loader_do_drop_loading(Loader* loader) {
+    if(!loader->loading_held) return;
+    loader->loading_held = false;
+    if(loader->loading_timer) furi_timer_stop(loader->loading_timer);
+    if(!loader->loading_depth && !loader->loader_menu) {
+        view_holder_set_view(loader->view_holder, NULL);
+    }
+}
+
+static void loader_do_show_loading(Loader* loader) {
+    if(!LOADER_AUTO_LOADING_ENABLED) return;
+    loader_do_drop_loading(loader);
+    if(loader->loading_depth == UINT8_MAX) {
+        FURI_LOG_E(TAG, "Load depth overflow");
+        return;
+    }
+    if(loader->loading_depth++ == 0) {
+        loading_reset_progress(loader->loading);
+        view_holder_send_to_front(loader->view_holder);
+        view_holder_set_view(loader->view_holder, loading_get_view(loader->loading));
+        loader->loading_view_ports_baseline = loader_do_count_view_ports(loader);
+    }
+}
+
+static void loader_do_hide_loading(Loader* loader) {
+    if(!LOADER_AUTO_LOADING_ENABLED) return;
+    if(!loader->loading_depth) {
+        FURI_LOG_E(TAG, "Load hide unbalanced");
+        return;
+    }
+    if(--loader->loading_depth) return;
+
+    const bool rpc_launch = loader->app.args && strncmp(loader->app.args, "RPC ", 4U) == 0;
+    if(loader_is_application_running(loader) && !rpc_launch) {
+        loader->loading_hold_start = furi_get_tick();
+        if(furi_timer_start(
+               loader->loading_timer, furi_ms_to_ticks(LOADER_LOADING_HOLD_PERIOD_MS)) ==
+           FuriStatusOk) {
+            loader->loading_held = true;
+            return;
+        }
+    }
+
+    if(!loader->loader_menu) view_holder_set_view(loader->view_holder, NULL);
+}
+
+static void loader_do_check_loading(Loader* loader) {
+    if(!LOADER_AUTO_LOADING_ENABLED) return;
+    if(!loader->loading_held) return;
+    const size_t view_ports = loader_do_count_view_ports(loader);
+    const uint32_t elapsed = furi_get_tick() - loader->loading_hold_start;
+    if(view_ports > loader->loading_view_ports_baseline ||
+       elapsed >= furi_ms_to_ticks(LOADER_LOADING_HOLD_MAX_MS)) {
+        loader_do_drop_loading(loader);
+    }
+}
+
 static LoaderMessageLoaderStatusResult loader_do_start_by_name(
     Loader* loader,
     const char* name,
@@ -725,7 +831,6 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
         LoaderEvent event;
         event.type = LoaderEventTypeApplicationBeforeLoad;
         furi_pubsub_publish(loader->pubsub, &event);
-
         // Translate app names (mainly for RPC)
         if(!strncmp(name, "Bad USB", strlen("Bad USB"))) {
             name = "Bad KB";
@@ -735,7 +840,9 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
         {
             const FlipperInternalApplication* app = loader_find_application_by_name(name);
             if(app) {
+                loader_do_show_loading(loader);
                 loader_start_internal_app(loader, app, args);
+                loader_do_hide_loading(loader);
                 status.value = loader_make_success_status(error_message);
                 break;
             }
@@ -753,7 +860,9 @@ static LoaderMessageLoaderStatusResult loader_do_start_by_name(
         {
             Storage* storage = furi_record_open(RECORD_STORAGE);
             if(storage_file_exists(storage, name)) {
+                loader_do_show_loading(loader);
                 status = loader_start_external_app(loader, storage, name, args, error_message);
+                loader_do_hide_loading(loader);
                 furi_record_close(RECORD_STORAGE);
                 break;
             }
@@ -811,8 +920,7 @@ static bool loader_do_deferred_launch(Loader* loader, LoaderDeferredLaunchRecord
 
     bool is_successful = false;
     FuriString* error_message = furi_string_alloc();
-    view_holder_set_view(loader->view_holder, loading_get_view(loader->loading));
-    view_holder_send_to_front(loader->view_holder);
+    loader_do_show_loading(loader);
 
     do {
         const char* app_name_str = record->name_or_path;
@@ -832,9 +940,7 @@ static bool loader_do_deferred_launch(Loader* loader, LoaderDeferredLaunchRecord
         loader_do_next_deferred_launch_if_available(loader);
     } while(false);
 
-    if(!loader->loader_menu) {
-        view_holder_set_view(loader->view_holder, NULL);
-    }
+    loader_do_hide_loading(loader);
     furi_string_free(error_message);
     return is_successful;
 }
@@ -842,6 +948,7 @@ static bool loader_do_deferred_launch(Loader* loader, LoaderDeferredLaunchRecord
 static void loader_do_app_closed(Loader* loader) {
     furi_assert(loader->app.thread);
 
+    loader_do_drop_loading(loader);
     furi_thread_join(loader->app.thread);
     FURI_LOG_I(TAG, "App returned: %li", furi_thread_get_return_code(loader->app.thread));
 
@@ -875,11 +982,6 @@ static void loader_do_app_closed(Loader* loader) {
     }
 
     loader_do_next_deferred_launch_if_available(loader);
-}
-
-static bool loader_is_application_running(Loader* loader) {
-    FuriThread* app_thread = loader->app.thread;
-    return app_thread && (app_thread != (FuriThread*)LOADER_MAGIC_THREAD_VALUE);
 }
 
 static bool loader_do_signal(Loader* loader, uint32_t signal, void* arg) {
@@ -1000,6 +1102,9 @@ int32_t loader_srv(void* p) {
             case LoaderMessageTypeClearLaunchQueue:
                 loader_queue_clear(&loader->launch_queue);
                 api_lock_unlock(message.api_lock);
+                break;
+            case LoaderMessageTypeLoadingCheck:
+                loader_do_check_loading(loader);
                 break;
             }
         }

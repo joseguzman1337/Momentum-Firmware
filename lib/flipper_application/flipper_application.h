@@ -46,6 +46,8 @@ const char* flipper_application_load_status_to_string(FlipperApplicationLoadStat
 
 typedef struct FlipperApplication FlipperApplication;
 
+typedef void (*FlipperApplicationAssetsProgress)(void* context, size_t done, size_t total);
+
 typedef struct {
     const char* name;
     uint32_t address;
@@ -70,6 +72,12 @@ FlipperApplication*
  * @param app Application pointer
  */
 void flipper_application_free(FlipperApplication* app);
+
+/** Set an optional callback for bundled-asset extraction progress. */
+void flipper_application_set_assets_progress_callback(
+    FlipperApplication* app,
+    FlipperApplicationAssetsProgress callback,
+    void* context);
 
 /** Validate elf file and load application metadata
  *
