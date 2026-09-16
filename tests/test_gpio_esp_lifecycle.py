@@ -53,13 +53,14 @@ def test_gpio_esp_menu_inventory_is_complete():
     assert discovered == GPIO_ESP_APPS
 
 
-def test_uart_workers_start_after_async_receiver():
+def test_uart_workers_start_before_async_receiver():
     for relative_path, sequences in UART_STARTUP_SEQUENCES.items():
         source = (EXTERNAL / relative_path).read_text()
         for callback, thread in sequences:
-            receiver = source.index(f"furi_hal_serial_async_rx_start(", source.index(callback))
-            worker = source.index(f"furi_thread_start({thread});", receiver)
-            assert receiver < worker, f"{relative_path}: {thread} starts before UART RX"
+            callback_position = source.index(callback)
+            worker = source.index(f"furi_thread_start({thread});", callback_position)
+            receiver = source.index("furi_hal_serial_async_rx_start(", worker)
+            assert worker < receiver, f"{relative_path}: UART RX starts before {thread}"
 
 
 def test_apps_restore_preexisting_otg_power_state():
@@ -76,3 +77,18 @@ def test_apps_restore_preexisting_otg_power_state():
 def test_wardriver_never_indexes_an_empty_scan_result():
     source = (EXTERNAL / "wardriver/wardriver.c").read_text()
     assert source.count("ctx->access_points_count > 0") >= 3
+
+
+def test_wifi_marauder_scan_defaults_to_compatible_ap_command():
+    menu = (
+        EXTERNAL
+        / "wifi_marauder_companion/scenes/wifi_marauder_scene_start.c"
+    ).read_text()
+    uart = (EXTERNAL / "wifi_marauder_companion/wifi_marauder_uart.c").read_text()
+    app = (EXTERNAL / "wifi_marauder_companion/wifi_marauder_app.c").read_text()
+
+    scan_item = menu[menu.index('{"Scan",') : menu.index('{"SSID",')]
+    assert '{"ap", "station", "all", "ping", "arp"}' in scan_item
+    assert '{"scanap", "scansta", "scanall", "pingscan", "arpscan"}' in scan_item
+    assert "calloc(1, sizeof(WifiMarauderUart))" in uart
+    assert "calloc(1, sizeof(WifiMarauderApp))" in app
