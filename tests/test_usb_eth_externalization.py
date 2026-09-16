@@ -13,6 +13,8 @@ CLI_MANIFEST = ROOT / "applications/services/cli/application.fam"
 FLASH_AND_SETUP = ROOT / "scripts/flash_and_setup_ethernet.sh"
 POST_FLASH_USB_ETH = ROOT / "scripts/fbt_hooks/post_flash_usb_ethernet.py"
 HOTPLUG_USB_ETH = ROOT / "scripts/flipper-auto-ethernet-setup.sh"
+CLI_BOOTSTRAP = ROOT / "applications/services/cli/cli_bootstrap_commands.c"
+CLI_REGISTRY = ROOT / "lib/toolbox/cli/cli_registry.c"
 LWIP_FREERTOS_API = {
     "vPortEnterCritical",
     "vPortExitCritical",
@@ -103,3 +105,16 @@ def test_usb_ethernet_host_automation_is_explicit_opt_in():
     assert "USB Ethernet autostart is disabled" in post_flash
     assert 'start)\n        log "USB Ethernet autostart is disabled' in hotplug
     assert "enable)" in hotplug
+
+
+def test_host_queried_device_info_stays_builtin_and_cannot_be_shadowed():
+    cli_manifest = CLI_MANIFEST.read_text()
+    bootstrap = CLI_BOOTSTRAP.read_text()
+    registry = CLI_REGISTRY.read_text()
+
+    core_app = cli_manifest[: cli_manifest.index("\n)\n")]
+    assert '"cli_info_command.c"' in core_app
+    assert 'registry, "device_info"' in bootstrap
+    assert 'registry, "info"' in bootstrap
+    assert "plugin_manager_load_single" not in bootstrap
+    assert "if(CliCommandDict_get(registry->commands, plugin_name)) continue;" in registry

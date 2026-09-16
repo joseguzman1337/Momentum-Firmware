@@ -141,6 +141,10 @@ void cli_registry_reload_external_commands(
             if(!furi_string_start_with_str(plugin_name, config->fal_prefix)) continue;
             furi_string_replace_at(plugin_name, 0, strlen(config->fal_prefix), "");
 
+            /* External commands must never replace boot-critical built-ins such as
+             * device_info, which host tools query immediately after enumeration. */
+            if(CliCommandDict_get(registry->commands, plugin_name)) continue;
+
             CliRegistryCommand command = {
                 .context = NULL,
                 .execute_callback = NULL,

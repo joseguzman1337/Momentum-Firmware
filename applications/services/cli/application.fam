@@ -5,6 +5,7 @@ App(
     cdefines=["SRV_CLI"],
     sources=[
         "cli_bootstrap_commands.c",
+        "cli_info_command.c",
         "cli_main_shell.c",
     ],
     sdk_headers=["usb_ethernet_broker.h"],
