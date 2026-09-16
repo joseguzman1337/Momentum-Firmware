@@ -59,11 +59,6 @@ struct CliVcp {
 // Data copying
 // ============
 
-/**
- * Called in the following cases:
- *   - previous transfer has finished;
- *   - new data became available to send.
- */
 static void cli_vcp_maybe_send_data(CliVcp* cli_vcp) {
     if(cli_vcp->is_currently_transmitting) return;
     if(!cli_vcp->own_pipe) return;
@@ -79,11 +74,6 @@ static void cli_vcp_maybe_send_data(CliVcp* cli_vcp) {
     cli_vcp->previous_tx_length = length;
 }
 
-/**
- * Called in the following cases:
- *   - new data arrived at the endpoint;
- *   - data was read out of the pipe.
- */
 static void cli_vcp_maybe_receive_data(CliVcp* cli_vcp) {
     if(!cli_vcp->own_pipe) return;
     if(pipe_spaces_available(cli_vcp->own_pipe) < USB_CDC_PKT_LEN) return;
@@ -154,9 +144,6 @@ static void cli_vcp_shell_ready(PipeSide* pipe, void* context) {
     cli_vcp_maybe_receive_data(cli_vcp);
 }
 
-/**
- * Processes messages arriving from other threads
- */
 static void cli_vcp_message_received(FuriEventLoopObject* object, void* context) {
     CliVcp* cli_vcp = context;
     CliVcpMessage message;
@@ -188,9 +175,6 @@ static void cli_vcp_message_received(FuriEventLoopObject* object, void* context)
     api_lock_unlock(message.api_lock);
 }
 
-/**
- * Processes messages arriving from CDC event callbacks
- */
 static void cli_vcp_internal_event_happened(FuriEventLoopObject* object, void* context) {
     CliVcp* cli_vcp = context;
     CliVcpInternalEvent event;

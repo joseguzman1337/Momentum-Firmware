@@ -24,19 +24,6 @@ void cli_command_info_callback(const char* key, const char* value, bool last, vo
     printf("%-30s: %s\r\n", key, value);
 }
 
-/** Info Command
- *
- * This command is intended to be used by humans
- *
- * Arguments:
- * - device - print device info
- * - power - print power info
- * - power_debug - print power debug info
- *
- * @param      cli      The cli instance
- * @param      args     The arguments
- * @param      context  The context
- */
 void cli_command_info(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(pipe);
 
@@ -157,14 +144,13 @@ bool cli_command_log_level_set_from_string(FuriString* level) {
         furi_log_set_level(log_level);
         return true;
     } else {
-        printf("<log> — start logging using the current level from the system settings\r\n");
-        printf("<log error> — only critical errors and other important messages\r\n");
-        printf("<log warn> — non-critical errors and warnings including <log error>\r\n");
-        printf("<log info> — non-critical information including <log warn>\r\n");
-        printf("<log default> — the default system log level (equivalent to <log info>)\r\n");
         printf(
-            "<log debug> — debug information including <log info> (may impact system performance)\r\n");
-        printf(
+            "<log> — start logging using the current level from the system settings\r\n"
+            "<log error> — only critical errors and other important messages\r\n"
+            "<log warn> — non-critical errors and warnings including <log error>\r\n"
+            "<log info> — non-critical information including <log warn>\r\n"
+            "<log default> — the default system log level (equivalent to <log info>)\r\n"
+            "<log debug> — debug information including <log info> (may impact system performance)\r\n"
             "<log trace> — system traces including <log debug> (may impact system performance)\r\n");
     }
     return false;
@@ -193,8 +179,7 @@ void cli_command_log(PipeSide* pipe, FuriString* args, void* context) {
 
     furi_log_add_handler(log_handler);
 
-    printf("Use <log ?> to list available log levels\r\n");
-    printf("Press CTRL+C to stop...\r\n");
+    printf("Use <log ?> to list available log levels\r\nPress CTRL+C to stop...\r\n");
     while(!cli_is_pipe_broken_or_is_etx_next_char(pipe)) {
         furi_delay_ms(100);
     }
@@ -275,18 +260,15 @@ void cli_command_sysctl_log_level(PipeSide* pipe, FuriString* args, void* contex
 }
 
 void cli_command_sysctl_print_usage(void) {
-    printf("Usage:\r\n");
-    printf("sysctl <cmd> <args>\r\n");
-    printf("Cmd list:\r\n");
-
-    printf("\tdebug <0|1>\t - Enable or disable system debug\r\n");
+    printf("Usage:\r\nsysctl <cmd> <args>\r\nCmd list:\r\n"
+           "\tdebug <0|1>\t - Enable or disable system debug\r\n"
 #ifdef FURI_DEBUG
-    printf("\theap_track <none|main|tree|all>\t - Set heap allocation tracking mode\r\n");
+           "\theap_track <none|main|tree|all>\t - Set heap allocation tracking mode\r\n"
 #else
-    printf("\theap_track <none|main>\t - Set heap allocation tracking mode\r\n");
+           "\theap_track <none|main>\t - Set heap allocation tracking mode\r\n"
 #endif
-    printf("\tsleep_mode <default|legacy>\t - Enable or disable deep sleep\r\n");
-    printf("\tlog_level <error|warn|info|default|debug|trace>\t - Set system log level\r\n");
+           "\tsleep_mode <default|legacy>\t - Enable or disable deep sleep\r\n"
+           "\tlog_level <error|warn|info|default|debug|trace>\t - Set system log level\r\n");
 }
 
 void cli_command_sysctl(PipeSide* pipe, FuriString* args, void* context) {
@@ -508,8 +490,7 @@ void cli_command_i2c(PipeSide* pipe, FuriString* args, void* context) {
     printf("Scanning external i2c on PC0(SCL)/PC1(SDA)\r\n"
            "Clock: 100khz, 7bit address\r\n"
            "\r\n");
-    printf("  | 0 1 2 3 4 5 6 7 8 9 A B C D E F\r\n");
-    printf("--+--------------------------------\r\n");
+    printf("  | 0 1 2 3 4 5 6 7 8 9 A B C D E F\r\n--+--------------------------------\r\n");
     for(uint8_t row = 0; row < 0x8; row++) {
         printf("%x | ", row);
         for(uint8_t column = 0; column <= 0xF; column++) {
@@ -522,9 +503,6 @@ void cli_command_i2c(PipeSide* pipe, FuriString* args, void* context) {
     furi_hal_i2c_release(&furi_hal_i2c_handle_external);
 }
 
-/**
- * Echoes any bytes it receives except ASCII ETX (0x03, Ctrl+C)
- */
 void cli_command_echo(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(args);
     UNUSED(context);
@@ -543,17 +521,6 @@ void cli_command_echo(PipeSide* pipe, FuriString* args, void* context) {
     }
 }
 
-/**
- * @brief Pause for a specified duration or until Ctrl+C is pressed or the
- * session is terminated.
- *
- * The duration can be specified in various units such as milliseconds (ms),
- * seconds (s), minutes (m), or hours (h). If the unit is not specified, the
- * second is used by default.
- *
- * Example:
- *   sleep 5s
- */
 void cli_command_sleep(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
     FuriString* duration_string;
@@ -605,11 +572,13 @@ void cli_command_mesh(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(args);
     UNUSED(context);
 
-    printf("AI Matrix SuperAIQuantumCluster Mesh Status\r\n");
-    printf("==========================================\r\n");
-    printf("Node: Asch1rp (Flipper Zero)\r\n");
-    printf("Status: Mesh Ready\r\n");
-    printf("Uptime: %lu seconds\r\n", (unsigned long)(furi_get_tick() / furi_kernel_get_tick_frequency()));
+    printf(
+        "AI Matrix SuperAIQuantumCluster Mesh Status\r\n"
+        "==========================================\r\n"
+        "Node: Asch1rp (Flipper Zero)\r\n"
+        "Status: Mesh Ready\r\n"
+        "Uptime: %lu seconds\r\n",
+        (unsigned long)(furi_get_tick() / furi_kernel_get_tick_frequency()));
 }
 
 void cli_command_net(PipeSide* pipe, FuriString* args, void* context) {
@@ -620,10 +589,7 @@ void cli_command_net(PipeSide* pipe, FuriString* args, void* context) {
     cmd = furi_string_alloc();
 
     if(!args_read_string_and_trim(args, cmd)) {
-        printf("Usage:\r\n");
-        printf("net gateway <ip>\r\n");
-        printf("net dns <ip>\r\n");
-        printf("net status\r\n");
+        printf("Usage:\r\nnet gateway <ip>\r\nnet dns <ip>\r\nnet status\r\n");
         furi_string_free(cmd);
         return;
     }
@@ -633,9 +599,7 @@ void cli_command_net(PipeSide* pipe, FuriString* args, void* context) {
     } else if(furi_string_cmp_str(cmd, "dns") == 0) {
         printf("Setting DNS to: %s (Simulated)\r\n", furi_string_get_cstr(args));
     } else if(furi_string_cmp_str(cmd, "status") == 0) {
-        printf("Network Status: Connected\r\n");
-        printf("Gateway: 10.42.0.1\r\n");
-        printf("DNS: 8.8.8.8\r\n");
+        printf("Network Status: Connected\r\nGateway: 10.42.0.1\r\nDNS: 8.8.8.8\r\n");
     } else {
         printf("Unknown net command: %s\r\n", furi_string_get_cstr(cmd));
     }
@@ -649,11 +613,14 @@ void cli_command_status(PipeSide* pipe, FuriString* args, void* context) {
     UNUSED(context);
 
     uint32_t uptime = furi_get_tick() / furi_kernel_get_tick_frequency();
-    printf("Flipper Status\r\n");
-    printf("==============\r\n");
-    printf("Device: %s\r\n", furi_hal_version_get_name_ptr());
-    printf("Uptime: %luh %lum %lus\r\n", (unsigned long)(uptime / 3600), (unsigned long)((uptime / 60) % 60), (unsigned long)(uptime % 60));
-    printf("Heap Free: %zu\r\n", memmgr_get_free_heap());
+    printf(
+        "Flipper Status\r\n==============\r\nDevice: %s\r\n"
+        "Uptime: %luh %lum %lus\r\nHeap Free: %zu\r\n",
+        furi_hal_version_get_name_ptr(),
+        (unsigned long)(uptime / 3600),
+        (unsigned long)((uptime / 60) % 60),
+        (unsigned long)(uptime % 60),
+        memmgr_get_free_heap());
 }
 
 void cli_main_commands_init(CliRegistry* registry) {
@@ -673,7 +640,8 @@ void cli_main_commands_init(CliRegistry* registry) {
     cli_registry_add_command(registry, "ping", CliCommandFlagParallelSafe, cli_command_ping, NULL);
     cli_registry_add_command(registry, "mesh", CliCommandFlagParallelSafe, cli_command_mesh, NULL);
     cli_registry_add_command(registry, "net", CliCommandFlagParallelSafe, cli_command_net, NULL);
-    cli_registry_add_command(registry, "status", CliCommandFlagParallelSafe, cli_command_status, NULL);
+    cli_registry_add_command(
+        registry, "status", CliCommandFlagParallelSafe, cli_command_status, NULL);
 }
 
 CLI_COMMAND_INTERFACE(src, cli_command_src, CliCommandFlagParallelSafe, 768, CLI_APPID);
