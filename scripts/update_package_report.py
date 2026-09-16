@@ -49,6 +49,9 @@ def audit(package: Path) -> dict:
     radio_address = little_endian_hex(fields["Radio address"])
     headroom = radio_address - fw_end
     minimum = UpdateMain.MIN_GAP_PAGES * UpdateMain.FLASH_PAGE_SIZE
+    cpu1_payload = fw_end - fw_start
+    cpu1_capacity = radio_address - minimum - fw_start
+    cpu1_free = cpu1_capacity - cpu1_payload
     files = {
         name: {
             "bytes": (package / name).stat().st_size,
@@ -65,9 +68,12 @@ def audit(package: Path) -> dict:
             "start": f"0x{fw_start:08X}",
             "end_exclusive": f"0x{fw_end:08X}",
             "radio_address": f"0x{radio_address:08X}",
+            "cpu1_payload_bytes": cpu1_payload,
+            "cpu1_capacity_before_guard_bytes": cpu1_capacity,
+            "cpu1_free_bytes": cpu1_free,
             "headroom_bytes": headroom,
             "required_headroom_bytes": minimum,
-            "layout_ready": headroom >= minimum,
+            "layout_ready": cpu1_free >= 0,
         },
         "files": files,
     }

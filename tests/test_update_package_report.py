@@ -44,6 +44,12 @@ class PackageReportTest(unittest.TestCase):
             )
             result = REPORT.audit(package)
             self.assertEqual(result["firmware"]["headroom_bytes"], 4096)
+            self.assertEqual(result["firmware"]["required_headroom_bytes"], 4096)
+            self.assertEqual(result["firmware"]["cpu1_payload_bytes"], 0xD6000)
+            self.assertEqual(
+                result["firmware"]["cpu1_capacity_before_guard_bytes"], 0xD6000
+            )
+            self.assertEqual(result["firmware"]["cpu1_free_bytes"], 0)
             self.assertTrue(result["firmware"]["layout_ready"])
             self.assertEqual(len(result["files"]["firmware.dfu"]["sha256"]), 64)
 
