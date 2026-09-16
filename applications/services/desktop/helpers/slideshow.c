@@ -3,6 +3,7 @@
 #include <storage/storage.h>
 #include <gui/icon.h>
 #include <core/dangerous_defines.h>
+#include <string.h>
 
 #define SLIDESHOW_MAGIC                 0x72676468
 #define SLIDESHOW_MAX_SUPPORTED_VERSION 1
@@ -27,13 +28,19 @@ _Static_assert(sizeof(SlideshowFrameHeader) == 2, "Incorrect SlideshowFrameHeade
 
 Slideshow* slideshow_alloc(void) {
     Slideshow* ret = malloc(sizeof(Slideshow));
-    ret->loaded = false;
+    /* The first-boot slideshow is loaded before the desktop is fully up.  Do
+     * not rely on the early heap returning zeroed memory: current_frame and
+     * every Icon member are consumed by draw/free paths even after a short or
+     * corrupt slideshow file. */
+    memset(ret, 0, sizeof(Slideshow));
     return ret;
 }
 
 void slideshow_free(Slideshow* slideshow) {
+    if(!slideshow) return;
+
     Icon* icon = &slideshow->icon;
-    if(icon) { //-V547
+    if(icon->frames) {
         for(int frame_idx = 0; frame_idx < icon->frame_count; ++frame_idx) {
             uint8_t* frame_data = (uint8_t*)icon->frames[frame_idx];
             free(frame_data);
@@ -61,13 +68,17 @@ bool slideshow_load(Slideshow* slideshow, const char* fspath) {
         FURI_CONST_ASSIGN(icon->frame_count, header.frame_count);
         FURI_CONST_ASSIGN(icon->width, header.width);
         FURI_CONST_ASSIGN(icon->height, header.height);
-        icon->frames = malloc(header.frame_count * sizeof(uint8_t*));
+        if((header.frame_count == 0) || (header.width == 0) || (header.height == 0)) {
+            break;
+        }
+        icon->frames = calloc(header.frame_count, sizeof(uint8_t*));
         for(int frame_idx = 0; frame_idx < header.frame_count; ++frame_idx) {
             SlideshowFrameHeader frame_header;
             if(storage_file_read(slideshow_file, &frame_header, sizeof(frame_header)) !=
                sizeof(frame_header)) {
                 break;
             }
+            if(frame_header.size == 0) break;
             FURI_CONST_ASSIGN_PTR(icon->frames[frame_idx], malloc(frame_header.size));
             uint8_t* frame_data = (uint8_t*)icon->frames[frame_idx];
             if(storage_file_read(slideshow_file, frame_data, frame_header.size) !=
