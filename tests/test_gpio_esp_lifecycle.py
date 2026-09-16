@@ -89,6 +89,6 @@ def test_wifi_marauder_scan_defaults_to_compatible_ap_command():
 
     scan_item = menu[menu.index('{"Scan",') : menu.index('{"SSID",')]
     assert '{"ap", "station", "all", "ping", "arp"}' in scan_item
-    assert '{"scanap", "scansta", "scanall", "pingscan", "arpscan"}' in scan_item
+    assert '{"sniffbeacon", "scanall", "scanall", "pingscan", "arpscan"}' in scan_item
     assert "calloc(1, sizeof(WifiMarauderUart))" in uart
     assert "calloc(1, sizeof(WifiMarauderApp))" in app
