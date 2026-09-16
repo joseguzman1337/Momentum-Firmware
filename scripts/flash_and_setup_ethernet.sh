@@ -19,9 +19,27 @@ DEVBOARD_AUTO_BOOTLOADER=1
 DEVBOARD_AUTO_BOOTLOADER_PORT="auto"
 SKIP_FLIPPER_FLASH=0
 AUTO_FORMAT_EXT=0
+ENABLE_USB_ETHERNET=0
 
 usage() {
-    echo "Usage: $0 [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--devboard-auto-bootloader <on|off>] [--devboard-auto-bootloader-port <port>] [--skip-flipper-flash] [--auto-format-ext]"
+    echo "Usage: $0 [--enable-usb-ethernet] [--devboard-flash] [--devboard-channel <release|dev|rc>] [--devboard-timeout <seconds>] [--devboard-auto-bootloader <on|off>] [--devboard-auto-bootloader-port <port>] [--skip-flipper-flash] [--auto-format-ext]"
+}
+
+flash_devboard() {
+    if [ "$DEVBOARD_FLASH" -ne 1 ]; then
+        return 0
+    fi
+
+    STEP=$((STEP + 1))
+    echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Flashing WiFi devboard via fbt...${NC}"
+    echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
+    DEVBOARD_ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
+    if [ "$DEVBOARD_AUTO_BOOTLOADER" -eq 1 ]; then
+        DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT --auto-bootloader-gpio"
+    fi
+    ./fbt devboard_flash ARGS="$DEVBOARD_ARGS"
+    echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"
+    echo ""
 }
 
 reset_flipper_usb() {
@@ -63,6 +81,10 @@ trap maybe_start_modemmanager EXIT
 
 while [ $# -gt 0 ]; do
     case "$1" in
+        --enable-usb-ethernet)
+            ENABLE_USB_ETHERNET=1
+            shift
+            ;;
         --devboard-flash)
             DEVBOARD_FLASH=1
             shift
@@ -193,11 +215,17 @@ fi
 echo -e "${GREEN}[✓] Firmware step complete${NC}"
 echo ""
 
+if [ "$ENABLE_USB_ETHERNET" -ne 1 ]; then
+    echo -e "${GREEN}[✓] USB Ethernet remains disabled (enable explicitly with --enable-usb-ethernet)${NC}"
+    flash_devboard
+    exit 0
+fi
+
 STEP=$((STEP + 1))
 
 # Step 2: Enable USB Ethernet on Flipper
 echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Enabling USB Ethernet on Flipper...${NC}"
-python3 "$SCRIPT_DIR/fbt_hooks/post_flash_usb_ethernet.py"
+python3 "$SCRIPT_DIR/fbt_hooks/post_flash_usb_ethernet.py" --enable
 
 echo ""
 
@@ -268,18 +296,7 @@ while [ $COUNT -lt $MAX_WAIT ]; do
         ip addr show "$FLIPPER_ETH"
         echo ""
 
-        if [ "$DEVBOARD_FLASH" -eq 1 ]; then
-            STEP=$((STEP + 1))
-            echo -e "${YELLOW}[${STEP}/${TOTAL_STEPS}] Flashing WiFi devboard via fbt...${NC}"
-            echo -e "${YELLOW}    Put the WiFi board in bootloader mode (hold BOOT, tap RESET).${NC}"
-            DEVBOARD_ARGS="-c $DEVBOARD_CHANNEL --wait --timeout $DEVBOARD_TIMEOUT"
-            if [ "$DEVBOARD_AUTO_BOOTLOADER" -eq 1 ]; then
-                DEVBOARD_ARGS="$DEVBOARD_ARGS --auto-bootloader --auto-bootloader-port $DEVBOARD_AUTO_BOOTLOADER_PORT --auto-bootloader-gpio"
-            fi
-            ./fbt devboard_flash ARGS="$DEVBOARD_ARGS"
-            echo -e "${GREEN}[✓] WiFi devboard flashed${NC}"
-            echo ""
-        fi
+        flash_devboard
 
         exit 0
     fi

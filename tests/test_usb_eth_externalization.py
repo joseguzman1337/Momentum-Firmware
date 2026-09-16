@@ -8,6 +8,11 @@ ROOT = Path(__file__).parents[1]
 TARGET = ROOT / "targets/f7/target.json"
 API_SYMBOLS = ROOT / "targets/f7/api_symbols.csv"
 USB_CORE = ROOT / "targets/f7/furi_hal/furi_hal_usb.c"
+USB_ETH_MANIFEST = ROOT / "applications/external/usb_ethernet/application.fam"
+CLI_MANIFEST = ROOT / "applications/services/cli/application.fam"
+FLASH_AND_SETUP = ROOT / "scripts/flash_and_setup_ethernet.sh"
+POST_FLASH_USB_ETH = ROOT / "scripts/fbt_hooks/post_flash_usb_ethernet.py"
+HOTPLUG_USB_ETH = ROOT / "scripts/flipper-auto-ethernet-setup.sh"
 LWIP_FREERTOS_API = {
     "vPortEnterCritical",
     "vPortExitCritical",
@@ -67,3 +72,34 @@ def test_core_usb_keeps_cdc_vcp_and_has_no_ethernet_dependency():
     assert "#include <furi_hal_usb_cdc.h>" in source
     assert "usb.interface = &usb_cdc_dual;" in source
     assert "furi_hal_usb_eth.h" not in source
+
+
+def test_scoped_fap_and_fal_apps_are_on_demand_types():
+    usb_manifest = USB_ETH_MANIFEST.read_text()
+    cli_manifest = CLI_MANIFEST.read_text()
+
+    usb_app = usb_manifest[usb_manifest.index('appid="usb_ethernet"') : usb_manifest.index('appid="cli_ping"')]
+    assert "FlipperAppType.EXTERNAL" in usb_app
+    assert "FlipperAppType.STARTUP" not in usb_app
+    assert "FlipperAppType.SERVICE" not in usb_app
+
+    for appid in re.findall(r'appid="(cli_[a-z0-9_]+)"', cli_manifest):
+        app = cli_manifest[cli_manifest.index(f'appid="{appid}"') :]
+        app = app[: app.index("\n)")]
+        if appid != "cli_vcp":
+            assert "FlipperAppType.PLUGIN" in app
+
+
+def test_usb_ethernet_host_automation_is_explicit_opt_in():
+    flash_script = FLASH_AND_SETUP.read_text()
+    post_flash = POST_FLASH_USB_ETH.read_text()
+    hotplug = HOTPLUG_USB_ETH.read_text()
+
+    assert "ENABLE_USB_ETHERNET=0" in flash_script
+    assert "--enable-usb-ethernet" in flash_script
+    assert "flash_devboard" in flash_script
+    assert 'post_flash_usb_ethernet.py\" --enable' in flash_script
+    assert 'if not args.enable:' in post_flash
+    assert "USB Ethernet autostart is disabled" in post_flash
+    assert 'start)\n        log "USB Ethernet autostart is disabled' in hotplug
+    assert "enable)" in hotplug

@@ -135,6 +135,11 @@ wait_for_usb_ethernet() {
 
 case "$ACTION" in
     start)
+        log "USB Ethernet autostart is disabled; use the explicit 'enable' action"
+        exit 0
+        ;;
+
+    enable)
         log "Flipper Zero detected on USB: $USB_DEV"
 
         # Find serial port
@@ -163,7 +168,7 @@ case "$ACTION" in
         ;;
 
     *)
-        echo "Usage: $0 <usb_device> {start|stop}"
+        echo "Usage: $0 <usb_device> {start|enable|stop}"
         exit 1
         ;;
 esac

@@ -8,6 +8,7 @@ import os
 import sys
 import time
 import subprocess
+import argparse
 from pathlib import Path
 
 # Add FlipperSerial to path
@@ -122,6 +123,17 @@ def trigger_internet_sharing():
 
 def main():
     """Main hook function"""
+    parser = argparse.ArgumentParser(description="Explicitly enable USB Ethernet after flashing")
+    parser.add_argument(
+        "--enable",
+        action="store_true",
+        help="confirm that USB Ethernet activation and reboot were explicitly requested",
+    )
+    args = parser.parse_args()
+    if not args.enable:
+        log("USB Ethernet autostart is disabled; rerun with --enable to activate it")
+        return 0
+
     log("Post-flash USB Ethernet setup started")
 
     # Wait for Flipper to finish booting
