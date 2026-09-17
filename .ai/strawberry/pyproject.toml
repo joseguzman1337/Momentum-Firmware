@@ -32,6 +32,12 @@ mcp = [
 strawberry = "strawberry.cli:main"
 hallucination-detector-mcp = "strawberry.mcp_server:main"
 
+[tool.uv]
+# vLLM 0.29 pins setuptools below 81 even though Strawberry requires the
+# security-fixed setuptools 84 release. Keep vLLM enabled while preventing
+# the transitive constraint from reintroducing CVE-2026-59890.
+override-dependencies = ["setuptools>=84.0.0"]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
