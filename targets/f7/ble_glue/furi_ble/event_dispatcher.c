@@ -69,7 +69,7 @@ GapSvcEventHandler*
     furi_check(context);
     furi_check(initialized);
 
-    GapSvcEventHandler* item = GapSvcEventHandlerList_push_back_raw(handlers);
+    GapSvcEventHandler* item = GapSvcEventHandlerList_push_raw(handlers);
     item->context = context;
     item->callback = handler;
 

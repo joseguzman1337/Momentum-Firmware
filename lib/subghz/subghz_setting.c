@@ -152,7 +152,7 @@ static void subghz_setting_load_default_preset(
     furi_assert(preset_data);
     uint32_t preset_data_count = 0;
     SubGhzSettingCustomPresetItem* item =
-        SubGhzSettingCustomPresetItemArray_push_back_raw(instance->preset->data);
+        SubGhzSettingCustomPresetItemArray_push_raw(instance->preset->data);
 
     item->custom_preset_name = furi_string_alloc();
     furi_string_set(item->custom_preset_name, preset_name);
@@ -369,7 +369,7 @@ bool subghz_setting_load_custom_preset(
     furi_check(preset_name);
     uint32_t temp_data32;
     SubGhzSettingCustomPresetItem* item =
-        SubGhzSettingCustomPresetItemArray_push_back_raw(instance->preset->data);
+        SubGhzSettingCustomPresetItemArray_push_raw(instance->preset->data);
     item->custom_preset_name = furi_string_alloc();
     furi_string_set(item->custom_preset_name, preset_name);
     do {

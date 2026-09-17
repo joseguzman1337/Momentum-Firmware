@@ -62,7 +62,7 @@ static void subghz_keystore_add_key(
     const char* name,
     uint64_t key,
     uint16_t type) {
-    SubGhzKey* manufacture_code = SubGhzKeyArray_push_back_raw(instance->data);
+    SubGhzKey* manufacture_code = SubGhzKeyArray_push_raw(instance->data);
     manufacture_code->name = furi_string_alloc_set(name);
     manufacture_code->key = key;
     manufacture_code->type = type;

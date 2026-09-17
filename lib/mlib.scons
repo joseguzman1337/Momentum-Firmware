@@ -22,10 +22,6 @@ env.Append(
         ),
     ],
     CPPDEFINES=[
-        '"M_MEMORY_FULL(...)=abort()"',
+        '"M_MEMORY_FULL(x)=abort()"',
     ],
-    # mlib is included from firmware translation units built with
-    # -fsingle-precision-constant; its deliberate double arithmetic then
-    # triggers GCC's double-promotion diagnostic.
-    CCFLAGS=["-Wno-error=double-promotion"],
 )

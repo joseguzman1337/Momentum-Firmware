@@ -12,14 +12,6 @@ env.Append(
 
 libenv = env.Clone(FW_LIB_NAME="freertos")
 libenv.ApplyLibFlags()
-libenv.AppendUnique(
-    CCFLAGS=[
-        # FreeRTOS keeps these locals for assert/trace configurations that are
-        # compiled out by the firmware's production configuration.
-        "-Wno-unused-variable",
-        "-Wno-unused-but-set-variable",
-    ],
-)
 
 
 sources = libenv.Glob("FreeRTOS-Kernel/*.c", source=True)

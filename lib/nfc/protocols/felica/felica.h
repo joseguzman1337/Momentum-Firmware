@@ -2,7 +2,7 @@
 
 #include <toolbox/bit_buffer.h>
 #include <nfc/protocols/nfc_device_base_i.h>
-#include <mbedtls/des.h>
+#include <mbedtls/include/mbedtls/des.h>
 #include <lib/toolbox/simple_array.h>
 
 #ifdef __cplusplus

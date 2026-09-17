@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lib/nfc/protocols/iso14443_3a/iso14443_3a.h>
-#include <mbedtls/des.h>
+#include <mbedtls/include/mbedtls/des.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -187,7 +187,7 @@ void subghz_view_receiver_add_item_to_menu(
         SubGhzViewReceiverModel * model,
         {
             SubGhzReceiverMenuItem* item_menu =
-                SubGhzReceiverMenuItemArray_push_back_raw(model->history->data);
+                SubGhzReceiverMenuItemArray_push_raw(model->history->data);
             item_menu->time = furi_string_alloc_set(time);
             item_menu->item_str = furi_string_alloc_set(name);
             item_menu->type = type;

@@ -106,15 +106,15 @@ Header,+,lib/libusb_stm32/inc/usb_hid.h,,
 Header,+,lib/libusb_stm32/inc/usb_std.h,,
 Header,+,lib/libusb_stm32/inc/usb_tmc.h,,
 Header,+,lib/libusb_stm32/inc/usbd_core.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/aes.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/des.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/ecdh.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/ecdsa.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/ecp.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/md.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/md5.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/sha1.h,,
-Header,+,lib/mbedtls/legacy-v3/include/mbedtls/sha256.h,,
+Header,+,lib/mbedtls/include/mbedtls/aes.h,,
+Header,+,lib/mbedtls/include/mbedtls/des.h,,
+Header,+,lib/mbedtls/include/mbedtls/ecdh.h,,
+Header,+,lib/mbedtls/include/mbedtls/ecdsa.h,,
+Header,+,lib/mbedtls/include/mbedtls/ecp.h,,
+Header,+,lib/mbedtls/include/mbedtls/md.h,,
+Header,+,lib/mbedtls/include/mbedtls/md5.h,,
+Header,+,lib/mbedtls/include/mbedtls/sha1.h,,
+Header,+,lib/mbedtls/include/mbedtls/sha256.h,,
 Header,+,lib/mjs/mjs_array_buf_public.h,,
 Header,+,lib/mjs/mjs_array_public.h,,
 Header,+,lib/mjs/mjs_core_public.h,,
@@ -351,7 +351,7 @@ Function,-,LL_ADC_StructInit,void,LL_ADC_InitTypeDef*
 Function,-,LL_COMP_DeInit,ErrorStatus,COMP_TypeDef*
 Function,+,LL_COMP_Init,ErrorStatus,"COMP_TypeDef*, const LL_COMP_InitTypeDef*"
 Function,-,LL_COMP_StructInit,void,LL_COMP_InitTypeDef*
-Function,-,LL_CRC_DeInit,ErrorStatus,const CRC_TypeDef*
+Function,-,LL_CRC_DeInit,ErrorStatus,CRC_TypeDef*
 Function,-,LL_CRS_DeInit,ErrorStatus,
 Function,+,LL_DMA_DeInit,ErrorStatus,"DMA_TypeDef*, uint32_t"
 Function,+,LL_DMA_Init,ErrorStatus,"DMA_TypeDef*, uint32_t, LL_DMA_InitTypeDef*"
@@ -359,21 +359,21 @@ Function,-,LL_DMA_StructInit,void,LL_DMA_InitTypeDef*
 Function,-,LL_EXTI_DeInit,ErrorStatus,
 Function,-,LL_EXTI_Init,ErrorStatus,LL_EXTI_InitTypeDef*
 Function,-,LL_EXTI_StructInit,void,LL_EXTI_InitTypeDef*
-Function,-,LL_GPIO_DeInit,ErrorStatus,const GPIO_TypeDef*
+Function,-,LL_GPIO_DeInit,ErrorStatus,GPIO_TypeDef*
 Function,+,LL_GPIO_Init,ErrorStatus,"GPIO_TypeDef*, LL_GPIO_InitTypeDef*"
 Function,-,LL_GPIO_StructInit,void,LL_GPIO_InitTypeDef*
 Function,-,LL_I2C_DeInit,ErrorStatus,const I2C_TypeDef*
 Function,+,LL_I2C_Init,ErrorStatus,"I2C_TypeDef*, const LL_I2C_InitTypeDef*"
 Function,-,LL_I2C_StructInit,void,LL_I2C_InitTypeDef*
 Function,-,LL_Init1msTick,void,uint32_t
-Function,+,LL_LPTIM_DeInit,ErrorStatus,const LPTIM_TypeDef*
+Function,+,LL_LPTIM_DeInit,ErrorStatus,LPTIM_TypeDef*
 Function,-,LL_LPTIM_Disable,void,LPTIM_TypeDef*
 Function,+,LL_LPTIM_Init,ErrorStatus,"LPTIM_TypeDef*, const LL_LPTIM_InitTypeDef*"
 Function,-,LL_LPTIM_StructInit,void,LL_LPTIM_InitTypeDef*
 Function,-,LL_LPUART_DeInit,ErrorStatus,const USART_TypeDef*
 Function,+,LL_LPUART_Init,ErrorStatus,"USART_TypeDef*, const LL_LPUART_InitTypeDef*"
 Function,-,LL_LPUART_StructInit,void,LL_LPUART_InitTypeDef*
-Function,-,LL_PKA_DeInit,ErrorStatus,const PKA_TypeDef*
+Function,-,LL_PKA_DeInit,ErrorStatus,PKA_TypeDef*
 Function,-,LL_PKA_Init,ErrorStatus,"PKA_TypeDef*, LL_PKA_InitTypeDef*"
 Function,-,LL_PKA_StructInit,void,LL_PKA_InitTypeDef*
 Function,-,LL_PLL_ConfigSystemClock_HSE,ErrorStatus,"uint32_t, LL_UTILS_PLLInitTypeDef*, LL_UTILS_ClkInitTypeDef*"
@@ -394,8 +394,8 @@ Function,-,LL_RCC_GetSMPSClockFreq,uint32_t,
 Function,-,LL_RCC_GetSystemClocksFreq,void,LL_RCC_ClocksTypeDef*
 Function,+,LL_RCC_GetUSARTClockFreq,uint32_t,uint32_t
 Function,-,LL_RCC_GetUSBClockFreq,uint32_t,uint32_t
-Function,-,LL_RNG_DeInit,ErrorStatus,const RNG_TypeDef*
-Function,-,LL_RNG_Init,ErrorStatus,"RNG_TypeDef*, const LL_RNG_InitTypeDef*"
+Function,-,LL_RNG_DeInit,ErrorStatus,RNG_TypeDef*
+Function,-,LL_RNG_Init,ErrorStatus,"RNG_TypeDef*, LL_RNG_InitTypeDef*"
 Function,-,LL_RNG_StructInit,void,LL_RNG_InitTypeDef*
 Function,-,LL_RTC_ALMA_Init,ErrorStatus,"RTC_TypeDef*, uint32_t, LL_RTC_AlarmTypeDef*"
 Function,-,LL_RTC_ALMA_StructInit,void,LL_RTC_AlarmTypeDef*
@@ -411,14 +411,14 @@ Function,-,LL_RTC_StructInit,void,LL_RTC_InitTypeDef*
 Function,-,LL_RTC_TIME_Init,ErrorStatus,"RTC_TypeDef*, uint32_t, LL_RTC_TimeTypeDef*"
 Function,-,LL_RTC_TIME_StructInit,void,LL_RTC_TimeTypeDef*
 Function,-,LL_RTC_WaitForSynchro,ErrorStatus,RTC_TypeDef*
-Function,-,LL_SPI_DeInit,ErrorStatus,const SPI_TypeDef*
+Function,-,LL_SPI_DeInit,ErrorStatus,SPI_TypeDef*
 Function,+,LL_SPI_Init,ErrorStatus,"SPI_TypeDef*, LL_SPI_InitTypeDef*"
 Function,-,LL_SPI_StructInit,void,LL_SPI_InitTypeDef*
 Function,-,LL_SetFlashLatency,ErrorStatus,uint32_t
 Function,+,LL_SetSystemCoreClock,void,uint32_t
 Function,-,LL_TIM_BDTR_Init,ErrorStatus,"TIM_TypeDef*, const LL_TIM_BDTR_InitTypeDef*"
 Function,-,LL_TIM_BDTR_StructInit,void,LL_TIM_BDTR_InitTypeDef*
-Function,+,LL_TIM_DeInit,ErrorStatus,const TIM_TypeDef*
+Function,+,LL_TIM_DeInit,ErrorStatus,TIM_TypeDef*
 Function,-,LL_TIM_ENCODER_Init,ErrorStatus,"TIM_TypeDef*, const LL_TIM_ENCODER_InitTypeDef*"
 Function,-,LL_TIM_ENCODER_StructInit,void,LL_TIM_ENCODER_InitTypeDef*
 Function,-,LL_TIM_HALLSENSOR_Init,ErrorStatus,"TIM_TypeDef*, const LL_TIM_HALLSENSOR_InitTypeDef*"
@@ -2527,34 +2527,34 @@ Function,-,mbedtls_des_key_set_parity,void,unsigned char[8]
 Function,-,mbedtls_des_setkey,void,"uint32_t[32], const unsigned char[8]"
 Function,-,mbedtls_des_setkey_dec,int,"mbedtls_des_context*, const unsigned char[8]"
 Function,-,mbedtls_des_setkey_enc,int,"mbedtls_des_context*, const unsigned char[8]"
-Function,-,mbedtls_ecdh_calc_secret,int,"mbedtls_ecdh_context*, size_t*, unsigned char*, size_t, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecdh_calc_secret,int,"mbedtls_ecdh_context*, size_t*, unsigned char*, size_t, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecdh_can_do,int,mbedtls_ecp_group_id
-Function,-,mbedtls_ecdh_compute_shared,int,"mbedtls_ecp_group*, mbedtls_mpi*, const mbedtls_ecp_point*, const mbedtls_mpi*, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecdh_compute_shared,int,"mbedtls_ecp_group*, mbedtls_mpi*, const mbedtls_ecp_point*, const mbedtls_mpi*, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecdh_free,void,mbedtls_ecdh_context*
-Function,-,mbedtls_ecdh_gen_public,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_ecp_point*, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecdh_gen_public,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_ecp_point*, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecdh_get_grp_id,mbedtls_ecp_group_id,mbedtls_ecdh_context*
 Function,-,mbedtls_ecdh_get_params,int,"mbedtls_ecdh_context*, const mbedtls_ecp_keypair*, mbedtls_ecdh_side"
 Function,-,mbedtls_ecdh_init,void,mbedtls_ecdh_context*
-Function,-,mbedtls_ecdh_make_params,int,"mbedtls_ecdh_context*, size_t*, unsigned char*, size_t, mbedtls_f_rng_t*, void*"
-Function,-,mbedtls_ecdh_make_public,int,"mbedtls_ecdh_context*, size_t*, unsigned char*, size_t, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecdh_make_params,int,"mbedtls_ecdh_context*, size_t*, unsigned char*, size_t, int (*)(void*, unsigned char*, size_t), void*"
+Function,-,mbedtls_ecdh_make_public,int,"mbedtls_ecdh_context*, size_t*, unsigned char*, size_t, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecdh_read_params,int,"mbedtls_ecdh_context*, const unsigned char**, const unsigned char*"
 Function,-,mbedtls_ecdh_read_public,int,"mbedtls_ecdh_context*, const unsigned char*, size_t"
 Function,-,mbedtls_ecdh_setup,int,"mbedtls_ecdh_context*, mbedtls_ecp_group_id"
 Function,-,mbedtls_ecdsa_can_do,int,mbedtls_ecp_group_id
 Function,-,mbedtls_ecdsa_free,void,mbedtls_ecdsa_context*
 Function,-,mbedtls_ecdsa_from_keypair,int,"mbedtls_ecdsa_context*, const mbedtls_ecp_keypair*"
-Function,-,mbedtls_ecdsa_genkey,int,"mbedtls_ecdsa_context*, mbedtls_ecp_group_id, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecdsa_genkey,int,"mbedtls_ecdsa_context*, mbedtls_ecp_group_id, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecdsa_init,void,mbedtls_ecdsa_context*
 Function,-,mbedtls_ecdsa_read_signature,int,"mbedtls_ecdsa_context*, const unsigned char*, size_t, const unsigned char*, size_t"
 Function,-,mbedtls_ecdsa_read_signature_restartable,int,"mbedtls_ecdsa_context*, const unsigned char*, size_t, const unsigned char*, size_t, mbedtls_ecdsa_restart_ctx*"
-Function,-,mbedtls_ecdsa_sign,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_mpi*, const mbedtls_mpi*, const unsigned char*, size_t, mbedtls_f_rng_t*, void*"
-Function,-,mbedtls_ecdsa_sign_restartable,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_mpi*, const mbedtls_mpi*, const unsigned char*, size_t, mbedtls_f_rng_t*, void*, mbedtls_f_rng_t*, void*, mbedtls_ecdsa_restart_ctx*"
+Function,-,mbedtls_ecdsa_sign,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_mpi*, const mbedtls_mpi*, const unsigned char*, size_t, int (*)(void*, unsigned char*, size_t), void*"
+Function,-,mbedtls_ecdsa_sign_restartable,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_mpi*, const mbedtls_mpi*, const unsigned char*, size_t, int (*)(void*, unsigned char*, size_t), void*, int (*)(void*, unsigned char*, size_t), void*, mbedtls_ecdsa_restart_ctx*"
 Function,-,mbedtls_ecdsa_verify,int,"mbedtls_ecp_group*, const unsigned char*, size_t, const mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_mpi*"
 Function,-,mbedtls_ecdsa_verify_restartable,int,"mbedtls_ecp_group*, const unsigned char*, size_t, const mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_mpi*, mbedtls_ecdsa_restart_ctx*"
-Function,-,mbedtls_ecdsa_write_signature,int,"mbedtls_ecdsa_context*, mbedtls_md_type_t, const unsigned char*, size_t, unsigned char*, size_t, size_t*, mbedtls_f_rng_t*, void*"
-Function,-,mbedtls_ecdsa_write_signature_restartable,int,"mbedtls_ecdsa_context*, mbedtls_md_type_t, const unsigned char*, size_t, unsigned char*, size_t, size_t*, mbedtls_f_rng_t*, void*, mbedtls_ecdsa_restart_ctx*"
+Function,-,mbedtls_ecdsa_write_signature,int,"mbedtls_ecdsa_context*, mbedtls_md_type_t, const unsigned char*, size_t, unsigned char*, size_t, size_t*, int (*)(void*, unsigned char*, size_t), void*"
+Function,-,mbedtls_ecdsa_write_signature_restartable,int,"mbedtls_ecdsa_context*, mbedtls_md_type_t, const unsigned char*, size_t, unsigned char*, size_t, size_t*, int (*)(void*, unsigned char*, size_t), void*, mbedtls_ecdsa_restart_ctx*"
 Function,-,mbedtls_ecp_check_privkey,int,"const mbedtls_ecp_group*, const mbedtls_mpi*"
-Function,-,mbedtls_ecp_check_pub_priv,int,"const mbedtls_ecp_keypair*, const mbedtls_ecp_keypair*, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecp_check_pub_priv,int,"const mbedtls_ecp_keypair*, const mbedtls_ecp_keypair*, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecp_check_pubkey,int,"const mbedtls_ecp_group*, const mbedtls_ecp_point*"
 Function,-,mbedtls_ecp_copy,int,"mbedtls_ecp_point*, const mbedtls_ecp_point*"
 Function,-,mbedtls_ecp_curve_info_from_grp_id,const mbedtls_ecp_curve_info*,mbedtls_ecp_group_id
@@ -2562,10 +2562,10 @@ Function,-,mbedtls_ecp_curve_info_from_name,const mbedtls_ecp_curve_info*,const 
 Function,-,mbedtls_ecp_curve_info_from_tls_id,const mbedtls_ecp_curve_info*,uint16_t
 Function,-,mbedtls_ecp_curve_list,const mbedtls_ecp_curve_info*,
 Function,-,mbedtls_ecp_export,int,"const mbedtls_ecp_keypair*, mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_ecp_point*"
-Function,-,mbedtls_ecp_gen_key,int,"mbedtls_ecp_group_id, mbedtls_ecp_keypair*, mbedtls_f_rng_t*, void*"
-Function,-,mbedtls_ecp_gen_keypair,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_ecp_point*, mbedtls_f_rng_t*, void*"
-Function,-,mbedtls_ecp_gen_keypair_base,int,"mbedtls_ecp_group*, const mbedtls_ecp_point*, mbedtls_mpi*, mbedtls_ecp_point*, mbedtls_f_rng_t*, void*"
-Function,-,mbedtls_ecp_gen_privkey,int,"const mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecp_gen_key,int,"mbedtls_ecp_group_id, mbedtls_ecp_keypair*, int (*)(void*, unsigned char*, size_t), void*"
+Function,-,mbedtls_ecp_gen_keypair,int,"mbedtls_ecp_group*, mbedtls_mpi*, mbedtls_ecp_point*, int (*)(void*, unsigned char*, size_t), void*"
+Function,-,mbedtls_ecp_gen_keypair_base,int,"mbedtls_ecp_group*, const mbedtls_ecp_point*, mbedtls_mpi*, mbedtls_ecp_point*, int (*)(void*, unsigned char*, size_t), void*"
+Function,-,mbedtls_ecp_gen_privkey,int,"const mbedtls_ecp_group*, mbedtls_mpi*, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecp_get_type,mbedtls_ecp_curve_type,const mbedtls_ecp_group*
 Function,-,mbedtls_ecp_group_copy,int,"mbedtls_ecp_group*, const mbedtls_ecp_group*"
 Function,-,mbedtls_ecp_group_free,void,mbedtls_ecp_group*
@@ -2573,12 +2573,12 @@ Function,-,mbedtls_ecp_group_init,void,mbedtls_ecp_group*
 Function,-,mbedtls_ecp_group_load,int,"mbedtls_ecp_group*, mbedtls_ecp_group_id"
 Function,-,mbedtls_ecp_grp_id_list,const mbedtls_ecp_group_id*,
 Function,-,mbedtls_ecp_is_zero,int,mbedtls_ecp_point*
-Function,-,mbedtls_ecp_keypair_calc_public,int,"mbedtls_ecp_keypair*, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_ecp_keypair_calc_public,int,"mbedtls_ecp_keypair*, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_ecp_keypair_free,void,mbedtls_ecp_keypair*
 Function,-,mbedtls_ecp_keypair_get_group_id,mbedtls_ecp_group_id,const mbedtls_ecp_keypair*
 Function,-,mbedtls_ecp_keypair_init,void,mbedtls_ecp_keypair*
-Function,-,mbedtls_ecp_mul,int,"mbedtls_ecp_group*, mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*, mbedtls_f_rng_t*, void*"
-Function,-,mbedtls_ecp_mul_restartable,int,"mbedtls_ecp_group*, mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*, mbedtls_f_rng_t*, void*, mbedtls_ecp_restart_ctx*"
+Function,-,mbedtls_ecp_mul,int,"mbedtls_ecp_group*, mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*, int (*)(void*, unsigned char*, size_t), void*"
+Function,-,mbedtls_ecp_mul_restartable,int,"mbedtls_ecp_group*, mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*, int (*)(void*, unsigned char*, size_t), void*, mbedtls_ecp_restart_ctx*"
 Function,-,mbedtls_ecp_muladd,int,"mbedtls_ecp_group*, mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*"
 Function,-,mbedtls_ecp_muladd_restartable,int,"mbedtls_ecp_group*, mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*, const mbedtls_mpi*, const mbedtls_ecp_point*, mbedtls_ecp_restart_ctx*"
 Function,-,mbedtls_ecp_point_cmp,int,"const mbedtls_ecp_point*, const mbedtls_ecp_point*"
@@ -2641,15 +2641,15 @@ Function,-,mbedtls_mpi_copy,int,"mbedtls_mpi*, const mbedtls_mpi*"
 Function,-,mbedtls_mpi_div_int,int,"mbedtls_mpi*, mbedtls_mpi*, const mbedtls_mpi*, mbedtls_mpi_sint"
 Function,-,mbedtls_mpi_div_mpi,int,"mbedtls_mpi*, mbedtls_mpi*, const mbedtls_mpi*, const mbedtls_mpi*"
 Function,-,mbedtls_mpi_exp_mod,int,"mbedtls_mpi*, const mbedtls_mpi*, const mbedtls_mpi*, const mbedtls_mpi*, mbedtls_mpi*"
-Function,-,mbedtls_mpi_fill_random,int,"mbedtls_mpi*, size_t, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_mpi_fill_random,int,"mbedtls_mpi*, size_t, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_mpi_free,void,mbedtls_mpi*
 Function,-,mbedtls_mpi_gcd,int,"mbedtls_mpi*, const mbedtls_mpi*, const mbedtls_mpi*"
-Function,-,mbedtls_mpi_gen_prime,int,"mbedtls_mpi*, size_t, int, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_mpi_gen_prime,int,"mbedtls_mpi*, size_t, int, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_mpi_get_bit,int,"const mbedtls_mpi*, size_t"
 Function,-,mbedtls_mpi_grow,int,"mbedtls_mpi*, size_t"
 Function,-,mbedtls_mpi_init,void,mbedtls_mpi*
 Function,-,mbedtls_mpi_inv_mod,int,"mbedtls_mpi*, const mbedtls_mpi*, const mbedtls_mpi*"
-Function,-,mbedtls_mpi_is_prime_ext,int,"const mbedtls_mpi*, int, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_mpi_is_prime_ext,int,"const mbedtls_mpi*, int, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_mpi_lsb,size_t,const mbedtls_mpi*
 Function,-,mbedtls_mpi_lset,int,"mbedtls_mpi*, mbedtls_mpi_sint"
 Function,-,mbedtls_mpi_lt_mpi_ct,int,"const mbedtls_mpi*, const mbedtls_mpi*, unsigned*"
@@ -2657,7 +2657,7 @@ Function,-,mbedtls_mpi_mod_int,int,"mbedtls_mpi_uint*, const mbedtls_mpi*, mbedt
 Function,-,mbedtls_mpi_mod_mpi,int,"mbedtls_mpi*, const mbedtls_mpi*, const mbedtls_mpi*"
 Function,-,mbedtls_mpi_mul_int,int,"mbedtls_mpi*, const mbedtls_mpi*, mbedtls_mpi_uint"
 Function,-,mbedtls_mpi_mul_mpi,int,"mbedtls_mpi*, const mbedtls_mpi*, const mbedtls_mpi*"
-Function,-,mbedtls_mpi_random,int,"mbedtls_mpi*, mbedtls_mpi_sint, const mbedtls_mpi*, mbedtls_f_rng_t*, void*"
+Function,-,mbedtls_mpi_random,int,"mbedtls_mpi*, mbedtls_mpi_sint, const mbedtls_mpi*, int (*)(void*, unsigned char*, size_t), void*"
 Function,-,mbedtls_mpi_read_binary,int,"mbedtls_mpi*, const unsigned char*, size_t"
 Function,-,mbedtls_mpi_read_binary_le,int,"mbedtls_mpi*, const unsigned char*, size_t"
 Function,-,mbedtls_mpi_read_string,int,"mbedtls_mpi*, int, const char*"
