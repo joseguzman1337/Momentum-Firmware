@@ -2,16 +2,18 @@
   "name": "momentum-codex-sdk",
   "version": "1.0.0",
   "description": "Codex SDK integration for Momentum Firmware AI automation",
-  "main": "sdk.ts",
+  "type": "module",
+  "main": "dist/sdk.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/sdk.js"
   },
   "dependencies": {
-    "@openai/codex-sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@openai/codex-sdk": "^0.154.0"
   },
   "devDependencies": {
-    "typescript": "^7.0.0",
-    "@types/node": "^24.0.0"
+    "typescript": "^7.0.2",
+    "@types/node": "^26.6.1"
   }
 }

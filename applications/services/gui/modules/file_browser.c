@@ -64,8 +64,12 @@ static void BrowserItem_t_set(BrowserItem_t* obj, const BrowserItem_t* src) {
     furi_string_set(obj->name, src->name);
     furi_string_set(obj->display_name, src->display_name);
     if(src->custom_icon_data) {
+        if(!obj->custom_icon_data) {
+            obj->custom_icon_data = malloc(CUSTOM_ICON_MAX_SIZE);
+        }
         memcpy(obj->custom_icon_data, src->custom_icon_data, CUSTOM_ICON_MAX_SIZE);
     } else {
+        free(obj->custom_icon_data);
         obj->custom_icon_data = NULL;
     }
 }
@@ -80,11 +84,8 @@ static void BrowserItem_t_clear(BrowserItem_t* obj) {
 
 static int BrowserItem_t_cmp(const BrowserItem_t* a, const BrowserItem_t* b) {
     // Back indicator comes before everything, then folders, then all other files.
-    if(a->type == BrowserItemTypeBack) {
-        return -1;
-    }
-    if(b->type == BrowserItemTypeBack) {
-        return 1;
+    if((a->type == BrowserItemTypeBack) || (b->type == BrowserItemTypeBack)) {
+        return (a->type == b->type) ? 0 : (a->type == BrowserItemTypeBack ? -1 : 1);
     }
     if(momentum_settings.sort_dirs_first) {
         if(a->type == BrowserItemTypeFolder && b->type != BrowserItemTypeFolder) {
@@ -98,6 +99,10 @@ static int BrowserItem_t_cmp(const BrowserItem_t* a, const BrowserItem_t* b) {
     return furi_string_cmpi(a->display_name, b->display_name);
 }
 
+static bool BrowserItem_t_equal(const BrowserItem_t* a, const BrowserItem_t* b) {
+    return BrowserItem_t_cmp(a, b) == 0;
+}
+
 #define M_OPL_BrowserItem_t()                 \
     (INIT(API_2(BrowserItem_t_init)),         \
      SET(API_6(BrowserItem_t_set)),           \
@@ -105,7 +110,7 @@ static int BrowserItem_t_cmp(const BrowserItem_t* a, const BrowserItem_t* b) {
      CLEAR(API_2(BrowserItem_t_clear)),       \
      CMP(API_6(BrowserItem_t_cmp)),           \
      SWAP(M_SWAP_DEFAULT),                    \
-     EQUAL(API_6(M_EQUAL_DEFAULT)))
+     EQUAL(API_6(BrowserItem_t_equal)))
 
 ARRAY_DEF(items_array, BrowserItem_t)
 

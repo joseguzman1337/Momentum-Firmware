@@ -27,7 +27,7 @@ def exchange(request: object) -> dict:
 
 
 def test_declared_environment_imports_runtime_dependency() -> None:
-    assert mcp_server.websockets.__version__ == "15.0.1"
+    assert mcp_server.websockets.__version__ == "17.1"
 
 
 def test_initialize_and_list_all_tools() -> None:

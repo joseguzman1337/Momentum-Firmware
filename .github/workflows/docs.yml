@@ -58,7 +58,7 @@ jobs:
       - name: install-doxygen
         uses: AdarshRawat1/Install-Doxygen@v1.0
         with:
-          version: "1.12.0"
+          version: "1.18.0"
 
       - name: 'Generate documentation'
         run: ./fbt doxygen

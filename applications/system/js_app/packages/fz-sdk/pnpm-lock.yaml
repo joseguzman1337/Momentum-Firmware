@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       esbuild:
-        specifier: ^0.28.0
+        specifier: ^0.28.2
         version: 0.28.2
       esbuild-plugin-tsc:
         specifier: ^0.6.0
@@ -24,10 +24,10 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0
       typedoc:
-        specifier: ^0.28.0
+        specifier: ^0.28.20
         version: 0.28.20(typescript@5.6.3)
       typedoc-material-theme:
-        specifier: ^1.1.0
+        specifier: ^1.4.1
         version: 1.4.1(typedoc@0.28.20(typescript@5.6.3))
 
 packages:

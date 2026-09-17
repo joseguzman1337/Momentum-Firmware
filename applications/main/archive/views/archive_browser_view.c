@@ -127,33 +127,33 @@ static void render_item_menu(Canvas* canvas, ArchiveBrowserViewModel* model) {
             if(!model->is_app_tab && !favorites) {
                 if(model->clipboard != NULL) {
                     archive_menu_add_item(
-                        menu_array_push_raw(model->context_menu),
+                        menu_array_push_back_raw(model->context_menu),
                         "Paste",
                         ArchiveBrowserEventFileMenuPaste);
                 } else if(selected) {
                     archive_menu_add_item(
-                        menu_array_push_raw(model->context_menu),
+                        menu_array_push_back_raw(model->context_menu),
                         "Cut",
                         ArchiveBrowserEventFileMenuCut);
                     archive_menu_add_item(
-                        menu_array_push_raw(model->context_menu),
+                        menu_array_push_back_raw(model->context_menu),
                         "Copy",
                         ArchiveBrowserEventFileMenuCopy);
                 }
                 archive_menu_add_item(
-                    menu_array_push_raw(model->context_menu),
+                    menu_array_push_back_raw(model->context_menu),
                     "New Dir",
                     ArchiveBrowserEventFileMenuNewDir);
             }
             if(selected) {
                 if(!selected->is_app) {
                     archive_menu_add_item(
-                        menu_array_push_raw(model->context_menu),
+                        menu_array_push_back_raw(model->context_menu),
                         "Rename",
                         ArchiveBrowserEventFileMenuRename);
                 }
                 archive_menu_add_item(
-                    menu_array_push_raw(model->context_menu),
+                    menu_array_push_back_raw(model->context_menu),
                     "Delete",
                     ArchiveBrowserEventFileMenuDelete);
             }
@@ -161,30 +161,30 @@ static void render_item_menu(Canvas* canvas, ArchiveBrowserViewModel* model) {
             if(archive_is_known_app(selected->type)) {
                 if(selected->type != ArchiveFileTypeFolder) {
                     archive_menu_add_item(
-                        menu_array_push_raw(model->context_menu),
+                        menu_array_push_back_raw(model->context_menu),
                         "Run In App",
                         ArchiveBrowserEventFileMenuRun);
                 }
                 archive_menu_add_item(
-                    menu_array_push_raw(model->context_menu),
+                    menu_array_push_back_raw(model->context_menu),
                     (selected->fav || favorites) ? "Unfavorite" : "Favorite",
                     ArchiveBrowserEventFileMenuFavorite);
             }
             if(!selected->is_app) {
                 archive_menu_add_item(
-                    menu_array_push_raw(model->context_menu),
+                    menu_array_push_back_raw(model->context_menu),
                     "Info",
                     ArchiveBrowserEventFileMenuInfo);
                 if(selected->type != ArchiveFileTypeFolder) {
                     archive_menu_add_item(
-                        menu_array_push_raw(model->context_menu),
+                        menu_array_push_back_raw(model->context_menu),
                         selected->type == ArchiveFileTypeDiskImage ? "Mount" : "Show",
                         ArchiveBrowserEventFileMenuShow);
                 }
             }
             if(favorites) {
                 archive_menu_add_item(
-                    menu_array_push_raw(model->context_menu),
+                    menu_array_push_back_raw(model->context_menu),
                     "Move",
                     ArchiveBrowserEventEnterFavMove);
             }

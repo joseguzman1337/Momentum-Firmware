@@ -10,13 +10,13 @@ export class CodexSDKIntegration {
   async processComplexTask(task: string, threadId?: string): Promise<string> {
     const thread = threadId ? this.codex.resumeThread(threadId) : this.codex.startThread();
     const result = await thread.run(task);
-    return result;
+    return result.finalResponse;
   }
 
   async generateStructuredOutput(task: string, schema: object): Promise<any> {
     const thread = this.codex.startThread();
     const result = await thread.run(task, { outputSchema: schema });
-    return JSON.parse(result);
+    return JSON.parse(result.finalResponse);
   }
 }
 

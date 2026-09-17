@@ -19,7 +19,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
       
       - name: Install SwiftLint
         run: brew install swiftlint
@@ -41,7 +41,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
       
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
@@ -53,7 +53,7 @@ jobs:
         run: swift --version
       
       - name: Cache build artifacts
-        uses: actions/cache@v3
+        uses: actions/cache@v6.1.0
         with:
           path: |
             ~/Library/Caches/org.swift.swiftpm
@@ -101,7 +101,7 @@ jobs:
           file "${{ steps.find-driver.outputs.dext_path }}/Contents/MacOS/RTL8814AUDriver"
       
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: RTL8814AUDriver-${{ github.sha }}
           path: ${{ steps.find-driver.outputs.dext_path }}
@@ -114,7 +114,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
       
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app
@@ -133,7 +133,7 @@ jobs:
       
       - name: Upload coverage to Codecov
         if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v7.1.1
         with:
           files: ./coverage.lcov
           fail_ci_if_error: false
@@ -144,7 +144,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
       
       - name: Run security audit
         run: |
@@ -161,7 +161,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
       
       - name: Check markdown files
         run: |
@@ -189,7 +189,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
       
       - name: Make scripts executable
         run: chmod +x build.sh sign.sh install.sh
@@ -211,7 +211,7 @@ jobs:
           echo "SHA256: $SHA256"
       
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

@@ -21,7 +21,7 @@ jobs:
         if: ${{ github.event.action == 'released' }}
         run: |
           echo '${{ secrets.FIREBASE_TOKEN }}' > firebase-token.json;
-          python3 -m pip install firebase-admin==6.4.0;
+          python3 -m pip install firebase-admin==7.5.0;
           python3 scripts/send_firebase_notification.py \
               "--version=${{ github.event.release.name }}" \
               "--token=firebase-token.json";

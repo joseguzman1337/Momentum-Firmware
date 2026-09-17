@@ -305,13 +305,13 @@ NfcCommand felica_poller_state_handler_traverse_standard_system(FelicaPoller* in
         }
 
         if(len == 0x0E) {
-            FelicaArea* area = felica_area_array_push_raw(area_buffer);
+            FelicaArea* area = felica_area_array_push_back_raw(area_buffer);
             memset(area, 0, sizeof *area);
             area->code = code_begin;
             area->first_idx = (uint16_t)felica_service_array_size(service_buffer);
             area->last_idx = 0;
         } else {
-            FelicaService* service = felica_service_array_push_raw(service_buffer);
+            FelicaService* service = felica_service_array_push_back_raw(service_buffer);
             memset(service, 0, sizeof *service);
             service->code = code_begin;
             service->attr = (uint8_t)(code_begin & 0x3F);
@@ -390,7 +390,7 @@ NfcCommand felica_poller_state_handler_read_standard_blocks(FelicaPoller* instan
 
             if(response->SF1 == 0 && response->SF2 == 0) {
                 FelicaPublicBlock* public_block =
-                    felica_public_block_array_push_raw(public_block_buffer);
+                    felica_public_block_array_push_back_raw(public_block_buffer);
                 memset(public_block, 0, sizeof *public_block);
                 memcpy(public_block->block.data, response->data, FELICA_DATA_BLOCK_SIZE);
 

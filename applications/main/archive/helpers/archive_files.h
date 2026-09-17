@@ -73,9 +73,12 @@ static void ArchiveFile_t_set(ArchiveFile_t* obj, const ArchiveFile_t* src) {
     furi_string_set(obj->path, src->path);
     obj->type = src->type;
     if(src->custom_icon_data) {
-        obj->custom_icon_data = malloc(FAP_MANIFEST_MAX_ICON_SIZE);
+        if(!obj->custom_icon_data) {
+            obj->custom_icon_data = malloc(FAP_MANIFEST_MAX_ICON_SIZE);
+        }
         memcpy(obj->custom_icon_data, src->custom_icon_data, FAP_MANIFEST_MAX_ICON_SIZE);
     } else {
+        free(obj->custom_icon_data);
         obj->custom_icon_data = NULL;
     }
     furi_string_set(obj->custom_name, src->custom_name);
@@ -107,6 +110,10 @@ static int ArchiveFile_t_cmp(const ArchiveFile_t* a, const ArchiveFile_t* b) {
         furi_string_empty(b->custom_name) ? b->path : b->custom_name);
 }
 
+static bool ArchiveFile_t_equal(const ArchiveFile_t* a, const ArchiveFile_t* b) {
+    return ArchiveFile_t_cmp(a, b) == 0;
+}
+
 #define M_OPL_ArchiveFile_t()                 \
     (INIT(API_2(ArchiveFile_t_init)),         \
      SET(API_6(ArchiveFile_t_set)),           \
@@ -114,7 +121,7 @@ static int ArchiveFile_t_cmp(const ArchiveFile_t* a, const ArchiveFile_t* b) {
      CLEAR(API_2(ArchiveFile_t_clear)),       \
      CMP(API_6(ArchiveFile_t_cmp)),           \
      SWAP(M_SWAP_DEFAULT),                    \
-     EQUAL(API_6(M_EQUAL_DEFAULT)))
+     EQUAL(API_6(ArchiveFile_t_equal)))
 
 ARRAY_DEF(files_array, ArchiveFile_t)
 

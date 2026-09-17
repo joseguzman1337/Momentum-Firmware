@@ -264,7 +264,7 @@ bool subghz_history_add_to_history(
     instance->code_last_hash_data = hash_data;
     instance->last_update_timestamp = furi_get_tick();
 
-    SubGhzHistoryItem* item = SubGhzHistoryItemArray_push_raw(instance->history->data);
+    SubGhzHistoryItem* item = SubGhzHistoryItemArray_push_back_raw(instance->history->data);
     item->preset = malloc(sizeof(SubGhzRadioPreset));
     item->type = decoder_base->protocol->type;
     // if(decoder_base->protocol->filter & SubGhzProtocolFilter_Weather) {

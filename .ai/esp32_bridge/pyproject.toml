@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools==80.10.2", "wheel==0.48.0"]
+requires = ["setuptools==84.0.0", "wheel==0.48.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "momentum-esp32-mcp-bridge"
 version = "1.1.0"
 description = "MCP-compatible WebSocket bridge for the Momentum ESP32 LoRa agent"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
-  "websockets==15.0.1",
+  "websockets==17.1",
 ]
 
 [project.scripts]
@@ -16,7 +16,7 @@ esp32-mcp-bridge = "mcp_server:main"
 
 [dependency-groups]
 dev = [
-  "pytest==8.4.2",
+  "pytest==9.1.1",
 ]
 
 [tool.setuptools]
@@ -24,4 +24,3 @@ py-modules = ["mcp_server"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-

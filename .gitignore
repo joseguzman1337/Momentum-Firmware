@@ -18,6 +18,7 @@ env/
 venv/
 # Python Byte-compiled / optimized files
 __pycache__/
+*.egg-info/
 *.py[cod]
 *$py.class
 *.pickle
@@ -50,6 +51,7 @@ PVS-Studio.log
 /fbt_options_local.py
 # JS packages
 node_modules/
+.ai/codex-sdk/dist/
 # cli_perf script output in case of errors
 /block.bin
 /return_block.bin

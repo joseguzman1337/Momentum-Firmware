@@ -416,7 +416,7 @@ void button_panel_add_label(
         button_panel->view,
         ButtonPanelModel * model,
         {
-            LabelElement* label = LabelList_push_raw(model->labels);
+            LabelElement* label = LabelList_push_back_raw(model->labels);
             label->x = x;
             label->y = y;
             label->font = font;
@@ -437,7 +437,7 @@ void button_panel_add_icon(
         button_panel->view,
         ButtonPanelModel * model,
         {
-            IconElement* icon = IconList_push_raw(model->icons);
+            IconElement* icon = IconList_push_back_raw(model->icons);
             icon->x = x;
             icon->y = y;
             icon->name = icon_name;

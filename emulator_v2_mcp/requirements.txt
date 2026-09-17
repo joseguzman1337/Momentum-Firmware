@@ -1,5 +1,5 @@
 # Flipper Zero Emulator v2 dependencies
 # The core emulator and MCP server are designed to run with Python 3.8+ standard library.
 # Optional packages for enhanced features:
-# pillow>=9.0.0      # For PNG screen export
-# mcp>=1.0.0         # For FastMCP integrations if desired
+# pillow>=12.3.0     # For PNG screen export
+# mcp>=2.2.0         # For FastMCP integrations if desired

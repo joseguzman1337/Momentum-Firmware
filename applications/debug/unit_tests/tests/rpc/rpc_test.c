@@ -1044,7 +1044,7 @@ static void test_storage_write_read_run(
     test_rpc_add_empty_to_list(expected_msg_list, PB_CommandStatus_OK, *command_id);
 
     test_rpc_create_simple_message(
-        MsgList_push_raw(input_msg_list), PB_Main_storage_read_request_tag, path, ++*command_id);
+        MsgList_push_back_raw(input_msg_list), PB_Main_storage_read_request_tag, path, ++*command_id);
     test_rpc_add_read_or_write_to_list(
         expected_msg_list,
         READ_RESPONSE,
@@ -1788,7 +1788,7 @@ MU_TEST(test_rpc_multisession_storage) {
     test_rpc_add_empty_to_list(expected_1, PB_CommandStatus_OK, command_id);
 
     test_rpc_create_simple_message(
-        MsgList_push_raw(input_0),
+        MsgList_push_back_raw(input_0),
         PB_Main_storage_read_request_tag,
         TEST_DIR "file0.txt",
         ++command_id);
@@ -1796,7 +1796,7 @@ MU_TEST(test_rpc_multisession_storage) {
         expected_0, READ_RESPONSE, TEST_DIR "file0.txt", pattern, sizeof(pattern), 1, command_id);
 
     test_rpc_create_simple_message(
-        MsgList_push_raw(input_1),
+        MsgList_push_back_raw(input_1),
         PB_Main_storage_read_request_tag,
         TEST_DIR "file1.txt",
         ++command_id);
