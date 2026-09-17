@@ -47,7 +47,7 @@ jobs:
           echo "hw-target-code=$TARGET" >> $GITHUB_OUTPUT
 
       - name: Deploy uFBT with SDK
-        uses: flipperdevices/flipperzero-ufbt-action@v0.1.3
+        uses: flipperdevices/flipperzero-ufbt-action@v0.1.4
         with:
           task: setup
           sdk-file: ${{ steps.build-fw.outputs.sdk-file }}
