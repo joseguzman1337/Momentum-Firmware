@@ -29,6 +29,18 @@ class ReadmeFapFalContractTest(unittest.TestCase):
         self.assertNotIn("bulletproof reliability", readme)
         self.assertEqual(readme.count("```") % 2, 0, "Markdown fences must be balanced")
 
+    def test_long_sections_are_collapsed_by_default(self) -> None:
+        readme = self.read("ReadMe.md")
+        for title in (
+            "Momentum Settings",
+            "Animations / Asset Packs",
+            "Bad Keyboard",
+            "Build it yourself",
+        ):
+            self.assertIn(f"<summary><strong>{title}</strong></summary>", readme)
+        self.assertNotIn("<details open", readme)
+        self.assertEqual(readme.count("<details>"), readme.count("</details>"))
+
     def test_promised_apps_are_sd_card_faps(self) -> None:
         faps = (
             ("applications/main/momentum_app/application.fam", "momentum_app", "MENUEXTERNAL"),

@@ -89,6 +89,9 @@ We politely welcome contributions in any programming language, as long as they h
 The sections below highlight staple additions. The repository's [List of changes](#list-of-changes), manifests, and release notes are the authoritative inventory for this fork.
 
 <br>
+<details>
+<summary><strong>Momentum Settings</strong></summary>
+
 <h2 align="center">Momentum Settings</h2>
 
 We offer a powerful and easy-to-use application tailor-made for our firmware, that lets you configure everything you could dream of, and more:
@@ -104,7 +107,12 @@ We offer a powerful and easy-to-use application tailor-made for our firmware, th
 
 <br>
 
+</details>
+
 <br>
+
+<details>
+<summary><strong>Animations / Asset Packs</strong></summary>
 
 <h2 align="center">Animations / Asset Packs</h2>
 
@@ -132,6 +140,13 @@ After installing the packs to Flipper, hit the <code>Arrow Up</code> button on t
 
 <br>
 
+</details>
+
+<br>
+
+<details>
+<summary><strong>Bad Keyboard</strong></summary>
+
 <h2 align="center">Bad Keyboard</h2>
 
 <img src=".github/assets/badkb.png" align="left" width="250px"/>
@@ -142,6 +157,8 @@ In Bluetooth mode it allows you to spoof the display name and MAC address of the
 In USB mode it also enables additional functionality to spoof the manufacturer and product names, as well as vendor and product IDs (VID/PID).
 
 <br>
+
+</details>
 
 <h2 align="center">List of changes</h2>
 
@@ -259,6 +276,9 @@ Four update workflows are described below. For NX Augmented, the release artifac
 
 <br>
 
+<details>
+<summary><strong>Build it yourself</strong></summary>
+
 <h2 align="center">Build it yourself</h2>
 
 ### Quick Start
@@ -356,6 +376,8 @@ For comprehensive AI agent integration, MCP server usage, and advanced automatio
 - Build automation for CI/CD
 - Unit test execution workflows
 - Linting and formatting automation
+
+</details>
 
 
 <h2 align="center">AI Automation Ecosystem</h2>
