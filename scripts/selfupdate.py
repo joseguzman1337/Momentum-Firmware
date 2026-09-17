@@ -3,6 +3,7 @@
 import logging
 import os
 import pathlib
+import re
 import shutil
 import sys
 import time
@@ -16,6 +17,8 @@ class Main(App):
     APP_POST_CLOSE_DELAY_SEC = 0.2
     CONNECT_RETRY_DELAY_SEC = 2.0
     CONNECT_RETRIES = 15
+    UPDATE_RESPONSE_LINES = 16
+    ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 
     def init(self):
         self.parser.add_argument("-p", "--port", help="CDC Port", default="auto")
@@ -87,6 +90,9 @@ class Main(App):
         result_str = result.decode("ascii", errors="ignore").strip()
         self._log_debug(f"[serial] {label}: {result_str}")
         return result, result_str
+
+    def _plain_cli_line(self, value: str) -> str:
+        return self.ANSI_ESCAPE_RE.sub("", value).strip()
 
     def _detect_flipper_mount(self) -> str | None:
         candidates = []
@@ -243,7 +249,7 @@ class Main(App):
                     )
 
                 storage.send_and_wait_eol(
-                    f"update install {flipper_update_path}/{manifest_name}\r"
+                    f"update --plain install {flipper_update_path}/{manifest_name}\r"
                 )
                 result, result_str = self._read_line(storage, "update install")
                 if b"Verifying" not in result:
@@ -252,13 +258,20 @@ class Main(App):
                     return 3
                 if self.pretty:
                     self._log_step("Device", "Verifying & applying update...")
-                result, result_str = self._read_line(storage, "update result")
-                if not result.startswith(b"OK"):
-                    self._log_err(result_str)
-                    self.logger.error(result_str)
-                    return 4
-                self._log_ok("Update triggered successfully. Device will reboot.")
-                return 0
+                for _ in range(self.UPDATE_RESPONSE_LINES):
+                    _, result_str = self._read_line(storage, "update result")
+                    response = self._plain_cli_line(result_str)
+                    if response.startswith(("[OK]", "OK")):
+                        self._log_ok("Update triggered successfully. Device will reboot.")
+                        return 0
+                    if response.startswith(("[ERR]", "Error:")):
+                        self._log_err(response)
+                        self.logger.error(response)
+                        return 4
+                msg = "No terminal update result received from device"
+                self._log_err(msg)
+                self.logger.error(msg)
+                return 4
         except Exception as e:
             self._log_err(str(e))
             self.logger.error(e)
