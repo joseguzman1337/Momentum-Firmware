@@ -12,7 +12,7 @@ from datetime import datetime
 
 class WarpAutomation:
     def __init__(self):
-        self.repo_root = Path("/Users/x/x/Momentum-Firmware")
+        self.repo_root = Path(__file__).resolve().parents[3]
         self.task_file = self.repo_root / "docs/automation/warp_agent_tasks.md"
         self.log_dir = self.repo_root / "logs/warp"
         self.log_dir.mkdir(parents=True, exist_ok=True)

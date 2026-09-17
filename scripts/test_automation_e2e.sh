@@ -213,7 +213,7 @@ fi
 # Test 14: Validate script syntax
 echo -e "\n${YELLOW}[TEST 14] Validating script syntax...${NC}"
 SYNTAX_OK=true
-for script in "$SCRIPT_DIR"/*.sh; do
+for script in "$SCRIPT_DIR"/*.sh "$SCRIPT_DIR"/device/*.sh; do
     if bash -n "$script" 2>/dev/null; then
         : # Script is valid
     else
@@ -227,10 +227,13 @@ fi
 
 # Test 15: Check Python script syntax
 echo -e "\n${YELLOW}[TEST 15] Validating Python script syntax...${NC}"
-if python3 -m py_compile "$SCRIPT_DIR/fbt_hooks/post_flash_usb_ethernet.py" 2>/dev/null; then
-    pass "Python script has valid syntax"
+if python3 -m py_compile \
+    "$SCRIPT_DIR/fbt_hooks/post_flash_usb_ethernet.py" \
+    "$SCRIPT_DIR/detect_flipper.py" \
+    "$SCRIPT_DIR/run_unit_tests.py" 2>/dev/null; then
+    pass "Python scripts have valid syntax"
 else
-    fail "Syntax error in post_flash_usb_ethernet.py"
+    fail "Syntax error in Python automation scripts"
 fi
 
 # Pre-flight: Ensure USB Ethernet NAT and routing are configured

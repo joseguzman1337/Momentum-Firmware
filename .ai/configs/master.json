@@ -124,7 +124,7 @@
             ".gemini/GEMINI.md",
             "ReadMe.md",
             "SKILL.md",
-            "docs/reference/**/*.md"
+            "docs/**/*.md"
         ],
         "embedding_model": "text-embedding-004",
         "chunk_size": 1000,
