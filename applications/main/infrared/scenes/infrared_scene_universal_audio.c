@@ -7,7 +7,7 @@ void infrared_scene_universal_audio_on_enter(void* context) {
     ButtonPanel* button_panel = infrared->button_panel;
     InfraredBruteForce* brute_force = infrared->brute_force;
 
-    infrared_brute_force_set_db_filename(brute_force, EXT_PATH("infrared/assets/audio.ir"));
+    infrared_brute_force_set_db_filename(brute_force, APP_ASSETS_PATH("assets/audio.ir"));
 
     button_panel_reserve(button_panel, 2, 4);
     uint32_t i = 0;

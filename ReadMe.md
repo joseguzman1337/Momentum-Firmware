@@ -20,16 +20,16 @@ This custom firmware is based on the [Official Firmware](https://github.com/flip
 
 ## ✨ What Makes Momentum Special
 
-This isn't just a firmware - it's a **fully autonomous AI-driven development platform** for Flipper Zero. We combine cutting-edge features with an unprecedented AI automation infrastructure.
+NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilities are delivered as external FAP applications, app-specific extensions as FAL plugins, and only the stable platform, hardware drivers, loader, storage, and ABI services remain in the firmware image. Host-side automation builds, tests, installs, and monitors those artifacts; it is not a permanently running service on the Flipper.
 
 ### 🤖 Industry-First AI Automation
-- **8 Specialized AI Agents** working 24/7 on development, security, and operations
-- **MCP (Model Context Protocol)** integration for real-time agent capabilities
+- **Specialized AI agent workflows** for development, security, and operations when their configured host runners are invoked
+- **MCP (Model Context Protocol)** integration for host-side agent capabilities when configured
 - **Strawberry Toolkit** for AI hallucination detection in code review
 - **Smart Flash** - AI-enhanced build workflows with ESP orchestration
-- **Automated App Management** - One command to sync the entire Flipper Catalog
+- **Automated App Management** - A host command that imports available official-catalog sources; `fap_deploy` separately validates catalog artifacts, hashes, target API compatibility, and the complete staged set before transfer
 - **Auto USB Ethernet** - Zero-config internet sharing ([FLIPPER_AUTO_ETHERNET.md](docs/FLIPPER_AUTO_ETHERNET.md))
-  - Plug in Flipper → USB Ethernet auto-enabled → Internet auto-shared
+  - After host setup, connecting a compatible Flipper can enable USB Ethernet and host Internet sharing
   - One-time setup: `sudo ./scripts/install-flipper-auto-ethernet.sh`
 
 ### 🚀 Technical Excellence
@@ -38,12 +38,29 @@ This isn't just a firmware - it's a **fully autonomous AI-driven development pla
   - Auto-download ESP32 Marauder firmware over USB Ethernet
   - Support for all ESP32 variants (ESP32, S2, S3, C3)
   - One-click flash for WiFi Devboard v1
-- **Forked Submodule Workflow** for guaranteed compile-time stability
+- **Forked Submodule Workflow** for pinned, reproducible dependency inputs, with compilation still enforced by the build gates
 - **Asset Pack System** - Complete theming with Anims/Icons/Fonts
 - **Extended JavaScript API** - Mass storage, file operations, and more
 - **Advanced Security** - Lock on boot, PIN protection, secure storage
 
-### 🎨 Unmatched Customization
+### 📦 FAP/FAL Delivery Matrix
+
+The split below is the delivery contract for NX Augmented. FAP/FAL artifacts remain versioned against the exported firmware API; a compatible firmware build and SD card are therefore still required.
+
+| Capability group | Delivered as | Firmware responsibility |
+|---|---|---|
+| Momentum Settings (`momentum_app.fap`), Bad Keyboard (`bad_kb.fap`), BLE Spam (`ble_spam.fap`), FindMy (`findmy.fap`), NFC Maker (`nfc_maker.fap`), Wardriver (`wardriver.fap`) and ESP Flasher (`esp_flasher.fap`) | **FAP applications**, installed below `/ext/apps/` by category | Stable GUI, loader, storage, USB/BLE/NFC/Sub-GHz/GPIO services and exported ABI |
+| NFC parsers/protocol extensions, Sub-GHz GPS (`/ext/apps_data/subghz_gps/plugins/subghz_gps.fal`), JavaScript modules (`/ext/apps_data/js_app/plugins/*.fal`) and app-specific protocol handlers | **FAL plugins** loaded by their owning FAP/platform app | Plugin loader, API resolver, protocol HALs and ABI validation |
+| File search/management, disk-image mounting/Mass Storage and the extended JavaScript file/UsbDisk APIs | **FAP features and FAL JavaScript modules** | Sandboxed storage, USB device mode, file browser integration and exported ABI |
+| Desktop keybinds, menu organization, asset-pack selection, spoofing controls, RGB profiles and Video Game Module color settings | **FAP configuration surfaces plus SD-card data** | Settings service, desktop hooks and hardware-facing services |
+| Lock on boot, PIN handling, false-PIN reset policy and secure application storage | **FAP configuration over minimal security services** | Boot/lock enforcement, cryptographic primitives and protected storage boundaries |
+| Asset packs (`/ext/asset_packs/`), shared application resources (`/ext/<feature>/assets/`), embedded read-only FAP assets, menu/keybind configuration, spoofing profiles, RGB profiles and persistent state (`/ext/apps_data/`) | **SD-card resources/configuration** consumed by FAPs/FALs; shared paths remain available to CLI and companion apps | Storage primitives, settings migration and resource loading |
+| Native USB Ethernet, HTTP transport, security/lock primitives, hardware drivers, radio services and application ABI | **Minimal firmware platform services** | Built into CPU1 firmware because applications require privileged hardware or system integration |
+| Smart Flash, catalog resolution, agent routing, Strawberry checks, MCP integrations, submodule synchronization and notifications | **Host automation** | No resident agent runtime; tools operate only when installed, configured, and invoked on a host |
+
+This architecture preserves the capabilities listed below while keeping independently updateable features outside the constrained CPU1 firmware image.
+
+### 🎨 Extensive Customization
 - **Momentum Settings App** - Configure everything from one place
 - **Desktop Keybinds** - Full key remapping and press/hold actions
 - **Main Menu Customization** - Add directories, JS files, reorganize freely
@@ -55,13 +72,13 @@ This isn't just a firmware - it's a **fully autonomous AI-driven development pla
 
 The goal of this firmware is to constantly push the bounds of what is possible with Flipper Zero, driving the innovation of many new groundbreaking features, while maintaining the easiest and most customizable user experience of any firmware. Fixing bugs promptly and ensuring a stable and compatible system is also of our utmost importance.
 
-- <h4>Feature-rich: We include all third-party features and apps as long as they fulfill a useful purpose and they work correctly, aswell as implement ourselves many new exciting functionalities.</h4>
+- <h4>Feature-rich: Useful third-party and NX capabilities are packaged as compatible FAP/FAL artifacts where possible. Inclusion is based on repository manifests, ABI compatibility, build results, and device testing—not an unconditional claim to contain every external app.</h4>
 
 - <h4>Stable: We ensure the most stable experience possible by having an actual understanding of what's going on, and proactively making all tweaks and additions backwards-, and inter-, compatible.</h4>
 
 - <h4>Customizable: You can tweak just about everything you see: add/remove apps from the menu, change the animations, replace icon graphics, change your Flipper's name, change how the main menu looks, setup different keybinds like never before, and so much more. All on-device, with no complicated configuration.</h4>
 
-- <h4>AI-Powered: Leveraging a fleet of specialized AI agents for autonomous development, security hardening, build automation, and quality assurance. From code generation to deployment, our AI infrastructure ensures rapid iteration and bulletproof reliability.</h4>
+- <h4>AI-assisted: Host-side agent workflows support development, security review, build automation, and quality assurance. Their output is reviewed through the same build and device-validation gates as any other contribution.</h4>
 
 <br>
 
@@ -69,7 +86,7 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 We politely welcome contributions in any programming language, as long as they help the project and are well documented. For guidance on style, tooling, and build requirements, see <a href="docs/CONTRIBUTING.md">CONTRIBUTING.md</a>.
 
-Note that mentioned below are only a few of our staple additions to the firmware. For a full list check [down here](https://github.com/Next-Flip/Momentum-Firmware#List-of-Changes).
+The sections below highlight staple additions. The repository's [List of changes](#list-of-changes), manifests, and release notes are the authoritative inventory for this fork.
 
 <br>
 <h2 align="center">Momentum Settings</h2>
@@ -94,7 +111,7 @@ We offer a powerful and easy-to-use application tailor-made for our firmware, th
 We created our own improved Animation / Asset system that lets you create and cycle through your own `Asset Packs` with only a few button presses, allowing you to easily load custom Animations, Icons and Fonts like never before. Think of it as a Theme system that's never been easier.
 
 <img src=".github/assets/packs-folder.png" align="left" width="200px"/>
-You can easily create your own pack, or find some community-made ones on <b><a href="https://momentum-fw.dev/asset-packs">our website</a> or on Discord</b>. Check <a href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/docs/reference/file_formats/AssetPacks.md">here</a> for a tutorial on creating your own. Essentially, each <code>Asset Pack</code> can configure its own <code>Anims</code>, <code>Icons</code> & <code>Fonts</code>.
+You can easily create your own pack, or find some community-made ones on <b><a href="https://momentum-fw.dev/asset-packs">the Momentum website</a> or on Discord</b>. See <a href="docs/reference/file_formats/AssetPacks.md">the local Asset Pack guide</a> for a tutorial. Each <code>Asset Pack</code> can configure its own <code>Anims</code>, <code>Icons</code> & <code>Fonts</code>.
 
 <br clear="left"/>
 
@@ -128,17 +145,17 @@ In USB mode it also enables additional functionality to spoof the manufacturer a
 
 <h2 align="center">List of changes</h2>
 
-There are too many to name them all, this is a **non-comprehensive** list of the **most notable from an end-user perspective**. For a more detailed list, you can read through the [**changelogs**](https://github.com/Next-Flip/Momentum-Firmware/releases) and commits/code. Also, you can find a **feature comparison with other firmwares** on [our website](https://momentum-fw.dev/).
+There are too many to name them all; this is a **non-comprehensive** list of the **most notable from an end-user perspective**. For exact changes, read this fork's [releases](https://github.com/joseguzman1337/Momentum-Firmware/releases), manifests, commits, and source. A broader firmware comparison is available on the [Momentum website](https://momentum-fw.dev/).
 
-Note that this repo is always updated with the great work from our friends at [Unleashed](https://github.com/DarkFlippers/unleashed-firmware) and the latest changes from [OFW](https://github.com/flipperdevices/flipperzero-firmware). Below are mentioned only **our** changes that we can actually be credited for, so make sure to check their fantastic additions aswell. And a huge thank you to both teams!
+This repository regularly integrates compatible work from [Unleashed](https://github.com/DarkFlippers/unleashed-firmware) and [OFW](https://github.com/flipperdevices/flipperzero-firmware). The list below focuses on NX/Momentum changes; the pinned revisions and merge history establish exactly which upstream changes are present. A huge thank you to both teams!
 
 <details>
-<summary><b>📋 View detailed changes (Added, Updated, Removed)</b></summary>
+<summary><b>📋 View detailed changes (Added, Updated, Externalized)</b></summary>
 
 ```txt
 [Added]
 
-### Core Firmware Features
+### Device Capabilities (FAP/FAL-first, backed by platform services)
 - Momentum App (Easy configuration of features and behavior of the firmware)
 - Asset Packs (Unparalleled theming and customization)
 - Native USB Ethernet support (CDC-ECM) - [Read Docs](docs/reference/NativeEthernet.md)
@@ -162,8 +179,8 @@ Note that this repo is always updated with the great work from our friends at [U
 - Disk Image management (Mount and view image contents, open in Mass Storage)
 - Extended JavaScript API (Support for UsbDisk/Mass Storage, File operations)
 
-### AI & Developer Tooling Infrastructure
-- **Multi-Agent AI System** for 24/7 autonomous development (8 specialized agents)
+### Host AI & Developer Tooling Infrastructure
+- **Multi-Agent AI workflows** for on-demand or scheduled development tasks (the documented roster describes roles, not continuously resident workers)
 - **Smart Flash Target** - AI-enhanced build and flash workflow with ESP MCP orchestration
 - **Warp CLI** (`scripts/flipper_warp_cli.py`) - Direct CLI control for AI agents
 - **App Catalog Manager** (`scripts/warp_app_manager.py`) - Automated app downloads
@@ -188,10 +205,11 @@ Note that this repo is always updated with the great work from our friends at [U
 - Improved Error Messages (Showing source file paths)
 ```
 ```txt
-[Removed]
+[Externalized from the CPU1 image]
 
-- Unused Dummy Mode
-- Broken or Superfluous apps
+- Optional applications ship as SD-card FAPs instead of consuming firmware flash
+- Extensible commands, parsers, protocols, and JavaScript modules ship as FAL plugins
+- Shared resources and mutable user data remain on SD so CLI and companion applications retain access
 ```
 
 </details>
@@ -201,11 +219,12 @@ Note that this repo is always updated with the great work from our friends at [U
 
 <h2 align="center">Install</h2>
 
-There are 4 methods to install Momentum, we recommend you use the **Web Updater**, but choose whichever one you prefer:
+Four update workflows are described below. For NX Augmented, the release artifacts from this fork are authoritative; the recommended route is its **qFlipper package (.tgz)**. Hosted Momentum services must only be used when they explicitly identify the same NX Augmented release and commit.
 
 > <details><summary><code>Web Updater (Chrome)</code></summary><ul>
 >   <li>Make sure qFlipper is closed</li>
 >   <li>Open the <a href="https://momentum-fw.dev/update">Web Updater</a></li>
+>   <li>Continue only if the updater explicitly lists the NX Augmented release and commit from this fork; otherwise use the qFlipper package below</li>
 >   <li>Click <code>Connect</code> and select your Flipper from the list</li>
 >   <li>Select which update <code>Channel</code> you prefer from the dropdown</li>
 >   <li>Click <code>Install</code> and wait for the update to complete</li>
@@ -214,7 +233,7 @@ There are 4 methods to install Momentum, we recommend you use the **Web Updater*
 > <details><summary><code>Flipper Lab/App (chrome/mobile)</code></summary><ul>
 >   <li>(Desktop) Make sure qFlipper is closed</li>
 >   <li>(Mobile) Make sure you have the <a href="https://docs.flipper.net/mobile-app">Flipper Mobile App</a> installed and paired</li>
->   <li>Open the <a href="https://github.com/Next-Flip/Momentum-Firmware/releases/latest">latest release page</a></li>
+>   <li>Open this fork's <a href="https://github.com/joseguzman1337/Momentum-Firmware/releases/latest">latest release page</a></li>
 >   <li>Click the <code>☁️ Flipper Lab/App (chrome/mobile)</code> link</li>
 >   <li>(Desktop) Click <code>Connect</code> and select your Flipper from the list</li>
 >   <li>(Desktop) Click <code>Install</code> and wait for the update to complete</li>
@@ -223,7 +242,7 @@ There are 4 methods to install Momentum, we recommend you use the **Web Updater*
 > </ul></details>
 
 > <details><summary><code>qFlipper Package (.tgz)</code></summary><ul>
->   <li>Download the qFlipper package (.tgz) from the <a href="https://github.com/Next-Flip/Momentum-Firmware/releases/latest">latest release page</a></li>
+>   <li>Download the qFlipper package (.tgz) from this fork's <a href="https://github.com/joseguzman1337/Momentum-Firmware/releases/latest">latest release page</a></li>
 >   <li>Make sure the <code>WebUpdater</code> and <code>lab.flipper.net</code> are closed</li>
 >   <li>Open <a href="https://flipperzero.one/update">qFlipper</a> and connect your Flipper</li>
 >   <li>Click <code>Install from file</code></li>
@@ -231,7 +250,7 @@ There are 4 methods to install Momentum, we recommend you use the **Web Updater*
 > </ul></details>
 
 > <details><summary><code>Zipped Archive (.zip)</code></summary><ul>
->   <li>Download the zipped archive (.zip) from the <a href="https://github.com/Next-Flip/Momentum-Firmware/releases/latest">latest release page</a></li>
+>   <li>Download the zipped archive (.zip) from this fork's <a href="https://github.com/joseguzman1337/Momentum-Firmware/releases/latest">latest release page</a></li>
 >   <li>Extract the archive. This is now your new Firmware folder</li>
 >   <li>Open <a href="https://flipperzero.one/update">qFlipper</a>, head to <code>SD/update</code> and simply move the firmware folder there</li>
 >   <li>On the Flipper, hit the <code>Arrow Down</code> button, this will get you to the file menu. In there simply search for your updates folder</li>
@@ -256,13 +275,13 @@ $ cd Momentum-Firmware/
 ```bash
 $ ./fbt smart_flash
 ```
-**What it does:**
+**What it does when the corresponding host dependencies and devices are available:**
 - Builds complete updater package with all resources
 - Auto-installs Python dependencies (`colorlog`, `pyserial`)
 - Launches ESP MCP orchestrator (if Rust `cargo` is available)
 - Provides beautiful, color-coded progress output
 - Auto-detects Flipper USB port and ESP devboard port
-- Handles both firmware and WiFi devboard updates seamlessly
+- Coordinates firmware and supported WiFi-devboard update steps and reports failures for recovery
 
 **Requirements:**
 - Flipper connected via USB
@@ -337,18 +356,17 @@ For comprehensive AI agent integration, MCP server usage, and advanced automatio
 - Build automation for CI/CD
 - Unit test execution workflows
 - Linting and formatting automation
-```
 
 
 <h2 align="center">AI Automation Ecosystem</h2>
 
-This repository hosts a sophisticated **Multi-Agent AI System** designed for 24/7 autonomous development, security operations, and architectural governance. Our AI infrastructure enables fully automated firmware development, testing, and deployment workflows.
+This repository includes host-side **multi-agent workflow definitions** for development, security review, operations, and architectural governance. They can automate configured portions of firmware development, testing, and deployment when explicitly invoked; availability depends on the installed runners, credentials, services, and connected hardware.
 
 <details>
 <summary><b>🤖 View Agent Roster & Automation Infrastructure</b></summary>
 
 ### Agent Roster
-The system is orchestrated by a collaborative fleet of specialized AI agents, each with specific capabilities and domain expertise:
+The following roster documents routing roles supported by the host orchestration layer. A listed role does not claim that a provider is installed, authenticated, or continuously running:
 
 | Agent | Role | Focus Area | Primary Tools |
 |-------|------|------------|---------------|
@@ -378,15 +396,15 @@ The system is orchestrated by a collaborative fleet of specialized AI agents, ea
   - Handles dependency installation (`colorlog`, `pyserial`)
 
 #### App Management
-- **`scripts/warp_app_manager.py`**: Fully automated Flipper app catalog manager
+- **`scripts/warp_app_manager.py`**: Flipper app catalog source importer and deployment launcher
   - Fetches latest apps from official Flipper Catalog API
   - Scans existing `applications/external` and `applications_user` directories
-  - Identifies missing apps and auto-clones from GitHub
+  - Identifies missing catalog aliases, rejects unsafe paths, and resolves available upstream repositories
   - Extracts repository URLs from catalog metadata
   - Usage: `python3 scripts/warp_app_manager.py`
 
 #### Agent Orchestration
-- **`.ai/scripts/orchestrator.py`**: The central nervous system
+- **`.ai/scripts/orchestrator.py`**: Host task orchestrator
   - Multi-agent task distribution and load balancing
   - Run with `--yolo-mode` for full autonomous operation
   - Coordinates between Gemini, Claude, Codex, and other agents
@@ -407,7 +425,7 @@ The system is orchestrated by a collaborative fleet of specialized AI agents, ea
 ### Security & Quality Assurance
 
 #### Strawberry Hallucination Detection
-The **Strawberry Toolkit** (`.ai/strawberry/`) provides advanced hallucination detection for AI-generated code:
+The **Strawberry Toolkit** (`.ai/strawberry/`) supplies additional static checks for common AI-generated-code mistakes:
 - Static analysis of AI code contributions
 - Pattern recognition for common AI mistakes
 - Integration with Claude Security Agent for CVE scanning
@@ -415,10 +433,10 @@ The **Strawberry Toolkit** (`.ai/strawberry/`) provides advanced hallucination d
 
 ### MCP (Model Context Protocol) Integration
 
-We leverage **MCP servers** to give our AI agents real-time access to:
+When configured and reachable, **MCP servers** can give host agents access to:
 - **ESP Flasher MCP** (`.ai/mcp/servers/esp_mcp/`): Direct control of ESP32 flashing operations
 - **GitHub MCP**: PR creation, issue management, code review automation
-- **Context7 MCP**: Up-to-date library documentation for accurate code generation
+- **Context7 MCP**: Library-documentation retrieval to support code generation
 - **Playwright MCP**: Automated web testing and UI validation
 
 See **WARP.md** for detailed MCP usage and integration patterns.
@@ -449,7 +467,7 @@ For more details, see [Forked Development Documentation](docs/reference/ForkedDe
 
 <h2 align="center">Stargazers over time</h2>
 
-[![Stargazers over time](https://starchart.cc/Next-Flip/Momentum-Firmware.svg?variant=adaptive)](https://starchart.cc/Next-Flip/Momentum-Firmware)
+[![Stargazers over time](https://starchart.cc/joseguzman1337/Momentum-Firmware.svg?variant=adaptive)](https://starchart.cc/joseguzman1337/Momentum-Firmware)
 
 <h2 align="center">❤️ Support</h2>
 

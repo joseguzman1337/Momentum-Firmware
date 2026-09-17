@@ -7,7 +7,7 @@ void infrared_scene_universal_digital_sign_on_enter(void* context) {
     ButtonPanel* button_panel = infrared->button_panel;
     InfraredBruteForce* brute_force = infrared->brute_force;
 
-    infrared_brute_force_set_db_filename(brute_force, EXT_PATH("infrared/assets/digital_sign.ir"));
+    infrared_brute_force_set_db_filename(brute_force, APP_ASSETS_PATH("assets/digital_sign.ir"));
 
     button_panel_reserve(button_panel, 2, 2);
     uint32_t i = 0;

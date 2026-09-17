@@ -10,8 +10,8 @@ void infrared_scene_universal_bluray_on_enter(void* context) {
 
     FURI_LOG_I(TAG, "Entering Universal Blu-ray/DVD scene");
 
-    infrared_brute_force_set_db_filename(brute_force, EXT_PATH("infrared/assets/bluray_dvd.ir"));
-    FURI_LOG_I(TAG, "Set database filename: %s", EXT_PATH("infrared/assets/bluray_dvd.ir"));
+    infrared_brute_force_set_db_filename(brute_force, APP_ASSETS_PATH("assets/bluray_dvd.ir"));
+    FURI_LOG_I(TAG, "Set database filename: %s", APP_ASSETS_PATH("assets/bluray_dvd.ir"));
 
     button_panel_reserve(button_panel, 2, 4);
     uint32_t i = 0;
