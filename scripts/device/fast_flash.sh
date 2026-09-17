@@ -1,10 +1,20 @@
 #!/bin/bash
 # High-speed polling for WiFi Board
 
-PYTHON_CMD="/home/d3c0d3r/.local/bin/python3"
-if ! command -v "$PYTHON_CMD" &> /dev/null; then
-    PYTHON_CMD="python3"
-fi
+PYTHON_CMD="${PYTHON_CMD:-python3}"
+
+esp32_s2_present() {
+    if command -v lsusb >/dev/null 2>&1; then
+        lsusb -d 303a: >/dev/null 2>&1
+    elif command -v system_profiler >/dev/null 2>&1; then
+        system_profiler SPUSBDataType 2>/dev/null | grep -Eiq 'Vendor ID: 0x303a'
+    elif command -v ioreg >/dev/null 2>&1; then
+        ioreg -p IOUSB -l -w 0 2>/dev/null | grep -Eiq '"idVendor"[[:space:]]*=[[:space:]]*12346'
+    else
+        echo "No supported USB inventory command found (lsusb, system_profiler, or ioreg)." >&2
+        return 2
+    fi
+}
 
 echo "🚀 polling for ESP32-S2 (ID 303a:*) every 0.1s..."
 
@@ -18,7 +28,7 @@ while true; do
         exit 1
     fi
 
-    if lsusb -d 303a: > /dev/null; then
+    if esp32_s2_present; then
         echo "✅ DEVICE DETECTED! Starting flash..."
         # Wait a split second for enumeration to stabilize?
         # sleep 0.5 

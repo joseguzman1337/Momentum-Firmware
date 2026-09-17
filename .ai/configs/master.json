@@ -86,7 +86,7 @@
             "auto_approve": "identity-metadata-only",
             "log_dir": "logs/warp",
             "config": {
-                "task_file": "warp_agent_tasks.md",
+                "task_file": "docs/automation/warp_agent_tasks.md",
                 "auto_execute": "identity-metadata-only",
                 "batch_mode": true
             },
@@ -124,7 +124,7 @@
             ".gemini/GEMINI.md",
             "ReadMe.md",
             "SKILL.md",
-            "documentation/**/*.md"
+            "docs/reference/**/*.md"
         ],
         "embedding_model": "text-embedding-004",
         "chunk_size": 1000,

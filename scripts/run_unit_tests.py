@@ -1,9 +1,3 @@
-import sys
-import os
-from pathlib import Path
-
-# Add scripts to path to import FlipperStorage
-sys.path.append(str(Path(__file__).parent / "scripts"))
 from flipper.storage import FlipperStorage
 
 def main():

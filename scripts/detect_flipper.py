@@ -1,9 +1,5 @@
 import logging
 import sys
-import os
-
-# Add scripts to path so we can import flipper
-sys.path.append(os.path.join(os.getcwd(), 'scripts'))
 
 from flipper.utils.cdc import resolve_port
 from flipper.storage import FlipperStorage

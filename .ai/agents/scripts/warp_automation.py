@@ -13,7 +13,7 @@ from datetime import datetime
 class WarpAutomation:
     def __init__(self):
         self.repo_root = Path("/Users/x/x/Momentum-Firmware")
-        self.task_file = self.repo_root / "warp_agent_tasks.md"
+        self.task_file = self.repo_root / "docs/automation/warp_agent_tasks.md"
         self.log_dir = self.repo_root / "logs/warp"
         self.log_dir.mkdir(parents=True, exist_ok=True)
         
@@ -29,7 +29,7 @@ class WarpAutomation:
         print(log_entry.strip())
     
     def parse_tasks(self) -> list:
-        """Parse tasks from warp_agent_tasks.md"""
+        """Parse tasks from docs/automation/warp_agent_tasks.md."""
         if not self.task_file.exists():
             return []
         

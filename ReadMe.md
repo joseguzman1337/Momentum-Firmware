@@ -28,13 +28,13 @@ This isn't just a firmware - it's a **fully autonomous AI-driven development pla
 - **Strawberry Toolkit** for AI hallucination detection in code review
 - **Smart Flash** - AI-enhanced build workflows with ESP orchestration
 - **Automated App Management** - One command to sync the entire Flipper Catalog
-- **Auto USB Ethernet** - Zero-config internet sharing ([FLIPPER_AUTO_ETHERNET.md](FLIPPER_AUTO_ETHERNET.md))
+- **Auto USB Ethernet** - Zero-config internet sharing ([FLIPPER_AUTO_ETHERNET.md](docs/FLIPPER_AUTO_ETHERNET.md))
   - Plug in Flipper → USB Ethernet auto-enabled → Internet auto-shared
   - One-time setup: `sudo ./scripts/install-flipper-auto-ethernet.sh`
 
 ### 🚀 Technical Excellence
-- **Native USB Ethernet** with HTTP download helpers ([NativeEthernet.md](documentation/NativeEthernet.md))
-- **ESP Flasher FAP** - Flash WiFi modules with lwIP HTTP download ([ESP_FLASHER_GUIDE.md](ESP_FLASHER_GUIDE.md))
+- **Native USB Ethernet** with HTTP download helpers ([NativeEthernet.md](docs/reference/NativeEthernet.md))
+- **ESP Flasher FAP** - Flash WiFi modules with lwIP HTTP download ([ESP_FLASHER_GUIDE.md](docs/ESP_FLASHER_GUIDE.md))
   - Auto-download ESP32 Marauder firmware over USB Ethernet
   - Support for all ESP32 variants (ESP32, S2, S3, C3)
   - One-click flash for WiFi Devboard v1
@@ -67,7 +67,7 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 <h2 align="center">Contributing</h2>
 
-We politely welcome contributions in any programming language, as long as they help the project and are well documented. For guidance on style, tooling, and build requirements, see <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>.
+We politely welcome contributions in any programming language, as long as they help the project and are well documented. For guidance on style, tooling, and build requirements, see <a href="docs/CONTRIBUTING.md">CONTRIBUTING.md</a>.
 
 Note that mentioned below are only a few of our staple additions to the firmware. For a full list check [down here](https://github.com/Next-Flip/Momentum-Firmware#List-of-Changes).
 
@@ -94,7 +94,7 @@ We offer a powerful and easy-to-use application tailor-made for our firmware, th
 We created our own improved Animation / Asset system that lets you create and cycle through your own `Asset Packs` with only a few button presses, allowing you to easily load custom Animations, Icons and Fonts like never before. Think of it as a Theme system that's never been easier.
 
 <img src=".github/assets/packs-folder.png" align="left" width="200px"/>
-You can easily create your own pack, or find some community-made ones on <b><a href="https://momentum-fw.dev/asset-packs">our website</a> or on Discord</b>. Check <a href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/documentation/file_formats/AssetPacks.md">here</a> for a tutorial on creating your own. Essentially, each <code>Asset Pack</code> can configure its own <code>Anims</code>, <code>Icons</code> & <code>Fonts</code>.
+You can easily create your own pack, or find some community-made ones on <b><a href="https://momentum-fw.dev/asset-packs">our website</a> or on Discord</b>. Check <a href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/docs/reference/file_formats/AssetPacks.md">here</a> for a tutorial on creating your own. Essentially, each <code>Asset Pack</code> can configure its own <code>Anims</code>, <code>Icons</code> & <code>Fonts</code>.
 
 <br clear="left"/>
 
@@ -141,7 +141,7 @@ Note that this repo is always updated with the great work from our friends at [U
 ### Core Firmware Features
 - Momentum App (Easy configuration of features and behavior of the firmware)
 - Asset Packs (Unparalleled theming and customization)
-- Native USB Ethernet support (CDC-ECM) - [Read Docs](documentation/NativeEthernet.md)
+- Native USB Ethernet support (CDC-ECM) - [Read Docs](docs/reference/NativeEthernet.md)
 - USB Ethernet HTTP download helper (HTTP GET to Storage via lwIP)
 - More UI customization, redesigns and optimizations
 - Bad-Keyboard App
@@ -171,7 +171,7 @@ Note that this repo is always updated with the great work from our friends at [U
 - **MCP Server Integration** - GitHub, Context7, ESP Flasher, Playwright
 - **FlipperSerial Submodule** (`tools/fz`) - Python library for device communication
 - **ESP MCP Orchestrator** - Rust-based build automation with real-time monitoring
-- **Forked Submodule Workflow** - Automated dependency sync - [Read Docs](documentation/ForkedDevelopment.md)
+- **Forked Submodule Workflow** - Automated dependency sync - [Read Docs](docs/reference/ForkedDevelopment.md)
 - **Agent Task Router** - Intelligent distribution of development tasks
 - **WARP.md Documentation** - Comprehensive AI agent integration guide
 ```
@@ -394,7 +394,7 @@ The system is orchestrated by a collaborative fleet of specialized AI agents, ea
 - **`.ai/scripts/sync_submodules.py`**: Forked dependency management
   - Automates synchronization of all forked submodules
   - Verifies compile-time integrity before merging
-  - See [Forked Development Documentation](documentation/ForkedDevelopment.md)
+  - See [Forked Development Documentation](docs/reference/ForkedDevelopment.md)
 
 - **`.ai/scripts/task_router.py`**: Intelligent task routing
   - Analyzes task requirements and routes to optimal agent
@@ -444,7 +444,7 @@ To sync all submodules to your personal fork:
 ```bash
 python3 .ai/scripts/sync_submodules.py
 ```
-For more details, see [Forked Development Documentation](documentation/ForkedDevelopment.md).
+For more details, see [Forked Development Documentation](docs/reference/ForkedDevelopment.md).
 
 
 <h2 align="center">Stargazers over time</h2>

@@ -350,7 +350,7 @@ done
 
 - [ESP_FLASHER_GUIDE.md](ESP_FLASHER_GUIDE.md) - ESP32 flashing with lwIP HTTP
 - [ethernet.md](ethernet.md) - Native USB Ethernet documentation
-- [CHANGELOG.md](CHANGELOG.md) - Version history
+- [CHANGELOG.md](../CHANGELOG.md) - Version history
 
 ---
 

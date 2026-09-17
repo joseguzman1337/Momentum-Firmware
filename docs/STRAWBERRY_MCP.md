@@ -1,6 +1,6 @@
 # Strawberry MCP
 
-Strawberry MCP is a Furi OS MCP server designed to facilitate Flipper Zero firmware operations and WiFi Devboard deployments. It is based on the [ESP MCP](../esp_mcp/README.md) architecture.
+Strawberry MCP is a Furi OS MCP server designed to facilitate Flipper Zero firmware operations and WiFi Devboard deployments. It is based on the [ESP MCP](../.ai/mcp/servers/esp_mcp/README.md) architecture.
 
 ## Features
 

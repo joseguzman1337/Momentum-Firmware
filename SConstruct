@@ -712,12 +712,12 @@ distenv.PhonyTarget(
 )
 
 doxy_build = distenv.DoxyBuild(
-    "documentation/doxygen/build/html/index.html",
-    "documentation/doxygen/Doxyfile-awesome.cfg",
+    "docs/reference/doxygen/build/html/index.html",
+    "docs/reference/doxygen/Doxyfile-awesome.cfg",
     doxy_env_variables={
         "DOXY_SRC_ROOT": Dir(".").abspath,
-        "DOXY_BUILD_DIR": Dir("documentation/doxygen/build").abspath,
-        "DOXY_CONFIG_DIR": "documentation/doxygen",
+        "DOXY_BUILD_DIR": Dir("docs/reference/doxygen/build").abspath,
+        "DOXY_CONFIG_DIR": "docs/reference/doxygen",
     },
 )
 distenv.Alias("doxygen", doxy_build)

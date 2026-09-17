@@ -6,7 +6,7 @@ Run this command and then put your WiFi board into bootloader mode:
 
 ```bash
 cd /home/d3c0d3r/x/Momentum-Firmware
-./monitor_and_flash_devboard.sh
+./scripts/device/monitor_and_flash_devboard.sh
 ```
 
 **Then physically on the WiFi board:**
@@ -25,7 +25,7 @@ If you prefer a one-time flash attempt:
 
 ```bash
 cd /home/d3c0d3r/x/Momentum-Firmware
-./auto_flash_devboard.sh
+./scripts/device/auto_flash_devboard.sh
 ```
 
 Then put the board in bootloader mode (same steps as above).
@@ -89,8 +89,8 @@ After WiFi board is flashed:
 
 ## 📁 Files Created
 
-- `auto_flash_devboard.sh` - Single-shot flash script
-- `monitor_and_flash_devboard.sh` - Continuous monitoring script
+- `scripts/device/auto_flash_devboard.sh` - Single-shot flash script
+- `scripts/device/monitor_and_flash_devboard.sh` - Continuous monitoring script
 - `WIFI_BOARD_FLASH_GUIDE.md` - Complete documentation
 - `QUICK_START_WIFI_FLASH.md` - This file
 

@@ -20,7 +20,9 @@ echo ""
 echo -e "${YELLOW}Waiting for WiFi Developer Board...${NC}"
 echo ""
 
-cd /home/d3c0d3r/x/Momentum-Firmware || exit 1
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+REPO_ROOT="$(dirname -- "$(dirname -- "$SCRIPT_DIR")")"
+cd "$REPO_ROOT" || exit 1
 
 PYTHON_CMD="/home/d3c0d3r/.local/bin/python3"
 if ! command -v "$PYTHON_CMD" &> /dev/null; then

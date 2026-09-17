@@ -1,7 +1,7 @@
 # AI Context: Flipper Auto-Detection
 
 ## Shortcuts
-- Detection Script: `detect_flipper.py`
+- Detection Script: `scripts/detect_flipper.py`
 - Core Logic: `scripts/flipper/utils/cdc.py` -> `resolve_port()`
 - CLI Interaction: `scripts/flipper/storage.py` -> `FlipperStorage`
 

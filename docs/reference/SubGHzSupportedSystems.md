@@ -227,7 +227,7 @@ Unleashed firmware supports various protocol types:
 - **Rolling Code (Dynamic) (KeeLoq)**: Dynamic codes with rolling counter using KeeLoq encryption (60+ manufacturer systems supported)
 - **Rolling Code (Dynamic)**: Other dynamic systems with custom encoding (e.g., CAME Atomo, Nice Flor S, Somfy Telis, FAAC SLH, Alutech AT-4N, Security+)
 
-For more information on how to use some of these protocols, see also [SubGHzRemoteProg.md](/documentation/SubGHzRemoteProg.md) and the main [ReadMe.md](/ReadMe.md).
+For more information on how to use some of these protocols, see also [SubGHzRemoteProg.md](/docs/reference/SubGHzRemoteProg.md) and the main [ReadMe.md](/ReadMe.md).
 
 ---
 

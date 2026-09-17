@@ -20,7 +20,7 @@ TESTS_SKIPPED=0
 
 echo -e "${BLUE}╔══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║  Flipper Zero Auto USB Ethernet - E2E Test Suite        ║${NC}"
-echo -e "${BLUE}╚══════════════════════════════════════════════════════════╝${NC}
+echo -e "${BLUE}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
 pass() {
@@ -91,9 +91,9 @@ fi
 
 # Test 6: Check documentation
 echo -e "\n${YELLOW}[TEST 6] Checking documentation...${NC}"
-if [ -f "$PROJECT_ROOT/FLIPPER_AUTO_ETHERNET.md" ] && \
-   [ -f "$PROJECT_ROOT/QUICK_START_AUTOMATION.md" ] && \
-   [ -f "$PROJECT_ROOT/ESP_FLASHER_GUIDE.md" ]; then
+if [ -f "$PROJECT_ROOT/docs/FLIPPER_AUTO_ETHERNET.md" ] && \
+   [ -f "$PROJECT_ROOT/docs/QUICK_START_AUTOMATION.md" ] && \
+   [ -f "$PROJECT_ROOT/docs/ESP_FLASHER_GUIDE.md" ]; then
     pass "All documentation files exist"
 else
     fail "Missing documentation files"
@@ -615,7 +615,7 @@ fi
 echo ""
 echo -e "${BLUE}╔══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║  Test Summary                                            ║${NC}"
-echo -e "${BLUE}╚══════════════════════════════════════════════════════════╝${NC}
+echo -e "${BLUE}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${GREEN}Passed:  ${TESTS_PASSED}${NC}"
 echo -e "${RED}Failed:  ${TESTS_FAILED}${NC}"

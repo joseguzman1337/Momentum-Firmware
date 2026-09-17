@@ -35,8 +35,8 @@
 [submodule "lib/stm32wb_copro"]
 	path = lib/stm32wb_copro
     url = https://github.com/joseguzman1337/stm32wb_copro.git
-[submodule "documentation/doxygen/doxygen-awesome-css"]
-	path = documentation/doxygen/doxygen-awesome-css
+[submodule "docs/reference/doxygen/doxygen-awesome-css"]
+	path = docs/reference/doxygen/doxygen-awesome-css
 	url = https://github.com/joseguzman1337/doxygen-awesome-css.git
 [submodule "lib/uzlib"]
 	path = lib/uzlib

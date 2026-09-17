@@ -17,7 +17,7 @@
     - Support for WiFi Devboard (ESP32-S2) and all ESP32 variants
     - Flash addresses: 0x1000 (bootloader), 0x8000 (partitions), 0xE000 (boot_app0), 0x10000 (firmware)
 - Automation:
-  - **Fully Automated USB Ethernet & Internet Sharing** (`FLIPPER_AUTO_ETHERNET.md`)
+  - **Fully Automated USB Ethernet & Internet Sharing** (`docs/FLIPPER_AUTO_ETHERNET.md`)
     - Automatic Flipper Zero detection via udev rules
     - Auto-enable USB Ethernet on Flipper when connected
     - Automatic NAT and internet sharing setup
@@ -32,8 +32,8 @@
   - Udev rules for automatic detection (`scripts/99-flipper-auto-ethernet.rules`)
   - Systemd service template (`scripts/flipper-ethernet@.service`)
 - Documentation:
-  - Comprehensive automation guide (`FLIPPER_AUTO_ETHERNET.md`)
-  - ESP Flasher FAP usage guide with lwIP HTTP download (`ESP_FLASHER_GUIDE.md`)
+  - Comprehensive automation guide (`docs/FLIPPER_AUTO_ETHERNET.md`)
+  - ESP Flasher FAP usage guide with lwIP HTTP download (`docs/ESP_FLASHER_GUIDE.md`)
   - WiFi module v1 flashing instructions
   - Troubleshooting section for USB Ethernet and internet sharing
 
@@ -100,7 +100,7 @@
 - OFW PR 4343: RFID: Add Indala 224-bit (long format) protocol support (by @kuzaxak)
 - UL: JS: Add IR capabilities to the JS engine (by @LuisMayo)
 - FBT: Allow apps to specify custom cflags (by @WillyJL)
-- UL: Docs: Add [full list of supported SubGHz protocols](https://github.com/Next-Flip/Momentum-Firmware/blob/dev/documentation/SubGHzSupportedSystems.md) and their frequencies/modulations that can be used for reading remotes (by @xMasterX)
+- UL: Docs: Add [full list of supported SubGHz protocols](https://github.com/Next-Flip/Momentum-Firmware/blob/dev/docs/reference/SubGHzSupportedSystems.md) and their frequencies/modulations that can be used for reading remotes (by @xMasterX)
 UL: API: Add `canvas_get_buffer`, `canvas_get_buffer_size` to public API (by @xMasterX)
 
 ### Updated:

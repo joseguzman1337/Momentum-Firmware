@@ -154,7 +154,7 @@ Given the working USB Ethernet and lwIP stack, there are two main directions for
    - Implement OS-specific scripts or BadUSB payloads that:
      - Detect the Flipper USB NIC.
      - Automatically enable ICS or configure a bridge from the host's primary network interface to the Flipper adapter.
-   - This corresponds to the automation concepts originally described in `ethernet.md`.
+   - This corresponds to the automation concepts originally described in [`docs/ethernet.md`](../ethernet.md).
 
 2. **On-device HTTP download service over Ethernet**
    - **Now available** as a HAL helper:
@@ -280,7 +280,7 @@ You now have two main directions for “full automation”:
 ◦  Implement platform‑specific scripts (or BadUSB payloads) that:
 ▪  Detect the Flipper USB NIC.
 ▪  Turn on ICS/bridge automatically.
-◦  This is exactly what your ethernet.md was describing.
+◦  This is exactly what [`docs/ethernet.md`](../ethernet.md) was describing.
 2. On‑device HTTP downloader using this Ethernet link:
 ◦  Build a small service on top of lwIP (inside firmware, not as a FAP) that:
 ▪  Does plain HTTP GET over eth_netif.

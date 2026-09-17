@@ -1,4 +1,4 @@
-# For details & more options, see documentation/AppManifests.md in firmware repo
+# For details & more options, see docs/reference/AppManifests.md in firmware repo
 
 App(
     appid="@FBT_APPID@",  # Must be unique

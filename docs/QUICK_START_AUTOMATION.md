@@ -176,7 +176,7 @@ sudo udevadm control --reload-rules
 
 - **Full Automation Guide:** [FLIPPER_AUTO_ETHERNET.md](FLIPPER_AUTO_ETHERNET.md)
 - **ESP Flasher Guide:** [ESP_FLASHER_GUIDE.md](ESP_FLASHER_GUIDE.md)
-- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+- **Changelog:** [CHANGELOG.md](../CHANGELOG.md)
 
 ---
 

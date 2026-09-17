@@ -5,7 +5,7 @@
  * To start developing with VSCode, run `./fbt vscode_dist` in project root. _That should only be done once_
  * After that, open firmware folder in VSCode: "File" > "Open folder"
 
- For more details on fbt, see [fbt docs](../documentation/fbt.md).
+ For more details on fbt, see [fbt docs](../docs/reference/fbt.md).
 
 
 ## Workflow

@@ -50,7 +50,7 @@ Momentum Firmware is a custom firmware for Flipper Zero based on the Official Fi
 ./fbt cli
 
 # Auto-detect Flipper Zero and show info
-python3 detect_flipper.py
+python3 scripts/detect_flipper.py
 ```
 
 ### Hardware Discovery

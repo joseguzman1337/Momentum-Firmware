@@ -15,10 +15,10 @@ The project provides built-in utilities for detection:
 
 ### Quick Detection Script
 
-A dedicated detection script is available at the root:
+A dedicated detection script is available under `scripts/`:
 
 ```bash
-python3 detect_flipper.py
+python3 scripts/detect_flipper.py
 ```
 
 ### Manual One-Liner (Shell)

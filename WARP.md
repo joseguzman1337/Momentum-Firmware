@@ -12,7 +12,7 @@ All commands below are run from the repository root unless noted otherwise.
   - `./fbt`
   - Equivalent to building the main firmware distribution (`fw_dist`) using the Flipper Build Tool (FBT).
 
-- **Common FBT high‑level targets** (see `documentation/fbt.md` for full list):
+- **Common FBT high‑level targets** (see `docs/reference/fbt.md` for full list):
   - `./fbt fw_dist` – build and publish firmware to `dist/`.
   - `./fbt fap_dist` – build external plugins and publish to `dist/`.
   - `./fbt updater_package` – build a full self‑update package.
@@ -54,7 +54,7 @@ FBT exposes convenient targets for C/C++ and Python formatting; an additional `s
 
 ### Unit tests running on device
 
-Unit tests are implemented as an on‑device application (`applications/debug/unit_tests`) and driven via the CLI. See `documentation/UnitTests.md` for full details.
+Unit tests are implemented as an on‑device application (`applications/debug/unit_tests`) and driven via the CLI. See `docs/reference/UnitTests.md` for full details.
 
 1. **Build firmware with unit tests enabled**
    - `./fbt FIRMWARE_APP_SET=unit_tests updater_package`
@@ -229,19 +229,19 @@ The main asset pipeline is invoked by the FBT command listed earlier. For delive
 - **Linting** – `lint.py` described above.
 - **Testing utilities** – `testops.py` for driving on‑device unit tests, `scripts/flippigator` for pytest‑based hardware E2E tests.
 
-### Documentation (`documentation/`)
+### Documentation (`docs/reference/`)
 
 Key docs you may want to consult or reference programmatically:
 
-- `documentation/fbt.md` – canonical reference for FBT commands, targets, configuration and environment.
-- `documentation/UnitTests.md` – how unit tests are built, run and organized.
-- `documentation/AppsOnSDCard.md` and `documentation/AppManifests.md` – architecture of external apps/FAPs and manifests.
-- `documentation/KeyCombo.md` – hardware key combinations for boot modes and recovery.
+- `docs/reference/fbt.md` – canonical reference for FBT commands, targets, configuration and environment.
+- `docs/reference/UnitTests.md` – how unit tests are built, run and organized.
+- `docs/reference/AppsOnSDCard.md` and `docs/reference/AppManifests.md` – architecture of external apps/FAPs and manifests.
+- `docs/reference/KeyCombo.md` – hardware key combinations for boot modes and recovery.
 
 ### Additional project metadata
 
-- `CODING_STYLE.md` – detailed C/C++ style and structural conventions used throughout the firmware.
-- `CONTRIBUTING.md` – contribution workflow and expectations.
-- `CODE_OF_CONDUCT.md` – community behavior guidelines.
+- `docs/CODING_STYLE.md` – detailed C/C++ style and structural conventions used throughout the firmware.
+- `docs/CONTRIBUTING.md` – contribution workflow and expectations.
+- `docs/CODE_OF_CONDUCT.md` – community behavior guidelines.
 
 Future Warp agents should consult these files when making non‑trivial structural or cross‑cutting changes to the firmware.

@@ -20,8 +20,10 @@ echo ""
 echo -e "${GREEN}The script will automatically detect and flash the board...${NC}"
 echo ""
 
-# Change to firmware directory
-cd /home/d3c0d3r/x/Momentum-Firmware || exit 1
+# Resolve the repository independently of the caller's working directory.
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+REPO_ROOT="$(dirname -- "$(dirname -- "$SCRIPT_DIR")")"
+cd "$REPO_ROOT" || exit 1
 
 # Use ufbt if available, otherwise use fbt
 if command -v /home/d3c0d3r/.local/bin/python3 &> /dev/null; then

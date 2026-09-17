@@ -31,7 +31,7 @@
 - **`scripts/`** - Build automation, debugging, and utility scripts
 - **`site_scons/`** - SCons build system extensions
 - **`toolchain/`** - Cross-compilation toolchain
-- **`documentation/`** - Comprehensive project documentation
+- **`docs/reference/`** - Comprehensive project documentation
 
 ### Assets & Resources
 - **`assets/`** - Icons, animations, fonts, and asset packs

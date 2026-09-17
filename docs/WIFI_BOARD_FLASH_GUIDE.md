@@ -15,7 +15,7 @@
 - ✅ CLI accessible and responsive
 
 ### 3. Automated Flash Script Created
-- ✅ Script created: `/home/d3c0d3r/x/Momentum-Firmware/auto_flash_devboard.sh`
+- ✅ Script available: `scripts/device/auto_flash_devboard.sh`
 - ✅ Script is executable
 - ✅ Includes 180-second timeout for board detection
 
@@ -37,7 +37,7 @@ The WiFi Developer Board **is not currently detected**. This means:
 
 ```bash
 cd /home/d3c0d3r/x/Momentum-Firmware
-./auto_flash_devboard.sh
+./scripts/device/auto_flash_devboard.sh
 ```
 
 **Then physically:**
@@ -156,10 +156,10 @@ Expected output: Successful ping responses showing connectivity.
 
 ## 📚 Additional Resources
 
-- **Flipper Documentation**: `documentation/devboard/Firmware update on Developer Board.md`
-- **ESP Flasher Guide**: `ESP_FLASHER_GUIDE.md`
-- **FBT Documentation**: `documentation/fbt.md`
-- **Automation Setup**: `FLIPPER_AUTO_ETHERNET.md`
+- **Flipper Documentation**: [`reference/devboard/Firmware update on Developer Board.md`](reference/devboard/Firmware%20update%20on%20Developer%20Board.md)
+- **ESP Flasher Guide**: [`ESP_FLASHER_GUIDE.md`](ESP_FLASHER_GUIDE.md)
+- **FBT Documentation**: [`reference/fbt.md`](reference/fbt.md)
+- **Automation Setup**: [`FLIPPER_AUTO_ETHERNET.md`](FLIPPER_AUTO_ETHERNET.md)
 
 ---
 
