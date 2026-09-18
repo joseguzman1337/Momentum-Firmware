@@ -1,7 +1,7 @@
 #include <toolbox/cli/cli_command.h>
 #include <cli/cli_main_commands.h>
 #include <furi.h>
-#include <rpc/rpc.h>
+#include "rpc_i.h"
 #include <furi_hal.h>
 #include <toolbox/pipe.h>
 
@@ -21,6 +21,16 @@ static void rpc_cli_send_bytes_callback(void* context, uint8_t* bytes, size_t by
     furi_assert(bytes_len > 0);
     CliRpc* cli_rpc = context;
     pipe_send(cli_rpc->pipe, bytes, bytes_len);
+}
+
+static bool
+    rpc_cli_send_bytes_best_effort_callback(void* context, uint8_t* bytes, size_t bytes_len) {
+    furi_assert(context);
+    furi_assert(bytes);
+    furi_assert(bytes_len > 0);
+    CliRpc* cli_rpc = context;
+    if(pipe_spaces_available(cli_rpc->pipe) < bytes_len) return false;
+    return pipe_send(cli_rpc->pipe, bytes, bytes_len) == bytes_len;
 }
 
 static void rpc_cli_session_close_callback(void* context) {
@@ -58,6 +68,8 @@ void rpc_cli_command_start_session(PipeSide* pipe, FuriString* args, void* conte
     cli_rpc.terminate_semaphore = furi_semaphore_alloc(1, 0);
     rpc_session_set_context(rpc_session, &cli_rpc);
     rpc_session_set_send_bytes_callback(rpc_session, rpc_cli_send_bytes_callback);
+    rpc_session_set_send_bytes_best_effort_callback(
+        rpc_session, rpc_cli_send_bytes_best_effort_callback);
     rpc_session_set_close_callback(rpc_session, rpc_cli_session_close_callback);
     rpc_session_set_terminated_callback(rpc_session, rpc_cli_session_terminated_callback);
 

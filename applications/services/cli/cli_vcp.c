@@ -12,7 +12,8 @@
 #define TAG "CliVcp"
 
 #define USB_CDC_PKT_LEN   CDC_DATA_SZ
-#define VCP_BUF_SIZE      (USB_CDC_PKT_LEN * 3)
+#define VCP_TX_BUF_SIZE   (USB_CDC_PKT_LEN * 32)
+#define VCP_RX_BUF_SIZE   (USB_CDC_PKT_LEN * 3)
 #define VCP_IF_NUM        0
 #define VCP_MESSAGE_Q_LEN 8
 
@@ -216,7 +217,9 @@ static void cli_vcp_internal_event_happened(FuriEventLoopObject* object, void* c
         cli_vcp->is_connected = true;
 
         // start shell thread
-        PipeSideBundle bundle = pipe_alloc(VCP_BUF_SIZE, 1);
+        PipeSideBundle bundle = pipe_alloc_ex(
+            (PipeSideReceiveSettings){.capacity = VCP_TX_BUF_SIZE, .trigger_level = 1},
+            (PipeSideReceiveSettings){.capacity = VCP_RX_BUF_SIZE, .trigger_level = 1});
         cli_vcp->own_pipe = bundle.alices_side;
         cli_vcp->shell_pipe = bundle.bobs_side;
         pipe_attach_to_event_loop(cli_vcp->own_pipe, cli_vcp->event_loop);

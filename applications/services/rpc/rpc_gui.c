@@ -66,6 +66,7 @@ typedef struct {
     // Transmit
     PB_Main* transmit_frame;
     FuriThread* transmit_thread;
+    FuriMutex* transmit_mutex;
 
     bool virtual_display_not_empty;
     bool is_streaming;
@@ -92,6 +93,7 @@ static void rpc_system_gui_screen_stream_frame_callback(
     furi_assert(context);
 
     RpcGuiSystem* rpc_gui = (RpcGuiSystem*)context;
+    furi_check(furi_mutex_acquire(rpc_gui->transmit_mutex, FuriWaitForever) == FuriStatusOk);
     uint8_t* buffer = rpc_gui->transmit_frame->content.gui_screen_frame.data->bytes;
 
     furi_assert(size == rpc_gui->transmit_frame->content.gui_screen_frame.data->size);
@@ -127,6 +129,7 @@ static void rpc_system_gui_screen_stream_frame_callback(
         rpc_gui->transmit_frame->content.gui_screen_frame.bg_color =
             momentum_settings.rpc_color_bg.value;
     }
+    furi_check(furi_mutex_release(rpc_gui->transmit_mutex) == FuriStatusOk);
 
     furi_thread_flags_set(furi_thread_get_id(rpc_gui->transmit_thread), RpcGuiWorkerFlagTransmit);
 }
@@ -141,19 +144,24 @@ static int32_t rpc_system_gui_screen_stream_frame_transmit_thread(void* context)
         uint32_t flags =
             furi_thread_flags_wait(RpcGuiWorkerFlagAny, FuriFlagWaitAny, FuriWaitForever);
 
+        // Stop takes priority over a queued frame so teardown cannot be delayed
+        // by a saturated WebSerial transmit path.
+        if(flags & RpcGuiWorkerFlagExit) {
+            break;
+        }
+
         if(flags & RpcGuiWorkerFlagTransmit) {
             transmit_time = furi_get_tick();
-            rpc_send(rpc_gui->session, rpc_gui->transmit_frame);
+            furi_check(
+                furi_mutex_acquire(rpc_gui->transmit_mutex, FuriWaitForever) == FuriStatusOk);
+            rpc_send_best_effort(rpc_gui->session, rpc_gui->transmit_frame);
+            furi_check(furi_mutex_release(rpc_gui->transmit_mutex) == FuriStatusOk);
             transmit_time = furi_get_tick() - transmit_time;
 
             // Guaranteed bandwidth reserve
             uint32_t extra_delay = transmit_time / 20;
             if(extra_delay > 500) extra_delay = 500;
             if(extra_delay) furi_delay_tick(extra_delay);
-        }
-
-        if(flags & RpcGuiWorkerFlagExit) {
-            break;
         }
     }
 
@@ -180,6 +188,7 @@ static void rpc_system_gui_start_screen_stream_process(const PB_Main* request, v
         size_t framebuffer_size = gui_get_framebuffer_size(rpc_gui->gui);
         // Reusable Frame
         rpc_gui->transmit_frame = malloc(sizeof(PB_Main));
+        *rpc_gui->transmit_frame = (PB_Main)PB_Main_init_zero;
         rpc_gui->transmit_frame->which_content = PB_Main_gui_screen_frame_tag;
         rpc_gui->transmit_frame->command_status = PB_CommandStatus_OK;
         rpc_gui->transmit_frame->content.gui_screen_frame.data =
@@ -212,12 +221,17 @@ static void rpc_system_gui_stop_screen_stream_process(const PB_Main* request, vo
             rpc_gui->gui, rpc_system_gui_screen_stream_frame_callback, context);
         // Stop and release worker thread
         furi_thread_flags_set(furi_thread_get_id(rpc_gui->transmit_thread), RpcGuiWorkerFlagExit);
+        // Acknowledge before waiting for the stream worker. The worker can still be
+        // draining a framebuffer through a slow WebSerial client; joining it first
+        // makes the host time out and discard an otherwise healthy RPC session.
+        rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);
         furi_thread_join(rpc_gui->transmit_thread);
         furi_thread_free(rpc_gui->transmit_thread);
         // Release frame
         pb_release(&PB_Main_msg, rpc_gui->transmit_frame);
         free(rpc_gui->transmit_frame);
         rpc_gui->transmit_frame = NULL;
+        return;
     }
 
     rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);
@@ -458,7 +472,8 @@ static void rpc_active_session_icon_draw_callback(Canvas* canvas, void* context)
 void* rpc_system_gui_alloc(RpcSession* session) {
     furi_assert(session);
 
-    RpcGuiSystem* rpc_gui = malloc(sizeof(RpcGuiSystem));
+    RpcGuiSystem* rpc_gui = calloc(1, sizeof(RpcGuiSystem));
+    rpc_gui->transmit_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     rpc_gui->gui = furi_record_open(RECORD_GUI);
     rpc_gui->input_events = furi_record_open(RECORD_INPUT_EVENTS);
     rpc_gui->session = session;
@@ -552,5 +567,6 @@ void rpc_system_gui_free(void* context) {
     }
     furi_record_close(RECORD_INPUT_EVENTS);
     furi_record_close(RECORD_GUI);
+    furi_mutex_free(rpc_gui->transmit_mutex);
     free(rpc_gui);
 }

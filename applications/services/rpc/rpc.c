@@ -81,6 +81,7 @@ struct RpcSession {
 
     FuriMutex* callbacks_mutex;
     RpcSendBytesCallback send_bytes_callback;
+    RpcSendBytesBestEffortCallback send_bytes_best_effort_callback;
     RpcBufferIsEmptyCallback buffer_is_empty_callback;
     RpcSessionClosedCallback closed_callback;
     RpcSessionTerminatedCallback terminated_callback;
@@ -135,6 +136,15 @@ void rpc_session_set_send_bytes_callback(RpcSession* session, RpcSendBytesCallba
 
     furi_mutex_acquire(session->callbacks_mutex, FuriWaitForever);
     session->send_bytes_callback = callback;
+    furi_mutex_release(session->callbacks_mutex);
+}
+
+void rpc_session_set_send_bytes_best_effort_callback(
+    RpcSession* session,
+    RpcSendBytesBestEffortCallback callback) {
+    furi_check(session);
+    furi_mutex_acquire(session->callbacks_mutex, FuriWaitForever);
+    session->send_bytes_best_effort_callback = callback;
     furi_mutex_release(session->callbacks_mutex);
 }
 
@@ -393,7 +403,7 @@ RpcSession* rpc_session_open(Rpc* rpc, RpcOwner owner) {
 
     furi_check(rpc);
 
-    RpcSession* session = malloc(sizeof(RpcSession));
+    RpcSession* session = calloc(1, sizeof(RpcSession));
     session->callbacks_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     session->stream = furi_stream_buffer_alloc(RPC_BUFFER_SIZE, 1);
     session->rpc = rpc;
@@ -437,13 +447,14 @@ void rpc_session_close(RpcSession* session) {
     session->rpc->sessions_count--;
 
     rpc_session_set_send_bytes_callback(session, NULL);
+    rpc_session_set_send_bytes_best_effort_callback(session, NULL);
     rpc_session_set_close_callback(session, NULL);
     rpc_session_set_buffer_is_empty_callback(session, NULL);
     furi_thread_flags_set(furi_thread_get_id(session->thread), RpcEvtDisconnect);
 }
 
 void rpc_on_system_start(void) {
-    Rpc* rpc = malloc(sizeof(Rpc));
+    Rpc* rpc = calloc(1, sizeof(Rpc));
 
     rpc->busy_mutex = furi_mutex_alloc(FuriMutexTypeNormal);
 
@@ -495,6 +506,38 @@ void rpc_send(RpcSession* session, PB_Main* message) {
     furi_mutex_release(session->callbacks_mutex);
 
     free(buffer);
+}
+
+bool rpc_send_best_effort(RpcSession* session, PB_Main* message) {
+    furi_assert(session);
+    furi_assert(message);
+
+    pb_ostream_t ostream = PB_OSTREAM_SIZING;
+    bool result = pb_encode_ex(&ostream, &PB_Main_msg, message, PB_ENCODE_DELIMITED);
+    furi_check(result && ostream.bytes_written);
+    uint8_t* buffer = malloc(ostream.bytes_written);
+    ostream = pb_ostream_from_buffer(buffer, ostream.bytes_written);
+    result = pb_encode_ex(&ostream, &PB_Main_msg, message, PB_ENCODE_DELIMITED);
+    furi_check(result);
+
+    bool sent = false;
+    bool has_best_effort_callback = false;
+    const bool acquired = furi_mutex_acquire(session->callbacks_mutex, 0) == FuriStatusOk;
+    if(acquired) {
+        if(session->send_bytes_best_effort_callback) {
+            has_best_effort_callback = true;
+            sent = session->send_bytes_best_effort_callback(
+                session->context, buffer, ostream.bytes_written);
+        }
+        furi_mutex_release(session->callbacks_mutex);
+    }
+    free(buffer);
+    if(!acquired) return false;
+    if(!has_best_effort_callback) {
+        rpc_send(session, message);
+        return true;
+    }
+    return sent;
 }
 
 void rpc_send_and_release(RpcSession* session, PB_Main* message) {

@@ -22,6 +22,11 @@ typedef struct {
 } RpcHandler;
 
 void rpc_send(RpcSession* session, PB_Main* main_message);
+typedef bool (*RpcSendBytesBestEffortCallback)(void* context, uint8_t* bytes, size_t bytes_len);
+void rpc_session_set_send_bytes_best_effort_callback(
+    RpcSession* session,
+    RpcSendBytesBestEffortCallback callback);
+bool rpc_send_best_effort(RpcSession* session, PB_Main* main_message);
 
 void rpc_send_and_release(RpcSession* session, PB_Main* main_message);
 
