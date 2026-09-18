@@ -93,7 +93,14 @@ static void rpc_system_gui_screen_stream_frame_callback(
     furi_assert(context);
 
     RpcGuiSystem* rpc_gui = (RpcGuiSystem*)context;
-    furi_check(furi_mutex_acquire(rpc_gui->transmit_mutex, FuriWaitForever) == FuriStatusOk);
+    // A framebuffer commit must never wait for the RPC transport. The stream is explicitly
+    // best-effort: when the previous frame is still being encoded, drop this one and let the
+    // next canvas commit refresh it.
+    if(furi_mutex_acquire(rpc_gui->transmit_mutex, 0) != FuriStatusOk) return;
+    if(!rpc_gui->is_streaming) {
+        furi_check(furi_mutex_release(rpc_gui->transmit_mutex) == FuriStatusOk);
+        return;
+    }
     uint8_t* buffer = rpc_gui->transmit_frame->content.gui_screen_frame.data->bytes;
 
     furi_assert(size == rpc_gui->transmit_frame->content.gui_screen_frame.data->size);
@@ -216,21 +223,19 @@ static void rpc_system_gui_stop_screen_stream_process(const PB_Main* request, vo
 
     if(rpc_gui->is_streaming) {
         rpc_gui->is_streaming = false;
-        // Remove GUI framebuffer callback
+        // The callback never waits for the stream worker, so synchronized removal is bounded
+        // and guarantees that no callback can signal a stopped thread.
         gui_remove_framebuffer_callback(
             rpc_gui->gui, rpc_system_gui_screen_stream_frame_callback, context);
-        // Stop and release worker thread
         furi_thread_flags_set(furi_thread_get_id(rpc_gui->transmit_thread), RpcGuiWorkerFlagExit);
-        // Acknowledge before waiting for the stream worker. The worker can still be
-        // draining a framebuffer through a slow WebSerial client; joining it first
-        // makes the host time out and discard an otherwise healthy RPC session.
-        rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);
         furi_thread_join(rpc_gui->transmit_thread);
         furi_thread_free(rpc_gui->transmit_thread);
         // Release frame
         pb_release(&PB_Main_msg, rpc_gui->transmit_frame);
         free(rpc_gui->transmit_frame);
         rpc_gui->transmit_frame = NULL;
+        // The stream is fully quiescent: no frame can be emitted after this acknowledgement.
+        rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);
         return;
     }
 
@@ -553,10 +558,8 @@ void rpc_system_gui_free(void* context) {
 
     if(rpc_gui->is_streaming) {
         rpc_gui->is_streaming = false;
-        // Remove GUI framebuffer callback
         gui_remove_framebuffer_callback(
             rpc_gui->gui, rpc_system_gui_screen_stream_frame_callback, context);
-        // Stop and release worker thread
         furi_thread_flags_set(furi_thread_get_id(rpc_gui->transmit_thread), RpcGuiWorkerFlagExit);
         furi_thread_join(rpc_gui->transmit_thread);
         furi_thread_free(rpc_gui->transmit_thread);

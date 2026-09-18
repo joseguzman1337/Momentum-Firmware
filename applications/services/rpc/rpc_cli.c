@@ -14,6 +14,7 @@ typedef struct {
 } CliRpc;
 
 #define CLI_READ_BUFFER_SIZE 64UL
+#define CLI_RPC_CONTROL_RESERVE 64UL
 
 static void rpc_cli_send_bytes_callback(void* context, uint8_t* bytes, size_t bytes_len) {
     furi_assert(context);
@@ -29,7 +30,10 @@ static bool
     furi_assert(bytes);
     furi_assert(bytes_len > 0);
     CliRpc* cli_rpc = context;
-    if(pipe_spaces_available(cli_rpc->pipe) < bytes_len) return false;
+    const size_t spaces = pipe_spaces_available(cli_rpc->pipe);
+    // Screen frames are best-effort traffic. Preserve room for a small command response so a
+    // saturated stream cannot make stop/get-info control traffic wait behind its own frames.
+    if((spaces < bytes_len) || ((spaces - bytes_len) < CLI_RPC_CONTROL_RESERVE)) return false;
     return pipe_send(cli_rpc->pipe, bytes, bytes_len) == bytes_len;
 }
 
