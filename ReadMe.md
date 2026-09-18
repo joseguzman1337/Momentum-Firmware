@@ -23,9 +23,9 @@ This custom firmware is based on the [Official Firmware](https://github.com/flip
 NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilities are delivered as external FAP applications, app-specific extensions as FAL plugins, and only the stable platform, hardware drivers, loader, storage, and ABI services remain in the firmware image. Host-side automation builds, tests, installs, and monitors those artifacts; it is not a permanently running service on the Flipper.
 
 <details>
-<summary><strong>✅ v1.0.19 NX Augmented — delivery state</strong></summary>
+<summary><strong>✅ v1.0.20 NX Augmented — delivery state</strong></summary>
 
-The `v1.0.19-nx-augmented` updater is built for **Flipper Zero target 7**. Its build date, version, release tag, branch identity, and source commit are generated from the same build metadata so the device and release artifacts identify the exact compilation rather than carrying manually maintained values.
+The `v1.0.20-nx-augmented` updater is built for **Flipper Zero target 7**. Its build date, version, release tag, branch identity, and source commit are generated from the same build metadata so the device and release artifacts identify the exact compilation rather than carrying manually maintained values.
 
 - **Official Marketplace synchronization:** the updater resolves the current target/API-compatible build for every catalog entry, verifies each FAP against the catalog SHA-256, and records the official application/version identity, display name, icon, and destination path in a lock receipt.
 - **Complete application delivery:** the verified release resource tree contains **439 current official-catalog FIMs** and **573 preserved FAPs** in total. Non-catalog FAPs remain available without being assigned fabricated catalog identities.

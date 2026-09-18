@@ -80,6 +80,20 @@ def test_reliable_rpc_responses_remain_lossless_without_firmware_timeout():
     assert "pipe_send_timeout" not in cli
 
 
+def test_multi_message_command_response_preempts_best_effort_frames():
+    core = RPC_CORE.read_text(encoding="utf-8")
+
+    assert "volatile bool command_in_progress;" in core
+    assert "session->command_in_progress = true;" in core
+    assert "session->command_in_progress = false;" in core
+    best_effort = core.split("bool rpc_send_best_effort", 1)[1].split(
+        "void rpc_send_and_release", 1
+    )[0]
+    assert "if(session->command_in_progress) return false;" in best_effort
+    assert "has_best_effort_callback = session->send_bytes_best_effort_callback != NULL;" in best_effort
+    assert "if(!session->command_in_progress && has_best_effort_callback)" in best_effort
+
+
 @dataclass
 class _UsbRpcSessionModel:
     connected: bool = False

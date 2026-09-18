@@ -76,6 +76,7 @@ struct RpcSession {
     FuriStreamBuffer* stream;
     PB_Main* decoded_message;
     bool terminate;
+    volatile bool command_in_progress;
     void** system_contexts;
     bool decode_error;
 
@@ -291,7 +292,12 @@ static int32_t rpc_session_worker(void* context) {
 
             if(handler && handler->message_handler) {
                 furi_check(furi_mutex_acquire(rpc->busy_mutex, FuriWaitForever) == FuriStatusOk);
+                // A command may emit a sequence of reliable protobuf replies. Keep asynchronous
+                // best-effort frames out for the entire sequence so the host receives the final
+                // reply promptly instead of repeatedly finding GUI frames between its chunks.
+                session->command_in_progress = true;
                 handler->message_handler(session->decoded_message, handler->context);
+                session->command_in_progress = false;
                 furi_check(furi_mutex_release(rpc->busy_mutex) == FuriStatusOk);
             } else if(session->decoded_message->which_content == 0) {
                 /* Receiving zeroes means message is 0-length, which
@@ -512,6 +518,9 @@ bool rpc_send_best_effort(RpcSession* session, PB_Main* message) {
     furi_assert(session);
     furi_assert(message);
 
+    // Screen frames are disposable; an in-flight command response is not.
+    if(session->command_in_progress) return false;
+
     pb_ostream_t ostream = PB_OSTREAM_SIZING;
     bool result = pb_encode_ex(&ostream, &PB_Main_msg, message, PB_ENCODE_DELIMITED);
     furi_check(result && ostream.bytes_written);
@@ -524,8 +533,9 @@ bool rpc_send_best_effort(RpcSession* session, PB_Main* message) {
     bool has_best_effort_callback = false;
     const bool acquired = furi_mutex_acquire(session->callbacks_mutex, 0) == FuriStatusOk;
     if(acquired) {
-        if(session->send_bytes_best_effort_callback) {
-            has_best_effort_callback = true;
+        has_best_effort_callback = session->send_bytes_best_effort_callback != NULL;
+        // Recheck after serialization: a command may have started while this frame was encoded.
+        if(!session->command_in_progress && has_best_effort_callback) {
             sent = session->send_bytes_best_effort_callback(
                 session->context, buffer, ostream.bytes_written);
         }
