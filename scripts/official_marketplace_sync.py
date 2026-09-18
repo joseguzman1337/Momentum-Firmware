@@ -8,6 +8,7 @@ verified staging tree which a separate deployment step may copy to the device.
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -74,11 +75,19 @@ def category_map() -> dict[str, str]:
 
 def compatible_fap(app: dict, *, target: str, api: str) -> tuple[bytes, dict]:
     alias = app["alias"]
+    application_id = app.get("_id")
     version = app.get("current_version") or {}
     version_id = version.get("_id")
+    name = version.get("name")
     build = version.get("current_build") or {}
     expected_hash = build.get("fap_hash")
-    if not version_id or not expected_hash:
+    if not re.fullmatch(r"[0-9a-f]{24}", application_id or ""):
+        raise RuntimeError(f"{alias}: catalog application ID is invalid")
+    if not re.fullmatch(r"[0-9a-f]{24}", version_id or ""):
+        raise RuntimeError(f"{alias}: catalog version ID is invalid")
+    if not name:
+        raise RuntimeError(f"{alias}: catalog version has no name")
+    if not expected_hash:
         raise RuntimeError(f"{alias}: catalog has no ready release build")
     query = urllib.parse.urlencode({"target": target, "api": api})
     url = f"{API_ROOT}/application/version/{version_id}/build/compatible?{query}"
@@ -90,10 +99,19 @@ def compatible_fap(app: dict, *, target: str, api: str) -> tuple[bytes, dict]:
         )
     if not payload.startswith(b"\x7fELF"):
         raise RuntimeError(f"{alias}: compatible build is not an ELF/FAP")
+    icon_uri = version.get("icon_uri")
+    if not icon_uri:
+        raise RuntimeError(f"{alias}: catalog version has no icon")
+    icon = fetch(icon_uri)
+    if not icon.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise RuntimeError(f"{alias}: catalog icon is not a PNG")
     return payload, {
         "alias": alias,
+        "application_id": application_id,
+        "name": name,
         "version": version.get("version"),
         "version_id": version_id,
+        "icon": base64.b64encode(icon).decode("ascii"),
         "sha256": actual_hash,
         "source": url,
     }

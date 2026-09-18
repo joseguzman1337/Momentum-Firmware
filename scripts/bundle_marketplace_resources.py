@@ -4,12 +4,19 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+
+try:
+    from fbt_tools.fbt_resources import _fim_text, _normalize_png
+except ModuleNotFoundError:  # imported as scripts.bundle_marketplace_resources in tests/tools
+    from scripts.fbt_tools.fbt_resources import _fim_text, _normalize_png
 
 
 def _base_timestamp(base: Path) -> int:
@@ -28,7 +35,11 @@ def bundle(
 ) -> None:
     lock = apps / "marketplace-lock.json"
     report = json.loads(lock.read_text(encoding="utf-8"))
-    if not report.get("complete") or report.get("verified_apps") != report.get("catalog_apps"):
+    if (
+        not report.get("complete")
+        or report.get("verified_apps") != report.get("catalog_apps")
+        or len(report.get("apps", ())) != report.get("verified_apps")
+    ):
         raise RuntimeError("refusing to bundle an incomplete Marketplace synchronization")
 
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -37,6 +48,45 @@ def bundle(
         shutil.copytree(base, stage, dirs_exist_ok=True)
         shutil.rmtree(stage / "apps", ignore_errors=True)
         shutil.copytree(apps, stage / "apps")
+        manifests = stage / "apps_manifests"
+        shutil.rmtree(manifests, ignore_errors=True)
+        manifests.mkdir()
+        aliases: set[str] = set()
+        application_ids: set[str] = set()
+        version_ids: set[str] = set()
+        for app in report["apps"]:
+            alias = app["alias"]
+            application_id = app["application_id"]
+            version_id = app["version_id"]
+            name = app["name"]
+            if not re.fullmatch(r"[a-z0-9_]+", alias):
+                raise RuntimeError(f"invalid Marketplace manifest alias: {alias}")
+            if alias in aliases:
+                raise RuntimeError(f"duplicate Marketplace manifest alias: {alias}")
+            if not re.fullmatch(r"[0-9a-f]{24}", application_id):
+                raise RuntimeError(f"invalid Marketplace application ID for {alias}")
+            if not re.fullmatch(r"[0-9a-f]{24}", version_id):
+                raise RuntimeError(f"invalid Marketplace version ID for {alias}")
+            if application_id in application_ids or version_id in version_ids:
+                raise RuntimeError(f"duplicate Marketplace identity for {alias}")
+            if not name or "\n" in name or "\r" in name:
+                raise RuntimeError(f"invalid Marketplace application name for {alias}")
+            aliases.add(alias)
+            application_ids.add(application_id)
+            version_ids.add(version_id)
+            fap = stage / "apps" / Path(app["path"])
+            if not fap.is_file() or not fap.resolve().is_relative_to((stage / "apps").resolve()):
+                raise RuntimeError(f"Marketplace manifest has no staged FAP for {alias}")
+            icon = _normalize_png(base64.b64decode(app["icon"], validate=True))
+            manifest = _fim_text(
+                name=name,
+                icon=icon,
+                api=report["api"],
+                uid=application_id,
+                version_uid=version_id,
+                path=f"/ext/apps/{app['path']}",
+            )
+            (manifests / f"{alias}.fim").write_text(manifest, encoding="utf-8", newline="\n")
         subprocess.run(
             [
                 str(assets_tool),
