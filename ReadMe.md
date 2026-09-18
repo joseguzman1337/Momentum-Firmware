@@ -106,6 +106,106 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 We politely welcome contributions in any programming language, as long as they help the project and are well documented. For guidance on style, tooling, and build requirements, see <a href="docs/CONTRIBUTING.md">CONTRIBUTING.md</a>.
 
+<details>
+<summary><strong>AI Automation Ecosystem</strong></summary>
+
+This repository includes host-side **multi-agent workflow definitions** for development, security review, operations, and architectural governance. They can automate configured portions of firmware development, testing, and deployment when explicitly invoked; availability depends on the installed runners, credentials, services, and connected hardware.
+
+<details>
+<summary><b>🤖 View Agent Roster & Automation Infrastructure</b></summary>
+
+### Agent Roster
+The following roster documents routing roles supported by the host orchestration layer. A listed role does not claim that a provider is installed, authenticated, or continuously running:
+
+| Agent | Role | Focus Area | Primary Tools |
+|-------|------|------------|---------------|
+| **Gemini** | **Architect** | Strategic planning, System Design, Orchestration | MCP Servers, Architecture Review |
+| **Codex** | **Engineer** | Feature implementation, Bug fixes, Refactoring | GitHub Copilot, Code Generation |
+| **Claude** | **Security** | CVE patching, Vulnerability scanning, Hardening | Strawberry Toolkit, Security Analysis |
+| **Jules** | **Ops** | Async Cloud tasks, Submodule synchronization | Cloud APIs, Async Workflows |
+| **DeepSeek** | **Performance** | Optimization, Latency reduction | Profiling, Benchmarking |
+| **Warp** | **QA** | Code quality analysis, Test generation, CI/CD | Warp CLI, FBT Automation |
+| **Amazon Q** | **Infra** | Cloud infrastructure, AWS/GCP integrations | AWS Services, Firebase |
+| **Kiro** | **Build** | FBT (Flipper Build Tool) workflow automation | Smart Flash, Build Optimization |
+
+### Core Automation Scripts
+
+#### Build & Flash Automation
+- **`scripts/flipper_warp_cli.py`**: Direct CLI interface for agents to communicate with connected Flipper devices
+  - Stateless command execution (no interactive shell overhead)
+  - Auto-discovery of serial ports (`/dev/ttyACM0`)
+  - Integrated FlipperSerial library from `tools/fz` submodule
+  - Mock dependency handling for restricted environments
+  - Usage: `./scripts/flipper_warp_cli.py <command>`
+
+- **ESP MCP Orchestrator** (`.ai/esp_mcp_orchestrator/`): Rust-based orchestration tool for smart flash workflows
+  - Real-time progress monitoring with colored output
+  - Automatic ESP port detection
+  - Integration with `smart_flash` FBT target
+  - Handles dependency installation (`colorlog`, `pyserial`)
+
+#### App Management
+- **`scripts/warp_app_manager.py`**: Flipper app catalog source importer and deployment launcher
+  - Fetches latest apps from official Flipper Catalog API
+  - Scans existing `applications/external` and `applications_user` directories
+  - Identifies missing catalog aliases, rejects unsafe paths, and resolves available upstream repositories
+  - Extracts repository URLs from catalog metadata
+  - Usage: `python3 scripts/warp_app_manager.py`
+
+#### Agent Orchestration
+- **`.ai/scripts/orchestrator.py`**: Host task orchestrator
+  - Multi-agent task distribution and load balancing
+  - Run with `--yolo-mode` for full autonomous operation
+  - Coordinates between Gemini, Claude, Codex, and other agents
+
+- **`.ai/scripts/sync_submodules.py`**: Forked dependency management
+  - Automates synchronization of all forked submodules
+  - Verifies compile-time integrity before merging
+  - See [Forked Development Documentation](docs/reference/ForkedDevelopment.md)
+
+- **`.ai/scripts/task_router.py`**: Intelligent task routing
+  - Analyzes task requirements and routes to optimal agent
+  - Context-aware agent selection based on specialization
+
+- **`.ai/scripts/notify.py`**: System-wide notification bus
+  - Cross-agent communication channel
+  - Slack/Discord integration for build status alerts
+
+### Security & Quality Assurance
+
+#### Strawberry Hallucination Detection
+The **Strawberry Toolkit** (`.ai/strawberry/`) supplies additional static checks for common AI-generated-code mistakes:
+- Static analysis of AI code contributions
+- Pattern recognition for common AI mistakes
+- Integration with Claude Security Agent for CVE scanning
+- Automated PR review with hallucination flagging
+
+### MCP (Model Context Protocol) Integration
+
+When configured and reachable, **MCP servers** can give host agents access to:
+- **ESP Flasher MCP** (`.ai/mcp/servers/esp_mcp/`): Direct control of ESP32 flashing operations
+- **GitHub MCP**: PR creation, issue management, code review automation
+- **Context7 MCP**: Library-documentation retrieval to support code generation
+- **Playwright MCP**: Automated web testing and UI validation
+
+See **WARP.md** for detailed MCP usage and integration patterns.
+
+### Developer Tools & Submodules
+
+- **`tools/fz`** (submodule from [x31337/fz](https://github.com/x31337/fz)): FlipperSerial library
+  - Python library for Flipper Zero serial communication
+  - Used by Warp CLI for agent-driven device control
+  - Mock-friendly architecture for testing environments
+
+- **`.ai/mcp/servers/esp_mcp`**: ESP32 operations via MCP protocol
+  - Flash firmware to WiFi devboard
+  - Monitor serial output
+  - Automated port detection
+
+</details>
+
+</details>
+
 The sections below highlight staple additions. The repository's [List of changes](#list-of-changes), manifests, and release notes are the authoritative inventory for this fork.
 
 <br>
@@ -398,104 +498,6 @@ For comprehensive AI agent integration, MCP server usage, and advanced automatio
 - Build automation for CI/CD
 - Unit test execution workflows
 - Linting and formatting automation
-
-</details>
-
-
-<h2 align="center">AI Automation Ecosystem</h2>
-
-This repository includes host-side **multi-agent workflow definitions** for development, security review, operations, and architectural governance. They can automate configured portions of firmware development, testing, and deployment when explicitly invoked; availability depends on the installed runners, credentials, services, and connected hardware.
-
-<details>
-<summary><b>🤖 View Agent Roster & Automation Infrastructure</b></summary>
-
-### Agent Roster
-The following roster documents routing roles supported by the host orchestration layer. A listed role does not claim that a provider is installed, authenticated, or continuously running:
-
-| Agent | Role | Focus Area | Primary Tools |
-|-------|------|------------|---------------|
-| **Gemini** | **Architect** | Strategic planning, System Design, Orchestration | MCP Servers, Architecture Review |
-| **Codex** | **Engineer** | Feature implementation, Bug fixes, Refactoring | GitHub Copilot, Code Generation |
-| **Claude** | **Security** | CVE patching, Vulnerability scanning, Hardening | Strawberry Toolkit, Security Analysis |
-| **Jules** | **Ops** | Async Cloud tasks, Submodule synchronization | Cloud APIs, Async Workflows |
-| **DeepSeek** | **Performance** | Optimization, Latency reduction | Profiling, Benchmarking |
-| **Warp** | **QA** | Code quality analysis, Test generation, CI/CD | Warp CLI, FBT Automation |
-| **Amazon Q** | **Infra** | Cloud infrastructure, AWS/GCP integrations | AWS Services, Firebase |
-| **Kiro** | **Build** | FBT (Flipper Build Tool) workflow automation | Smart Flash, Build Optimization |
-
-### Core Automation Scripts
-
-#### Build & Flash Automation
-- **`scripts/flipper_warp_cli.py`**: Direct CLI interface for agents to communicate with connected Flipper devices
-  - Stateless command execution (no interactive shell overhead)
-  - Auto-discovery of serial ports (`/dev/ttyACM0`)
-  - Integrated FlipperSerial library from `tools/fz` submodule
-  - Mock dependency handling for restricted environments
-  - Usage: `./scripts/flipper_warp_cli.py <command>`
-
-- **ESP MCP Orchestrator** (`.ai/esp_mcp_orchestrator/`): Rust-based orchestration tool for smart flash workflows
-  - Real-time progress monitoring with colored output
-  - Automatic ESP port detection
-  - Integration with `smart_flash` FBT target
-  - Handles dependency installation (`colorlog`, `pyserial`)
-
-#### App Management
-- **`scripts/warp_app_manager.py`**: Flipper app catalog source importer and deployment launcher
-  - Fetches latest apps from official Flipper Catalog API
-  - Scans existing `applications/external` and `applications_user` directories
-  - Identifies missing catalog aliases, rejects unsafe paths, and resolves available upstream repositories
-  - Extracts repository URLs from catalog metadata
-  - Usage: `python3 scripts/warp_app_manager.py`
-
-#### Agent Orchestration
-- **`.ai/scripts/orchestrator.py`**: Host task orchestrator
-  - Multi-agent task distribution and load balancing
-  - Run with `--yolo-mode` for full autonomous operation
-  - Coordinates between Gemini, Claude, Codex, and other agents
-
-- **`.ai/scripts/sync_submodules.py`**: Forked dependency management
-  - Automates synchronization of all forked submodules
-  - Verifies compile-time integrity before merging
-  - See [Forked Development Documentation](docs/reference/ForkedDevelopment.md)
-
-- **`.ai/scripts/task_router.py`**: Intelligent task routing
-  - Analyzes task requirements and routes to optimal agent
-  - Context-aware agent selection based on specialization
-
-- **`.ai/scripts/notify.py`**: System-wide notification bus
-  - Cross-agent communication channel
-  - Slack/Discord integration for build status alerts
-
-### Security & Quality Assurance
-
-#### Strawberry Hallucination Detection
-The **Strawberry Toolkit** (`.ai/strawberry/`) supplies additional static checks for common AI-generated-code mistakes:
-- Static analysis of AI code contributions
-- Pattern recognition for common AI mistakes
-- Integration with Claude Security Agent for CVE scanning
-- Automated PR review with hallucination flagging
-
-### MCP (Model Context Protocol) Integration
-
-When configured and reachable, **MCP servers** can give host agents access to:
-- **ESP Flasher MCP** (`.ai/mcp/servers/esp_mcp/`): Direct control of ESP32 flashing operations
-- **GitHub MCP**: PR creation, issue management, code review automation
-- **Context7 MCP**: Library-documentation retrieval to support code generation
-- **Playwright MCP**: Automated web testing and UI validation
-
-See **WARP.md** for detailed MCP usage and integration patterns.
-
-### Developer Tools & Submodules
-
-- **`tools/fz`** (submodule from [x31337/fz](https://github.com/x31337/fz)): FlipperSerial library
-  - Python library for Flipper Zero serial communication
-  - Used by Warp CLI for agent-driven device control
-  - Mock-friendly architecture for testing environments
-
-- **`.ai/mcp/servers/esp_mcp`**: ESP32 operations via MCP protocol
-  - Flash firmware to WiFi devboard
-  - Monitor serial output
-  - Automated port detection
 
 </details>
 
