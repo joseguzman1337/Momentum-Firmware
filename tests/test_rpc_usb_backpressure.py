@@ -14,6 +14,7 @@ RPC_CLI = ROOT / "applications/services/rpc/rpc_cli.c"
 RPC_CORE = ROOT / "applications/services/rpc/rpc.c"
 RPC_GUI = ROOT / "applications/services/rpc/rpc_gui.c"
 RPC_STORAGE = ROOT / "applications/services/rpc/rpc_storage.c"
+CLI_VCP = ROOT / "applications/services/cli/cli_vcp.c"
 
 STORAGE_CHUNK_BYTES = 512
 # command_id, status, has_next, nested-message tags/lengths and delimited envelope all add
@@ -92,6 +93,13 @@ def test_multi_message_command_response_preempts_best_effort_frames():
     assert "if(session->command_in_progress) return false;" in best_effort
     assert "has_best_effort_callback = session->send_bytes_best_effort_callback != NULL;" in best_effort
     assert "if(!session->command_in_progress && has_best_effort_callback)" in best_effort
+
+
+def test_usb_tx_queue_holds_full_lab_inventory_burst():
+    vcp = CLI_VCP.read_text(encoding="utf-8")
+    match = re.search(r"#define\s+VCP_TX_BUF_SIZE\s+\(USB_CDC_PKT_LEN\s*\*\s*(\d+)\)", vcp)
+    assert match
+    assert int(match.group(1)) >= 512
 
 
 @dataclass

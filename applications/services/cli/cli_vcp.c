@@ -12,7 +12,11 @@
 #define TAG "CliVcp"
 
 #define USB_CDC_PKT_LEN   CDC_DATA_SZ
-#define VCP_TX_BUF_SIZE   (USB_CDC_PKT_LEN * 32)
+// Flipper Lab pipelines manifest discovery, device properties, and screen control. Those RPC
+// responses can form a burst much larger than the original 2 KiB queue even though USB is
+// draining normally. Buffer the complete burst so the RPC worker can reach each terminating
+// response without changing protocol semantics or adding host-visible timeouts.
+#define VCP_TX_BUF_SIZE   (USB_CDC_PKT_LEN * 512)
 #define VCP_RX_BUF_SIZE   (USB_CDC_PKT_LEN * 3)
 #define VCP_IF_NUM        0
 #define VCP_MESSAGE_Q_LEN 8
