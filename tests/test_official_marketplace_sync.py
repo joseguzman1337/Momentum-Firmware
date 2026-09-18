@@ -75,7 +75,7 @@ class OfficialMarketplaceSyncTests(unittest.TestCase):
             with patch.object(marketplace, "catalog_apps", return_value=[self.app()]), patch.object(
                 marketplace, "category_map", return_value={"cat-id": "Tools"}
             ), patch.object(marketplace, "fetch", side_effect=OSError("network down")):
-                with self.assertRaisesRegex(RuntimeError, "sync incomplete"):
+                with self.assertRaisesRegex(RuntimeError, "demo: network down"):
                     marketplace.sync(root, target="f7", api="87.6")
             self.assertEqual(old.read_bytes(), b"old")
 

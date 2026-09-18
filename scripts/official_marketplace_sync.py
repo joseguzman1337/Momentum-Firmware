@@ -182,7 +182,10 @@ def sync(
     }
     if not report["complete"]:
         shutil.rmtree(stage)
-        raise RuntimeError(f"official marketplace sync incomplete: {len(failures)} app(s) failed")
+        details = "; ".join(f"{item['alias']}: {item['error']}" for item in failures)
+        raise RuntimeError(
+            f"official marketplace sync incomplete: {len(failures)} app(s) failed: {details}"
+        )
     atomic_write(stage / "marketplace-lock.json", (json.dumps(report, indent=2, sort_keys=True) + "\n").encode())
     backup = destination.with_name(f".{destination.name}.previous")
     if backup.exists():
