@@ -91,9 +91,51 @@ if GetOption("fullenv") or any(
         "--stackversion",
         "${COPRO_CUBE_VERSION}",
     ]
+    updater_marketplace_sync = distenv.PhonyTarget(
+        "updater_marketplace_sync",
+        Action(
+            [
+                [
+                    "${PYTHON3}",
+                    "${ROOT_DIR}/scripts/official_marketplace_sync.py",
+                    "--api-file",
+                    "${ROOT_DIR}/targets/f7/api_symbols.csv",
+                    "--destination",
+                    "${ROOT_DIR}/build/official-marketplace/apps",
+                    "--base",
+                    "${SOURCE}",
+                ]
+            ]
+        ),
+        source=firmware_env.Dir("${RESOURCES_ROOT}/apps"),
+    )
+    Depends(updater_marketplace_sync, firmware_env["FW_RESOURCES_MANIFEST"])
+
+    bundled_resources_dir = firmware_env.Dir("${BUILD_DIR}/resources-marketplace")
+    bundled_resources = distenv.PhonyTarget(
+        "updater_marketplace_resources",
+        Action(
+            [
+                [
+                    "${PYTHON3}",
+                    "${ROOT_DIR}/scripts/bundle_marketplace_resources.py",
+                    "--base",
+                    firmware_env.subst("${RESOURCES_ROOT}"),
+                    "--apps",
+                    "${ROOT_DIR}/build/official-marketplace/apps",
+                    "--destination",
+                    bundled_resources_dir.abspath,
+                    "--assets-tool",
+                    "${ROOT_DIR}/scripts/assets.py",
+                ]
+            ]
+        ),
+    )
+    Depends(bundled_resources, updater_marketplace_sync)
+
     dist_resource_arguments = [
         "-r",
-        firmware_env.subst("${RESOURCES_ROOT}"),
+        bundled_resources_dir.abspath,
     ]
     dist_splash_arguments = (
         [
@@ -106,7 +148,7 @@ if GetOption("fullenv") or any(
 
     selfupdate_dist = distenv.DistCommand(
         "updater_package",
-        (distenv["DIST_DEPENDS"], firmware_env["FW_RESOURCES_MANIFEST"]),
+        (distenv["DIST_DEPENDS"], bundled_resources),
         DIST_EXTRA=[
             *dist_basic_arguments,
             *dist_radio_arguments,
