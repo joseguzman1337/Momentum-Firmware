@@ -16,6 +16,7 @@ typedef struct {
     RpcSession* session;
     PB_Main* response;
     FuriString* subkey;
+    uint32_t command_id;
 } RpcPropertyContext;
 
 static void
@@ -31,13 +32,18 @@ static void
     PB_Main* response = ctx->response;
 
     if(!strncmp(key, furi_string_get_cstr(ctx->subkey), furi_string_size(ctx->subkey))) {
-        response->content.system_device_info_response.key = strdup(key);
-        response->content.system_device_info_response.value = strdup(value);
+        *response = (PB_Main)PB_Main_init_zero;
+        response->command_id = ctx->command_id;
+        response->command_status = PB_CommandStatus_OK;
+        response->has_next = true;
+        response->which_content = PB_Main_property_get_response_tag;
+        response->content.property_get_response.key = strdup(key);
+        response->content.property_get_response.value = strdup(value);
         rpc_send_and_release(session, response);
     }
 
     if(last) {
-        rpc_send_and_release_empty(session, response->command_id, PB_CommandStatus_OK);
+        rpc_send_and_release_empty(session, ctx->command_id, PB_CommandStatus_OK);
     }
 }
 
@@ -64,15 +70,11 @@ static void rpc_system_property_get_process(const PB_Main* request, void* contex
 
     PB_Main* response = malloc(sizeof(PB_Main));
 
-    response->command_id = request->command_id;
-    response->command_status = PB_CommandStatus_OK;
-    response->has_next = true;
-    response->which_content = PB_Main_property_get_response_tag;
-
     RpcPropertyContext property_context = {
         .session = session,
         .response = response,
         .subkey = subkey,
+        .command_id = request->command_id,
     };
 
     if(!furi_string_cmp(topkey, PROPERTY_CATEGORY_DEVICE_INFO)) {

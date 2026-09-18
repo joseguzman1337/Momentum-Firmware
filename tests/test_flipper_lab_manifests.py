@@ -100,7 +100,11 @@ def test_storage_read_response_is_zeroed_and_released_on_short_read():
     source = (ROOT / "applications/services/rpc/rpc_storage.c").read_text(encoding="utf-8")
     function = source[source.index("static void rpc_system_storage_read_process") :]
     function = function[: function.index("static void rpc_system_storage_write_process")]
-    assert "*response = (PB_Main)PB_Main_init_zero;" in function
+    allocation = function.index("PB_Main* response = malloc(sizeof(PB_Main));")
+    initialization = function.index("*response = (PB_Main)PB_Main_init_zero;")
+    open_file = function.index("storage_file_open")
+    release = function.index("pb_release(&PB_Main_msg, response);")
+    assert allocation < initialization < open_file < release
     assert "if(!fs_operation_success) {\n        pb_release(&PB_Main_msg, response);" in function
 
 

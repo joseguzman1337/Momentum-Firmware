@@ -116,6 +116,7 @@ static void rpc_system_storage_info_process(const PB_Main* request, void* contex
     rpc_system_storage_reset_state(rpc_storage, session, true);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
 
     FS_Error error = storage_common_fs_info(
@@ -149,6 +150,7 @@ static void rpc_system_storage_timestamp_process(const PB_Main* request, void* c
     rpc_system_storage_reset_state(rpc_storage, session, true);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
 
     const char* path = request->content.storage_timestamp_request.path;
@@ -181,6 +183,7 @@ static void rpc_system_storage_stat_process(const PB_Main* request, void* contex
     rpc_system_storage_reset_state(rpc_storage, session, true);
 
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     response->command_id = request->command_id;
 
     const char* path = request->content.storage_stat_request.path;
@@ -356,6 +359,7 @@ static void rpc_system_storage_read_process(const PB_Main* request, void* contex
 
     /* use same message memory to send response */
     PB_Main* response = malloc(sizeof(PB_Main));
+    *response = (PB_Main)PB_Main_init_zero;
     const char* path = request->content.storage_read_request.path;
     File* file = storage_file_alloc(rpc_storage->api);
     bool fs_operation_success = storage_file_open(file, path, FSAM_READ, FSOM_OPEN_EXISTING);
