@@ -2,11 +2,13 @@ import base64
 from pathlib import Path
 import sys
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from fbt_tools.fbt_resources import _blank_png, _fim_text, _read_api_version
+from fbt_tools.fbt_resources import _blank_png, _fim_text, _normalize_png, _read_api_version
 
 
 def test_fim_contains_every_field_required_by_flipper_lab():
@@ -48,6 +50,58 @@ def test_fim_rejects_empty_icon():
         assert "no icon" in str(error)
     else:
         raise AssertionError("an empty icon must be rejected")
+
+
+def _png_with_chunk(kind, payload):
+    png = _blank_png()
+    iend = png.rfind(b"\x00\x00\x00\x00IEND")
+    from fbt_tools.fbt_resources import _png_chunk
+
+    return png[:iend] + _png_chunk(kind, payload) + png[iend:] + b"trailing-junk"
+
+
+def test_normalize_png_removes_metadata_and_trailing_bytes():
+    source = _png_with_chunk(b"iTXt", b"metadata" * 1000)
+    normalized = _normalize_png(source)
+
+    assert normalized == _blank_png()
+    assert b"iTXt" not in normalized
+    assert normalized.endswith(b"IEND\xaeB`\x82")
+
+
+def test_normalize_png_rejects_wrong_dimensions():
+    with pytest.raises(Exception, match="must be 10x10"):
+        _normalize_png(_blank_png(11, 10))
+
+
+@pytest.mark.parametrize(
+    ("kind", "message"),
+    ((b"IHDR", "duplicate"), (b"PLTE", "invalid PLTE"), (b"tRNS", "invalid tRNS")),
+)
+def test_normalize_png_rejects_render_chunks_after_image_data(kind, message):
+    source = _png_with_chunk(kind, b"" if kind != b"IHDR" else b"\x00" * 13)
+    with pytest.raises(Exception, match=message):
+        _normalize_png(source)
+
+
+def test_normalize_png_rejects_invalid_checksum():
+    source = bytearray(_blank_png())
+    source[-1] ^= 1
+    with pytest.raises(Exception, match="checksum"):
+        _normalize_png(bytes(source))
+
+
+def test_normalize_png_rejects_truncated_png():
+    with pytest.raises(Exception, match="incomplete|truncated"):
+        _normalize_png(_blank_png()[:-5])
+
+
+def test_storage_read_response_is_zeroed_and_released_on_short_read():
+    source = (ROOT / "applications/services/rpc/rpc_storage.c").read_text(encoding="utf-8")
+    function = source[source.index("static void rpc_system_storage_read_process") :]
+    function = function[: function.index("static void rpc_system_storage_write_process")]
+    assert "*response = (PB_Main)PB_Main_init_zero;" in function
+    assert "if(!fs_operation_success) {\n        pb_release(&PB_Main_msg, response);" in function
 
 
 def test_api_version_is_read_after_csv_header(tmp_path):

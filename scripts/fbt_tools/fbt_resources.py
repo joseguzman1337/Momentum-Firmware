@@ -27,6 +27,86 @@ def _blank_png(width=10, height=10):
     )
 
 
+def _normalize_png(data, width=10, height=10):
+    """Keep the pixel and transparency chunks required by a Flipper Lab icon."""
+    signature = b"\x89PNG\r\n\x1a\n"
+    if not data.startswith(signature):
+        raise StopError("Flipper Lab application icon is not a PNG")
+
+    offset = len(signature)
+    chunks = []
+    seen_ihdr = False
+    seen_idat = False
+    seen_iend = False
+    seen_plte = False
+    seen_trns = False
+    idat_ended = False
+    allowed = {b"IHDR", b"PLTE", b"tRNS", b"IDAT", b"IEND"}
+
+    while offset + 12 <= len(data):
+        length = struct.unpack(">I", data[offset : offset + 4])[0]
+        end = offset + 12 + length
+        if end > len(data):
+            raise StopError("Flipper Lab application icon has a truncated PNG chunk")
+        kind = data[offset + 4 : offset + 8]
+        payload = data[offset + 8 : offset + 8 + length]
+        if len(kind) != 4 or not all(
+            ord("A") <= byte <= ord("Z") or ord("a") <= byte <= ord("z") for byte in kind
+        ):
+            raise StopError("Flipper Lab application icon has an invalid PNG chunk type")
+        expected_crc = struct.unpack(">I", data[offset + 8 + length : end])[0]
+        if (zlib.crc32(kind + payload) & 0xFFFFFFFF) != expected_crc:
+            raise StopError("Flipper Lab application icon has an invalid PNG checksum")
+
+        if not seen_ihdr:
+            if kind != b"IHDR" or length != 13:
+                raise StopError("Flipper Lab application icon has no valid PNG header")
+            png_width, png_height = struct.unpack(">II", payload[:8])
+            if (png_width, png_height) != (width, height):
+                raise StopError(
+                    f"Flipper Lab application icon must be {width}x{height}, "
+                    f"got {png_width}x{png_height}"
+                )
+            seen_ihdr = True
+        elif kind == b"IHDR":
+            raise StopError("Flipper Lab application icon has duplicate PNG headers")
+
+        if kind == b"PLTE":
+            if seen_plte or seen_idat:
+                raise StopError("Flipper Lab application icon has an invalid PLTE chunk")
+            seen_plte = True
+        elif kind == b"tRNS":
+            if seen_trns or seen_idat:
+                raise StopError("Flipper Lab application icon has an invalid tRNS chunk")
+            seen_trns = True
+        elif kind == b"IDAT":
+            if idat_ended:
+                raise StopError("Flipper Lab application icon has non-consecutive IDAT chunks")
+            seen_idat = True
+        elif seen_idat:
+            idat_ended = True
+
+        if kind == b"IEND" and (length != 0 or not seen_idat):
+            raise StopError("Flipper Lab application icon has an invalid IEND chunk")
+
+        # Unknown critical chunks cannot be discarded without changing rendering.
+        if kind not in allowed and not (kind[0] & 0x20):
+            raise StopError(f"Unsupported critical PNG chunk {kind!r} in application icon")
+        if kind in allowed:
+            chunks.append(data[offset:end])
+        if kind == b"IDAT":
+            seen_idat = True
+        if kind == b"IEND":
+            seen_iend = True
+            offset = end
+            break
+        offset = end
+
+    if not (seen_ihdr and seen_idat and seen_iend):
+        raise StopError("Flipper Lab application icon is incomplete")
+    return signature + b"".join(chunks)
+
+
 def _fim_text(*, name, icon, api, uid, version_uid, path):
     if not icon:
         raise StopError(f"Flipper Lab application manifest has no icon for {path}")
@@ -77,7 +157,7 @@ def _generate_lab_app_manifests(env, resources_root):
                 with open(os.path.join(app._apppath, app.fap_icon), "rb") as stream:
                     source_icon = stream.read()
                 if source_icon.startswith(b"\x89PNG\r\n\x1a\n"):
-                    icon = source_icon
+                    icon = _normalize_png(source_icon)
             manifest = _fim_text(
                 name=app.name or app.appid,
                 icon=icon,

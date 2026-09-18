@@ -363,6 +363,7 @@ static void rpc_system_storage_read_process(const PB_Main* request, void* contex
     if(fs_operation_success) {
         size_t size_left = storage_file_size(file);
         do {
+            *response = (PB_Main)PB_Main_init_zero;
             response->command_id = request->command_id;
             response->which_content = PB_Main_storage_read_response_tag;
             response->command_status = PB_CommandStatus_OK;
@@ -399,6 +400,7 @@ static void rpc_system_storage_read_process(const PB_Main* request, void* contex
     }
 
     if(!fs_operation_success) {
+        pb_release(&PB_Main_msg, response);
         rpc_send_and_release_empty(
             session, request->command_id, rpc_system_storage_get_file_error(file));
     }
