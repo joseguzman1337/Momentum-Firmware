@@ -8,6 +8,11 @@ from datetime import date, datetime
 from flipper.app import App
 
 
+def format_build_date(value=None):
+    """Return the firmware build date using the qFlipper display format."""
+    return (value or date.today()).strftime("%d-%m-%Y")
+
+
 class GitVersion:
     REVISION_SUFFIX_LENGTH = 8
 
@@ -126,11 +131,9 @@ class Main(App):
     def generate(self):
         current_info = GitVersion(self.args.sourcedir).get_version_info()
 
-        build_date = date.today()
-
         current_info.update(
             {
-                "BUILD_DATE": "25-02-2026",
+                "BUILD_DATE": format_build_date(),
                 "TARGET": self.args.target,
                 "FIRMWARE_ORIGIN": self.args.firmware_origin,
             }
