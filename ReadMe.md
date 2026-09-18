@@ -520,7 +520,12 @@ For more details, see [Forked Development Documentation](docs/reference/ForkedDe
 
 <h2 align="center">Stargazers over time</h2>
 
+<details>
+<summary><strong>View star history</strong></summary>
+
 [![Stargazers over time](https://api.star-history.com/image?repos=joseguzman1337/Momentum-Firmware&type=Date)](https://www.star-history.com/#joseguzman1337/Momentum-Firmware&Date)
+
+</details>
 
 <h2 align="center">❤️ Support</h2>
 
