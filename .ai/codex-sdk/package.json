@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "@openai/codex-sdk": "^0.154.0"
+    "@openai/codex-sdk": "^0.155.0"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
