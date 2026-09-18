@@ -20,7 +20,8 @@ def test_stop_stream_removes_callback_before_stopping_worker_and_acknowledging()
 
 def test_best_effort_frames_reserve_pipe_space_for_control_replies():
     source = (ROOT / "applications/services/rpc/rpc_cli.c").read_text(encoding="utf-8")
-    assert "#define CLI_RPC_CONTROL_RESERVE 64UL" in source
+    assert "#define CLI_RPC_STORAGE_RESPONSE_MAX 768UL" in source
+    assert "#define CLI_RPC_CONTROL_RESERVE CLI_RPC_STORAGE_RESPONSE_MAX" in source
     assert "(spaces - bytes_len) < CLI_RPC_CONTROL_RESERVE" in source
 
 

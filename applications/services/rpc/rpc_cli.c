@@ -14,13 +14,18 @@ typedef struct {
 } CliRpc;
 
 #define CLI_READ_BUFFER_SIZE 64UL
-#define CLI_RPC_CONTROL_RESERVE 64UL
+// Storage reads carry up to 512 data bytes plus protobuf framing, paths, and status fields.
+// Keep a conservative complete-response slot free while GUI frames are being streamed.
+#define CLI_RPC_STORAGE_RESPONSE_MAX 768UL
+#define CLI_RPC_CONTROL_RESERVE CLI_RPC_STORAGE_RESPONSE_MAX
 
 static void rpc_cli_send_bytes_callback(void* context, uint8_t* bytes, size_t bytes_len) {
     furi_assert(context);
     furi_assert(bytes);
     furi_assert(bytes_len > 0);
     CliRpc* cli_rpc = context;
+    // Reliable replies retain the pipe's lossless backpressure semantics. Best-effort GUI
+    // traffic is admitted separately and cannot consume the storage-response reserve below.
     pipe_send(cli_rpc->pipe, bytes, bytes_len);
 }
 
