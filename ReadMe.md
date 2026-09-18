@@ -258,6 +258,8 @@ This repository regularly integrates compatible work from [Unleashed](https://gi
 
 Four update workflows are described below. For NX Augmented, the release artifacts from this fork are authoritative; the recommended route is its **qFlipper package (.tgz)**. Hosted Momentum services must only be used when they explicitly identify the same NX Augmented release and commit.
 
+> **Flash timing:** A complete Flipper Zero update measured **7 minutes 53 seconds** on 2026-09-17. Allow approximately **10 minutes per complete flash** for normal variation. During the internal updater phase, the USB serial device may temporarily disappear; this is expected, so do not restart the flash, reconnect tools, or otherwise intervene unless the updater reports a failure or the device remains unavailable after the full update window.
+
 > <details><summary><code>Web Updater (Chrome)</code></summary><ul>
 >   <li>Make sure qFlipper is closed</li>
 >   <li>Open the <a href="https://momentum-fw.dev/update">Web Updater</a></li>
