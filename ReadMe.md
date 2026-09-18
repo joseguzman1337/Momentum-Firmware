@@ -22,6 +22,9 @@ This custom firmware is based on the [Official Firmware](https://github.com/flip
 
 NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilities are delivered as external FAP applications, app-specific extensions as FAL plugins, and only the stable platform, hardware drivers, loader, storage, and ABI services remain in the firmware image. Host-side automation builds, tests, installs, and monitors those artifacts; it is not a permanently running service on the Flipper.
 
+<details>
+<summary><strong>🤖 Industry-First AI Automation</strong></summary>
+
 ### 🤖 Industry-First AI Automation
 - **Specialized AI agent workflows** for development, security, and operations when their configured host runners are invoked
 - **MCP (Model Context Protocol)** integration for host-side agent capabilities when configured
@@ -31,6 +34,11 @@ NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilit
 - **Auto USB Ethernet** - Zero-config internet sharing ([FLIPPER_AUTO_ETHERNET.md](docs/FLIPPER_AUTO_ETHERNET.md))
   - After host setup, connecting a compatible Flipper can enable USB Ethernet and host Internet sharing
   - One-time setup: `sudo ./scripts/install-flipper-auto-ethernet.sh`
+
+</details>
+
+<details>
+<summary><strong>🚀 Technical Excellence</strong></summary>
 
 ### 🚀 Technical Excellence
 - **Native USB Ethernet** with HTTP download helpers ([NativeEthernet.md](docs/reference/NativeEthernet.md))
@@ -42,6 +50,11 @@ NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilit
 - **Asset Pack System** - Complete theming with Anims/Icons/Fonts
 - **Extended JavaScript API** - Mass storage, file operations, and more
 - **Advanced Security** - Lock on boot, PIN protection, secure storage
+
+</details>
+
+<details>
+<summary><strong>📦 FAP/FAL Delivery Matrix</strong></summary>
 
 ### 📦 FAP/FAL Delivery Matrix
 
@@ -60,6 +73,11 @@ The split below is the delivery contract for NX Augmented. FAP/FAL artifacts rem
 
 This architecture preserves the capabilities listed below while keeping independently updateable features outside the constrained CPU1 firmware image.
 
+</details>
+
+<details>
+<summary><strong>🎨 Extensive Customization</strong></summary>
+
 ### 🎨 Extensive Customization
 - **Momentum Settings App** - Configure everything from one place
 - **Desktop Keybinds** - Full key remapping and press/hold actions
@@ -67,8 +85,13 @@ This architecture preserves the capabilities listed below while keeping independ
 - **Bad-Keyboard** - Full BLE/USB spoofing with custom VID/PID
 - **RGB Backlight** - Rainbow mode and per-app color profiles
 
+</details>
+
 <br>
 <h2 align="center">Modus Operandi</h2>
+
+<details>
+<summary><strong>View project philosophy</strong></summary>
 
 The goal of this firmware is to constantly push the bounds of what is possible with Flipper Zero, driving the innovation of many new groundbreaking features, while maintaining the easiest and most customizable user experience of any firmware. Fixing bugs promptly and ensuring a stable and compatible system is also of our utmost importance.
 
@@ -79,6 +102,8 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 - <h4>Customizable: You can tweak just about everything you see: add/remove apps from the menu, change the animations, replace icon graphics, change your Flipper's name, change how the main menu looks, setup different keybinds like never before, and so much more. All on-device, with no complicated configuration.</h4>
 
 - <h4>AI-assisted: Host-side agent workflows support development, security review, build automation, and quality assurance. Their output is reviewed through the same build and device-validation gates as any other contribution.</h4>
+
+</details>
 
 <br>
 
@@ -479,12 +504,18 @@ See **WARP.md** for detailed MCP usage and integration patterns.
 
 
 ### Submodule Synchronization
+
+<details>
+<summary><strong>View synchronization instructions</strong></summary>
+
 We use a forked submodule workflow to verify integrity and compile-time stability.
 To sync all submodules to your personal fork:
 ```bash
 python3 .ai/scripts/sync_submodules.py
 ```
 For more details, see [Forked Development Documentation](docs/reference/ForkedDevelopment.md).
+
+</details>
 
 
 <h2 align="center">Stargazers over time</h2>
