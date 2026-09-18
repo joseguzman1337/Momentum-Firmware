@@ -25,7 +25,6 @@ NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilit
 <details>
 <summary><strong>🤖 Industry-First AI Automation</strong></summary>
 
-### 🤖 Industry-First AI Automation
 - **Specialized AI agent workflows** for development, security, and operations when their configured host runners are invoked
 - **MCP (Model Context Protocol)** integration for host-side agent capabilities when configured
 - **Strawberry Toolkit** for AI hallucination detection in code review
@@ -40,7 +39,6 @@ NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilit
 <details>
 <summary><strong>🚀 Technical Excellence</strong></summary>
 
-### 🚀 Technical Excellence
 - **Native USB Ethernet** with HTTP download helpers ([NativeEthernet.md](docs/reference/NativeEthernet.md))
 - **ESP Flasher FAP** - Flash WiFi modules with lwIP HTTP download ([ESP_FLASHER_GUIDE.md](docs/ESP_FLASHER_GUIDE.md))
   - Auto-download ESP32 Marauder firmware over USB Ethernet
@@ -55,8 +53,6 @@ NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilit
 
 <details>
 <summary><strong>📦 FAP/FAL Delivery Matrix</strong></summary>
-
-### 📦 FAP/FAL Delivery Matrix
 
 The split below is the delivery contract for NX Augmented. FAP/FAL artifacts remain versioned against the exported firmware API; a compatible firmware build and SD card are therefore still required.
 
@@ -78,7 +74,6 @@ This architecture preserves the capabilities listed below while keeping independ
 <details>
 <summary><strong>🎨 Extensive Customization</strong></summary>
 
-### 🎨 Extensive Customization
 - **Momentum Settings App** - Configure everything from one place
 - **Desktop Keybinds** - Full key remapping and press/hold actions
 - **Main Menu Customization** - Add directories, JS files, reorganize freely
