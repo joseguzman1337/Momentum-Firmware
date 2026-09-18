@@ -23,6 +23,21 @@ This custom firmware is based on the [Official Firmware](https://github.com/flip
 NX Augmented is a **FAP/FAL-first Flipper Zero platform**. User-facing capabilities are delivered as external FAP applications, app-specific extensions as FAL plugins, and only the stable platform, hardware drivers, loader, storage, and ABI services remain in the firmware image. Host-side automation builds, tests, installs, and monitors those artifacts; it is not a permanently running service on the Flipper.
 
 <details>
+<summary><strong>✅ v1.0.16 NX Augmented — verified delivery state</strong></summary>
+
+The `v1.0.16-nx-augmented` updater was built for **Flipper Zero target 7** and verified through a complete device update. Its build date is generated when the firmware is compiled, so the device and release artifacts identify the actual build rather than carrying a manually maintained date.
+
+- **Official Marketplace synchronization:** the updater resolves the current target/API-compatible build for every catalog entry, verifies each FAP against the catalog SHA-256, and records the official application/version identity, display name, icon, and destination path in a lock receipt.
+- **Complete application delivery:** the verified release resource tree contains **439 current official-catalog FIMs** and **573 preserved FAPs** in total. Non-catalog FAPs remain available without being assigned fabricated catalog identities.
+- **Flipper Lab compatibility:** every generated FIM uses the catalog's unique 24-character hexadecimal application and version IDs, normalized icon, and exact `/ext/apps/...` FAP path. A full 439-application Lab inventory completed without the former catalog HTTP 422 responses or `storageReadRequest` timeout.
+- **Atomic, fail-closed packaging:** synchronization is rejected if the catalog changes mid-run, an app is missing or incompatible, a hash/icon/identity/path is invalid, or the verified count is incomplete. Resources and manifests are assembled in a temporary tree and replace the prior bundle only after all checks and manifest generation succeed.
+- **Regression coverage:** Marketplace synchronization and resource-bundle tests cover valid receipts, IDs, icons and FIM paths as well as incomplete syncs, hash mismatches, missing builds, unsafe paths, invalid identities, and preservation of the last good destination on failure.
+
+The counts above describe this verified release snapshot. Future builds always derive their catalog inventory and firmware API from the current source inputs rather than treating these numbers as permanent configuration.
+
+</details>
+
+<details>
 <summary><strong>🤖 Industry-First AI Automation</strong></summary>
 
 - **Specialized AI agent workflows** for development, security, and operations when their configured host runners are invoked
@@ -475,6 +490,18 @@ $ ./fbt FIRMWARE_APP_SET=unit_tests updater_package
 ```bash
 # Auto-download missing apps from Flipper Catalog
 $ python3 scripts/warp_app_manager.py
+```
+
+The full updater workflow performs a stricter official-catalog synchronization automatically. It reads the exported firmware API, downloads the compatible target-7 FAP and official icon for every current catalog app, verifies catalog hashes and identities, then creates the atomic resource bundle and catalog-valid FIMs. A partial or invalid synchronization stops the package build without replacing the previous good bundle.
+
+To exercise the Marketplace regression suite directly:
+
+```bash
+$ python3 -m pytest \
+    tests/test_official_marketplace_sync.py \
+    tests/test_marketplace_resource_bundle.py \
+    tests/test_flipper_lab_manifests.py \
+    tests/test_rpc_gui_stream_stop.py
 ```
 
 #### Agent-Driven CLI Control
