@@ -489,7 +489,7 @@ For more details, see [Forked Development Documentation](docs/reference/ForkedDe
 
 <h2 align="center">Stargazers over time</h2>
 
-[![Stargazers over time](https://starchart.cc/joseguzman1337/Momentum-Firmware.svg?variant=adaptive)](https://starchart.cc/joseguzman1337/Momentum-Firmware)
+[![Stargazers over time](https://api.star-history.com/image?repos=joseguzman1337/Momentum-Firmware&type=Date)](https://www.star-history.com/#joseguzman1337/Momentum-Firmware&Date)
 
 <h2 align="center">❤️ Support</h2>
 
