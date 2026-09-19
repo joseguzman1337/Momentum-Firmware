@@ -19,10 +19,10 @@ typedef struct {
 // Keep a conservative complete-response slot free while GUI frames are being streamed.
 #define CLI_RPC_STORAGE_RESPONSE_MAX 768UL
 #define CLI_RPC_CONTROL_RESERVE CLI_RPC_STORAGE_RESPONSE_MAX
-// Keep at most a couple of screen frames ahead of reliable replies. The VCP pipe remains large
-// enough for complete manifest bursts, but disposable frames must not turn that capacity into
-// seconds of head-of-line latency for property, storage, or stream-control responses.
-#define CLI_RPC_BEST_EFFORT_BACKLOG_MAX 2048UL
+// Screen frames are disposable and must never form a queue. Admit one only when the USB pipe is
+// completely idle; a reliable reply that arrives immediately afterwards can then wait behind at
+// most the single in-flight frame instead of an accumulated stream backlog.
+#define CLI_RPC_BEST_EFFORT_BACKLOG_MAX 0UL
 
 static void rpc_cli_send_bytes_callback(void* context, uint8_t* bytes, size_t bytes_len) {
     furi_assert(context);
@@ -44,7 +44,7 @@ static bool
     const size_t queued = CLI_VCP_TX_BUF_SIZE - spaces;
     // Screen frames are best-effort traffic. Preserve room for a small command response so a
     // saturated stream cannot make stop/get-info control traffic wait behind its own frames.
-    if((queued >= CLI_RPC_BEST_EFFORT_BACKLOG_MAX) || (spaces < bytes_len) ||
+    if((queued > CLI_RPC_BEST_EFFORT_BACKLOG_MAX) || (spaces < bytes_len) ||
        ((spaces - bytes_len) < CLI_RPC_CONTROL_RESERVE)) {
         return false;
     }

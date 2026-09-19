@@ -110,9 +110,9 @@ def test_usb_tx_queue_holds_full_lab_inventory_burst():
 def test_best_effort_backlog_is_bounded_independently_of_total_pipe_capacity():
     cli = RPC_CLI.read_text(encoding="utf-8")
     backlog = _numeric_define(cli, "CLI_RPC_BEST_EFFORT_BACKLOG_MAX")
-    assert backlog <= 2 * 1024
+    assert backlog == 0
     assert "const size_t queued = CLI_VCP_TX_BUF_SIZE - spaces;" in cli
-    assert "queued >= CLI_RPC_BEST_EFFORT_BACKLOG_MAX" in cli
+    assert "queued > CLI_RPC_BEST_EFFORT_BACKLOG_MAX" in cli
 
     # A large reliable pipe must not authorize filling the entire queue with stale GUI frames.
     capacity = 32 * 1024
@@ -120,14 +120,14 @@ def test_best_effort_backlog_is_bounded_independently_of_total_pipe_capacity():
     def admit_best_effort(spaces: int, frame_bytes: int) -> bool:
         queued = capacity - spaces
         return (
-            queued < backlog
+            queued <= backlog
             and spaces >= frame_bytes
             and spaces - frame_bytes >= MIN_STORAGE_RESPONSE_RESERVE
         )
 
     assert admit_best_effort(capacity, 1024)
-    assert admit_best_effort(capacity - 1024, 1024)
-    assert not admit_best_effort(capacity - backlog, 1)
+    assert not admit_best_effort(capacity - 1, 1)
+    assert not admit_best_effort(capacity - 1024, 1024)
     assert not admit_best_effort(MIN_STORAGE_RESPONSE_RESERVE, 1)
 
 
