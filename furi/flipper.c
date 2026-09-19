@@ -12,6 +12,9 @@
 
 #define TAG "Flipper"
 
+#define NFC_LAB_FOLDER          EXT_PATH("nfc")
+#define NFC_LAB_MFKEY32_LOG_PATH EXT_PATH("nfc/.mfkey32.log")
+
 #define HEAP_CANARY_VALUE 0x8BADF00D
 
 static void flipper_print_version(const char* target, const Version* version) {
@@ -55,8 +58,51 @@ static void flipper_print_version(const char* target, const Version* version) {
 #include <applications/main/infrared/infrared_settings.h>
 #include <applications/main/u2f/u2f_data.h>
 
+static void flipper_prepare_nfc_lab_storage(Storage* storage) {
+    furi_assert(storage);
+
+    FileInfo info;
+    FS_Error folder_error = storage_common_stat(storage, NFC_LAB_FOLDER, &info);
+    if(folder_error == FSE_OK) {
+        if(!file_info_is_dir(&info)) {
+            FURI_LOG_W(TAG, "NFC Lab: %s is not a directory", NFC_LAB_FOLDER);
+            return;
+        }
+    } else {
+        FS_Error mkdir_error = storage_common_mkdir(storage, NFC_LAB_FOLDER);
+        if(mkdir_error != FSE_OK && mkdir_error != FSE_EXIST) {
+            FURI_LOG_W(TAG, "NFC Lab: cannot prepare %s", NFC_LAB_FOLDER);
+            return;
+        }
+    }
+
+    FS_Error log_error = storage_common_stat(storage, NFC_LAB_MFKEY32_LOG_PATH, &info);
+    if(log_error == FSE_OK) {
+        if(file_info_is_dir(&info)) {
+            FURI_LOG_W(TAG, "NFC Lab: %s is not a file", NFC_LAB_MFKEY32_LOG_PATH);
+        }
+        return;
+    } else if(log_error != FSE_NOT_EXIST) {
+        FURI_LOG_W(TAG, "NFC Lab: cannot inspect %s", NFC_LAB_MFKEY32_LOG_PATH);
+        return;
+    }
+
+    File* log = storage_file_alloc(storage);
+    if(storage_file_open(log, NFC_LAB_MFKEY32_LOG_PATH, FSAM_WRITE, FSOM_CREATE_NEW)) {
+        FURI_LOG_I(TAG, "NFC Lab: prepared %s", NFC_LAB_MFKEY32_LOG_PATH);
+        storage_file_close(log);
+    } else if(storage_file_get_error(log) != FSE_EXIST) {
+        FURI_LOG_W(TAG, "NFC Lab: cannot prepare %s", NFC_LAB_MFKEY32_LOG_PATH);
+    }
+    storage_file_free(log);
+}
+
 void flipper_migrate_files() {
     Storage* storage = furi_record_open(RECORD_STORAGE);
+
+    // Flipper Lab reads this exchange file directly from the SD card. Create it
+    // only when absent so captured nonces are never truncated or overwritten.
+    flipper_prepare_nfc_lab_storage(storage);
 
     // Revert cringe
     FURI_LOG_I(TAG, "Migrate: Remove unused files");
