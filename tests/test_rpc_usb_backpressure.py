@@ -15,6 +15,7 @@ RPC_CORE = ROOT / "applications/services/rpc/rpc.c"
 RPC_GUI = ROOT / "applications/services/rpc/rpc_gui.c"
 RPC_STORAGE = ROOT / "applications/services/rpc/rpc_storage.c"
 CLI_VCP = ROOT / "applications/services/cli/cli_vcp.c"
+CLI_VCP_HEADER = ROOT / "applications/services/cli/cli_vcp.h"
 
 STORAGE_CHUNK_BYTES = 512
 # command_id, status, has_next, nested-message tags/lengths and delimited envelope all add
@@ -97,9 +98,37 @@ def test_multi_message_command_response_preempts_best_effort_frames():
 
 def test_usb_tx_queue_holds_full_lab_inventory_burst():
     vcp = CLI_VCP.read_text(encoding="utf-8")
-    match = re.search(r"#define\s+VCP_TX_BUF_SIZE\s+\(USB_CDC_PKT_LEN\s*\*\s*(\d+)\)", vcp)
+    header = CLI_VCP_HEADER.read_text(encoding="utf-8")
+    assert "#define VCP_TX_BUF_SIZE   CLI_VCP_TX_BUF_SIZE" in vcp
+    match = re.search(
+        r"#define\s+CLI_VCP_TX_BUF_SIZE\s+\((\d+)UL\s*\*\s*(\d+)UL\)", header
+    )
     assert match
-    assert int(match.group(1)) >= 512
+    assert int(match.group(1)) * int(match.group(2)) >= 32 * 1024
+
+
+def test_best_effort_backlog_is_bounded_independently_of_total_pipe_capacity():
+    cli = RPC_CLI.read_text(encoding="utf-8")
+    backlog = _numeric_define(cli, "CLI_RPC_BEST_EFFORT_BACKLOG_MAX")
+    assert backlog <= 2 * 1024
+    assert "const size_t queued = CLI_VCP_TX_BUF_SIZE - spaces;" in cli
+    assert "queued >= CLI_RPC_BEST_EFFORT_BACKLOG_MAX" in cli
+
+    # A large reliable pipe must not authorize filling the entire queue with stale GUI frames.
+    capacity = 32 * 1024
+
+    def admit_best_effort(spaces: int, frame_bytes: int) -> bool:
+        queued = capacity - spaces
+        return (
+            queued < backlog
+            and spaces >= frame_bytes
+            and spaces - frame_bytes >= MIN_STORAGE_RESPONSE_RESERVE
+        )
+
+    assert admit_best_effort(capacity, 1024)
+    assert admit_best_effort(capacity - 1024, 1024)
+    assert not admit_best_effort(capacity - backlog, 1)
+    assert not admit_best_effort(MIN_STORAGE_RESPONSE_RESERVE, 1)
 
 
 @dataclass

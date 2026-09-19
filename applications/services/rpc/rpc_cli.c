@@ -1,5 +1,6 @@
 #include <toolbox/cli/cli_command.h>
 #include <cli/cli_main_commands.h>
+#include <cli/cli_vcp.h>
 #include <furi.h>
 #include "rpc_i.h"
 #include <furi_hal.h>
@@ -18,6 +19,10 @@ typedef struct {
 // Keep a conservative complete-response slot free while GUI frames are being streamed.
 #define CLI_RPC_STORAGE_RESPONSE_MAX 768UL
 #define CLI_RPC_CONTROL_RESERVE CLI_RPC_STORAGE_RESPONSE_MAX
+// Keep at most a couple of screen frames ahead of reliable replies. The VCP pipe remains large
+// enough for complete manifest bursts, but disposable frames must not turn that capacity into
+// seconds of head-of-line latency for property, storage, or stream-control responses.
+#define CLI_RPC_BEST_EFFORT_BACKLOG_MAX 2048UL
 
 static void rpc_cli_send_bytes_callback(void* context, uint8_t* bytes, size_t bytes_len) {
     furi_assert(context);
@@ -36,9 +41,13 @@ static bool
     furi_assert(bytes_len > 0);
     CliRpc* cli_rpc = context;
     const size_t spaces = pipe_spaces_available(cli_rpc->pipe);
+    const size_t queued = CLI_VCP_TX_BUF_SIZE - spaces;
     // Screen frames are best-effort traffic. Preserve room for a small command response so a
     // saturated stream cannot make stop/get-info control traffic wait behind its own frames.
-    if((spaces < bytes_len) || ((spaces - bytes_len) < CLI_RPC_CONTROL_RESERVE)) return false;
+    if((queued >= CLI_RPC_BEST_EFFORT_BACKLOG_MAX) || (spaces < bytes_len) ||
+       ((spaces - bytes_len) < CLI_RPC_CONTROL_RESERVE)) {
+        return false;
+    }
     return pipe_send(cli_rpc->pipe, bytes, bytes_len) == bytes_len;
 }
 
