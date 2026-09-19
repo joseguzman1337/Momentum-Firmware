@@ -1,4 +1,4 @@
-#include "pipe.h"
+#include "pipe_i.h"
 #include <furi.h>
 
 #define PIPE_DEFAULT_STATE_CHECK_PERIOD furi_ms_to_ticks(100)
@@ -19,6 +19,7 @@ struct PipeSide {
     PipeShared* shared;
     FuriStreamBuffer* sending;
     FuriStreamBuffer* receiving;
+    FuriMutex* send_mutex;
 
     FuriEventLoop* event_loop;
     void* callback_context;
@@ -55,6 +56,7 @@ PipeSideBundle pipe_alloc_ex(PipeSideReceiveSettings alice, PipeSideReceiveSetti
         .shared = shared,
         .sending = alice_to_bob,
         .receiving = bob_to_alice,
+        .send_mutex = furi_mutex_alloc(FuriMutexTypeNormal),
         .state_check_period = PIPE_DEFAULT_STATE_CHECK_PERIOD,
     };
     *bobs_side = (PipeSide){
@@ -62,6 +64,7 @@ PipeSideBundle pipe_alloc_ex(PipeSideReceiveSettings alice, PipeSideReceiveSetti
         .shared = shared,
         .sending = bob_to_alice,
         .receiving = alice_to_bob,
+        .send_mutex = furi_mutex_alloc(FuriMutexTypeNormal),
         .state_check_period = PIPE_DEFAULT_STATE_CHECK_PERIOD,
     };
 
@@ -85,6 +88,7 @@ void pipe_free(PipeSide* pipe) {
 
     furi_mutex_acquire(pipe->shared->state_transition, FuriWaitForever);
     FuriStatus status = furi_semaphore_acquire(pipe->shared->instance_count, 0);
+    furi_mutex_free(pipe->send_mutex);
 
     if(status == FuriStatusOk) {
         // the other side is still intact
@@ -144,6 +148,7 @@ size_t pipe_receive(PipeSide* pipe, void* data, size_t length) {
 
 size_t pipe_send(PipeSide* pipe, const void* data, size_t length) {
     furi_check(pipe);
+    furi_check(furi_mutex_acquire(pipe->send_mutex, FuriWaitForever) == FuriStatusOk);
 
     size_t sent = 0;
     while(length) {
@@ -156,7 +161,23 @@ size_t pipe_send(PipeSide* pipe, const void* data, size_t length) {
         data += sent_this_time;
     }
 
+    furi_check(furi_mutex_release(pipe->send_mutex) == FuriStatusOk);
     return sent;
+}
+
+size_t pipe_try_send(PipeSide* pipe, const void* data, size_t length) {
+    furi_check(pipe);
+    furi_check(data || !length);
+
+    if(!length) return 0;
+    if(furi_mutex_acquire(pipe->send_mutex, 0) != FuriStatusOk) return 0;
+
+    size_t sent = 0;
+    if(furi_stream_buffer_spaces_available(pipe->sending) >= length) {
+        sent = furi_stream_buffer_send(pipe->sending, data, length, 0);
+    }
+    furi_check(furi_mutex_release(pipe->send_mutex) == FuriStatusOk);
+    return sent == length ? sent : 0;
 }
 
 size_t pipe_bytes_available(PipeSide* pipe) {

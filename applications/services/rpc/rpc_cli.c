@@ -5,6 +5,7 @@
 #include "rpc_i.h"
 #include <furi_hal.h>
 #include <toolbox/pipe.h>
+#include <toolbox/pipe_i.h>
 
 #define TAG "RpcCli"
 
@@ -48,7 +49,7 @@ static bool
        ((spaces - bytes_len) < CLI_RPC_CONTROL_RESERVE)) {
         return false;
     }
-    return pipe_send(cli_rpc->pipe, bytes, bytes_len) == bytes_len;
+    return pipe_try_send(cli_rpc->pipe, bytes, bytes_len) == bytes_len;
 }
 
 static void rpc_cli_session_close_callback(void* context) {

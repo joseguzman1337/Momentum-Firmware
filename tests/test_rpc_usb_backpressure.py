@@ -16,6 +16,7 @@ RPC_GUI = ROOT / "applications/services/rpc/rpc_gui.c"
 RPC_STORAGE = ROOT / "applications/services/rpc/rpc_storage.c"
 CLI_VCP = ROOT / "applications/services/cli/cli_vcp.c"
 CLI_VCP_HEADER = ROOT / "applications/services/cli/cli_vcp.h"
+PIPE = ROOT / "lib/toolbox/pipe.c"
 
 STORAGE_CHUNK_BYTES = 512
 # command_id, status, has_next, nested-message tags/lengths and delimited envelope all add
@@ -129,6 +130,20 @@ def test_best_effort_backlog_is_bounded_independently_of_total_pipe_capacity():
     assert not admit_best_effort(capacity - 1, 1)
     assert not admit_best_effort(capacity - 1024, 1024)
     assert not admit_best_effort(MIN_STORAGE_RESPONSE_RESERVE, 1)
+
+
+def test_best_effort_pipe_write_is_atomic_and_never_waits():
+    cli = RPC_CLI.read_text(encoding="utf-8")
+    assert "pipe_try_send(cli_rpc->pipe, bytes, bytes_len)" in cli
+
+    pipe = PIPE.read_text(encoding="utf-8")
+    helper = pipe.split("size_t pipe_try_send", 1)[1].split(
+        "size_t pipe_bytes_available", 1
+    )[0]
+    assert "furi_mutex_acquire(pipe->send_mutex, 0)" in helper
+    assert "furi_stream_buffer_spaces_available(pipe->sending) >= length" in helper
+    assert "furi_stream_buffer_send(pipe->sending, data, length, 0)" in helper
+    assert "pipe->state_check_period" not in helper
 
 
 @dataclass
