@@ -78,6 +78,7 @@ static void rpc_system_property_get_process(const PB_Main* request, void* contex
     };
 
     if(!furi_string_cmp(topkey, PROPERTY_CATEGORY_DEVICE_INFO)) {
+        rpc_system_gui_quiesce(session);
         furi_hal_info_get(rpc_system_property_get_callback, '.', &property_context);
     } else if(!furi_string_cmp(topkey, PROPERTY_CATEGORY_POWER_INFO)) {
         furi_hal_power_info_get(rpc_system_property_get_callback, '.', &property_context);

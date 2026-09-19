@@ -211,6 +211,31 @@ static void rpc_system_gui_start_screen_stream_process(const PB_Main* request, v
     }
 }
 
+void rpc_system_gui_quiesce_context(void* context) {
+    furi_assert(context);
+
+    RpcGuiSystem* rpc_gui = context;
+    if(!rpc_gui->is_streaming) return;
+
+    // Device-info navigation can begin before the browser has unmounted its screen viewer.
+    // Stop producing unsolicited frames first so the following multi-message property response
+    // cannot sit behind frames which no longer have a consumer on the host.
+    furi_check(furi_mutex_acquire(rpc_gui->transmit_mutex, FuriWaitForever) == FuriStatusOk);
+    rpc_gui->is_streaming = false;
+    furi_check(furi_mutex_release(rpc_gui->transmit_mutex) == FuriStatusOk);
+
+    gui_remove_framebuffer_callback(
+        rpc_gui->gui, rpc_system_gui_screen_stream_frame_callback, context);
+    furi_thread_flags_set(furi_thread_get_id(rpc_gui->transmit_thread), RpcGuiWorkerFlagExit);
+    furi_thread_join(rpc_gui->transmit_thread);
+    furi_thread_free(rpc_gui->transmit_thread);
+    rpc_gui->transmit_thread = NULL;
+
+    pb_release(&PB_Main_msg, rpc_gui->transmit_frame);
+    free(rpc_gui->transmit_frame);
+    rpc_gui->transmit_frame = NULL;
+}
+
 static void rpc_system_gui_stop_screen_stream_process(const PB_Main* request, void* context) {
     furi_assert(request);
     furi_assert(context);
@@ -221,25 +246,7 @@ static void rpc_system_gui_stop_screen_stream_process(const PB_Main* request, vo
     RpcSession* session = rpc_gui->session;
     furi_assert(session);
 
-    if(rpc_gui->is_streaming) {
-        rpc_gui->is_streaming = false;
-        // The callback never waits for the stream worker, so synchronized removal is bounded
-        // and guarantees that no callback can signal a stopped thread.
-        gui_remove_framebuffer_callback(
-            rpc_gui->gui, rpc_system_gui_screen_stream_frame_callback, context);
-        furi_thread_flags_set(furi_thread_get_id(rpc_gui->transmit_thread), RpcGuiWorkerFlagExit);
-        // Acknowledge as soon as no new frame can be queued. The worker may still be finishing
-        // an already admitted frame; waiting for it before replying makes Flipper Lab time out
-        // and discard an otherwise healthy RPC session.
-        rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);
-        furi_thread_join(rpc_gui->transmit_thread);
-        furi_thread_free(rpc_gui->transmit_thread);
-        // Release frame
-        pb_release(&PB_Main_msg, rpc_gui->transmit_frame);
-        free(rpc_gui->transmit_frame);
-        rpc_gui->transmit_frame = NULL;
-        return;
-    }
+    if(rpc_gui->is_streaming) rpc_system_gui_quiesce_context(context);
 
     rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);
 }
@@ -558,18 +565,7 @@ void rpc_system_gui_free(void* context) {
         view_port_free(rpc_gui->rpc_session_active_viewport);
     }
 
-    if(rpc_gui->is_streaming) {
-        rpc_gui->is_streaming = false;
-        gui_remove_framebuffer_callback(
-            rpc_gui->gui, rpc_system_gui_screen_stream_frame_callback, context);
-        furi_thread_flags_set(furi_thread_get_id(rpc_gui->transmit_thread), RpcGuiWorkerFlagExit);
-        furi_thread_join(rpc_gui->transmit_thread);
-        furi_thread_free(rpc_gui->transmit_thread);
-        // Release frame
-        pb_release(&PB_Main_msg, rpc_gui->transmit_frame);
-        free(rpc_gui->transmit_frame);
-        rpc_gui->transmit_frame = NULL;
-    }
+    if(rpc_gui->is_streaming) rpc_system_gui_quiesce_context(context);
     furi_record_close(RECORD_INPUT_EVENTS);
     furi_record_close(RECORD_GUI);
     furi_mutex_free(rpc_gui->transmit_mutex);

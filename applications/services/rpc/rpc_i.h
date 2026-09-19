@@ -41,6 +41,8 @@ void* rpc_system_app_alloc(RpcSession* session);
 void rpc_system_app_free(void* ctx);
 void* rpc_system_gui_alloc(RpcSession* session);
 void rpc_system_gui_free(void* ctx);
+void rpc_system_gui_quiesce(RpcSession* session);
+void rpc_system_gui_quiesce_context(void* context);
 void* rpc_system_gpio_alloc(RpcSession* session);
 void rpc_system_gpio_free(void* ctx);
 void* rpc_system_property_alloc(RpcSession* session);

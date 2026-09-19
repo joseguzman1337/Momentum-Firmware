@@ -36,32 +36,43 @@ typedef struct {
     void* context;
 } RpcSystemCallbacks;
 
-static RpcSystemCallbacks rpc_systems[] = {
-    {
+typedef enum {
+    RpcSystemSystemIndex,
+    RpcSystemStorageIndex,
+    RpcSystemAppIndex,
+    RpcSystemGuiIndex,
+    RpcSystemGpioIndex,
+    RpcSystemPropertyIndex,
+    RpcSystemDesktopIndex,
+    RpcSystemCount,
+} RpcSystemIndex;
+
+static RpcSystemCallbacks rpc_systems[RpcSystemCount] = {
+    [RpcSystemSystemIndex] = {
         .alloc = rpc_system_system_alloc,
         .free = NULL,
     },
-    {
+    [RpcSystemStorageIndex] = {
         .alloc = rpc_system_storage_alloc,
         .free = rpc_system_storage_free,
     },
-    {
+    [RpcSystemAppIndex] = {
         .alloc = rpc_system_app_alloc,
         .free = rpc_system_app_free,
     },
-    {
+    [RpcSystemGuiIndex] = {
         .alloc = rpc_system_gui_alloc,
         .free = rpc_system_gui_free,
     },
-    {
+    [RpcSystemGpioIndex] = {
         .alloc = rpc_system_gpio_alloc,
         .free = NULL,
     },
-    {
+    [RpcSystemPropertyIndex] = {
         .alloc = rpc_system_property_alloc,
         .free = NULL,
     },
-    {
+    [RpcSystemDesktopIndex] = {
         .alloc = rpc_desktop_alloc,
         .free = rpc_desktop_free,
     },
@@ -94,6 +105,11 @@ struct Rpc {
     FuriMutex* busy_mutex;
     size_t sessions_count;
 };
+
+void rpc_system_gui_quiesce(RpcSession* session) {
+    furi_check(session);
+    rpc_system_gui_quiesce_context(session->system_contexts[RpcSystemGuiIndex]);
+}
 
 RpcOwner rpc_session_get_owner(RpcSession* session) {
     furi_check(session);

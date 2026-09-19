@@ -205,5 +205,27 @@ def test_stop_screen_stream_replies_before_waiting_for_worker_exit():
     )[0]
 
     acknowledge = "rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);"
-    assert stop.index("gui_remove_framebuffer_callback") < stop.index(acknowledge)
-    assert stop.index(acknowledge) < stop.index("furi_thread_join")
+    assert "rpc_system_gui_quiesce_context(context);" in stop
+    assert stop.index("rpc_system_gui_quiesce_context(context);") < stop.index(acknowledge)
+
+
+def test_devinfo_quiesces_screen_frames_before_multi_message_response():
+    property_source = (ROOT / "applications/services/rpc/rpc_property.c").read_text(
+        encoding="utf-8"
+    )
+    branch = property_source.split(
+        "if(!furi_string_cmp(topkey, PROPERTY_CATEGORY_DEVICE_INFO))", 1
+    )[1].split("} else if", 1)[0]
+    assert branch.index("rpc_system_gui_quiesce(session);") < branch.index(
+        "furi_hal_info_get"
+    )
+
+    gui = RPC_GUI.read_text(encoding="utf-8")
+    quiesce = gui.split("void rpc_system_gui_quiesce_context", 1)[1].split(
+        "static void rpc_system_gui_stop_screen_stream_process", 1
+    )[0]
+    assert quiesce.index("rpc_gui->is_streaming = false;") < quiesce.index(
+        "gui_remove_framebuffer_callback"
+    )
+    assert "furi_thread_join" in quiesce
+    assert "rpc_gui->transmit_frame = NULL;" in quiesce
