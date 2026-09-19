@@ -181,3 +181,14 @@ def test_disconnect_reconnect_then_maximum_storage_read_is_fresh_and_complete():
     open_start = core.index("RpcSession* rpc_session_open")
     open_end = core.index("void rpc_session_close", open_start)
     assert "RpcSession* session = calloc(1, sizeof(RpcSession))" in core[open_start:open_end]
+
+
+def test_stop_screen_stream_replies_before_waiting_for_worker_exit():
+    gui = RPC_GUI.read_text(encoding="utf-8")
+    stop = gui.split("static void rpc_system_gui_stop_screen_stream_process", 1)[1].split(
+        "static void\n    rpc_system_gui_send_input_event_request_process", 1
+    )[0]
+
+    acknowledge = "rpc_send_and_release_empty(session, request->command_id, PB_CommandStatus_OK);"
+    assert stop.index("gui_remove_framebuffer_callback") < stop.index(acknowledge)
+    assert stop.index(acknowledge) < stop.index("furi_thread_join")

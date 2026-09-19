@@ -14,7 +14,7 @@ def test_stop_stream_removes_callback_before_stopping_worker_and_acknowledging()
     acknowledgement = handler.index("rpc_send_and_release_empty")
     remove_callback = handler.index("gui_remove_framebuffer_callback")
     join = handler.index("furi_thread_join")
-    assert remove_callback < exit_signal < join < acknowledgement
+    assert remove_callback < exit_signal < acknowledgement < join
     assert "return;" in handler[join:]
 
 
