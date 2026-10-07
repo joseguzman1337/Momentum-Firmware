@@ -1,11 +1,13 @@
 import enum
 import hashlib
+import json
 import logging
 import math
 import os
 import posixpath
 import sys
 import time
+from pathlib import Path
 
 import serial
 
@@ -313,11 +315,52 @@ class FlipperStorage:
 
     def send_file(self, filename_from: str, filename_to: str):
         """Send file from local device to Flipper"""
-        if self.exist_file(filename_to):
-            self.remove(filename_to)
+        response_timeout = float(
+            os.environ.get("FBT_STORAGE_CHUNK_RESPONSE_TIMEOUT", "30")
+        )
 
         with open(filename_from, "rb") as file:
             filesize = os.fstat(file.fileno()).st_size
+            local_identity = {
+                "sha256": hashlib.sha256(file.read()).hexdigest(),
+                "size": filesize,
+            }
+            file.seek(0)
+            state_dir = Path(
+                os.environ.get(
+                    "FBT_STORAGE_RESUME_STATE_DIR", ".fbt-state/storage-resume"
+                )
+            )
+            state_path = state_dir / (
+                hashlib.sha256(filename_to.encode("utf-8")).hexdigest() + ".json"
+            )
+            saved_identity = None
+            try:
+                saved_identity = json.loads(state_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                pass
+            resume_offset = 0
+            if self.exist_file(filename_to):
+                remote_size = self.size(filename_to)
+                resume_enabled = os.environ.get("FBT_STORAGE_RESUME", "1") != "0"
+                if (
+                    resume_enabled
+                    and saved_identity == local_identity
+                    and 0 < remote_size < filesize
+                ):
+                    resume_offset = remote_size
+                    file.seek(resume_offset)
+                    print(
+                        f'Resuming "{filename_to}" at byte '
+                        f"{resume_offset} of {filesize}"
+                    )
+                else:
+                    self.remove(filename_to)
+
+            state_dir.mkdir(parents=True, exist_ok=True)
+            temp_state = state_path.with_suffix(".tmp")
+            temp_state.write_text(json.dumps(local_identity), encoding="utf-8")
+            temp_state.replace(state_path)
 
             buffer_size = self.chunk_size
             start_time = time.time()
@@ -328,27 +371,31 @@ class FlipperStorage:
                     break
 
                 self.send_and_wait_eol(f'storage write_chunk "{filename_to}" {size}\r')
-                answer = self.read.until(self.CLI_EOL)
+                answer = self.read.until(self.CLI_EOL, timeout_sec=response_timeout)
                 if self.has_error(answer):
                     last_error = self.get_error(answer)
-                    self.read.until(self.CLI_PROMPT)
+                    self.read.until(
+                        self.CLI_PROMPT, timeout_sec=response_timeout
+                    )
                     raise FlipperStorageException.from_error_code(
                         filename_to, last_error
                     )
 
                 self.port.write(filedata)
-                self.read.until(self.CLI_PROMPT)
+                self.read.until(self.CLI_PROMPT, timeout_sec=response_timeout)
 
                 ftell = file.tell()
                 percent = math.ceil(ftell / filesize * 100)
                 total_chunks = math.ceil(filesize / buffer_size)
                 current_chunk = math.ceil(ftell / buffer_size)
-                approx_speed = ftell / (time.time() - start_time + 0.0001)
+                session_bytes = ftell - resume_offset
+                approx_speed = session_bytes / (time.time() - start_time + 0.0001)
                 sys.stdout.write(
                     f"\r<{percent:3d}%, chunk {current_chunk:2d} of {total_chunks:2d} @ {approx_speed/1024:.2f} kb/s"
                 )
                 sys.stdout.flush()
         print()
+        state_path.unlink(missing_ok=True)
 
     def read_file(self, filename: str):
         """Receive file from Flipper, and get filedata (bytes)"""

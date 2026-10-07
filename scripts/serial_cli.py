@@ -16,7 +16,6 @@ def main():
     
     if args.args and args.args[0] == "bridge":
         # Dispatch to marauder_bridge.py
-        import subprocess
         cmd = [sys.executable, os.path.join(os.path.dirname(__file__), "marauder_bridge.py"), "--port", args.port]
         if len(args.args) > 1:
             cmd.extend(args.args[1:])

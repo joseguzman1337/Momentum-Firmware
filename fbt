@@ -46,4 +46,22 @@ if [ -z "$FBT_NO_SYNC" ]; then
     git submodule update --init --recursive $_FBT_CLONE_FLAGS;
 fi
 
-$SCONS_EP $SCONS_DEFAULT_FLAGS "$@"
+python3 "$SCRIPT_PATH/scripts/fbt_error_state.py" check
+
+# Validate SCons configuration, dependencies, and the complete target graph
+# without executing compiler or flash actions. Compilation starts only after
+# this preflight exits successfully.
+FBT_LOG_DIR="${FBT_LOG_DIR:-$SCRIPT_PATH/.fbt-state/runs}"
+FBT_BUILD_MAX_ATTEMPTS="${FBT_BUILD_MAX_ATTEMPTS:-1}"
+case " $* " in
+    *" flash_usb_full "*) FBT_BUILD_MAX_ATTEMPTS="${FBT_FLASH_MAX_ATTEMPTS:-0}" ;;
+esac
+
+FBT_PHASE=preflight python3 "$SCRIPT_PATH/scripts/fbt_supervisor.py" \
+    --phase preflight --log-dir "$FBT_LOG_DIR" --max-attempts 1 -- \
+    $SCONS_EP $SCONS_DEFAULT_FLAGS --no-exec "$@"
+
+python3 "$SCRIPT_PATH/scripts/fbt_supervisor.py" \
+    --phase build --log-dir "$FBT_LOG_DIR" \
+    --max-attempts "$FBT_BUILD_MAX_ATTEMPTS" -- \
+    $SCONS_EP $SCONS_DEFAULT_FLAGS "$@"

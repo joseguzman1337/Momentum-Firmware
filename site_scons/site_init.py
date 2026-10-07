@@ -6,6 +6,7 @@ import atexit
 from ansi.color import fg, fx
 
 sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
+from fbt_error_state import BuildErrorState
 
 
 def bf_to_str(bf):
@@ -28,6 +29,8 @@ def display_build_status():
     """Display the build status.  Called by atexit.
     Here you could do all kinds of complicated things."""
     bf = GetBuildFailures()
+    phase = os.environ.get("FBT_PHASE", "build")
+    error_state = BuildErrorState(os.getcwd())
     if bf:
         # bf is normally a list of build failures; if an element is None,
         # it's because of a target that scons doesn't know anything about.
@@ -35,6 +38,11 @@ def display_build_status():
         print()
         print(fg.brightred(fx.bold("*" * 10 + " FBT ERRORS " + "*" * 10)))
         print(failures_message)
+        error_state.record_failure(
+            [bf_to_str(x) for x in bf if x is not None], phase=phase
+        )
+    else:
+        error_state.record_success(phase=phase)
 
 
 atexit.register(display_build_status)

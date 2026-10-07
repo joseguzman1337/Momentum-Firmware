@@ -252,6 +252,19 @@ class Main(App):
                     f"update --plain install {flipper_update_path}/{manifest_name}\r"
                 )
                 result, result_str = self._read_line(storage, "update install")
+                if result.strip().startswith(b"Commands:"):
+                    # Official 1.4.x firmware predates the --plain flag. Drain
+                    # its help text, then retry using the compatible syntax.
+                    storage.read.until(storage.CLI_PROMPT)
+                    self.logger.warning(
+                        "Device CLI does not support update --plain; retrying legacy syntax"
+                    )
+                    storage.send_and_wait_eol(
+                        f"update install {flipper_update_path}/{manifest_name}\r"
+                    )
+                    result, result_str = self._read_line(
+                        storage, "legacy update install"
+                    )
                 if b"Verifying" not in result:
                     self._log_err(f"Unexpected response: {result_str}")
                     self.logger.error(f"Unexpected response: {result_str}")

@@ -152,10 +152,10 @@ cd "$PROJECT_ROOT"
 if [ "$SKIP_FLIPPER_FLASH" -eq 1 ]; then
     echo -e "${YELLOW}[!] Skipping firmware flash (requested)${NC}"
 else
-    if [ "$AUTO_FORMAT_EXT" -eq 1 ]; then
-        if ! timeout 20s python3 "$SCRIPT_DIR/ensure_flipper_ext.py" --wait --timeout 30 --format-if-missing; then
-            echo -e "${YELLOW}[!] /ext check failed; continuing anyway${NC}"
-        fi
+    # Reuse the existing formatted/mounted SD card. Never auto-format it.
+    if ! timeout 40s python3 "$SCRIPT_DIR/ensure_flipper_ext.py" --wait --timeout 30; then
+        echo -e "${RED}[!] /ext is unavailable; refusing to flash or format the SD card${NC}"
+        exit 1
     fi
     maybe_stop_modemmanager
     if [ -x "$PROJECT_ROOT/toolchain/x86_64-linux/bin/python3" ]; then

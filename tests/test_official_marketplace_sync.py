@@ -2,9 +2,12 @@ import hashlib
 import base64
 import json
 import tempfile
+import threading
+import time
 import unittest
+import urllib.error
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from scripts import official_marketplace_sync as marketplace
 from scripts.fbt_tools.fbt_resources import _blank_png
@@ -125,3 +128,87 @@ class OfficialMarketplaceSyncTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "changed during inventory"):
                 marketplace.sync(Path(directory) / "apps", target="f7", api="87.6")
             self.assertFalse((Path(directory) / "apps").exists())
+
+    def test_sync_emits_realtime_progress_for_each_app(self):
+        payload = b"\x7fELFtest"
+        events = []
+        with tempfile.TemporaryDirectory() as directory, patch.object(
+            marketplace, "catalog_apps", return_value=[self.app(payload)]
+        ), patch.object(marketplace, "category_map", return_value={"cat-id": "Tools"}), patch.object(
+            marketplace, "fetch", side_effect=self.fetcher(payload)
+        ):
+            marketplace.sync(
+                Path(directory),
+                target="f7",
+                api="87.6",
+                event_sink=events.append,
+            )
+
+        self.assertEqual(events[0]["event"], "inventory_verified")
+        self.assertEqual(events[1]["event"], "app_start")
+        self.assertEqual(events[1]["alias"], "demo")
+        self.assertEqual(events[1]["index"], 1)
+        self.assertEqual(events[1]["total"], 1)
+        self.assertEqual(events[2]["event"], "app_verified")
+        self.assertIn("duration_ms", events[2])
+
+    def test_fetch_retries_transient_network_failure(self):
+        response = MagicMock()
+        response.geturl.return_value = "https://catalog.flipperzero.one/api/v0/category"
+        response.read.return_value = b"[]"
+        response.__enter__.return_value = response
+        events = []
+        with patch.object(
+            marketplace.urllib.request,
+            "urlopen",
+            side_effect=[urllib.error.URLError("temporary"), response],
+        ), patch.object(marketplace.time, "sleep"):
+            payload = marketplace.fetch(
+                "https://catalog.flipperzero.one/api/v0/category",
+                max_attempts=2,
+                retry_delay=0,
+                event_sink=events.append,
+            )
+
+        self.assertEqual(payload, b"[]")
+        self.assertEqual(events[0]["event"], "fetch_retry")
+        self.assertEqual(events[0]["attempt"], 1)
+
+    def test_sync_downloads_apps_concurrently(self):
+        apps = []
+        for index in range(4):
+            app = self.app()
+            app["alias"] = f"demo_{index}"
+            app["_id"] = f"{index + 1:024x}"
+            app["current_version"]["_id"] = f"{index + 11:024x}"
+            apps.append(app)
+        lock = threading.Lock()
+        active = 0
+        peak = 0
+
+        def compatible(app, *, target, api):
+            nonlocal active, peak
+            with lock:
+                active += 1
+                peak = max(peak, active)
+            time.sleep(0.03)
+            with lock:
+                active -= 1
+            alias = app["alias"]
+            return b"\x7fELF", {"alias": alias, "sha256": "test"}
+
+        with tempfile.TemporaryDirectory() as directory, patch.object(
+            marketplace, "catalog_apps", return_value=apps
+        ), patch.object(marketplace, "category_map", return_value={"cat-id": "Tools"}), patch.object(
+            marketplace, "compatible_fap", side_effect=compatible
+        ):
+            report = marketplace.sync(
+                Path(directory),
+                target="f7",
+                api="87.6",
+                workers=2,
+                event_sink=lambda _event: None,
+            )
+
+        self.assertTrue(report["complete"])
+        self.assertGreaterEqual(peak, 2)

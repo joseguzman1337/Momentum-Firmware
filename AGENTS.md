@@ -1,5 +1,17 @@
 # AGENTS.md - Project Policy for AI Collaboration
 
+## System-wide Search Policy
+
+- Use `tgrep` as the first tool for every filesystem text or file search.
+- Fall back to `rg`, `find`, or `grep` only when `tgrep` cannot express the operation or is unavailable, and state the fallback reason.
+- Apply this policy to all repositories and operational work on this node.
+
+## Flipper SD-card Policy
+
+- If the SD card is already formatted and mounted before flashing, reuse it as-is throughout the flash/update process.
+- Never format, erase, repartition, or replace an existing mounted SD card automatically.
+- Treat an unavailable `/ext` as a blocking condition: log it, wait for the same card, and resume the existing transfer/update.
+
 ## Absolute Policy Statement
 
 This repository operates under an **open, AI-inclusive policy**: **AI-generated contributions are explicitly welcomed and encouraged.**

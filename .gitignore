@@ -7,6 +7,9 @@
 # LSP
 .cache
 compile_commands.json
+# Local tgrep search index
+/.tgrep/
+/.fbt-state/
 # JetBrains IDEs
 .idea/
 # Sublime Text

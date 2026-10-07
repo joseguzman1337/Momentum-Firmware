@@ -15,26 +15,65 @@ import os
 import re
 import shutil
 import tempfile
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Callable
 
 
 CATALOG_ORIGIN = "https://catalog.flipperzero.one"
 API_ROOT = f"{CATALOG_ORIGIN}/api/v0"
 USER_AGENT = "Momentum-Firmware-Official-Marketplace-Sync/1.0"
+EventSink = Callable[[dict], None]
 
 
-def fetch(url: str, *, timeout: int = 30) -> bytes:
+def emit_event(event: dict) -> None:
+    payload = {
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+        "component": "official_marketplace",
+        **event,
+    }
+    print(json.dumps(payload, sort_keys=True), flush=True)
+
+
+def fetch(
+    url: str,
+    *,
+    timeout: int = 30,
+    max_attempts: int = 3,
+    retry_delay: float = 1,
+    event_sink: EventSink = emit_event,
+) -> bytes:
     parsed = urllib.parse.urlsplit(url)
     if parsed.scheme != "https" or parsed.hostname != "catalog.flipperzero.one" or parsed.username or parsed.password or parsed.port:
         raise RuntimeError(f"refusing non-official catalog URL: {url}")
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        final = urllib.parse.urlsplit(response.geturl())
-        if final.scheme != "https" or final.hostname != "catalog.flipperzero.one" or final.username or final.password or final.port:
-            raise RuntimeError(f"catalog redirected outside official origin: {response.geturl()}")
-        return response.read()
+    for attempt in range(1, max_attempts + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                final = urllib.parse.urlsplit(response.geturl())
+                if final.scheme != "https" or final.hostname != "catalog.flipperzero.one" or final.username or final.password or final.port:
+                    raise RuntimeError(f"catalog redirected outside official origin: {response.geturl()}")
+                return response.read()
+        except (TimeoutError, urllib.error.URLError, OSError) as error:
+            if attempt >= max_attempts:
+                raise
+            event_sink(
+                {
+                    "event": "fetch_retry",
+                    "endpoint": parsed.path,
+                    "attempt": attempt,
+                    "max_attempts": max_attempts,
+                    "error_type": type(error).__name__,
+                    "error": str(error),
+                }
+            )
+            time.sleep(retry_delay * attempt)
+    raise RuntimeError("unreachable marketplace fetch state")
 
 
 def fetch_json(url: str) -> object:
@@ -146,6 +185,8 @@ def sync(
     api: str,
     base: Path | None = None,
     limit: int | None = None,
+    event_sink: EventSink = emit_event,
+    workers: int | None = None,
 ) -> dict:
     apps = catalog_apps()
     confirmation = catalog_apps()
@@ -158,6 +199,19 @@ def sync(
     if limit is not None:
         apps = apps[:limit]
     categories = category_map()
+    if workers is None:
+        workers = int(os.environ.get("FBT_MARKETPLACE_WORKERS", "8"))
+    workers = max(1, min(workers, 32))
+    event_sink(
+        {
+            "event": "inventory_verified",
+            "apps": len(apps),
+            "categories": len(categories),
+            "target": target,
+            "api": api,
+            "workers": workers,
+        }
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix=f".{destination.name}.", dir=destination.parent))
     if base is not None:
@@ -168,24 +222,59 @@ def sync(
     receipts: list[dict] = []
     failures: list[dict] = []
     output_paths: set[str] = set()
-    for app in apps:
-        alias = app.get("alias", "<unknown>")
-        try:
-            category = categories[app["category_id"]]
-            payload, receipt = compatible_fap(app, target=target, api=api)
-            relative = safe_relative_path(category, alias)
-            normalized = relative.as_posix().casefold()
-            if normalized in output_paths:
-                raise RuntimeError(f"duplicate catalog output path: {relative}")
-            output_paths.add(normalized)
-            candidate = (stage / relative).resolve()
-            if not candidate.is_relative_to(stage.resolve()):
-                raise RuntimeError(f"catalog path escapes staging tree: {relative}")
-            atomic_write(candidate, payload)
-            receipt["path"] = relative.as_posix()
-            receipts.append(receipt)
-        except Exception as error:  # keep a complete fail-closed audit
-            failures.append({"alias": alias, "error": str(error)})
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="marketplace") as pool:
+        pending = {}
+        for index, app in enumerate(apps, start=1):
+            alias = app.get("alias", "<unknown>")
+            started = time.monotonic()
+            event_sink(
+                {"event": "app_start", "alias": alias, "index": index, "total": len(apps)}
+            )
+            future = pool.submit(compatible_fap, app, target=target, api=api)
+            pending[future] = (index, app, alias, started)
+
+        for future in as_completed(pending):
+            index, app, alias, started = pending[future]
+            try:
+                payload, receipt = future.result()
+                category = categories[app["category_id"]]
+                relative = safe_relative_path(category, alias)
+                normalized = relative.as_posix().casefold()
+                if normalized in output_paths:
+                    raise RuntimeError(f"duplicate catalog output path: {relative}")
+                output_paths.add(normalized)
+                candidate = (stage / relative).resolve()
+                if not candidate.is_relative_to(stage.resolve()):
+                    raise RuntimeError(f"catalog path escapes staging tree: {relative}")
+                atomic_write(candidate, payload)
+                receipt["path"] = relative.as_posix()
+                receipts.append(receipt)
+                event_sink(
+                    {
+                        "event": "app_verified",
+                        "alias": alias,
+                        "index": index,
+                        "total": len(apps),
+                        "duration_ms": round((time.monotonic() - started) * 1000),
+                        "bytes": len(payload),
+                    }
+                )
+            except Exception as error:  # keep a complete fail-closed audit
+                failures.append({"alias": alias, "error": str(error)})
+                event_sink(
+                    {
+                        "event": "app_failed",
+                        "alias": alias,
+                        "index": index,
+                        "total": len(apps),
+                        "duration_ms": round((time.monotonic() - started) * 1000),
+                        "error_type": type(error).__name__,
+                        "error": str(error),
+                    }
+                )
+
+    receipts.sort(key=lambda item: item["alias"])
+    failures.sort(key=lambda item: item["alias"])
 
     report = {
         "schema": 1,
@@ -218,6 +307,15 @@ def sync(
         raise
     if backup.exists():
         shutil.rmtree(backup)
+    event_sink(
+        {
+            "event": "sync_complete",
+            "catalog_apps": len(apps),
+            "verified_apps": len(receipts),
+            "target": target,
+            "api": api,
+        }
+    )
     return report
 
 
