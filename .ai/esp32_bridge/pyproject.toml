@@ -16,7 +16,7 @@ esp32-mcp-bridge = "mcp_server:main"
 
 [dependency-groups]
 dev = [
-  "pytest==9.1.1",
+  "pytest==9.2.0",
 ]
 
 [tool.setuptools]
